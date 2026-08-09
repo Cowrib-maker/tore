@@ -3,6 +3,7 @@ import type { UserRole } from "@/domain/enums";
 
 export interface UserRepository {
   findById(id: string): Promise<User | null>;
+  findByIds(ids: string[]): Promise<User[]>;
   findByEmail(email: string): Promise<User | null>;
   findByEmailWithPasswordHash(
     email: string,
@@ -11,4 +12,5 @@ export interface UserRepository {
   emailExists(email: string): Promise<boolean>;
   isActiveUser(id: string): Promise<boolean>;
   findByRole(role: UserRole): Promise<User[]>;
+  markEmailVerified(userId: string, verifiedAt?: Date): Promise<User>;
 }

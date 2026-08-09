@@ -1,7 +1,13 @@
 import { z } from "zod";
 
+const emailSchema = z
+  .string()
+  .trim()
+  .email("Invalid email address")
+  .transform((value) => value.toLowerCase());
+
 export const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: emailSchema,
   password: z.string().min(1, "Password is required"),
 });
 
@@ -15,12 +21,12 @@ const passwordSchema = z
 
 const baseRegisterSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
+  email: emailSchema,
   password: passwordSchema,
   acceptTerms: z
     .boolean()
     .refine((value) => value === true, "You must accept the terms and policies"),
-  preferredLanguage: z.enum(["mn", "en"]).default("mn"),
+  preferredLanguage: z.enum(["mn", "en", "zh", "ko"]).default("mn"),
 });
 
 export const registerClientSchema = baseRegisterSchema;
@@ -31,7 +37,13 @@ export type RegisterClientInput = z.infer<typeof registerClientSchema>;
 export type RegisterLawyerInput = z.infer<typeof registerLawyerSchema>;
 
 export const forgotPasswordSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: emailSchema,
 });
 
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+
+export const resendVerificationSchema = z.object({
+  email: emailSchema,
+});
+
+export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>;

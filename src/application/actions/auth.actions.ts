@@ -3,14 +3,17 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { issueVerificationEmailAfterRegister, getEmailVerificationDeps } from "@/application/services/issue-verification-email";
 import { registerClientUseCase } from "@/application/use-cases/auth/register-client";
 import { registerLawyerUseCase } from "@/application/use-cases/auth/register-lawyer";
+import { resendEmailVerificationUseCase } from "@/application/use-cases/auth/email-verification";
 import {
   loginSchema,
   registerClientSchema,
   registerLawyerSchema,
+  resendVerificationSchema,
 } from "@/application/validators/auth.schema";
-import { DomainError } from "@/domain/errors/domain-error";
+import { mapActionError } from "@/application/common/map-action-error";
 import { UserRole, UserStatus } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
 import {
@@ -21,6 +24,7 @@ import {
 import {
   LOGIN_RATE_LIMIT,
   REGISTER_RATE_LIMIT,
+  RESEND_VERIFICATION_RATE_LIMIT,
   consumeRateLimit,
 } from "@/infrastructure/security/rate-limiter";
 import { signIn, signOut, auth } from "@/lib/auth";
@@ -28,14 +32,11 @@ import { signIn, signOut, auth } from "@/lib/auth";
 export type ActionState = {
   error?: string;
   success?: boolean;
+  message?: string;
 };
 
 function mapError(error: unknown): ActionState {
-  if (error instanceof DomainError) {
-    return { error: error.message };
-  }
-  console.error(error);
-  return { error: "An unexpected error occurred" };
+  return mapActionError(error);
 }
 
 async function getClientIp(): Promise<string | undefined> {
@@ -70,7 +71,7 @@ export async function registerClientAction(
   formData: FormData,
 ): Promise<ActionState> {
   const ipAddress = await getClientIp();
-  const rate = consumeRateLimit(
+  const rate = await consumeRateLimit(
     `register:${ipAddress ?? "unknown"}`,
     REGISTER_RATE_LIMIT.limit,
     REGISTER_RATE_LIMIT.windowMs,
@@ -97,6 +98,8 @@ export async function registerClientAction(
     return mapError(error);
   }
 
+  await issueVerificationEmailAfterRegister(parsed.data.email);
+
   const signInResult = await signIn("credentials", {
     email: parsed.data.email,
     password: parsed.data.password,
@@ -115,7 +118,7 @@ export async function registerLawyerAction(
   formData: FormData,
 ): Promise<ActionState> {
   const ipAddress = await getClientIp();
-  const rate = consumeRateLimit(
+  const rate = await consumeRateLimit(
     `register:${ipAddress ?? "unknown"}`,
     REGISTER_RATE_LIMIT.limit,
     REGISTER_RATE_LIMIT.windowMs,
@@ -141,6 +144,8 @@ export async function registerLawyerAction(
   } catch (error) {
     return mapError(error);
   }
+
+  await issueVerificationEmailAfterRegister(parsed.data.email);
 
   const signInResult = await signIn("credentials", {
     email: parsed.data.email,
@@ -169,8 +174,8 @@ export async function loginAction(
   }
 
   const ipAddress = await getClientIp();
-  const rate = consumeRateLimit(
-    `login:${ipAddress ?? "unknown"}:${parsed.data.email.toLowerCase()}`,
+  const rate = await consumeRateLimit(
+    `login:${ipAddress ?? "unknown"}:${parsed.data.email}`,
     LOGIN_RATE_LIMIT.limit,
     LOGIN_RATE_LIMIT.windowMs,
   );
@@ -207,6 +212,50 @@ export async function loginAction(
   }
 
   redirect("/");
+}
+
+export async function resendVerificationEmailAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const parsed = resendVerificationSchema.safeParse({
+    email: formData.get("email"),
+  });
+
+  if (!parsed.success) {
+    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
+  }
+
+  const ipAddress = await getClientIp();
+  const rate = await consumeRateLimit(
+    `resend-verify:${ipAddress ?? "unknown"}:${parsed.data.email}`,
+    RESEND_VERIFICATION_RATE_LIMIT.limit,
+    RESEND_VERIFICATION_RATE_LIMIT.windowMs,
+  );
+  if (!rate.ok) {
+    return tooManyRequests(rate.retryAfterSeconds);
+  }
+
+  try {
+    const result = await resendEmailVerificationUseCase(
+      parsed.data.email,
+      getEmailVerificationDeps(),
+    );
+    if (result.alreadyVerified) {
+      return {
+        success: true,
+        message: "This email is already verified. You can sign in.",
+      };
+    }
+    return {
+      success: true,
+      message:
+        "If an unverified account exists for that email, a verification link has been sent.",
+    };
+  } catch (error) {
+    console.error("[email:verification] resend action failed", error);
+    return mapError(error);
+  }
 }
 
 export async function logoutAction() {

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="TORE">
+  <title>TORE</title>
+  <!-- Geometric T monogram for light surfaces -->
+  <rect width="64" height="64" rx="14" fill="#F7FAF8" stroke="#0F3D33" stroke-width="1.5"/>
+  <path d="M16 18h32v7H16V18z" fill="#0F3D33"/>
+  <path d="M28.5 25h7v21h-7V25z" fill="#0F3D33"/>
+  <circle cx="16" cy="21.5" r="2.4" fill="#C8A45D"/>
+  <circle cx="48" cy="21.5" r="2.4" fill="#C8A45D"/>
+  <circle cx="32" cy="48" r="2.4" fill="#C8A45D"/>
+</svg>

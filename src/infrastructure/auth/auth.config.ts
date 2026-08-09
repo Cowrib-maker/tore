@@ -22,6 +22,18 @@ export const authConfig = {
           return null;
         }
 
+        const { consumeRateLimit, CREDENTIALS_AUTH_RATE_LIMIT } = await import(
+          "@/infrastructure/security/rate-limiter"
+        );
+        const rate = await consumeRateLimit(
+          `credentials:${parsed.data.email.toLowerCase()}`,
+          CREDENTIALS_AUTH_RATE_LIMIT.limit,
+          CREDENTIALS_AUTH_RATE_LIMIT.windowMs,
+        );
+        if (!rate.ok) {
+          return null;
+        }
+
         const { verifyCredentials } = await import(
           "@/application/use-cases/auth/verify-credentials"
         );

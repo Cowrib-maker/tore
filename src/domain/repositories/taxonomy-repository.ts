@@ -21,7 +21,13 @@ export interface LanguageRepository {
 
 export interface LawyerTaxonomyRepository {
   getPracticeAreas(lawyerProfileId: string): Promise<LawyerPracticeAreaLink[]>;
+  getPracticeAreasForProfiles(
+    lawyerProfileIds: string[],
+  ): Promise<LawyerPracticeAreaLink[]>;
   getLanguages(lawyerProfileId: string): Promise<LawyerLanguageLink[]>;
+  getLanguagesForProfiles(
+    lawyerProfileIds: string[],
+  ): Promise<LawyerLanguageLink[]>;
   setPracticeAreas(input: SetLawyerPracticeAreasInput): Promise<void>;
   setLanguages(input: SetLawyerLanguagesInput): Promise<void>;
 }

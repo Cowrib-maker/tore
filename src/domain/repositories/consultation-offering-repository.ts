@@ -8,6 +8,9 @@ export interface ConsultationOfferingRepository {
   findById(id: string): Promise<ConsultationOffering | null>;
   findByLawyerProfileId(lawyerProfileId: string): Promise<ConsultationOffering[]>;
   findActiveByLawyerProfileId(lawyerProfileId: string): Promise<ConsultationOffering[]>;
+  findActiveByLawyerProfileIds(
+    lawyerProfileIds: string[],
+  ): Promise<ConsultationOffering[]>;
   create(input: CreateConsultationOfferingInput): Promise<ConsultationOffering>;
   update(
     id: string,

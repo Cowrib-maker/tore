@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { UserRole } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
+import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 import { cn } from "@/lib/utils";
 
 export default async function ClientDashboardPage() {
@@ -34,17 +35,23 @@ export default async function ClientDashboardPage() {
     redirect("/login");
   }
 
-  const nav = [
-    { href: "/client/dashboard", label: "Dashboard" },
-    { href: "/client/profile", label: "Profile" },
-  ];
+  const i18n = await getShellI18n("client");
+  const m = i18n.dict.marketplace;
+  const nav = i18n.nav;
+  const cd = m.clientDashboard;
 
   if (data.status === "profile_missing") {
     return (
-      <DashboardShell user={session.user} title="Client dashboard" nav={nav}>
+      <DashboardShell
+        user={session.user}
+        title={i18n.title}
+        nav={nav}
+        {...i18n.shellProps}
+      >
         <ProfileMissingState
           dashboardHref="/client/dashboard"
           roleLabel="client"
+          copy={m.profileMissing}
         />
       </DashboardShell>
     );
@@ -56,20 +63,26 @@ export default async function ClientDashboardPage() {
   );
 
   return (
-    <DashboardShell user={session.user} title="Client dashboard" nav={nav}>
-      <div className="grid gap-4 sm:grid-cols-2">
+    <DashboardShell
+      user={session.user}
+      title={i18n.title}
+      nav={nav}
+      {...i18n.shellProps}
+    >
+      <p className="mb-5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+        {cd.intro}
+      </p>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between gap-2">
-              <CardTitle>Profile</CardTitle>
+              <CardTitle>{cd.profile}</CardTitle>
               <Badge variant={profileFilled ? "default" : "outline"}>
-                {profileFilled ? "Updated" : "Incomplete"}
+                {profileFilled ? m.common.complete : m.common.incomplete}
               </Badge>
             </div>
             <CardDescription>
-              {profileFilled
-                ? "Your contact details are on file."
-                : "Add a phone number or company name in profile settings."}
+              {profileFilled ? cd.profileComplete : cd.profileIncomplete}
             </CardDescription>
           </CardHeader>
           <CardFooter>
@@ -77,35 +90,47 @@ export default async function ClientDashboardPage() {
               href="/client/profile"
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
             >
-              Edit profile
+              {m.common.editProfile}
+            </Link>
+          </CardFooter>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>{cd.consultations}</CardTitle>
+            <CardDescription>{cd.consultationsHelp}</CardDescription>
+          </CardHeader>
+          <CardFooter className="flex flex-wrap gap-2">
+            <Link
+              href="/lawyers"
+              className={cn(
+                buttonVariants({ size: "sm" }),
+                "bg-[#0F3D33] text-white hover:bg-[#0F3D33]/90",
+              )}
+            >
+              {m.common.browseLawyers}
+            </Link>
+            <Link
+              href="/client/bookings"
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+            >
+              {m.common.viewBookings}
             </Link>
           </CardFooter>
         </Card>
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between gap-2">
-              <CardTitle>Email verification</CardTitle>
+              <CardTitle>{cd.emailTitle}</CardTitle>
               <Badge variant={emailVerified ? "default" : "secondary"}>
-                {emailVerified ? "Verified" : "Pending"}
+                {emailVerified ? m.common.confirmed : m.common.pending}
               </Badge>
             </div>
             <CardDescription>
-              {emailVerified
-                ? "Your email is verified."
-                : "Email verification opens in the next milestone. Marketplace booking will require a verified email."}
+              {emailVerified ? cd.emailConfirmed : cd.emailPending}
             </CardDescription>
           </CardHeader>
         </Card>
       </div>
-      <Card className="mt-4">
-        <CardHeader>
-          <CardTitle>Welcome to TORE</CardTitle>
-          <CardDescription>
-            Your client account is ready. Browse lawyers and book consultations —
-            full discovery launches in Sprint 5.
-          </CardDescription>
-        </CardHeader>
-      </Card>
     </DashboardShell>
   );
 }

@@ -43,6 +43,8 @@ export interface LawyerDiscoveryFilters {
   practiceAreaId?: string;
   languageId?: string;
   minRating?: number;
+  city?: string;
+  query?: string;
   limit?: number;
   offset?: number;
 }

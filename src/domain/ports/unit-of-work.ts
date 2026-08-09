@@ -1,6 +1,8 @@
 import type { AuditLogRepository } from "@/domain/repositories/audit-log-repository";
+import type { NotificationRepository } from "@/domain/repositories/trust-repository";
 import type {
   ClientProfileRepository,
+  LawyerCredentialRepository,
   LawyerProfileRepository,
 } from "@/domain/repositories/profile-repository";
 import type { TermsAcceptanceRepository } from "@/domain/repositories/terms-acceptance-repository";
@@ -14,8 +16,10 @@ export type UnitOfWorkRepositories = {
   userRepository: UserRepository;
   clientProfileRepository: ClientProfileRepository;
   lawyerProfileRepository: LawyerProfileRepository;
+  lawyerCredentialRepository: LawyerCredentialRepository;
   termsAcceptanceRepository: TermsAcceptanceRepository;
   auditLogRepository: AuditLogRepository;
+  notificationRepository: NotificationRepository;
 };
 
 export interface UnitOfWork {

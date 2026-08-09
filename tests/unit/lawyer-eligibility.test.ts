@@ -4,6 +4,7 @@ import type { LawyerProfile } from "@/domain/entities/profile";
 import { LawyerVerificationStatus } from "@/domain/enums";
 import {
   canClientBookLawyer,
+  canSubmitCredentials,
   isLawyerPubliclyListed,
   isLawyerVerified,
 } from "@/domain/services/lawyer-eligibility";
@@ -19,6 +20,8 @@ function profile(
     headline: null,
     bio: null,
     yearsOfExperience: null,
+    city: null,
+    education: null,
     verificationStatus: LawyerVerificationStatus.APPROVED,
     verifiedAt: now,
     isListed: true,
@@ -54,5 +57,12 @@ describe("lawyer listing eligibility", () => {
         true,
       ),
     ).toBe(false);
+  });
+
+  it("allows credential submission only while pending or rejected", () => {
+    expect(canSubmitCredentials(profile({ verificationStatus: LawyerVerificationStatus.PENDING }))).toBe(true);
+    expect(canSubmitCredentials(profile({ verificationStatus: LawyerVerificationStatus.REJECTED }))).toBe(true);
+    expect(canSubmitCredentials(profile({ verificationStatus: LawyerVerificationStatus.APPROVED }))).toBe(false);
+    expect(canSubmitCredentials(profile({ verificationStatus: LawyerVerificationStatus.SUSPENDED }))).toBe(false);
   });
 });

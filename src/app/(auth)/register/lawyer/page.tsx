@@ -1,9 +1,14 @@
+import { AuthPageChrome } from "@/components/auth/auth-page-chrome";
 import { RegisterLawyerForm } from "@/components/auth/register-lawyer-form";
+import { getDictionary } from "@/i18n/get-dictionary";
+import { getLocale } from "@/i18n/get-locale";
 
-export default function RegisterLawyerPage() {
+export default async function RegisterLawyerPage() {
+  const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
+
   return (
-    <div className="flex min-h-svh items-center justify-center bg-muted/30 p-6">
-      <RegisterLawyerForm />
-    </div>
+    <AuthPageChrome locale={locale} dict={dict}>
+      <RegisterLawyerForm copy={dict.auth} locale={locale} />
+    </AuthPageChrome>
   );
 }

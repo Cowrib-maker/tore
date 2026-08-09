@@ -18,10 +18,19 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { localeMeta, type Locale } from "@/i18n/config";
+import { localeMenuOrder } from "@/i18n/client-storage";
+import type { Dictionary } from "@/i18n/types";
 
 const initialState: ActionState = {};
 
-export function RegisterClientForm() {
+export function RegisterClientForm({
+  copy,
+  locale,
+}: {
+  copy: Dictionary["auth"];
+  locale: Locale;
+}) {
   const [state, formAction, pending] = useActionState(
     registerClientAction,
     initialState,
@@ -30,56 +39,81 @@ export function RegisterClientForm() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>Create a client account</CardTitle>
-        <CardDescription>
-          Find and book licensed lawyers for your legal needs in Mongolia.
-        </CardDescription>
+        <CardTitle>{copy.clientTitle}</CardTitle>
+        <CardDescription>{copy.clientDescription}</CardDescription>
       </CardHeader>
       <form action={formAction}>
         <CardContent className="space-y-4">
           {state.error && (
-            <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            <div
+              id="register-client-form-error"
+              role="alert"
+              aria-live="assertive"
+              className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
+            >
               {state.error}
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="name">Full name</Label>
-            <Input id="name" name="name" placeholder="Your name" required />
+            <Label htmlFor="name">{copy.fullName}</Label>
+            <Input
+              id="name"
+              name="name"
+              placeholder={copy.namePlaceholder}
+              required
+              aria-invalid={Boolean(state.error)}
+              aria-describedby={
+                state.error ? "register-client-form-error" : undefined
+              }
+            />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{copy.email}</Label>
             <Input
               id="email"
               name="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder={copy.emailPlaceholder}
               required
               autoComplete="email"
+              aria-invalid={Boolean(state.error)}
+              aria-describedby={
+                state.error ? "register-client-form-error" : undefined
+              }
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{copy.password}</Label>
             <Input
               id="password"
               name="password"
               type="password"
               required
               autoComplete="new-password"
+              aria-invalid={Boolean(state.error)}
+              aria-describedby={
+                state.error ? "register-client-form-error" : undefined
+              }
             />
-            <p className="text-xs text-muted-foreground">
-              Min 8 characters, one uppercase letter, one number.
-            </p>
+            <p className="text-xs text-muted-foreground">{copy.passwordHint}</p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="preferredLanguage">Preferred language</Label>
+            <Label htmlFor="preferredLanguage">{copy.preferredLanguage}</Label>
             <select
               id="preferredLanguage"
               name="preferredLanguage"
-              defaultValue="mn"
+              defaultValue={locale}
               className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs"
+              aria-invalid={Boolean(state.error)}
+              aria-describedby={
+                state.error ? "register-client-form-error" : undefined
+              }
             >
-              <option value="mn">Mongolian</option>
-              <option value="en">English</option>
+              {localeMenuOrder.map((code) => (
+                <option key={code} value={code}>
+                  {localeMeta[code].nativeLabel}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex items-start gap-2">
@@ -91,24 +125,30 @@ export function RegisterClientForm() {
               className="mt-1 size-4 rounded border-input"
             />
             <Label htmlFor="acceptTerms" className="text-sm font-normal leading-snug">
-              I accept the Terms of Service, Privacy Policy, and Marketplace Disclaimer.
+              {copy.acceptTerms}
             </Label>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Creating account..." : "Create client account"}
+            {pending ? copy.creating : copy.createClient}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Are you a lawyer?{" "}
-            <Link href="/register/lawyer" className="text-primary underline-offset-4 hover:underline">
-              Register as lawyer
+            {copy.areYouLawyer}{" "}
+            <Link
+              href="/register/lawyer"
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              {copy.registerAsLawyer}
             </Link>
           </p>
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link href="/login" className="text-primary underline-offset-4 hover:underline">
-              Sign in
+            {copy.alreadyHave}{" "}
+            <Link
+              href="/login"
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              {copy.signInSubmit}
             </Link>
           </p>
         </CardFooter>

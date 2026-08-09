@@ -21,6 +21,15 @@ export class PrismaUserRepository implements UserRepository {
     return record ? mapUser(record) : null;
   }
 
+  async findByIds(ids: string[]): Promise<User[]> {
+    if (ids.length === 0) return [];
+    const records = await this.db.user.findMany({
+      where: { id: { in: ids }, deletedAt: null },
+      select: userSelect,
+    });
+    return records.map(mapUser);
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     const record = await this.db.user.findFirst({
       where: { email, deletedAt: null },
@@ -96,6 +105,18 @@ export class PrismaUserRepository implements UserRepository {
       orderBy: { createdAt: "desc" },
     });
     return records.map(mapUser);
+  }
+
+  async markEmailVerified(
+    userId: string,
+    verifiedAt: Date = new Date(),
+  ): Promise<User> {
+    const record = await this.db.user.update({
+      where: { id: userId },
+      data: { emailVerified: verifiedAt },
+      select: userSelect,
+    });
+    return mapUser(record);
   }
 }
 

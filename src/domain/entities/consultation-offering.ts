@@ -1,3 +1,5 @@
+import type { ConsultationModality } from "@/domain/enums";
+
 export interface ConsultationOffering {
   id: string;
   lawyerProfileId: string;
@@ -6,6 +8,7 @@ export interface ConsultationOffering {
   descriptionMn: string | null;
   durationMinutes: number;
   priceMnt: number;
+  modality: ConsultationModality;
   isActive: boolean;
   deletedAt: Date | null;
   createdAt: Date;
@@ -19,6 +22,7 @@ export interface CreateConsultationOfferingInput {
   descriptionMn?: string;
   durationMinutes: number;
   priceMnt: number;
+  modality: ConsultationModality;
 }
 
 export interface UpdateConsultationOfferingInput {
@@ -27,5 +31,6 @@ export interface UpdateConsultationOfferingInput {
   descriptionMn?: string | null;
   durationMinutes?: number;
   priceMnt?: number;
+  modality?: ConsultationModality;
   isActive?: boolean;
 }

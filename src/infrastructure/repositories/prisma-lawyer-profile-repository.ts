@@ -93,6 +93,8 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
         headline: input.headline,
         bio: input.bio,
         yearsOfExperience: input.yearsOfExperience,
+        city: input.city,
+        education: input.education,
         timezone: input.timezone,
         isListed: input.isListed,
       },
@@ -151,6 +153,31 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
         },
         ...(filters?.minRating != null
           ? { averageRating: { gte: filters.minRating } }
+          : {}),
+        ...(filters?.city
+          ? {
+              city: {
+                contains: filters.city,
+                mode: "insensitive" as const,
+              },
+            }
+          : {}),
+        ...(filters?.query
+          ? {
+              OR: [
+                { headline: { contains: filters.query, mode: "insensitive" as const } },
+                { bio: { contains: filters.query, mode: "insensitive" as const } },
+                { slug: { contains: filters.query, mode: "insensitive" as const } },
+                {
+                  user: {
+                    name: {
+                      contains: filters.query,
+                      mode: "insensitive" as const,
+                    },
+                  },
+                },
+              ],
+            }
           : {}),
         ...(filters?.practiceAreaId
           ? {

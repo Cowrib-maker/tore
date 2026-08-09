@@ -57,6 +57,8 @@ export async function updateLawyerProfileUseCase(
     headline: input.headline,
     bio: input.bio,
     yearsOfExperience: input.yearsOfExperience,
+    city: input.city,
+    education: input.education,
     timezone: input.timezone,
     isListed: input.isListed,
   });

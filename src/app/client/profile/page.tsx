@@ -16,6 +16,8 @@ import {
 import { UserRole } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
 
+import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
+
 export default async function ClientProfilePage() {
   const session = await getSessionUser();
 
@@ -32,41 +34,54 @@ export default async function ClientProfilePage() {
     redirect("/login");
   }
 
-  const nav = [
-    { href: "/client/dashboard", label: "Dashboard" },
-    { href: "/client/profile", label: "Profile" },
-  ];
+  const i18n = await getShellI18n("client");
+  const m = i18n.dict.marketplace;
+  const nav = i18n.nav;
+  const cp = m.clientProfile;
 
   if (data.status === "profile_missing") {
     return (
-      <DashboardShell user={session.user} title="Profile settings" nav={nav}>
+      <DashboardShell
+        user={session.user}
+        title={cp.title}
+        nav={nav}
+        {...i18n.shellProps}
+      >
         <ProfileMissingState
           dashboardHref="/client/dashboard"
           roleLabel="client"
+          copy={m.profileMissing}
         />
       </DashboardShell>
     );
   }
 
   return (
-    <DashboardShell user={session.user} title="Profile settings" nav={nav}>
+    <DashboardShell
+      user={session.user}
+      title={cp.title}
+      nav={nav}
+      {...i18n.shellProps}
+    >
       <Card>
         <CardHeader>
-          <CardTitle>Your client profile</CardTitle>
+          <CardTitle>{cp.title}</CardTitle>
           <CardDescription>
-            Contact details used for bookings and account communications.{" "}
+            {cp.description}{" "}
             <Link
               href="/client/dashboard"
               className="text-primary underline-offset-4 hover:underline"
             >
-              Back to dashboard
+              {m.common.returnOverview}
             </Link>
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ClientProfileForm
-            phone={data.profile.phone}
-            companyName={data.profile.companyName}
+            key={data.profile.updatedAt.toISOString()}
+            phone={data.profile.phone ?? ""}
+            companyName={data.profile.companyName ?? ""}
+            copy={{ ...m.clientProfileForm, saving: m.common.saving }}
           />
         </CardContent>
       </Card>

@@ -15,24 +15,30 @@ import {
 import type { ClientProfile, LawyerProfile } from "@/domain/entities/profile";
 import type { User } from "@/domain/entities/user";
 import {
-  DomainError,
   ForbiddenError,
   UnauthorizedError,
 } from "@/domain/errors/domain-error";
 import { UserRole } from "@/domain/enums";
+import { mapActionError } from "@/application/common/map-action-error";
 import {
   auditLogRepository,
   clientProfileRepository,
   lawyerProfileRepository,
   userRepository,
 } from "@/infrastructure/repositories";
+import {
+  PROFILE_WRITE_RATE_LIMIT,
+  consumeRateLimit,
+} from "@/infrastructure/security/rate-limiter";
 
 function mapError(error: unknown): ActionState {
-  if (error instanceof DomainError) {
-    return { error: error.message };
-  }
-  console.error(error);
-  return { error: "An unexpected error occurred" };
+  return mapActionError(error);
+}
+
+function tooManyWrites(retryAfterSeconds: number): ActionState {
+  return {
+    error: `Too many requests. Try again in ${retryAfterSeconds} seconds.`,
+  };
 }
 
 async function getClientIp(): Promise<string | undefined> {
@@ -74,6 +80,12 @@ export async function updateClientProfileAction(
 ): Promise<ActionState> {
   try {
     const actor = await requireSessionUser(UserRole.CLIENT);
+    const rate = await consumeRateLimit(
+      `profile:write:${actor.userId}`,
+      PROFILE_WRITE_RATE_LIMIT.limit,
+      PROFILE_WRITE_RATE_LIMIT.windowMs,
+    );
+    if (!rate.ok) return tooManyWrites(rate.retryAfterSeconds);
     const parsed = updateClientProfileSchema.safeParse({
       phone: formData.get("phone") ?? "",
       companyName: formData.get("companyName") ?? "",
@@ -104,10 +116,18 @@ export async function updateLawyerProfileAction(
 ): Promise<ActionState> {
   try {
     const actor = await requireSessionUser(UserRole.LAWYER);
+    const rate = await consumeRateLimit(
+      `profile:write:${actor.userId}`,
+      PROFILE_WRITE_RATE_LIMIT.limit,
+      PROFILE_WRITE_RATE_LIMIT.windowMs,
+    );
+    if (!rate.ok) return tooManyWrites(rate.retryAfterSeconds);
     const parsed = updateLawyerProfileSchema.safeParse({
       headline: formData.get("headline") ?? "",
       bio: formData.get("bio") ?? "",
       yearsOfExperience: formData.get("yearsOfExperience") ?? "",
+      city: formData.get("city") ?? "",
+      education: formData.get("education") ?? "",
       timezone: formData.get("timezone") ?? "Asia/Ulaanbaatar",
       isListed: formData.get("isListed") === "on",
     });

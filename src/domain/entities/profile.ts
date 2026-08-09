@@ -31,6 +31,8 @@ export interface LawyerProfile {
   headline: string | null;
   bio: string | null;
   yearsOfExperience: number | null;
+  city: string | null;
+  education: string | null;
   verificationStatus: LawyerVerificationStatus;
   verifiedAt: Date | null;
   isListed: boolean;
@@ -53,6 +55,8 @@ export interface UpdateLawyerProfileInput {
   headline?: string | null;
   bio?: string | null;
   yearsOfExperience?: number | null;
+  city?: string | null;
+  education?: string | null;
   timezone?: string;
   isListed?: boolean;
 }

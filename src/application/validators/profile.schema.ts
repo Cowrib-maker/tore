@@ -35,6 +35,14 @@ export const updateLawyerProfileSchema = z.object({
     }
     return value;
   }, z.coerce.number().int().min(0).max(70).nullable()),
+  city: z
+    .string()
+    .max(120, "City must be at most 120 characters")
+    .transform(emptyToNull),
+  education: z
+    .string()
+    .max(2000, "Education must be at most 2000 characters")
+    .transform(emptyToNull),
   timezone: z
     .string()
     .min(1, "Timezone is required")

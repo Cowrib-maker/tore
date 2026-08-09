@@ -96,7 +96,7 @@ No public REST surface for app CRUD in MVP.
 |------|---------|--------------|
 | `UserRepository` et al. | Persistence | Prisma |
 | `EmailSender` | Verify, reset, notifications | Console (dev) → SMTP/Resend/SES (prod) |
-| `FileStorage` | Credentials, attachments | Local disk (dev) → S3-compatible (prod) |
+| `FileStorage` | Credentials, attachments, profile photos, contracts, evidence | `FILE_STORAGE=local` (default) → `s3` via config; same port |
 | `PaymentGateway` | Checkout + refunds | Provider TBD (Mongolia/MNT) |
 | `Clock` / jobs | Reminders, auto-complete | Vercel Cron or worker |
 

@@ -51,6 +51,21 @@ describe("booking-state-machine", () => {
     ).toBe(false);
   });
 
+  it("allows Sprint 4 request path without payment", () => {
+    expect(
+      canTransitionBooking(
+        BookingStatus.DRAFT,
+        BookingStatus.PENDING_ACCEPTANCE,
+      ),
+    ).toBe(true);
+    expect(
+      canTransitionBooking(
+        BookingStatus.PENDING_ACCEPTANCE,
+        BookingStatus.CANCELLED,
+      ),
+    ).toBe(true);
+  });
+
   it("exposes allowed transitions and terminal helpers", () => {
     expect(getAllowedBookingTransitions(BookingStatus.REFUNDED)).toEqual([]);
     expect(isTerminalBookingStatus(BookingStatus.REFUNDED)).toBe(true);

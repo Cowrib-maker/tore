@@ -9,11 +9,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import type { MarketplaceDictionary } from "@/i18n/marketplace-types";
 import { cn } from "@/lib/utils";
 
 type ProfileMissingStateProps = {
   dashboardHref: string;
   roleLabel: "client" | "lawyer";
+  copy: MarketplaceDictionary["profileMissing"];
 };
 
 /**
@@ -23,30 +25,29 @@ type ProfileMissingStateProps = {
 export function ProfileMissingState({
   dashboardHref,
   roleLabel,
+  copy,
 }: ProfileMissingStateProps) {
+  const body = roleLabel === "lawyer" ? copy.bodyLawyer : copy.bodyClient;
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Profile record missing</CardTitle>
-        <CardDescription>
-          Your account is signed in, but the {roleLabel} profile could not be
-          loaded. An operator can restore it with the profile backfill script
-          (`npm run db:backfill-profiles`).
-        </CardDescription>
+        <CardTitle>{copy.title}</CardTitle>
+        <CardDescription>{body}</CardDescription>
       </CardHeader>
       <CardFooter className="flex flex-wrap gap-3">
         <Link
           href={dashboardHref}
           className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
         >
-          Back to dashboard
+          {copy.returnOverview}
         </Link>
         <form action={logoutAction}>
           <button
             type="submit"
             className={cn(buttonVariants({ variant: "secondary", size: "sm" }))}
           >
-            Sign out
+            {copy.signOut}
           </button>
         </form>
       </CardFooter>

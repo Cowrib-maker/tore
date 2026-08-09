@@ -31,6 +31,8 @@ export interface CreateBookingInput {
   scheduledStartAt: Date;
   scheduledEndAt: Date;
   bookingNumber: string;
+  /** Sprint 4 request-only path uses PENDING_ACCEPTANCE. */
+  status: BookingStatus;
 }
 
 export interface BookingStatusHistory {

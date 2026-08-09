@@ -17,6 +17,8 @@ import {
 import { UserRole } from "@/domain/enums";
 import { isLawyerVerified } from "@/domain/services/lawyer-eligibility";
 import { getDashboardPath } from "@/domain/services/rbac";
+import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
+import { formatVerificationStatus } from "@/lib/format-labels";
 import { cn } from "@/lib/utils";
 
 function verificationBadgeVariant(
@@ -49,45 +51,58 @@ export default async function LawyerDashboardPage() {
     redirect("/login");
   }
 
-  const nav = [
-    { href: "/lawyer/dashboard", label: "Dashboard" },
-    { href: "/lawyer/profile", label: "Profile" },
-  ];
+  const i18n = await getShellI18n("lawyer");
+  const m = i18n.dict.marketplace;
+  const locale = i18n.locale;
+  const nav = i18n.nav;
 
   if (data.status === "profile_missing") {
     return (
-      <DashboardShell user={session.user} title="Lawyer dashboard" nav={nav}>
+      <DashboardShell
+        user={session.user}
+        title={i18n.title}
+        nav={nav}
+        {...i18n.shellProps}
+      >
         <ProfileMissingState
           dashboardHref="/lawyer/dashboard"
           roleLabel="lawyer"
+          copy={m.profileMissing}
         />
       </DashboardShell>
     );
   }
 
   const emailVerified = Boolean(data.user.emailVerified);
-  const profileFilled = Boolean(
-    data.profile.headline || data.profile.bio,
-  );
+  const profileFilled = Boolean(data.profile.headline || data.profile.bio);
   const verificationStatus = data.profile.verificationStatus;
   const verified = isLawyerVerified(data.profile);
   const listed = data.profile.isListed;
+  const ld = m.lawyerDashboard;
 
   return (
-    <DashboardShell user={session.user} title="Lawyer dashboard" nav={nav}>
+    <DashboardShell
+      user={session.user}
+      title={i18n.title}
+      nav={nav}
+      {...i18n.shellProps}
+    >
+      <p className="mb-5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+        {ld.intro}
+      </p>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between gap-2">
-              <CardTitle>Profile</CardTitle>
+              <CardTitle>{ld.profile}</CardTitle>
               <Badge variant={profileFilled ? "default" : "outline"}>
-                {profileFilled ? "Updated" : "Incomplete"}
+                {profileFilled ? m.common.complete : m.common.incomplete}
               </Badge>
             </div>
             <CardDescription>
               {profileFilled
-                ? `Slug: ${data.profile.slug}`
-                : "Add a headline and bio in profile settings."}
+                ? ld.publicUrl.replace("{slug}", data.profile.slug)
+                : ld.addHeadline}
             </CardDescription>
           </CardHeader>
           <CardFooter>
@@ -95,54 +110,98 @@ export default async function LawyerDashboardPage() {
               href="/lawyer/profile"
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
             >
-              Edit profile
+              {m.common.editProfile}
             </Link>
           </CardFooter>
         </Card>
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between gap-2">
-              <CardTitle>Verification</CardTitle>
+              <CardTitle>{ld.verification}</CardTitle>
               <Badge variant={verificationBadgeVariant(verificationStatus)}>
-                {verificationStatus}
+                {formatVerificationStatus(verificationStatus, locale)}
               </Badge>
             </div>
             <CardDescription>
-              {verified
-                ? "Your license is approved."
-                : "License submission and admin review land in Sprint 3."}
+              {verified ? ld.verificationApproved : ld.verificationPending}
             </CardDescription>
           </CardHeader>
+          <CardFooter>
+            <Link
+              href="/lawyer/verification"
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+            >
+              {ld.manageVerification}
+            </Link>
+          </CardFooter>
         </Card>
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between gap-2">
-              <CardTitle>Email & listing</CardTitle>
-              <div className="flex flex-wrap gap-1">
+              <CardTitle>{ld.listing}</CardTitle>
+              <div className="flex flex-wrap justify-end gap-1">
                 <Badge variant={emailVerified ? "default" : "secondary"}>
-                  {emailVerified ? "Email verified" : "Email pending"}
+                  {emailVerified ? ld.emailConfirmed : ld.emailPending}
                 </Badge>
                 <Badge variant={listed ? "default" : "outline"}>
-                  {listed ? "Listed" : "Not listed"}
+                  {listed ? ld.listed : ld.notListed}
                 </Badge>
               </div>
             </div>
             <CardDescription>
-              Listing requires verification and an active offering. Public
-              directory ships with discovery (Sprint 5).
+              {ld.listingHelp}{" "}
+              <Link href="/lawyers" className="underline underline-offset-4">
+                {ld.directoryLink}
+              </Link>
+              .
             </CardDescription>
           </CardHeader>
         </Card>
       </div>
-      <Card className="mt-4">
-        <CardHeader>
-          <CardTitle>Welcome to TORE</CardTitle>
-          <CardDescription>
-            Update your profile now. Submit your license for verification in
-            Sprint 3.
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle>{ld.offerings}</CardTitle>
+            <CardDescription>{ld.offeringsHelp}</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Link
+              href="/lawyer/offerings"
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+            >
+              {ld.manageOfferings}
+            </Link>
+          </CardFooter>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>{ld.availability}</CardTitle>
+            <CardDescription>{ld.availabilityHelp}</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Link
+              href="/lawyer/availability"
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+            >
+              {ld.setSchedule}
+            </Link>
+          </CardFooter>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>{ld.bookings}</CardTitle>
+            <CardDescription>{ld.bookingsHelp}</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Link
+              href="/lawyer/bookings"
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+            >
+              {ld.openBookings}
+            </Link>
+          </CardFooter>
+        </Card>
+      </div>
     </DashboardShell>
   );
 }

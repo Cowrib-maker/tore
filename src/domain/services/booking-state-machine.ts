@@ -2,7 +2,11 @@ import { BookingStatus } from "@/domain/enums";
 import { InvalidStateTransitionError } from "@/domain/errors/invalid-state-transition-error";
 
 const BOOKING_TRANSITIONS: Record<BookingStatus, readonly BookingStatus[]> = {
-  [BookingStatus.DRAFT]: [BookingStatus.PENDING_PAYMENT, BookingStatus.CANCELLED],
+  [BookingStatus.DRAFT]: [
+    BookingStatus.PENDING_PAYMENT,
+    BookingStatus.PENDING_ACCEPTANCE,
+    BookingStatus.CANCELLED,
+  ],
   [BookingStatus.PENDING_PAYMENT]: [
     BookingStatus.PENDING_ACCEPTANCE,
     BookingStatus.CANCELLED,

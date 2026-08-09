@@ -3,7 +3,24 @@ import { Input as InputPrimitive } from "@base-ui/react/input"
 
 import { cn } from "@/lib/utils"
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+function normalizeUncontrolledDefault(
+  defaultValue: React.ComponentProps<"input">["defaultValue"],
+): string {
+  if (defaultValue === undefined || defaultValue === null) {
+    return ""
+  }
+  return String(defaultValue)
+}
+
+function Input({
+  className,
+  type,
+  defaultValue,
+  value,
+  ...props
+}: React.ComponentProps<"input">) {
+  const isControlled = value !== undefined
+
   return (
     <InputPrimitive
       type={type}
@@ -13,6 +30,9 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         className
       )}
       {...props}
+      {...(isControlled
+        ? { value }
+        : { defaultValue: normalizeUncontrolledDefault(defaultValue) })}
     />
   )
 }

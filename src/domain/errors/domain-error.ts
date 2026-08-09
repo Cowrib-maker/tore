@@ -11,12 +11,12 @@ export class DomainError extends Error {
 
 export class NotFoundError extends DomainError {
   constructor(resource: string, id?: string) {
-    super(
-      id ? `${resource} with id '${id}' not found` : `${resource} not found`,
-      "NOT_FOUND",
-      404,
-    );
+    // Keep resource for ops logs via Error stack; never include internal IDs for clients.
+    super(`${resource} not found`, "NOT_FOUND", 404);
     this.name = "NotFoundError";
+    if (id) {
+      this.cause = { resource, id };
+    }
   }
 }
 

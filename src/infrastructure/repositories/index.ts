@@ -4,4 +4,15 @@ export { termsAcceptanceRepository } from "./prisma-terms-acceptance-repository"
 export { platformSettingRepository } from "./prisma-platform-setting-repository";
 export { clientProfileRepository } from "./prisma-client-profile-repository";
 export { lawyerProfileRepository } from "./prisma-lawyer-profile-repository";
+export { lawyerCredentialRepository } from "./prisma-lawyer-credential-repository";
+export { notificationRepository } from "./prisma-notification-repository";
+export { consultationOfferingRepository } from "./prisma-consultation-offering-repository";
+export { availabilityRepository } from "./prisma-availability-repository";
+export { bookingRepository } from "./prisma-booking-repository";
+export {
+  practiceAreaRepository,
+  languageRepository,
+  lawyerTaxonomyRepository,
+} from "./prisma-taxonomy-repository";
+export { emailVerificationTokenRepository } from "./prisma-email-verification-token-repository";
 export { unitOfWork } from "@/infrastructure/database/prisma-unit-of-work";

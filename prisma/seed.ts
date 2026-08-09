@@ -1,5 +1,6 @@
 import "dotenv/config";
 
+import bcrypt from "bcryptjs";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
@@ -193,6 +194,38 @@ async function main() {
         key: setting.key,
         value: setting.value,
         description: setting.description,
+      },
+    });
+  }
+
+  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@tore.mn";
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "ChangeMe-Admin1";
+  console.log(`Seeding admin user (${adminEmail})...`);
+  const passwordHash = await bcrypt.hash(adminPassword, 12);
+  const existingAdmin = await prisma.user.findFirst({
+    where: { email: adminEmail, deletedAt: null },
+  });
+  if (existingAdmin) {
+    await prisma.user.update({
+      where: { id: existingAdmin.id },
+      data: {
+        role: "ADMIN",
+        status: "ACTIVE",
+        passwordHash,
+        name: "TORE Admin",
+        preferredLanguage: "mn",
+      },
+    });
+  } else {
+    await prisma.user.create({
+      data: {
+        email: adminEmail,
+        name: "TORE Admin",
+        role: "ADMIN",
+        status: "ACTIVE",
+        passwordHash,
+        preferredLanguage: "mn",
+        emailVerified: new Date(),
       },
     });
   }

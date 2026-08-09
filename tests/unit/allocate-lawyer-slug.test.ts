@@ -15,6 +15,8 @@ function makeProfile(slug: string): LawyerProfile {
     headline: null,
     bio: null,
     yearsOfExperience: null,
+    city: null,
+    education: null,
     verificationStatus: LawyerVerificationStatus.PENDING,
     verifiedAt: null,
     isListed: false,

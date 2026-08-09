@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 64" fill="none" role="img" aria-label="TORE">
+  <title>TORE</title>
+  <g>
+    <rect width="64" height="64" rx="14" fill="#0F3D33"/>
+    <path d="M16 18h32v7H16V18z" fill="#F7FAF8"/>
+    <path d="M28.5 25h7v21h-7V25z" fill="#F7FAF8"/>
+    <circle cx="16" cy="21.5" r="2.4" fill="#C8A45D"/>
+    <circle cx="48" cy="21.5" r="2.4" fill="#C8A45D"/>
+    <circle cx="32" cy="48" r="2.4" fill="#C8A45D"/>
+  </g>
+  <text
+    x="80"
+    y="41"
+    fill="#0F3D33"
+    font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="26"
+    font-weight="650"
+    letter-spacing="-1.2"
+  >TORE</text>
+</svg>

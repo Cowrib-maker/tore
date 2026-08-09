@@ -1,6 +1,8 @@
+import { getRedisClient } from "@/infrastructure/security/redis-client";
+
 /**
- * Best-effort in-memory rate limiter (per server isolate).
- * Suitable as a first line of defense for login/register until a shared store exists.
+ * Rate limiter: Redis (REDIS_URL) in production / when configured;
+ * in-memory only for development and test isolates.
  */
 
 type Bucket = {
@@ -14,7 +16,7 @@ export type RateLimitResult =
   | { ok: true }
   | { ok: false; retryAfterSeconds: number };
 
-export function consumeRateLimit(
+function consumeInMemory(
   key: string,
   limit: number,
   windowMs: number,
@@ -41,8 +43,115 @@ export function consumeRateLimit(
   return { ok: true };
 }
 
+async function consumeRedis(
+  key: string,
+  limit: number,
+  windowMs: number,
+): Promise<RateLimitResult> {
+  const redis = getRedisClient();
+  if (!redis) {
+    return consumeInMemory(key, limit, windowMs);
+  }
+
+  const redisKey = `tore:rl:${key}`;
+  const count = await redis.incr(redisKey);
+  if (count === 1) {
+    await redis.pexpire(redisKey, windowMs);
+  }
+
+  if (count > limit) {
+    const ttl = await redis.pttl(redisKey);
+    return {
+      ok: false,
+      retryAfterSeconds: Math.max(
+        1,
+        Math.ceil((ttl > 0 ? ttl : windowMs) / 1000),
+      ),
+    };
+  }
+
+  return { ok: true };
+}
+
+function shouldUseRedis(): boolean {
+  if (process.env.NODE_ENV === "test") return false;
+  if (process.env.NODE_ENV === "production") return true;
+  return Boolean(process.env.REDIS_URL);
+}
+
+export async function consumeRateLimit(
+  key: string,
+  limit: number,
+  windowMs: number,
+): Promise<RateLimitResult> {
+  if (shouldUseRedis()) {
+    return consumeRedis(key, limit, windowMs);
+  }
+  return consumeInMemory(key, limit, windowMs);
+}
+
 /** Auth registration: 5 attempts / 15 minutes / IP */
 export const REGISTER_RATE_LIMIT = { limit: 5, windowMs: 15 * 60 * 1000 };
 
 /** Auth login: 10 attempts / 15 minutes / IP+email */
 export const LOGIN_RATE_LIMIT = { limit: 10, windowMs: 15 * 60 * 1000 };
+
+/** Resend verification: 3 attempts / 15 minutes / IP+email */
+export const RESEND_VERIFICATION_RATE_LIMIT = {
+  limit: 3,
+  windowMs: 15 * 60 * 1000,
+};
+
+/** Booking requests: 20 attempts / 15 minutes / user */
+export const BOOKING_CREATE_RATE_LIMIT = {
+  limit: 20,
+  windowMs: 15 * 60 * 1000,
+};
+
+/** Booking accept/decline: 40 attempts / 15 minutes / user */
+export const BOOKING_RESPOND_RATE_LIMIT = {
+  limit: 40,
+  windowMs: 15 * 60 * 1000,
+};
+
+/** Credentials authorize (Auth.js path): 20 attempts / 15 minutes / email */
+export const CREDENTIALS_AUTH_RATE_LIMIT = {
+  limit: 20,
+  windowMs: 15 * 60 * 1000,
+};
+
+/** Profile / taxonomy writes: 30 / 15 minutes / user */
+export const PROFILE_WRITE_RATE_LIMIT = {
+  limit: 30,
+  windowMs: 15 * 60 * 1000,
+};
+
+/** Offerings mutations: 40 / 15 minutes / user */
+export const OFFERING_WRITE_RATE_LIMIT = {
+  limit: 40,
+  windowMs: 15 * 60 * 1000,
+};
+
+/** Availability mutations: 60 / 15 minutes / user */
+export const AVAILABILITY_WRITE_RATE_LIMIT = {
+  limit: 60,
+  windowMs: 15 * 60 * 1000,
+};
+
+/** Credential submit: 10 / 15 minutes / user */
+export const CREDENTIAL_SUBMIT_RATE_LIMIT = {
+  limit: 10,
+  windowMs: 15 * 60 * 1000,
+};
+
+/** Admin credential review: 60 / 15 minutes / user */
+export const CREDENTIAL_REVIEW_RATE_LIMIT = {
+  limit: 60,
+  windowMs: 15 * 60 * 1000,
+};
+
+/** Notification mark-read: 60 / 15 minutes / user */
+export const NOTIFICATION_WRITE_RATE_LIMIT = {
+  limit: 60,
+  windowMs: 15 * 60 * 1000,
+};

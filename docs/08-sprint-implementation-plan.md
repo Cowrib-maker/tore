@@ -3,9 +3,9 @@
 | Field | Value |
 |-------|-------|
 | Document | Sprint Implementation Plan |
-| Status | Draft for approval |
+| Status | Active — Sprint 4 **COMPLETE**; Sprint 5 payments next |
 | Cadence | 10 × ~2 weeks ≈ 20 weeks |
-| Baseline | Sprint 1 complete |
+| Baseline | Sprint 1 + Sprint 2 complete (`v0.2.0-alpha`) |
 
 ---
 
@@ -37,101 +37,84 @@
 
 ---
 
-## 8.2 Sprint 2 — Profiles & onboarding
+## 8.2 Sprint 2 — Profiles & onboarding — COMPLETE
 
-**Goal:** Every user has a role profile; email verification gated for marketplace actions.
+**Goal:** Every user has a role profile; profile settings live; platform auth/data hardening for staging.
 
-| Deliverables | Details |
-|--------------|---------|
-| Repos | ClientProfile, LawyerProfile, Language, LawyerLanguage |
-| Register | Create profile in same flow as User |
-| Legal | Accept ToS + Privacy + **Marketplace Disclaimer** versions |
-| Backfill | Script for existing S1 users |
-| UI | Profile settings; richer dashboards |
-| Auth extend | Verify-email pages + token flow; wire forgot-password |
-| Ports | Email console adapter |
-| CA hygiene | When touching auth use-cases, prefer port injection over new infra imports |
+| Deliverables | Status |
+|--------------|--------|
+| Repos | ClientProfile, LawyerProfile — Done |
+| Register | Profile in same flow as User (UoW) — Done |
+| Legal | ToS + Privacy + Marketplace Disclaimer versions — Done |
+| Backfill | Script for existing S1 users — Done |
+| UI | Profile settings; richer dashboards — Done |
+| Auth extend (email verify / forgot-password) | **Deferred** (Product) — see remaining roadmap |
+| Ports (Email console) | **Deferred** (Product) |
+| CA hygiene | Port injection + UnitOfWork — Done |
+| Production High remediations | Status revoke, rate limits, env, CI, listing gate — Done |
 
-**Exit criteria:** Client and lawyer can update profiles; disclaimer stored; unverified users blocked from booking/payout paths (even if booking UI not live yet).
+**Exit (delivered):** Client and lawyer can update profiles; disclaimer stored; orphans backfilled; listing requires verification + active offering.
 
----
+**Deferred from original exit:** Unverified users blocked from booking/payout paths; verify-email; password-reset wire.
 
-## 8.3 Sprint 3 — Lawyer verification
-
-| Deliverables | Details |
-|--------------|---------|
-| Credential submit | License number, authority, document upload |
-| Storage | Local/S3 file port |
-| Admin queue | Approve/reject with reason |
-| Eligibility | Badge; listing still gated until offerings |
-
-**Routes:** `/lawyer/verification`, `/admin/lawyers`
-
-**Exit criteria:** Approved lawyer distinguishable; rejected has reason; audit logged.
+**Release:** `v0.2.0-alpha` (2026-08-09)
 
 ---
 
-## 8.4 Sprint 4 — Offerings & availability
+## 8.3 Sprint 3 — Lawyer verification — COMPLETE
 
-| Deliverables | Details |
-|--------------|---------|
-| Offerings CRUD | MN titles, duration, price MNT |
-| Availability | Weekly rules + exceptions |
-| Practice areas | Lawyer M:N assignment |
-| Listing rule | `isListed` only if APPROVED + ≥1 active offering + eligibility |
+| Deliverables | Status |
+|--------------|--------|
+| Credential submit | Done — `/lawyer/verification` |
+| Storage | Done — `FileStorage` port; `FILE_STORAGE=local\|s3` |
+| Admin queue | Done — `/admin/lawyers` approve/reject + audit + notification |
+| Eligibility | Done — badge; listing still gated until offerings |
+| Seed admin | Done — optional via seed env |
 
-**Routes:** `/lawyer/offerings`, `/lawyer/availability`
+**Exit (delivered):** Approved lawyer distinguishable; rejected has reason; audit logged; storage abstracted.
 
----
-
-## 8.5 Sprint 5 — Public marketplace
-
-| Deliverables | Details |
-|--------------|---------|
-| Directory | Filter by practice area; optional language/sort |
-| Public profile | `/lawyers/[slug]` with credentials, ratings placeholders, offerings |
-| Slots read | Show available times from rules |
-| i18n | MN/EN UI catalogs for public + shell strings (M13) |
-
-**Exit criteria:** Guest can browse; only listable lawyers appear; book CTA visible to clients (wires to S6).
+**Routes:** `/lawyer/verification`, `/admin/lawyers`, `/api/files/[...key]`
 
 ---
 
-## 8.6 Sprint 6 — Booking engine
+## 8.4 Sprint 4 — Public marketplace MVP (demand validation) — COMPLETE
+
+> **Reshuffle (startup):** Former S4 catalog + S5 discovery + S6 booking-request are **one sprint**.  
+> Full detail: [sprint-4-mvp-plan.md](./sprints/sprint-4-mvp-plan.md) · [milestones](./sprints/sprint-4-milestones.md).  
+> **Payment decision:** Option A — **request/accept only**; no gateway/escrow/invoices/payouts in S4.
 
 | Deliverables | Details |
 |--------------|---------|
-| Migration | Additive: `meeting_url`, `meeting_instructions`, `version` |
-| Create booking | Issue summary + slot + offering → `PENDING_PAYMENT` |
-| Stub payments | `PaymentGateway` stub + `PAYMENTS_MODE=stub` (staging/local only) |
-| Lifecycle | Accept/decline/cancel/complete via state machine |
-| Meeting fields | Lawyer sets external link/instructions on accept/confirm |
-| History | Every transition recorded |
-| Conflicts | Slot overlap prevention + optimistic `version` |
-| Completion | Lawyer completes; optional client confirm; settings-based auto-complete job may land S9 |
-| Reschedule | **Should** — implement if capacity; else explicit Product deferral |
-| UI | Client & lawyer booking lists/detail |
+| Public directory | `/lawyers` — search, practice area, language, location, verified badge; listable only |
+| Public profile | `/lawyers/[slug]` — bio, areas, languages, offerings, reviews placeholder, slot preview |
+| Offerings CRUD | Duration, fixed MNT price, online / in-person; listing gate unchanged |
+| Availability | Weekly rules + manual exceptions → bookable slots |
+| Booking requests | Create → `PENDING_ACCEPTANCE` → lawyer accept (`CONFIRMED`) / reject (`CANCELLED`) + client notification |
+| Payments | **Out of scope** — keep `PENDING_PAYMENT` in domain for a later sprint |
 
-**Payments:** Live provider is S7. S6 uses stub gateway only — never state-machine skip flags.
+**Routes:** `/lawyers`, `/lawyers/[slug]`, `/lawyer/offerings`, `/lawyer/availability`, `/lawyer/bookings`, `/client/bookings`, notification inboxes.
+
+**Exit criteria:** Guest discovers verified lawyers; client requests consultation; lawyer accepts/rejects; status tracked; **no payment** required to demo. **Met.**
+
+**Explicitly deferred:** AI Client, TORE Pro/Harvey, Contract/Litigation AI, CRM, DMS, Enterprise, Uulen.ai, payment provider.
 
 ---
 
-## 8.7 Sprint 7 — Payments & payouts
+## 8.5 Sprint 5 — Payments (was S7; moved up after MVP loop)
 
 | Deliverables | Details |
 |--------------|---------|
-| Provider adapter | Sandbox first |
-| Checkout | Before acceptance progression |
-| Webhook | Idempotent on `providerPaymentId` |
-| Fee split | Immutable snapshot |
-| Earnings | Lawyer view |
-| Admin payouts | Mark PAID manually |
+| Insert pay step | Use existing `PENDING_PAYMENT` without renaming statuses |
+| Stub then provider | Stub for staging; live provider when selected |
+| Webhooks / fees / payouts | As former S7 |
 
-**Hard gate:** Provider must be selected before sprint start.
+**Hard gate:** Provider selected before production payment go-live.
+
+> Former **S5 Public marketplace** and **S6 Booking engine** content is absorbed into **Sprint 4** (request path only).
 
 ---
 
-## 8.8 Sprint 8 — Messaging
+## 8.6 Sprint 6 — Messaging
 
 | Deliverables | Details |
 |--------------|---------|
@@ -143,30 +126,28 @@
 
 ---
 
-## 8.9 Sprint 9 — Reviews & notifications
+## 8.7 Sprint 7 — Reviews & notifications
 
 | Deliverables | Details |
 |--------------|---------|
-| Reviews | After COMPLETED; denorm ratings |
+| Reviews | After COMPLETED; denorm ratings (replace S4 placeholders) |
 | In-app notifications | Bell / list |
 | Email delivery | Real adapter |
-| Jobs | 24h / 1h reminders; review request; auto-complete after SLA if client did not confirm |
+| Jobs | Reminders; review request; optional auto-complete |
 
 ---
 
-## 8.10 Sprint 10 — Admin ops & launch
+## 8.8 Sprint 8 — Admin ops & launch
 
 | Deliverables | Details |
 |--------------|---------|
-| Disputes & refunds | Admin workflows (dispute on booking; refund on payment) |
-| Settings UI | Fee, SLA, cancellation hours, auto-complete hours |
+| Disputes & refunds | Admin workflows (after payments exist) |
+| Settings UI | Fee, SLA, cancellation hours |
 | Legal pages | `/terms`, `/privacy` (+ disclaimer content) |
-| Export | CSV (Should); manual data-export/delete runbook (Should) |
-| Ops note | Annual lawyer re-verify handled manually in MVP |
 | Hardening | E2E, security review, runbook |
-| Go-live checklist | ≥30 lawyers goal is ops; system readiness E2E |
+| Go-live checklist | Supply/ops readiness |
 
-**Final E2E:** register lawyer → admin approve → client book → pay → accept → message → complete → review.
+**Final E2E (post-payments):** register lawyer → admin approve → offerings → list → client request → pay → accept → message → complete → review.
 
 ---
 
@@ -186,13 +167,11 @@ Every sprint:
 
 ```text
 S1 ██ done
-S2 ░░ profiles / email
-S3 ░░ verification
-S4 ░░ catalog
-S5 ░░ discovery
-S6 ░░ booking
-S7 ░░ payments   ← provider gate
-S8 ░░ messaging
-S9 ░░ reviews / notif
-S10░░ launch
+S2 ██ done (v0.2.0-alpha)
+S3 ██ done (verification + FileStorage)
+S4 ▓▓ public MVP: directory + offerings + availability + booking requests (no pay)
+S5 ░░ payments (PENDING_PAYMENT path)
+S6 ░░ messaging
+S7 ░░ reviews / richer notifications
+S8 ░░ admin ops & launch
 ```

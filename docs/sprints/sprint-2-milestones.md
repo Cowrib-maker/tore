@@ -3,7 +3,16 @@
 | Field | Value |
 |-------|-------|
 | Sprint | 2 — Profiles & onboarding |
-| Status | **Milestone 3 complete — awaiting approval** |
+| Status | **COMPLETE — Product approved 2026-08-09** |
+| Release | `v0.2.0-alpha` |
+
+---
+
+## Sprint outcome
+
+Sprint 2 delivered role profiles on register, orphan backfill, client/lawyer profile settings, enriched dashboards, Clean Architecture hygiene, and production-blocker / High audit remediations.
+
+**Product-approved deferrals (not blocking Sprint 2 close):** email verification, password-reset backend, and marketplace unverified-user booking/payout gates. Tracked in the remaining roadmap for a follow-on auth hardening slice (or early Sprint 3 adjacent work)—**Sprint 3 itself is lawyer verification and is not started.**
 
 ---
 
@@ -19,26 +28,17 @@
 - Client/lawyer registration creates matching profile rows
 - Lawyer slug via domain `slug-generator` with uniqueness retry
 - Marketplace disclaimer recorded with `marketplace_disclaimer_version` from settings
-- Vitest + unit tests for `slug-generator` (5 passing)
+- Vitest + unit tests for `slug-generator`
 - Scripts: `typecheck`, `test`
 
 ### Verification
 
-- [x] `npm test` — pass (5)
-- [x] `npm run lint` — pass
-- [x] `npm run typecheck` — pass
-- [x] `npm run build` — pass
+- [x] `npm test`
+- [x] `npm run lint`
+- [x] `npm run typecheck`
+- [x] `npm run build`
 
-### Out of scope (later milestones)
-
-- Profile settings UI
-- Email / verify / password reset
-- Backfill script for orphan S1 users
-- Dashboard enrichment
-
-### Suggested commit (when requested)
-
-`feat(auth): create profiles on register via injected repositories`
+**Commit:** `feat(auth): create profiles on register via injected repositories`
 
 ---
 
@@ -61,10 +61,7 @@
 - [x] `npm run build`
 - [x] `npm run db:backfill-profiles` (idempotent)
 
-### Out of scope (Milestone 3+)
-
-- Profile settings UI
-- Email / verify / password reset
+**Commit:** `feat(profiles): add idempotent orphan profile backfill`
 
 ---
 
@@ -74,28 +71,57 @@
 
 ### Done
 
-- Zod validators: `profile.schema.ts` (client phone/company; lawyer headline/bio/experience/timezone/listing)
-- `updateClientProfileUseCase` / `updateLawyerProfileUseCase` with port injection + `AuditAction.UPDATE`
-- Listing requires verified lawyer (`isLawyerVerified`); otherwise ValidationError
-- Composition root: `profile.actions.ts` (session/role assert, FormData parse, load helpers)
-- Settings pages: `/client/profile`, `/lawyer/profile` + profile forms
-- Dashboards show profile completeness, email verification, lawyer verification + listing signals
-- `DashboardShell` nav links to dashboard/profile
+- Zod validators: `profile.schema.ts`
+- `updateClientProfileUseCase` / `updateLawyerProfileUseCase` with port injection + audit
+- Listing requires verified lawyer + active offering (post High remediaiton)
+- Composition root: `profile.actions.ts`
+- Settings pages: `/client/profile`, `/lawyer/profile`
+- Dashboards show profile / verification / listing signals
+- `DashboardShell` nav links
 
 ### Verification
 
-- [x] `npm test` — pass (18)
-- [x] `npm run lint` — pass
-- [x] `npm run typecheck` — pass
-- [x] `npm run build` — pass
+- [x] `npm test`
+- [x] `npm run lint`
+- [x] `npm run typecheck`
+- [x] `npm run build`
 
-### Out of scope (Milestone 4+)
+**Commit:** `feat(profiles): add client and lawyer profile settings UI`
 
-- Email port / verify-email / password reset
-- Gate unverified users from booking/payout paths
+---
 
-**STOP — awaiting approval before Milestone 4.**
+## Hardening — Production blockers + High audit remediations
 
-### Suggested commit (when requested)
+**Completed:** 2026-08-09
 
-`feat(profiles): add client and lawyer profile settings UI`
+### Done
+
+- JWT role lock; transactional register (`UnitOfWork`); slug create-retry
+- Use-case `ActorContext` authz; `revalidatePath` on profile updates
+- Session status revoke; login/register rate limits; runtime env validation
+- Soft-delete-safe partial unique indexes; CI workflow; profile-missing UX
+- Listing eligibility aligned with active offerings
+
+**Commits:**
+
+- `fix(core): resolve production readiness blockers`
+- `fix(core): remediate Sprint 2 audit High findings`
+
+---
+
+## Deferred (Product-approved)
+
+| Item | Original milestone | Notes |
+|------|-------------------|--------|
+| `EmailSender` + verify-email flow | M4 | Follow-on auth hardening |
+| Forgot-password / reset backend | M4 | UI stub remains |
+| Unverified booking/payout gates | M4 | Needed before public booking |
+| Remaining Medium audit backlog | M5 / hygiene | See final audit |
+
+---
+
+## Sprint 2 closed
+
+**Product approval:** 2026-08-09  
+**Tag:** `v0.2.0-alpha`  
+**Next:** Sprint 3 — Lawyer verification (**not started**)

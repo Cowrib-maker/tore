@@ -2,11 +2,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | Architecture Review complete — **awaiting approval before Sprint 2 kickoff** |
+| **Status** | Sprint 1–4 **COMPLETE** |
 | **Product** | TORE LegalTech Marketplace (Mongolia) |
-| **Baseline** | Sprint 1 already complete (`tore@0.1.0`) — do **not** re-run Sprint 1 |
-| **Sources** | Approved SRS v1.0 · Product Vision · Architecture Analysis · 10-Sprint Roadmap |
-| **Scope of this folder** | Planning + architecture review only — **no production code** |
+| **Baseline** | Marketplace request loop live · do **not** re-run Sprint 1–4 |
+| **Sources** | Ecosystem Architecture · Sprint 4 MVP (request-only bookings) |
+| **Next** | Sprint 5 — Payments (insert pay step; gateways deferred until provider chosen) |
 
 ---
 
@@ -30,44 +30,35 @@
 | 14 | [Risk Analysis](./14-risk-analysis.md) | Risks, mitigations, open decisions |
 | 15 | [AI Module Roadmap](./15-ai-module-roadmap.md) | Future Legal AI (post-MVP) |
 | 16 | [Architecture Review Report](./16-architecture-review-report.md) | Consistency, gaps, risks, SRS↔sprint audit |
+| 17 | [Architecture summary (S2)](./17-architecture-summary.md) | Post–Sprint 2 architecture snapshot |
+| 18 | [Remaining roadmap](./18-remaining-roadmap.md) | Deferred S2 items + S3–S10 plan |
+| 19 | [TORE Ecosystem Architecture](./19-tore-ecosystem-architecture.md) | Dual-product vision: Client + Pro AI legal ecosystem (V1–V5) |
 | — | [Sprint 1 milestones](./sprints/sprint-1-milestones.md) | Sprint 1 milestone log |
-| — | [Sprint 2 checklist](./sprints/sprint-2-checklist.md) | Sprint 2 implementation checklist |
-| — | [Sprint 2 milestones](./sprints/sprint-2-milestones.md) | Sprint 2 milestone log |
+| — | [Sprint 2 checklist](./sprints/sprint-2-checklist.md) | Sprint 2 implementation checklist (**COMPLETE**) |
+| — | [Sprint 2 milestones](./sprints/sprint-2-milestones.md) | Sprint 2 milestone log (**COMPLETE**) |
+| — | [Sprint 3 milestones](./sprints/sprint-3-milestones.md) | Sprint 3 verification + FileStorage (**COMPLETE**) |
+| — | [Sprint 4 MVP plan](./sprints/sprint-4-mvp-plan.md) | Public marketplace MVP — request/accept, no payments |
+| — | [Sprint 4 milestones](./sprints/sprint-4-milestones.md) | Sprint 4 marketplace loop (**COMPLETE**) |
 | — | [Sprint 2 CA check](./sprints/sprint-2-clean-architecture-check.md) | Pre-Sprint 2 CA verification |
+| — | [Sprint 2 M3 review](./reviews/sprint-2-m3-review.md) | M3 production readiness review |
+| — | [Final Sprint 2 audit](./reviews/final-sprint-2-audit.md) | Final audit + High remediations |
 
 ---
 
-## Approval required
+## Release artifacts (repo root)
 
-Implementation (including cleanup commits that touch `src/`) must **not** begin until Product approves this documentation set **and** the Architecture Review.
-
-*(Sprint 1 complete. Sprint 2 Milestone 3 complete — see sprint milestone logs for gate status.)*
-
-
----
-
-## Approval required
-
-Implementation (including cleanup commits that touch `src/`) must **not** begin until Product approves this documentation set **and** the Architecture Review.
-
-Recommended approval checklist:
-
-- [ ] Gap analysis accepted
-- [ ] Target architecture & domain model accepted
-- [ ] Database design accepted as schema source of truth (incl. planned additive columns)
-- [ ] Sprint plan & dependencies accepted
-- [ ] Standards, testing, deployment accepted
-- [ ] Risks & open decisions acknowledged
-- [ ] AI roadmap accepted as **future-only** (not MVP)
-- [ ] Architecture Review Report accepted
-- [ ] Decision **D5** (S6 stub PaymentGateway) accepted or alternative written
-- [ ] Authorization to start **Sprint 0 / Sprint 2 kickoff**
+| Document | Description |
+|----------|-------------|
+| [RELEASE_NOTES.md](../RELEASE_NOTES.md) | `v0.2.0-alpha` release notes |
+| [CHANGELOG.md](../CHANGELOG.md) | Version history |
 
 ---
 
-## Explicit non-goals of this phase
+## Gate status
 
-- No production feature code
-- No modifications to `src/`, `prisma/`, or config for features
-- No payment-provider integration yet
-- No AI features in MVP
+| Gate | Status |
+|------|--------|
+| Architecture docs + review | Approved (implementation authorized) |
+| Sprint 1 | Complete |
+| Sprint 2 | **Complete — Product approved 2026-08-09** |
+| Sprint 3 | **Not started** |

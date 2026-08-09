@@ -10,17 +10,21 @@ import type { ActionState } from "@/application/actions/auth.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import type { MarketplaceDictionary } from "@/i18n/marketplace-types";
 
 const initialState: ActionState = {};
 
 type ClientProfileFormProps = {
-  phone: string | null;
-  companyName: string | null;
+  phone: string;
+  companyName: string;
+  copy: MarketplaceDictionary["clientProfileForm"] &
+    Pick<MarketplaceDictionary["common"], "saving">;
 };
 
 export function ClientProfileForm({
   phone,
   companyName,
+  copy,
 }: ClientProfileFormProps) {
   const [state, formAction, pending] = useActionState(
     updateClientProfileAction,
@@ -29,40 +33,53 @@ export function ClientProfileForm({
 
   useEffect(() => {
     if (state.success) {
-      toast.success("Profile saved");
+      toast.success(copy.savedToast);
     }
-  }, [state]);
+  }, [state, copy.savedToast]);
 
   return (
     <form action={formAction} className="space-y-4">
       {state.error && (
-        <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+        <div
+          id="client-profile-form-error"
+          role="alert"
+          aria-live="assertive"
+          className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
+        >
           {state.error}
         </div>
       )}
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone</Label>
+        <Label htmlFor="phone">{copy.phone}</Label>
         <Input
           id="phone"
           name="phone"
           type="tel"
           defaultValue={phone ?? ""}
-          placeholder="+976 …"
+          placeholder={copy.phonePh}
           autoComplete="tel"
+          aria-invalid={Boolean(state.error)}
+          aria-describedby={
+            state.error ? "client-profile-form-error" : undefined
+          }
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="companyName">Company name</Label>
+        <Label htmlFor="companyName">{copy.company}</Label>
         <Input
           id="companyName"
           name="companyName"
           defaultValue={companyName ?? ""}
-          placeholder="Optional"
+          placeholder={copy.companyPh}
           autoComplete="organization"
+          aria-invalid={Boolean(state.error)}
+          aria-describedby={
+            state.error ? "client-profile-form-error" : undefined
+          }
         />
       </div>
       <Button type="submit" disabled={pending}>
-        {pending ? "Saving…" : "Save profile"}
+        {pending ? copy.saving : copy.save}
       </Button>
     </form>
   );

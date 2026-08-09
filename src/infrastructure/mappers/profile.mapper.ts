@@ -21,6 +21,8 @@ type LawyerProfileRecord = {
   headline: string | null;
   bio: string | null;
   yearsOfExperience: number | null;
+  city: string | null;
+  education: string | null;
   verificationStatus: string;
   verifiedAt: Date | null;
   isListed: boolean;
@@ -59,6 +61,8 @@ export function mapLawyerProfile(record: LawyerProfileRecord): LawyerProfile {
     headline: record.headline,
     bio: record.bio,
     yearsOfExperience: record.yearsOfExperience,
+    city: record.city,
+    education: record.education,
     verificationStatus: record.verificationStatus as LawyerVerificationStatus,
     verifiedAt: record.verifiedAt,
     isListed: record.isListed,
@@ -88,6 +92,8 @@ export const lawyerProfileSelect = {
   headline: true,
   bio: true,
   yearsOfExperience: true,
+  city: true,
+  education: true,
   verificationStatus: true,
   verifiedAt: true,
   isListed: true,

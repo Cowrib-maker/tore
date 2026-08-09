@@ -57,6 +57,10 @@ export {
   DEFAULT_BOOKING_NUMBER_PREFIX,
 } from "./booking-number";
 export {
+  generateCandidateSlots,
+  filterAvailableSlots,
+} from "./generate-slots";
+export {
   isLawyerVerified,
   isLawyerPubliclyListed,
   canClientBookLawyer,

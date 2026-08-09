@@ -1,31 +1,43 @@
 import Link from "next/link";
 
+import { AuthPageChrome } from "@/components/auth/auth-page-chrome";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
+  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getDictionary } from "@/i18n/get-dictionary";
+import { getLocale } from "@/i18n/get-locale";
 import { cn } from "@/lib/utils";
 
-export default function ForgotPasswordPage() {
+export default async function ForgotPasswordPage() {
+  const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
+
   return (
-    <div className="flex min-h-svh items-center justify-center bg-muted/30 p-6">
+    <AuthPageChrome locale={locale} dict={dict}>
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Reset your password</CardTitle>
-          <CardDescription>
-            Password reset via email will be available in a upcoming release.
-            Please contact support if you need immediate assistance.
-          </CardDescription>
+          <CardTitle>{dict.auth.forgotTitle}</CardTitle>
+          <CardDescription>{dict.auth.forgotDescription}</CardDescription>
         </CardHeader>
-        <div className="px-6 pb-6">
-          <Link href="/login" className={cn(buttonVariants({ variant: "outline" }), "w-full")}>
-            Back to sign in
+        <CardContent className="flex flex-col gap-3">
+          <a
+            href="mailto:support@tore.mn?subject=Password%20recovery"
+            className={cn(buttonVariants(), "w-full bg-[#0F3D33] text-white")}
+          >
+            {dict.auth.sendReset}
+          </a>
+          <Link
+            href="/login"
+            className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+          >
+            {dict.auth.backToSignIn}
           </Link>
-        </div>
+        </CardContent>
       </Card>
-    </div>
+    </AuthPageChrome>
   );
 }

@@ -3,24 +3,24 @@
 | Field | Value |
 |-------|-------|
 | Sprint | 2 — Profiles & onboarding |
-| Goal | Every user has a role profile; email verification gated for marketplace actions |
-| Exit criteria | Profiles on register; disclaimer stored; profile update capability; unverified users blocked from book/payout paths; email verify + password reset wired |
+| Status | **COMPLETE — Product approved 2026-08-09** |
+| Release | `v0.2.0-alpha` |
+| Goal (delivered) | Every user has a role profile; profile update capability; disclaimer on register; production auth/data hardening for staging |
+| Original exit notes | Email verify + booking gates Product-deferred; tracked in remaining roadmap |
 
 ---
 
-## Clean Architecture rules (every milestone)
+## Clean Architecture rules (sprint)
 
-- [ ] Use-cases depend on domain ports only (no new Prisma / concrete repo imports)
-- [ ] Prisma only in `infrastructure/`
-- [ ] Server Actions wire adapters (composition root)
-- [ ] Domain stays free of Next.js / Auth.js / Prisma
-- [ ] Lint + typecheck + build green before requesting next milestone
+- [x] Use-cases depend on domain ports only (no new Prisma / concrete repo imports in use-cases)
+- [x] Prisma only in `infrastructure/`
+- [x] Server Actions wire adapters (composition root)
+- [x] Domain stays free of Next.js / Auth.js / Prisma
+- [x] Lint + typecheck + build green at close
 
 ---
 
 ## Milestone 1 — Profile repos + register creates profiles — DONE
-
-**Scope**
 
 - [x] Implement `PrismaClientProfileRepository` + mapper
 - [x] Implement `PrismaLawyerProfileRepository` + mapper (`slugExists`, create, find*)
@@ -31,17 +31,17 @@
 - [x] Unit tests for `slug-generator` (validation / slug logic)
 - [x] lint · typecheck · build
 
-**Out of scope for M1:** profile settings UI, email adapter, verify-email pages, forgot-password backend, backfill script, dashboard enrichment
-
 **Commit:** `feat(auth): create profiles on register via injected repositories`
 
 ---
 
-## Milestone 2 — Backfill orphan users + Vitest harness completeness — DONE
+## Milestone 2 — Backfill orphan users + Vitest harness — DONE
 
 - [x] Script/use-case: backfill missing Client/Lawyer profiles for existing users
-- [x] Expand domain unit tests (fee/cancellation/state-machine per testing strategy) as capacity allows
+- [x] Expand domain unit tests (fee/cancellation/state-machine)
 - [x] lint · typecheck · build
+
+**Commit:** `feat(profiles): add idempotent orphan profile backfill`
 
 ---
 
@@ -56,23 +56,24 @@
 
 ---
 
-## Milestone 4 — Email port + verify-email + password reset (THIS MILESTONE)
+## Hardening — Blockers + High audit items — DONE
 
-- [ ] `EmailSender` port + console adapter
-- [ ] Verification token flow + `/verify-email` page
-- [ ] Forgot-password + reset flow (replace UI placeholder)
-- [ ] Gate: unverified users blocked from booking/payout paths (helpers ready even if booking UI absent)
-- [ ] lint · typecheck · build
+- [x] Production blockers (JWT role lock, UoW register, slug race, use-case authz, revalidate)
+- [x] High audit remediations (status revoke, rate limits, env validation, partial uniques, CI, listing gate, profile-missing UX)
+- [x] lint · typecheck · build · test
 
 ---
 
-## Milestone 5 — Sprint 2 hardening / DoD
+## Deferred from original M4 / M5 — Product-approved
 
-- [ ] Audit coverage for profile create/update
-- [ ] Register forms still accept terms (disclaimer covered by bundle)
-- [ ] Stakeholder demo checklist
-- [ ] Update `docs/sprints/sprint-2-milestones.md` completion
-- [ ] lint · typecheck · build
+- [ ] `EmailSender` port + console adapter *(follow-on)*
+- [ ] Verification token flow + `/verify-email` page *(follow-on)*
+- [ ] Forgot-password + reset flow *(follow-on)*
+- [ ] Gate: unverified users blocked from booking/payout paths *(follow-on)*
+- [x] Audit coverage for profile **update** (create-on-register still User-only — residual Medium)
+- [x] Register forms still accept terms (disclaimer covered by bundle)
+- [x] Update `docs/sprints/sprint-2-milestones.md` completion
+- [ ] Full stakeholder demo checklist *(ops)*
 
 ---
 
@@ -83,5 +84,5 @@
 | Profiles on register | Gap G1, Sprint plan §8.2 |
 | Disclaimer version | Architecture Review MED-3, seed key |
 | Port injection | Target Architecture §3.4, Coding Conventions §11.2 |
-| Email / verify | Sprint plan §8.2, FR-AUTH |
+| Email / verify | Deferred — Remaining roadmap |
 | Slug on lawyer profile | Domain `slug-generator`, FR public URLs |

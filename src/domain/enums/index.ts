@@ -114,3 +114,8 @@ export enum LanguageProficiency {
   FLUENT = "FLUENT",
   NATIVE = "NATIVE",
 }
+
+export enum ConsultationModality {
+  ONLINE = "ONLINE",
+  IN_PERSON = "IN_PERSON",
+}
