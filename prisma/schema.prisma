@@ -1,0 +1,709 @@
+// TORE LegalTech Marketplace MVP
+// PostgreSQL · Prisma 7 · Auth.js compatible
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  CLIENT
+  LAWYER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
+enum LawyerVerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum CredentialReviewStatus {
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum BookingStatus {
+  DRAFT
+  PENDING_PAYMENT
+  PENDING_ACCEPTANCE
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  REFUNDED
+  DISPUTED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+}
+
+enum RefundStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  PROCESSED
+}
+
+enum DisputeStatus {
+  OPEN
+  RESOLVED_CLIENT
+  RESOLVED_LAWYER
+  CLOSED
+}
+
+enum NotificationType {
+  ACCOUNT_VERIFIED
+  LAWYER_APPROVED
+  LAWYER_REJECTED
+  BOOKING_CREATED
+  BOOKING_ACCEPTED
+  BOOKING_DECLINED
+  BOOKING_CANCELLED
+  PAYMENT_SUCCEEDED
+  PAYMENT_FAILED
+  MESSAGE_RECEIVED
+  CONSULTATION_REMINDER
+  REVIEW_REQUESTED
+  PAYOUT_PROCESSED
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  APPROVE
+  REJECT
+  SUSPEND
+  REFUND
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum TermsType {
+  TERMS_OF_SERVICE
+  PRIVACY_POLICY
+  MARKETPLACE_DISCLAIMER
+}
+
+enum LanguageProficiency {
+  BASIC
+  CONVERSATIONAL
+  FLUENT
+  NATIVE
+}
+
+// ─── Identity & Authentication (Auth.js) ─────────────────────────────────────
+
+model User {
+  id                String     @id @default(cuid())
+  email             String     @unique
+  emailVerified     DateTime?  @map("email_verified_at")
+  passwordHash      String?    @map("password_hash")
+  name              String?
+  image             String?    @map("image_url")
+  role              UserRole
+  status            UserStatus @default(ACTIVE)
+  preferredLanguage String     @default("mn") @map("preferred_language")
+  deletedAt         DateTime?  @map("deleted_at")
+  createdAt         DateTime   @default(now()) @map("created_at")
+  updatedAt         DateTime   @updatedAt @map("updated_at")
+
+  accounts  Account[]
+  sessions  Session[]
+  terms     TermsAcceptance[]
+
+  clientProfile ClientProfile?
+  lawyerProfile LawyerProfile?
+
+  clientBookings           Booking[]              @relation("ClientBookings")
+  cancelledBookings        Booking[]              @relation("BookingCancelledBy")
+  bookingStatusChanges     BookingStatusHistory[] @relation("BookingStatusChangedBy")
+  clientPayments           Payment[]              @relation("ClientPayments")
+  messages                 Message[]              @relation("MessageSender")
+  reviewsWritten           Review[]               @relation("ReviewAuthor")
+  notifications            Notification[]
+  auditLogs                AuditLog[]             @relation("AuditActor")
+  credentialsReviewed      LawyerCredential[]     @relation("CredentialReviewer")
+  payoutsProcessed         Payout[]               @relation("PayoutProcessor")
+  refundsRequested         Refund[]               @relation("RefundRequester")
+  refundsProcessed         Refund[]               @relation("RefundProcessor")
+  disputesRaised           Dispute[]              @relation("DisputeRaiser")
+  disputesResolved         Dispute[]              @relation("DisputeResolver")
+  platformSettingsUpdated  PlatformSetting[]      @relation("PlatformSettingUpdater")
+  reviewsModerated         Review[]               @relation("ReviewModerator")
+
+  @@index([role, status])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model TermsAcceptance {
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  termsType     TermsType @map("terms_type")
+  termsVersion  String    @map("terms_version")
+  acceptedAt    DateTime  @default(now()) @map("accepted_at")
+  ipAddress     String?   @map("ip_address")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, termsType, termsVersion])
+  @@index([userId])
+  @@map("terms_acceptances")
+}
+
+// ─── Profiles ─────────────────────────────────────────────────────────────────
+
+model ClientProfile {
+  id          String    @id @default(cuid())
+  userId      String    @unique @map("user_id")
+  phone       String?
+  companyName String?   @map("company_name")
+  deletedAt   DateTime? @map("deleted_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([deletedAt])
+  @@map("client_profiles")
+}
+
+model LawyerProfile {
+  id                 String                   @id @default(cuid())
+  userId             String                   @unique @map("user_id")
+  slug               String                   @unique
+  headline           String?
+  bio                String?                  @db.Text
+  yearsOfExperience  Int?                     @map("years_of_experience")
+  verificationStatus LawyerVerificationStatus @default(PENDING) @map("verification_status")
+  verifiedAt         DateTime?                @map("verified_at")
+  isListed           Boolean                  @default(false) @map("is_listed")
+  averageRating      Decimal?                 @map("average_rating") @db.Decimal(3, 2)
+  reviewCount        Int                      @default(0) @map("review_count")
+  timezone           String                   @default("Asia/Ulaanbaatar")
+  deletedAt          DateTime?                @map("deleted_at")
+  createdAt          DateTime                 @default(now()) @map("created_at")
+  updatedAt          DateTime                 @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  credentials  LawyerCredential[]
+  practiceAreas LawyerPracticeArea[]
+  languages    LawyerLanguage[]
+  offerings    ConsultationOffering[]
+  availabilityRules      AvailabilityRule[]
+  availabilityExceptions AvailabilityException[]
+  bookings     Booking[]
+  reviews      Review[]
+  payouts      Payout[]
+
+  @@index([verificationStatus])
+  @@index([isListed, verificationStatus])
+  @@index([averageRating(sort: Desc)])
+  @@index([deletedAt])
+  @@map("lawyer_profiles")
+}
+
+model LawyerCredential {
+  id               String                 @id @default(cuid())
+  lawyerProfileId  String                 @map("lawyer_profile_id")
+  licenseNumber    String                 @map("license_number")
+  issuingAuthority String                 @map("issuing_authority")
+  documentUrl      String                 @map("document_url")
+  documentFileName String                 @map("document_file_name")
+  status           CredentialReviewStatus @default(SUBMITTED)
+  rejectionReason  String?                @map("rejection_reason") @db.Text
+  reviewedByUserId String?                @map("reviewed_by_user_id")
+  reviewedAt       DateTime?              @map("reviewed_at")
+  submittedAt      DateTime               @default(now()) @map("submitted_at")
+  createdAt        DateTime               @default(now()) @map("created_at")
+
+  lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+  reviewedBy    User?         @relation("CredentialReviewer", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([lawyerProfileId])
+  @@index([status, submittedAt])
+  @@index([reviewedByUserId])
+  @@map("lawyer_credentials")
+}
+
+// ─── Reference / Taxonomy ─────────────────────────────────────────────────────
+
+model PracticeArea {
+  id            String    @id @default(cuid())
+  slug          String    @unique
+  nameMn        String    @map("name_mn")
+  nameEn        String    @map("name_en")
+  descriptionMn String?   @map("description_mn") @db.Text
+  descriptionEn String?   @map("description_en") @db.Text
+  isActive      Boolean   @default(true) @map("is_active")
+  sortOrder     Int       @default(0) @map("sort_order")
+  deletedAt     DateTime? @map("deleted_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  lawyers  LawyerPracticeArea[]
+  bookings Booking[]
+
+  @@index([isActive, sortOrder])
+  @@index([deletedAt])
+  @@map("practice_areas")
+}
+
+model Language {
+  id       String  @id @default(cuid())
+  code     String  @unique
+  nameMn   String  @map("name_mn")
+  nameEn   String  @map("name_en")
+  isActive Boolean @default(true) @map("is_active")
+
+  lawyers LawyerLanguage[]
+
+  @@index([isActive])
+  @@map("languages")
+}
+
+model LawyerPracticeArea {
+  lawyerProfileId String   @map("lawyer_profile_id")
+  practiceAreaId  String   @map("practice_area_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+  practiceArea  PracticeArea  @relation(fields: [practiceAreaId], references: [id], onDelete: Restrict)
+
+  @@id([lawyerProfileId, practiceAreaId])
+  @@index([practiceAreaId])
+  @@map("lawyer_practice_areas")
+}
+
+model LawyerLanguage {
+  lawyerProfileId String               @map("lawyer_profile_id")
+  languageId      String               @map("language_id")
+  proficiency     LanguageProficiency?
+  createdAt       DateTime             @default(now()) @map("created_at")
+
+  lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+  language      Language      @relation(fields: [languageId], references: [id], onDelete: Restrict)
+
+  @@id([lawyerProfileId, languageId])
+  @@index([languageId])
+  @@map("lawyer_languages")
+}
+
+// ─── Offerings & Availability ─────────────────────────────────────────────────
+
+model ConsultationOffering {
+  id              String    @id @default(cuid())
+  lawyerProfileId String    @map("lawyer_profile_id")
+  titleMn         String    @map("title_mn")
+  titleEn         String?   @map("title_en")
+  descriptionMn   String?   @map("description_mn") @db.Text
+  durationMinutes Int       @map("duration_minutes")
+  priceMnt        Int       @map("price_mnt")
+  isActive        Boolean   @default(true) @map("is_active")
+  deletedAt       DateTime? @map("deleted_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+  bookings      Booking[]
+
+  @@index([lawyerProfileId, isActive])
+  @@index([deletedAt])
+  @@map("consultation_offerings")
+}
+
+model AvailabilityRule {
+  id              String    @id @default(cuid())
+  lawyerProfileId String    @map("lawyer_profile_id")
+  dayOfWeek       DayOfWeek @map("day_of_week")
+  startTime       DateTime  @map("start_time") @db.Time(0)
+  endTime         DateTime  @map("end_time") @db.Time(0)
+  isActive        Boolean   @default(true) @map("is_active")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+
+  @@index([lawyerProfileId, dayOfWeek, isActive])
+  @@map("availability_rules")
+}
+
+model AvailabilityException {
+  id              String    @id @default(cuid())
+  lawyerProfileId String    @map("lawyer_profile_id")
+  exceptionDate   DateTime  @map("exception_date") @db.Date
+  startTime       DateTime? @map("start_time") @db.Time(0)
+  endTime         DateTime? @map("end_time") @db.Time(0)
+  isAvailable     Boolean   @default(false) @map("is_available")
+  reason          String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([lawyerProfileId, exceptionDate, startTime, endTime])
+  @@index([lawyerProfileId, exceptionDate])
+  @@map("availability_exceptions")
+}
+
+// ─── Bookings & Transactions ──────────────────────────────────────────────────
+
+model Booking {
+  id                   String        @id @default(cuid())
+  bookingNumber        String        @unique @map("booking_number")
+  clientUserId         String        @map("client_user_id")
+  lawyerProfileId      String        @map("lawyer_profile_id")
+  offeringId           String        @map("offering_id")
+  practiceAreaId       String?       @map("practice_area_id")
+  status               BookingStatus
+  issueSummary         String        @map("issue_summary") @db.Text
+  scheduledStartAt     DateTime      @map("scheduled_start_at")
+  scheduledEndAt       DateTime      @map("scheduled_end_at")
+  meetingUrl           String?       @map("meeting_url")
+  meetingInstructions  String?       @map("meeting_instructions") @db.Text
+  version              Int           @default(1)
+  acceptedAt           DateTime?     @map("accepted_at")
+  declinedAt           DateTime?     @map("declined_at")
+  declineReason        String?       @map("decline_reason") @db.Text
+  completedAt          DateTime?     @map("completed_at")
+  cancelledAt          DateTime?     @map("cancelled_at")
+  cancellationReason   String?       @map("cancellation_reason") @db.Text
+  cancelledByUserId    String?       @map("cancelled_by_user_id")
+  createdAt            DateTime      @default(now()) @map("created_at")
+  updatedAt            DateTime      @updatedAt @map("updated_at")
+
+  clientUser    User           @relation("ClientBookings", fields: [clientUserId], references: [id], onDelete: Restrict)
+  lawyerProfile LawyerProfile  @relation(fields: [lawyerProfileId], references: [id], onDelete: Restrict)
+  offering      ConsultationOffering @relation(fields: [offeringId], references: [id], onDelete: Restrict)
+  practiceArea  PracticeArea?  @relation(fields: [practiceAreaId], references: [id], onDelete: SetNull)
+  cancelledBy   User?          @relation("BookingCancelledBy", fields: [cancelledByUserId], references: [id], onDelete: SetNull)
+
+  statusHistory BookingStatusHistory[]
+  payment       Payment?
+  messageThread MessageThread?
+  review        Review?
+  dispute       Dispute?
+  refunds       Refund[]
+
+  @@index([clientUserId, status])
+  @@index([lawyerProfileId, status])
+  @@index([status, scheduledStartAt])
+  @@index([lawyerProfileId, scheduledStartAt, scheduledEndAt])
+  @@map("bookings")
+}
+
+model BookingStatusHistory {
+  id              String         @id @default(cuid())
+  bookingId       String         @map("booking_id")
+  fromStatus      BookingStatus? @map("from_status")
+  toStatus        BookingStatus  @map("to_status")
+  changedByUserId String?        @map("changed_by_user_id")
+  reason          String?        @db.Text
+  createdAt       DateTime       @default(now()) @map("created_at")
+
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  changedBy User?   @relation("BookingStatusChangedBy", fields: [changedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([bookingId, createdAt])
+  @@map("booking_status_histories")
+}
+
+model Payment {
+  id                 String        @id @default(cuid())
+  bookingId          String        @unique @map("booking_id")
+  clientUserId       String        @map("client_user_id")
+  amountMnt          Int           @map("amount_mnt")
+  platformFeeMnt     Int           @map("platform_fee_mnt")
+  lawyerNetMnt       Int           @map("lawyer_net_mnt")
+  currency           String        @default("MNT")
+  status             PaymentStatus
+  provider           String
+  providerPaymentId  String?       @unique @map("provider_payment_id")
+  providerReceiptUrl String?       @map("provider_receipt_url")
+  paidAt             DateTime?     @map("paid_at")
+  failedAt           DateTime?     @map("failed_at")
+  failureReason      String?       @map("failure_reason") @db.Text
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  client  User    @relation("ClientPayments", fields: [clientUserId], references: [id], onDelete: Restrict)
+
+  payout  Payout?
+  refunds Refund[]
+
+  @@index([status])
+  @@index([clientUserId])
+  @@map("payments")
+}
+
+model Payout {
+  id                 String       @id @default(cuid())
+  paymentId          String       @unique @map("payment_id")
+  lawyerProfileId    String       @map("lawyer_profile_id")
+  amountMnt          Int          @map("amount_mnt")
+  status             PayoutStatus @default(PENDING)
+  processedByUserId  String?      @map("processed_by_user_id")
+  processedAt        DateTime?    @map("processed_at")
+  payoutReference    String?      @map("payout_reference")
+  notes              String?      @db.Text
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+
+  payment       Payment       @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Restrict)
+  processedBy   User?         @relation("PayoutProcessor", fields: [processedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([lawyerProfileId, status])
+  @@map("payouts")
+}
+
+model Refund {
+  id                 String       @id @default(cuid())
+  paymentId          String       @map("payment_id")
+  bookingId          String       @map("booking_id")
+  amountMnt          Int          @map("amount_mnt")
+  status             RefundStatus
+  reason             String       @db.Text
+  requestedByUserId  String       @map("requested_by_user_id")
+  processedByUserId  String?      @map("processed_by_user_id")
+  processedAt        DateTime?    @map("processed_at")
+  providerRefundId   String?      @map("provider_refund_id")
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+
+  payment     Payment @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  booking     Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  requestedBy User    @relation("RefundRequester", fields: [requestedByUserId], references: [id], onDelete: Restrict)
+  processedBy User?   @relation("RefundProcessor", fields: [processedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([paymentId])
+  @@index([bookingId, status])
+  @@map("refunds")
+}
+
+model Dispute {
+  id               String        @id @default(cuid())
+  bookingId        String        @unique @map("booking_id")
+  raisedByUserId   String        @map("raised_by_user_id")
+  reason           String        @db.Text
+  status           DisputeStatus @default(OPEN)
+  resolutionNotes  String?       @map("resolution_notes") @db.Text
+  resolvedByUserId String?       @map("resolved_by_user_id")
+  resolvedAt       DateTime?     @map("resolved_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  booking    Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  raisedBy   User    @relation("DisputeRaiser", fields: [raisedByUserId], references: [id], onDelete: Restrict)
+  resolvedBy User?   @relation("DisputeResolver", fields: [resolvedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@map("disputes")
+}
+
+// ─── Communication ────────────────────────────────────────────────────────────
+
+model MessageThread {
+  id        String    @id @default(cuid())
+  bookingId String    @unique @map("booking_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  closedAt  DateTime? @map("closed_at")
+
+  booking  Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@map("message_threads")
+}
+
+model Message {
+  id           String    @id @default(cuid())
+  threadId     String    @map("thread_id")
+  senderUserId String    @map("sender_user_id")
+  body         String    @db.Text
+  readAt       DateTime? @map("read_at")
+  deletedAt    DateTime? @map("deleted_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  thread      MessageThread      @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender      User               @relation("MessageSender", fields: [senderUserId], references: [id], onDelete: Restrict)
+  attachments MessageAttachment[]
+
+  @@index([threadId, createdAt])
+  @@index([senderUserId])
+  @@index([deletedAt])
+  @@map("messages")
+}
+
+model MessageAttachment {
+  id            String   @id @default(cuid())
+  messageId     String   @map("message_id")
+  fileName      String   @map("file_name")
+  fileUrl       String   @map("file_url")
+  mimeType      String   @map("mime_type")
+  fileSizeBytes Int      @map("file_size_bytes")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@map("message_attachments")
+}
+
+// ─── Trust & Reputation ───────────────────────────────────────────────────────
+
+model Review {
+  id                 String    @id @default(cuid())
+  bookingId          String    @unique @map("booking_id")
+  clientUserId       String    @map("client_user_id")
+  lawyerProfileId    String    @map("lawyer_profile_id")
+  rating             Int
+  comment            String?   @db.Text
+  isVisible          Boolean   @default(true) @map("is_visible")
+  moderatedByUserId  String?   @map("moderated_by_user_id")
+  deletedAt          DateTime? @map("deleted_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  booking       Booking       @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  client        User          @relation("ReviewAuthor", fields: [clientUserId], references: [id], onDelete: Restrict)
+  lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Restrict)
+  moderatedBy   User?         @relation("ReviewModerator", fields: [moderatedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([lawyerProfileId, isVisible, createdAt(sort: Desc)])
+  @@index([clientUserId])
+  @@index([deletedAt])
+  @@map("reviews")
+}
+
+// ─── Platform Operations ──────────────────────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String           @map("user_id")
+  type      NotificationType
+  title     String
+  body      String           @db.Text
+  metadata  Json?
+  readAt    DateTime?        @map("read_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+model AuditLog {
+  id           String      @id @default(cuid())
+  actorUserId  String?     @map("actor_user_id")
+  action       AuditAction
+  entityType   String      @map("entity_type")
+  entityId     String?     @map("entity_id")
+  metadata     Json?
+  ipAddress    String?     @map("ip_address")
+  userAgent    String?     @map("user_agent") @db.Text
+  createdAt    DateTime    @default(now()) @map("created_at")
+
+  actor User? @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([actorUserId])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
+
+model PlatformSetting {
+  key              String   @id
+  value            String   @db.Text
+  description      String?  @db.Text
+  updatedByUserId  String?  @map("updated_by_user_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  updatedBy User? @relation("PlatformSettingUpdater", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+
+  @@map("platform_settings")
+}
