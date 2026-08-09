@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Sprint | 2 — Profiles & onboarding |
-| Status | **Milestone 1 complete — awaiting approval** |
+| Status | **Milestone 2 complete — awaiting approval** |
 
 ---
 
@@ -42,4 +42,28 @@
 
 ---
 
-**STOP — awaiting approval before Milestone 2.**
+## Milestone 2 — Backfill orphan users + domain unit tests
+
+**Completed:** 2026-08-09
+
+### Done
+
+- `backfillMissingProfilesUseCase` (port-injected) creates missing Client/Lawyer profiles
+- CLI composition root: `scripts/backfill-missing-profiles.ts` (`npm run db:backfill-profiles`)
+- Domain unit tests: fee-calculator, cancellation-policy, booking-state-machine
+- Audit entries on backfilled profiles
+
+### Verification
+
+- [x] `npm test`
+- [x] `npm run lint`
+- [x] `npm run typecheck`
+- [x] `npm run build`
+- [x] `npm run db:backfill-profiles` (idempotent)
+
+### Out of scope (Milestone 3+)
+
+- Profile settings UI
+- Email / verify / password reset
+
+**STOP — awaiting approval before Milestone 3.**
