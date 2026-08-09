@@ -18,43 +18,45 @@
 
 ---
 
-## Milestone 1 — Profile repos + register creates profiles (THIS MILESTONE)
+## Milestone 1 — Profile repos + register creates profiles — DONE
 
 **Scope**
 
-- [ ] Implement `PrismaClientProfileRepository` + mapper
-- [ ] Implement `PrismaLawyerProfileRepository` + mapper (`slugExists`, create, find*)
-- [ ] Refactor `registerClientUseCase` / `registerLawyerUseCase` to **port injection**
-- [ ] On register: create `ClientProfile` or `LawyerProfile` (lawyer slug via domain `slug-generator`)
-- [ ] Load `marketplace_disclaimer_version` and record disclaimer acceptance with correct version
-- [ ] Wire composition root in `auth.actions.ts`
-- [ ] Unit tests for `slug-generator` (validation / slug logic)
-- [ ] lint · typecheck · build
+- [x] Implement `PrismaClientProfileRepository` + mapper
+- [x] Implement `PrismaLawyerProfileRepository` + mapper (`slugExists`, create, find*)
+- [x] Refactor `registerClientUseCase` / `registerLawyerUseCase` to **port injection**
+- [x] On register: create `ClientProfile` or `LawyerProfile` (lawyer slug via domain `slug-generator`)
+- [x] Load `marketplace_disclaimer_version` and record disclaimer acceptance with correct version
+- [x] Wire composition root in `auth.actions.ts`
+- [x] Unit tests for `slug-generator` (validation / slug logic)
+- [x] lint · typecheck · build
 
 **Out of scope for M1:** profile settings UI, email adapter, verify-email pages, forgot-password backend, backfill script, dashboard enrichment
 
-**Suggested commit (when requested):** `feat(auth): create profiles on register via injected repositories`
+**Commit:** `feat(auth): create profiles on register via injected repositories`
 
 ---
 
-## Milestone 2 — Backfill orphan users + Vitest harness completeness
+## Milestone 2 — Backfill orphan users + Vitest harness completeness — DONE
 
-- [ ] Script/use-case: backfill missing Client/Lawyer profiles for existing users
-- [ ] Expand domain unit tests (fee/cancellation/state-machine per testing strategy) as capacity allows
-- [ ] lint · typecheck · build
-
----
-
-## Milestone 3 — Profile settings UI + richer dashboards
-
-- [ ] Client/lawyer profile update use-cases + validators + Server Actions
-- [ ] Settings pages under `/client/profile`, `/lawyer/profile`
-- [ ] Dashboards show profile / verification status signals
-- [ ] lint · typecheck · build
+- [x] Script/use-case: backfill missing Client/Lawyer profiles for existing users
+- [x] Expand domain unit tests (fee/cancellation/state-machine per testing strategy) as capacity allows
+- [x] lint · typecheck · build
 
 ---
 
-## Milestone 4 — Email port + verify-email + password reset
+## Milestone 3 — Profile settings UI + richer dashboards — DONE
+
+- [x] Client/lawyer profile update use-cases + validators + Server Actions
+- [x] Settings pages under `/client/profile`, `/lawyer/profile`
+- [x] Dashboards show profile / verification status signals
+- [x] lint · typecheck · build
+
+**Commit:** `feat(profiles): add client and lawyer profile settings UI`
+
+---
+
+## Milestone 4 — Email port + verify-email + password reset (THIS MILESTONE)
 
 - [ ] `EmailSender` port + console adapter
 - [ ] Verification token flow + `/verify-email` page

@@ -41,7 +41,7 @@
 
 Implementation (including cleanup commits that touch `src/`) must **not** begin until Product approves this documentation set **and** the Architecture Review.
 
-*(Sprint 1 complete. Sprint 2 Milestone 1 implemented — see sprint milestone logs for gate status.)*
+*(Sprint 1 complete. Sprint 2 Milestone 3 complete — see sprint milestone logs for gate status.)*
 
 
 ---

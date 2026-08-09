@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Sprint | 2 — Profiles & onboarding |
-| Status | **Milestone 2 complete — awaiting approval** |
+| Status | **Milestone 3 complete — awaiting approval** |
 
 ---
 
@@ -66,4 +66,36 @@
 - Profile settings UI
 - Email / verify / password reset
 
-**STOP — awaiting approval before Milestone 3.**
+---
+
+## Milestone 3 — Profile settings UI + richer dashboards
+
+**Completed:** 2026-08-09
+
+### Done
+
+- Zod validators: `profile.schema.ts` (client phone/company; lawyer headline/bio/experience/timezone/listing)
+- `updateClientProfileUseCase` / `updateLawyerProfileUseCase` with port injection + `AuditAction.UPDATE`
+- Listing requires verified lawyer (`isLawyerVerified`); otherwise ValidationError
+- Composition root: `profile.actions.ts` (session/role assert, FormData parse, load helpers)
+- Settings pages: `/client/profile`, `/lawyer/profile` + profile forms
+- Dashboards show profile completeness, email verification, lawyer verification + listing signals
+- `DashboardShell` nav links to dashboard/profile
+
+### Verification
+
+- [x] `npm test` — pass (18)
+- [x] `npm run lint` — pass
+- [x] `npm run typecheck` — pass
+- [x] `npm run build` — pass
+
+### Out of scope (Milestone 4+)
+
+- Email port / verify-email / password reset
+- Gate unverified users from booking/payout paths
+
+**STOP — awaiting approval before Milestone 4.**
+
+### Suggested commit (when requested)
+
+`feat(profiles): add client and lawyer profile settings UI`
