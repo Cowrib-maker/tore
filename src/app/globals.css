@@ -215,7 +215,7 @@
   }
 
   .ds-chrome-inner {
-    @apply mx-auto flex h-14 max-w-6xl items-center;
+    @apply mx-auto flex h-[4.5rem] max-w-6xl items-center;
     padding-inline: var(--page-px);
   }
 
@@ -266,11 +266,16 @@
 @layer components {
   .landing-hero-atmosphere {
     background:
-      radial-gradient(1100px 520px at 8% -8%, rgb(15 61 51 / 0.09), transparent 58%),
-      radial-gradient(900px 460px at 92% 0%, rgb(200 164 93 / 0.06), transparent 50%),
-      radial-gradient(700px 400px at 50% 100%, rgb(232 240 236 / 0.9), transparent 62%),
-      linear-gradient(180deg, #fafbfa 0%, #f3f7f5 100%);
+      radial-gradient(1100px 520px at 8% -8%, rgb(15 61 51 / 0.07), transparent 58%),
+      radial-gradient(900px 460px at 92% 0%, rgb(200 164 93 / 0.055), transparent 50%),
+      radial-gradient(700px 400px at 50% 100%, rgb(245 242 236 / 0.85), transparent 62%),
+      linear-gradient(180deg, #faf9f7 0%, #f3f1ed 100%);
     animation: landing-atmosphere 24s ease-in-out infinite alternate;
+  }
+
+  .landing-page {
+    --landing-canvas: #faf9f7;
+    --landing-canvas-muted: #f3f1ed;
   }
 
   .landing-product-panel {
@@ -285,42 +290,42 @@
 
   .landing-shadow-sm {
     box-shadow:
-      0 1px 2px rgb(15 61 51 / 0.04),
-      0 8px 24px -12px rgb(15 61 51 / 0.12);
+      0 1px 2px rgb(15 61 51 / 0.03),
+      0 6px 18px -12px rgb(15 61 51 / 0.1);
   }
 
   .landing-shadow-md {
     box-shadow:
-      0 1px 2px rgb(15 61 51 / 0.05),
-      0 12px 32px -14px rgb(15 61 51 / 0.16),
-      0 28px 56px -28px rgb(15 61 51 / 0.14);
+      0 1px 2px rgb(15 61 51 / 0.035),
+      0 10px 28px -14px rgb(15 61 51 / 0.12),
+      0 22px 44px -28px rgb(15 61 51 / 0.1);
   }
 
   .landing-shadow-lg {
     box-shadow:
-      0 2px 4px rgb(15 61 51 / 0.04),
-      0 18px 40px -16px rgb(15 61 51 / 0.2),
-      0 40px 72px -36px rgb(15 61 51 / 0.18);
+      0 1px 3px rgb(15 61 51 / 0.035),
+      0 14px 34px -16px rgb(15 61 51 / 0.15),
+      0 32px 60px -36px rgb(15 61 51 / 0.12);
   }
 
   .landing-card {
-    @apply rounded-2xl border border-[#0F3D33]/10 bg-white;
+    @apply rounded-2xl border border-[#0F3D33]/8 bg-white;
     box-shadow:
-      0 1px 2px rgb(15 61 51 / 0.04),
-      0 10px 28px -14px rgb(15 61 51 / 0.12);
+      0 1px 2px rgb(15 61 51 / 0.03),
+      0 8px 22px -14px rgb(15 61 51 / 0.1);
     transition:
-      transform 500ms cubic-bezier(0.16, 1, 0.3, 1),
-      box-shadow 500ms cubic-bezier(0.16, 1, 0.3, 1),
-      border-color 500ms ease;
+      transform 250ms ease,
+      box-shadow 250ms ease,
+      border-color 250ms ease;
   }
 
   .landing-card:hover {
-    transform: translateY(-3px);
-    border-color: rgb(15 61 51 / 0.18);
+    transform: translateY(-2px);
+    border-color: rgb(15 61 51 / 0.14);
     box-shadow:
-      0 2px 4px rgb(15 61 51 / 0.05),
-      0 18px 40px -16px rgb(15 61 51 / 0.18),
-      0 36px 64px -32px rgb(15 61 51 / 0.14);
+      0 1px 3px rgb(15 61 51 / 0.04),
+      0 14px 32px -16px rgb(15 61 51 / 0.14),
+      0 28px 52px -32px rgb(15 61 51 / 0.1);
   }
 
   .landing-btn-primary {
@@ -329,9 +334,9 @@
       0 1px 0 rgb(255 255 255 / 0.12) inset,
       0 8px 20px -8px rgb(15 61 51 / 0.55);
     transition:
-      transform 200ms ease,
-      background-color 200ms ease,
-      box-shadow 200ms ease;
+      transform 250ms ease,
+      background-color 250ms ease,
+      box-shadow 250ms ease;
   }
 
   .landing-btn-primary:hover {
@@ -350,10 +355,10 @@
     @apply inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-[#0F3D33]/14 bg-white/90 px-6 text-[15px] font-semibold text-[#0F3D33] backdrop-blur-sm;
     box-shadow: 0 1px 2px rgb(15 61 51 / 0.04);
     transition:
-      transform 200ms ease,
-      background-color 200ms ease,
-      border-color 200ms ease,
-      box-shadow 200ms ease;
+      transform 250ms ease,
+      background-color 250ms ease,
+      border-color 250ms ease,
+      box-shadow 250ms ease;
   }
 
   .landing-btn-secondary:hover {
@@ -364,7 +369,7 @@
   }
 
   .landing-nav-link {
-    @apply relative text-[13px] font-medium tracking-tight text-[#5A6B64] transition-colors duration-200;
+    @apply relative text-[13px] font-medium tracking-tight text-[#5A6B64] transition-colors duration-[250ms] ease-in-out;
   }
 
   .landing-nav-link::after {
@@ -378,7 +383,7 @@
     background: #0f3d33;
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 250ms ease;
   }
 
   .landing-nav-link:hover {

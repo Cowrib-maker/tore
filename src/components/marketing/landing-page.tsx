@@ -1,4 +1,5 @@
-import { ToreMark } from "@/components/brand/tore-logo";
+import { BrandTagline } from "@/components/brand/brand-tagline";
+import { ToreLogo } from "@/components/brand/tore-logo";
 import { BRAND_LOGO_LANDING } from "@/components/brand/tokens";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { BrandLink } from "@/components/layout/brand-link";
@@ -49,14 +50,14 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
       className={cn(
         display.variable,
         sans.variable,
-        "landing-page min-h-screen bg-[#FAFBFA] text-[#0A0F14] antialiased",
+        "landing-page min-h-screen bg-[#FAF9F7] text-[#0A0F14] antialiased",
         "font-[family-name:var(--font-landing-sans)]",
       )}
     >
       <div className="pointer-events-none fixed inset-0 -z-10 landing-hero-atmosphere" />
 
-      <header className="sticky top-0 z-40 border-b border-[#0F3D33]/08 bg-[#FAFBFA]/80 shadow-[0_1px_0_rgb(15_61_51/0.03)] backdrop-blur-2xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:h-[4.25rem] sm:px-8">
+      <header className="sticky top-0 z-40 border-b border-[#0F3D33]/8 bg-[#FAF9F7]/80 shadow-[0_1px_0_rgb(15_61_51/0.03)] backdrop-blur-2xl">
+        <div className="mx-auto flex h-[4.75rem] max-w-6xl items-center justify-between gap-4 px-5 sm:px-8">
           <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_LANDING} />
           <nav
             className="hidden items-center gap-8 md:flex"
@@ -79,13 +80,13 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
             <LanguageSwitcher locale={locale} label={dict.common.language} />
             <Link
               href="/login"
-              className="hidden h-10 items-center rounded-xl px-3 text-[13px] font-medium text-[#5A6B64] transition-colors hover:bg-[#0F3D33]/05 hover:text-[#0F3D33] sm:inline-flex"
+              className="hidden h-10 items-center rounded-xl px-3 text-[13px] font-medium text-[#5A6B64] transition-colors duration-[250ms] ease-in-out hover:bg-[#0F3D33]/5 hover:text-[#0F3D33] sm:inline-flex"
             >
               {dict.common.signIn}
             </Link>
             <Link
               href="/register/client"
-              className="inline-flex h-10 items-center rounded-xl bg-[#0F3D33] px-4 text-[13px] font-semibold text-white shadow-[0_6px_16px_-8px_rgb(15_61_51/0.55)] transition-[transform,background-color] hover:-translate-y-px hover:bg-[#0F3D33]/92"
+              className="inline-flex h-10 items-center rounded-xl bg-[#0F3D33] px-4 text-[13px] font-semibold text-white shadow-[0_6px_16px_-8px_rgb(15_61_51/0.55)] transition-[transform,background-color] duration-[250ms] ease-in-out hover:-translate-y-px hover:bg-[#0F3D33]/92"
             >
               {dict.common.getStarted}
             </Link>
@@ -94,16 +95,16 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
       </header>
 
       <main>
-        <section className="relative overflow-hidden border-b border-[#0F3D33]/08">
-          <div className="mx-auto grid max-w-6xl gap-12 px-5 pb-20 pt-14 sm:px-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-14 lg:pb-24 lg:pt-20">
+        <section className="relative overflow-hidden border-b border-[#0F3D33]/8">
+          <div className="mx-auto grid max-w-6xl gap-12 px-5 pb-20 pt-14 sm:px-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-20 lg:pb-24 lg:pt-20">
             <LandingReveal className="max-w-xl">
               <p className="text-[12px] font-semibold tracking-[0.14em] text-[#5A6B64] uppercase sm:text-[13px]">
                 {t.eyebrow}
               </p>
-              <h1 className="mt-5 font-[family-name:var(--font-landing-display)] text-[2.75rem] leading-[1.06] tracking-[-0.03em] text-[#0A0F14] sm:text-[3.4rem] lg:text-[3.65rem]">
+              <h1 className="mt-5 font-[family-name:var(--font-landing-display)] text-[2.75rem] leading-[1.06] tracking-[-0.03em] text-[#0A0F14] sm:text-[3.4rem] lg:text-[4rem]">
                 {t.headline}
               </h1>
-              <p className="mt-6 max-w-md text-[1.05rem] leading-relaxed text-[#5A6B64] sm:text-lg">
+              <p className="mt-6 max-w-sm text-[1.05rem] leading-relaxed text-[#5A6B64] sm:text-lg">
                 {t.support}
               </p>
 
@@ -134,18 +135,33 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
                 ))}
               </div>
 
-              <div className="mt-7 flex items-center gap-3.5">
-                <ToreMark className="size-9" decorative />
-                <p className="max-w-[18rem] text-xs leading-snug text-[#5A6B64] sm:max-w-md">
+              <div className="mt-7">
+                <div className="inline-flex flex-col items-center">
+                  <ToreLogo
+                    brand={dict.common.brand}
+                    markClassName="size-9"
+                    wordmarkClassName="text-[15px] tracking-[-0.02em]"
+                    className="gap-3"
+                  />
+                  <BrandTagline />
+                </div>
+                <p className="mt-3 max-w-[18rem] text-xs leading-snug text-[#5A6B64] sm:max-w-md">
                   {t.proofAvatars}
                 </p>
               </div>
             </LandingReveal>
 
-            <LandingReveal delayMs={120} className="lg:justify-self-end">
+            <LandingReveal
+              delayMs={120}
+              className="relative lg:justify-self-end"
+            >
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -inset-6 -z-10 rounded-[2.75rem] bg-[radial-gradient(ellipse_at_50%_40%,rgba(15,61,51,0.04),transparent_64%),radial-gradient(ellipse_at_70%_70%,rgba(200,164,93,0.03),transparent_58%)] sm:-inset-10"
+              />
               <LandingProductMockup
                 copy={t.mockup}
-                className="w-full max-w-[580px] lg:max-w-none"
+                className="w-full max-w-[620px] opacity-[0.96] lg:max-w-none"
               />
             </LandingReveal>
           </div>
@@ -153,7 +169,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
 
         <section
           id="featured"
-          className="scroll-mt-24 border-b border-[#0F3D33]/08"
+          className="scroll-mt-24 border-b border-[#0F3D33]/8"
         >
           <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
             <LandingReveal className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
@@ -170,7 +186,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
               </div>
               <Link
                 href="/lawyers"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0F3D33] transition-opacity hover:opacity-70"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0F3D33] transition-opacity duration-[250ms] ease-in-out hover:opacity-70"
               >
                 {t.browseAll}
                 <ArrowRight className="size-3.5" />
@@ -188,11 +204,11 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
                       )}
                     >
                       <div className="absolute inset-x-5 bottom-0 translate-y-1/2">
-                        <div className="flex size-14 items-center justify-center rounded-2xl border border-[#0F3D33]/08 bg-white text-sm font-semibold tracking-tight text-[#0F3D33] shadow-[0_8px_20px_-10px_rgb(15_61_51/0.35)]">
+                        <div className="flex size-14 items-center justify-center rounded-2xl border border-[#0F3D33]/8 bg-white text-sm font-semibold tracking-tight text-[#0F3D33] shadow-[0_8px_20px_-10px_rgb(15_61_51/0.35)]">
                           {lawyer.initials}
                         </div>
                       </div>
-                      <span className="absolute right-3.5 top-3.5 inline-flex items-center gap-1 rounded-lg border border-[#0F3D33]/08 bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-[#0F3D33] shadow-sm backdrop-blur-sm">
+                      <span className="absolute right-3.5 top-3.5 inline-flex items-center gap-1 rounded-lg border border-[#0F3D33]/8 bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-[#0F3D33] shadow-sm backdrop-blur-sm">
                         <BadgeCheck className="size-3 fill-[#0F3D33] text-white" />
                         {t.verified}
                       </span>
@@ -223,7 +239,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
                         {lawyer.focus.map((tag) => (
                           <span
                             key={tag}
-                            className="rounded-md border border-[#0F3D33]/08 bg-[#F7FAF8] px-2 py-0.5 text-[11px] font-medium text-[#3D4F48]"
+                            className="rounded-md border border-[#0F3D33]/8 bg-[#F7FAF8] px-2 py-0.5 text-[11px] font-medium text-[#3D4F48]"
                           >
                             {tag}
                           </span>
@@ -248,13 +264,13 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
                       <div className="mt-auto flex gap-2.5 pt-6">
                         <Link
                           href="/lawyers"
-                          className="inline-flex h-10 flex-1 items-center justify-center rounded-xl bg-[#0F3D33] text-sm font-semibold text-white shadow-[0_8px_18px_-10px_rgb(15_61_51/0.5)] transition-[transform,background-color] hover:-translate-y-px hover:bg-[#0F3D33]/92"
+                          className="inline-flex h-10 flex-1 items-center justify-center rounded-xl bg-[#0F3D33] text-sm font-semibold text-white shadow-[0_8px_18px_-10px_rgb(15_61_51/0.5)] transition-[transform,background-color] duration-[250ms] ease-in-out hover:-translate-y-px hover:bg-[#0F3D33]/92"
                         >
                           {t.book}
                         </Link>
                         <Link
                           href="/lawyers"
-                          className="inline-flex h-10 items-center justify-center rounded-xl border border-[#0F3D33]/14 bg-white px-4 text-sm font-semibold text-[#0F3D33] transition-colors hover:bg-[#F4F8F6]"
+                          className="inline-flex h-10 items-center justify-center rounded-xl border border-[#0F3D33]/14 bg-white px-4 text-sm font-semibold text-[#0F3D33] transition-colors duration-[250ms] ease-in-out hover:bg-[#F4F8F6]"
                         >
                           {t.profile}
                         </Link>
@@ -267,7 +283,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
           </div>
         </section>
 
-        <section id="how" className="scroll-mt-24 border-b border-[#0F3D33]/08">
+        <section id="how" className="scroll-mt-24 border-b border-[#0F3D33]/8">
           <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
             <LandingReveal className="max-w-xl">
               <p className="text-[12px] font-semibold tracking-[0.14em] text-[#5A6B64] uppercase sm:text-[13px]">
@@ -300,7 +316,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
 
         <section
           id="trust"
-          className="scroll-mt-24 border-b border-[#0F3D33]/08 bg-[#F4F8F6]"
+          className="scroll-mt-24 border-b border-[#0F3D33]/8 bg-[#F3F1ED]"
         >
           <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
             <LandingReveal className="max-w-xl">
@@ -343,7 +359,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
           </div>
         </section>
 
-        <section className="border-b border-[#0F3D33]/08">
+        <section className="border-b border-[#0F3D33]/8">
           <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
             <LandingReveal className="max-w-xl">
               <p className="text-[12px] font-semibold tracking-[0.14em] text-[#5A6B64] uppercase sm:text-[13px]">
@@ -361,7 +377,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
                     <blockquote className="flex-1 text-[15px] leading-relaxed text-[#3D4F48] sm:text-base">
                       “{item.quote}”
                     </blockquote>
-                    <figcaption className="mt-7 border-t border-[#0F3D33]/08 pt-5">
+                    <figcaption className="mt-7 border-t border-[#0F3D33]/8 pt-5">
                       <p className="text-sm font-semibold text-[#0A0F14]">
                         {item.name}
                       </p>
@@ -374,7 +390,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
           </div>
         </section>
 
-        <section id="faq" className="scroll-mt-24 border-b border-[#0F3D33]/08">
+        <section id="faq" className="scroll-mt-24 border-b border-[#0F3D33]/8">
           <div className="mx-auto grid max-w-6xl gap-12 px-5 py-20 sm:px-8 sm:py-24 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
             <LandingReveal>
               <p className="text-[12px] font-semibold tracking-[0.14em] text-[#5A6B64] uppercase sm:text-[13px]">
@@ -393,7 +409,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
           </div>
         </section>
 
-        <section className="border-b border-[#0F3D33]/08">
+        <section className="border-b border-[#0F3D33]/8">
           <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
             <LandingReveal className="landing-shadow-lg relative overflow-hidden rounded-[1.75rem] border border-[#0F3D33]/25 bg-[#0F3D33] px-8 py-14 text-white sm:rounded-[2rem] sm:px-14 sm:py-16">
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_85%_10%,rgba(200,164,93,0.16),transparent_45%),radial-gradient(ellipse_at_15%_90%,rgba(255,255,255,0.06),transparent_40%)]" />
@@ -407,13 +423,13 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
                 <div className="mt-9 flex flex-wrap gap-3">
                   <Link
                     href="/register/client"
-                    className="inline-flex h-12 items-center justify-center rounded-xl bg-white px-6 text-[15px] font-semibold text-[#0F3D33] shadow-[0_10px_28px_-12px_rgb(0_0_0/0.35)] transition-[transform,background-color] hover:-translate-y-px hover:bg-white/95"
+                    className="inline-flex h-12 items-center justify-center rounded-xl bg-white px-6 text-[15px] font-semibold text-[#0F3D33] shadow-[0_10px_28px_-12px_rgb(0_0_0/0.35)] transition-[transform,background-color] duration-[250ms] ease-in-out hover:-translate-y-px hover:bg-white/95"
                   >
                     {t.ctaClient}
                   </Link>
                   <Link
                     href="/register/lawyer"
-                    className="inline-flex h-12 items-center justify-center rounded-xl border border-white/25 bg-transparent px-6 text-[15px] font-semibold text-white transition-[transform,background-color] hover:-translate-y-px hover:bg-white/10"
+                    className="inline-flex h-12 items-center justify-center rounded-xl border border-white/25 bg-transparent px-6 text-[15px] font-semibold text-white transition-[transform,background-color] duration-[250ms] ease-in-out hover:-translate-y-px hover:bg-white/10"
                   >
                     {t.ctaLawyer}
                   </Link>
@@ -424,11 +440,14 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
         </section>
       </main>
 
-      <footer className="bg-[#FAFBFA]">
+      <footer className="bg-[#FAF9F7]">
         <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-16">
           <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
             <div className="sm:col-span-2 lg:col-span-1">
-              <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_LANDING} />
+              <div className="inline-flex flex-col items-center">
+                <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_LANDING} />
+                <BrandTagline />
+              </div>
               <p className="mt-4 max-w-xs text-sm leading-relaxed text-[#5A6B64]">
                 {t.footerTagline}
               </p>
@@ -441,7 +460,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
                 <li>
                   <a
                     href="#featured"
-                    className="transition-colors hover:text-[#0F3D33]"
+                    className="transition-colors duration-[250ms] ease-in-out hover:text-[#0F3D33]"
                   >
                     {t.footerFeatured}
                   </a>
@@ -449,7 +468,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
                 <li>
                   <a
                     href="#how"
-                    className="transition-colors hover:text-[#0F3D33]"
+                    className="transition-colors duration-[250ms] ease-in-out hover:text-[#0F3D33]"
                   >
                     {t.footerHow}
                   </a>
@@ -457,7 +476,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
                 <li>
                   <a
                     href="#trust"
-                    className="transition-colors hover:text-[#0F3D33]"
+                    className="transition-colors duration-[250ms] ease-in-out hover:text-[#0F3D33]"
                   >
                     {t.footerTrust}
                   </a>
@@ -472,7 +491,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
                 <li>
                   <Link
                     href="/login"
-                    className="transition-colors hover:text-[#0F3D33]"
+                    className="transition-colors duration-[250ms] ease-in-out hover:text-[#0F3D33]"
                   >
                     {dict.common.signIn}
                   </Link>
@@ -480,7 +499,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
                 <li>
                   <Link
                     href="/register/client"
-                    className="transition-colors hover:text-[#0F3D33]"
+                    className="transition-colors duration-[250ms] ease-in-out hover:text-[#0F3D33]"
                   >
                     {t.footerClientReg}
                   </Link>
@@ -488,7 +507,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
                 <li>
                   <Link
                     href="/register/lawyer"
-                    className="transition-colors hover:text-[#0F3D33]"
+                    className="transition-colors duration-[250ms] ease-in-out hover:text-[#0F3D33]"
                   >
                     {t.footerLawyerReg}
                   </Link>
@@ -503,7 +522,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
                 <li>
                   <a
                     href="#faq"
-                    className="transition-colors hover:text-[#0F3D33]"
+                    className="transition-colors duration-[250ms] ease-in-out hover:text-[#0F3D33]"
                   >
                     {t.footerFaq}
                   </a>

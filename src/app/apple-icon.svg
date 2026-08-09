@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none" role="img" aria-label="TORE">
   <title>TORE</title>
-  <!-- Apple Touch icon — forest tile mark -->
   <rect width="180" height="180" rx="40" fill="#0F3D33"/>
-  <path d="M45 50.625h90v19.6875H45V50.625z" fill="#F7FAF8"/>
-  <path d="M80.15625 70.3125h19.6875v59.0625H80.15625V70.3125z" fill="#F7FAF8"/>
-  <circle cx="45" cy="60.46875" r="6.75" fill="#C8A45D"/>
-  <circle cx="135" cy="60.46875" r="6.75" fill="#C8A45D"/>
-  <circle cx="90" cy="135" r="6.75" fill="#C8A45D"/>
+  <g transform="translate(11.25 11.25) scale(2.4609375)">
+    <path fill="#F7FAF8" d="M4 8H44V22H12L4 14V8Z"/>
+    <path fill="#F7FAF8" d="M12 22H24V40L18 48H12V22Z"/>
+    <path fill="#F7FAF8" d="M26 22H42V44L34 58L26 44V22Z"/>
+    <rect x="46" y="8" width="10" height="10" fill="#C8A45D"/>
+  </g>
 </svg>

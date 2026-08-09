@@ -12,7 +12,7 @@ export function LandingFaq({ faqs }: { faqs: FaqItem[] }) {
   const [open, setOpen] = useState(0);
 
   return (
-    <div className="divide-y divide-[#0F3D33]/08 overflow-hidden rounded-2xl border border-[#0F3D33]/10 bg-white landing-shadow-sm">
+    <div className="divide-y divide-[#0F3D33]/8 overflow-hidden rounded-2xl border border-[#0F3D33]/10 bg-white landing-shadow-sm">
       {faqs.map((item, index) => {
         const isOpen = open === index;
         return (

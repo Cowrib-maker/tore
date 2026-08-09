@@ -1,9 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" role="img" aria-label="TORE">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="TORE">
   <title>TORE</title>
-  <rect width="32" height="32" rx="8" fill="#0F3D33"/>
-  <path d="M8 9h16v3.5H8V9z" fill="#F7FAF8"/>
-  <path d="M14.25 12.5h3.5v10.5h-3.5V12.5z" fill="#F7FAF8"/>
-  <circle cx="8" cy="10.75" r="1.2" fill="#C8A45D"/>
-  <circle cx="24" cy="10.75" r="1.2" fill="#C8A45D"/>
-  <circle cx="16" cy="24" r="1.2" fill="#C8A45D"/>
+  <!-- App icon: forest tile + ivory monogram + gold square -->
+  <rect width="64" height="64" rx="14" fill="#0F3D33"/>
+  <g transform="translate(4 4) scale(0.875)">
+    <path fill="#F7FAF8" d="M4 8H44V22H12L4 14V8Z"/>
+    <path fill="#F7FAF8" d="M12 22H24V40L18 48H12V22Z"/>
+    <path fill="#F7FAF8" d="M26 22H42V44L34 58L26 44V22Z"/>
+    <rect x="46" y="8" width="10" height="10" fill="#C8A45D"/>
+  </g>
 </svg>

@@ -4,24 +4,42 @@ import { BRAND_COLORS, BRAND_NAME } from "@/components/brand/tokens";
 
 export type ToreMarkProps = {
   className?: string;
-  /** on-light pages use forest tile; on-dark surfaces use ivory tile. */
-  tone?: "on-light" | "on-dark";
+  /**
+   * on-light: forest mark (nav/marketing).
+   * on-dark: ivory mark for dark surfaces.
+   * app: white mark on forest rounded tile (favicon / app icon).
+   */
+  tone?: "on-light" | "on-dark" | "app";
   /** When true, hide from accessibility tree (paired with visible wordmark). */
   decorative?: boolean;
 };
 
+/** Canonical monogram paths (64×64). Brand sheet Aug 2026. */
+function MarkGlyph({ fill }: { fill: string }) {
+  return (
+    <g fill={fill}>
+      {/* Top bar — left edge chamfered downward */}
+      <path d="M4 8H44V22H12L4 14V8Z" />
+      {/* Left under-piece — short vertical with angled base */}
+      <path d="M12 22H24V40L18 48H12V22Z" />
+      {/* Right stem — taller, tapering tip */}
+      <path d="M26 22H42V44L34 58L26 44V22Z" />
+    </g>
+  );
+}
+
 /**
- * Geometric "T" monogram with warm gold node accents.
- * Geometry matches public/brand/tore-mark.svg (64×64 viewBox).
+ * Canonical TORE geometric monogram (brand sheet Aug 2026).
+ * Angular T + gold square — replaces the legacy square-tile logo.
  */
 export function ToreMark({
   className,
   tone = "on-light",
   decorative = false,
 }: ToreMarkProps) {
-  const onDark = tone === "on-dark";
-  const tile = onDark ? BRAND_COLORS.ivory : BRAND_COLORS.forest;
-  const bar = onDark ? BRAND_COLORS.forest : BRAND_COLORS.ivory;
+  const framed = tone === "app";
+  const mark =
+    tone === "on-dark" || framed ? BRAND_COLORS.ivory : BRAND_COLORS.forest;
 
   return (
     <svg
@@ -34,19 +52,13 @@ export function ToreMark({
       aria-label={decorative ? undefined : BRAND_NAME}
     >
       {!decorative ? <title>{BRAND_NAME}</title> : null}
-      <rect
-        width="64"
-        height="64"
-        rx="14"
-        fill={tile}
-        stroke={onDark ? BRAND_COLORS.forest : undefined}
-        strokeWidth={onDark ? 1.5 : undefined}
-      />
-      <path d="M16 18h32v7H16V18z" fill={bar} />
-      <path d="M28.5 25h7v21h-7V25z" fill={bar} />
-      <circle cx="16" cy="21.5" r="2.4" fill={BRAND_COLORS.gold} />
-      <circle cx="48" cy="21.5" r="2.4" fill={BRAND_COLORS.gold} />
-      <circle cx="32" cy="48" r="2.4" fill={BRAND_COLORS.gold} />
+      {framed ? (
+        <rect width="64" height="64" rx="14" fill={BRAND_COLORS.forest} />
+      ) : null}
+      <g transform={framed ? "translate(4 4) scale(0.875)" : undefined}>
+        <MarkGlyph fill={mark} />
+        <rect x="46" y="8" width="10" height="10" fill={BRAND_COLORS.gold} />
+      </g>
     </svg>
   );
 }
@@ -58,10 +70,18 @@ export type ToreLogoProps = {
   variant?: "full" | "mark";
   tone?: "on-light" | "on-dark";
   brand?: string;
+  /**
+   * @deprecated Tagline is never shown in the horizontal lockup (navbar rule).
+   * Use `BrandTagline` under the logo on hero / footer / splash / OG.
+   */
+  showTagline?: boolean;
+  /** @deprecated Unused — tagline uses BrandTagline. */
+  taglineClassName?: string;
 };
 
 /**
- * Premium mark + wordmark. Use inside BrandLink for navigation.
+ * Primary lockup: monogram + TORE. Navbar/header must not include the tagline.
+ * Pair with `BrandTagline` on marketing, footer, splash, and social surfaces only.
  */
 export function ToreLogo({
   className,
@@ -70,20 +90,24 @@ export function ToreLogo({
   variant = "full",
   tone = "on-light",
   brand = BRAND_NAME,
+  showTagline: _showTagline = false,
+  taglineClassName: _taglineClassName,
 }: ToreLogoProps) {
+  void _showTagline;
+  void _taglineClassName;
   const onDark = tone === "on-dark";
 
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
+    <span className={cn("inline-flex items-center gap-3.5", className)}>
       <ToreMark
         tone={tone}
         decorative={variant === "full"}
-        className={cn("size-7", markClassName)}
+        className={cn("size-9", markClassName)}
       />
       {variant === "full" ? (
         <span
           className={cn(
-            "text-[15px] font-semibold tracking-[-0.04em]",
+            "text-base font-semibold leading-none tracking-[-0.02em]",
             onDark ? "text-[#F7FAF8]" : "text-[#0F3D33]",
             wordmarkClassName,
           )}

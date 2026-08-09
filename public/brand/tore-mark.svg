@@ -1,10 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="TORE">
   <title>TORE</title>
-  <!-- Geometric T monogram — favicon / app icon (forest tile) -->
-  <rect width="64" height="64" rx="14" fill="#0F3D33"/>
-  <path d="M16 18h32v7H16V18z" fill="#F7FAF8"/>
-  <path d="M28.5 25h7v21h-7V25z" fill="#F7FAF8"/>
-  <circle cx="16" cy="21.5" r="2.4" fill="#C8A45D"/>
-  <circle cx="48" cy="21.5" r="2.4" fill="#C8A45D"/>
-  <circle cx="32" cy="48" r="2.4" fill="#C8A45D"/>
+  <!-- Canonical monogram — angular T + gold square (brand sheet Aug 2026) -->
+  <path fill="#0F3D33" d="M4 8H44V22H12L4 14V8Z"/>
+  <path fill="#0F3D33" d="M12 22H24V40L18 48H12V22Z"/>
+  <path fill="#0F3D33" d="M26 22H42V44L34 58L26 44V22Z"/>
+  <rect x="46" y="8" width="10" height="10" fill="#C8A45D"/>
 </svg>

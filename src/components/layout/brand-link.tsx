@@ -58,7 +58,10 @@ export function BrandLink({
       href="/"
       aria-label={`${brand} home`}
       onClick={handleClick}
-      className={cn("inline-flex cursor-pointer items-center", className)}
+      className={cn(
+        "inline-flex h-full cursor-pointer items-center self-center",
+        className,
+      )}
     >
       {children ?? (
         <ToreLogo brand={brand} variant="full" tone="on-light" {...logo} />

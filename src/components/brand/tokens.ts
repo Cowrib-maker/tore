@@ -3,22 +3,28 @@ export const BRAND_COLORS = {
   forest: "#0F3D33",
   gold: "#C8A45D",
   ivory: "#F7FAF8",
+  /** App / dashboard shell surface (cool). */
   canvas: "#FAFBFA",
+  /** Marketing page canvas — warm ivory (Harvey / Linear tone). */
+  marketing: "#FAF9F7",
   ink: "#0A0F14",
 } as const;
 
-/** Default logo proportions for h-14 app chrome (auth, dashboards, directory). */
+/** Official secondary brand line — not used in navbar/header. */
+export const BRAND_TAGLINE = "LEGAL. AI. CONNECTED.";
+
+/** Default logo proportions for app chrome (auth, dashboards, directory). */
 export const BRAND_LOGO_SHELL = {
-  markClassName: "size-7",
-  wordmarkClassName: "text-[15px]",
-  className: "gap-2.5",
+  markClassName: "size-9",
+  wordmarkClassName: "text-base tracking-[-0.02em]",
+  className: "gap-3.5",
 } as const;
 
-/** Slightly larger logo for marketing / landing headers. */
+/** Marketing / landing header lockup — wordmark only in nav. */
 export const BRAND_LOGO_LANDING = {
-  markClassName: "size-8 sm:size-9",
-  wordmarkClassName: "text-base sm:text-[1.125rem]",
-  className: "gap-3",
+  markClassName: "size-[2.875rem] sm:size-[3.15rem]",
+  wordmarkClassName: "text-[1.2rem] sm:text-[1.35rem] tracking-[-0.02em]",
+  className: "gap-4",
 } as const;
 
 export const BRAND_NAME = "TORE";

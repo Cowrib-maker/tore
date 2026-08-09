@@ -48,11 +48,9 @@ export async function generateMetadata(): Promise<Metadata> {
       description: dict.meta.description,
     },
     icons: {
-      icon: [
-        { url: "/favicon.svg", type: "image/svg+xml" },
-        { url: "/brand/tore-mark.svg", type: "image/svg+xml" },
-      ],
-      apple: [{ url: "/brand/tore-mark.svg", type: "image/svg+xml" }],
+      // Static SVGs synced to ToreMark geometry (browsers can't use the React component).
+      // src/app/icon.svg + apple-icon.svg are also emitted by the App Router file convention.
+      icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     },
   };
 }
