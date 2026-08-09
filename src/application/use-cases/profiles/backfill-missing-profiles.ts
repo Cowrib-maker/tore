@@ -5,8 +5,7 @@ import type {
   LawyerProfileRepository,
 } from "@/domain/repositories/profile-repository";
 import type { UserRepository } from "@/domain/repositories/user-repository";
-import { ConflictError } from "@/domain/errors/domain-error";
-import { generateLawyerSlug } from "@/domain/services/slug-generator";
+import { createLawyerProfileWithUniqueSlug } from "@/domain/services/allocate-lawyer-slug";
 
 export type BackfillMissingProfilesDeps = {
   userRepository: UserRepository;
@@ -21,21 +20,6 @@ export type BackfillMissingProfilesResult = {
   clientsSkipped: number;
   lawyersSkipped: number;
 };
-
-async function allocateUniqueLawyerSlug(
-  displayName: string,
-  lawyerProfileRepository: LawyerProfileRepository,
-): Promise<string> {
-  for (let attempt = 0; attempt < 8; attempt += 1) {
-    const slug = generateLawyerSlug(displayName);
-    const taken = await lawyerProfileRepository.slugExists(slug);
-    if (!taken) {
-      return slug;
-    }
-  }
-
-  throw new ConflictError("Could not allocate a unique lawyer profile slug");
-}
 
 /**
  * Creates missing ClientProfile / LawyerProfile rows for existing users
@@ -59,12 +43,14 @@ export async function backfillMissingProfilesUseCase(
       continue;
     }
 
-    await deps.clientProfileRepository.create({ userId: user.id });
+    const profile = await deps.clientProfileRepository.create({
+      userId: user.id,
+    });
     await deps.auditLogRepository.create({
       actorUserId: user.id,
       action: AuditAction.CREATE,
       entityType: "ClientProfile",
-      entityId: user.id,
+      entityId: profile.id,
       metadata: { source: "backfill-missing-profiles", userId: user.id },
     });
     result.clientsCreated += 1;
@@ -78,15 +64,11 @@ export async function backfillMissingProfilesUseCase(
       continue;
     }
 
-    const slug = await allocateUniqueLawyerSlug(
+    const profile = await createLawyerProfileWithUniqueSlug(
       user.name ?? user.email,
+      user.id,
       deps.lawyerProfileRepository,
     );
-
-    const profile = await deps.lawyerProfileRepository.create({
-      userId: user.id,
-      slug,
-    });
 
     await deps.auditLogRepository.create({
       actorUserId: user.id,
@@ -96,7 +78,7 @@ export async function backfillMissingProfilesUseCase(
       metadata: {
         source: "backfill-missing-profiles",
         userId: user.id,
-        slug,
+        slug: profile.slug,
       },
     });
     result.lawyersCreated += 1;

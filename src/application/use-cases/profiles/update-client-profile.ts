@@ -1,7 +1,11 @@
+import type { ActorContext } from "@/application/common/actor-context";
 import type { UpdateClientProfileFormInput } from "@/application/validators/profile.schema";
 import type { ClientProfile } from "@/domain/entities/profile";
-import { AuditAction } from "@/domain/enums";
-import { NotFoundError } from "@/domain/errors/domain-error";
+import { AuditAction, UserRole } from "@/domain/enums";
+import {
+  ForbiddenError,
+  NotFoundError,
+} from "@/domain/errors/domain-error";
 import type { AuditLogRepository } from "@/domain/repositories/audit-log-repository";
 import type { ClientProfileRepository } from "@/domain/repositories/profile-repository";
 
@@ -11,14 +15,24 @@ export type UpdateClientProfileDeps = {
 };
 
 export async function updateClientProfileUseCase(
-  userId: string,
+  actor: ActorContext,
   input: UpdateClientProfileFormInput,
   deps: UpdateClientProfileDeps,
   ipAddress?: string,
 ): Promise<ClientProfile> {
-  const existing = await deps.clientProfileRepository.findByUserId(userId);
+  if (actor.role !== UserRole.CLIENT) {
+    throw new ForbiddenError();
+  }
+
+  const existing = await deps.clientProfileRepository.findByUserId(
+    actor.userId,
+  );
   if (!existing) {
     throw new NotFoundError("ClientProfile");
+  }
+
+  if (existing.userId !== actor.userId) {
+    throw new ForbiddenError();
   }
 
   const updated = await deps.clientProfileRepository.update(existing.id, {
@@ -27,7 +41,7 @@ export async function updateClientProfileUseCase(
   });
 
   await deps.auditLogRepository.create({
-    actorUserId: userId,
+    actorUserId: actor.userId,
     action: AuditAction.UPDATE,
     entityType: "ClientProfile",
     entityId: updated.id,

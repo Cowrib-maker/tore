@@ -1,8 +1,10 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
 import type { ActionState } from "@/application/actions/auth.actions";
+import type { ActorContext } from "@/application/common/actor-context";
 import { updateClientProfileUseCase } from "@/application/use-cases/profiles/update-client-profile";
 import { updateLawyerProfileUseCase } from "@/application/use-cases/profiles/update-lawyer-profile";
 import {
@@ -52,7 +54,7 @@ const updateLawyerDeps = {
   auditLogRepository,
 };
 
-async function requireSessionUser(role: UserRole) {
+async function requireSessionUser(role: UserRole): Promise<ActorContext> {
   const session = await auth();
   if (!session?.user?.id) {
     throw new UnauthorizedError("You must be signed in");
@@ -60,7 +62,10 @@ async function requireSessionUser(role: UserRole) {
   if (session.user.role !== role) {
     throw new ForbiddenError();
   }
-  return session.user;
+  return {
+    userId: session.user.id,
+    role: session.user.role as UserRole,
+  };
 }
 
 export async function updateClientProfileAction(
@@ -68,7 +73,7 @@ export async function updateClientProfileAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const user = await requireSessionUser(UserRole.CLIENT);
+    const actor = await requireSessionUser(UserRole.CLIENT);
     const parsed = updateClientProfileSchema.safeParse({
       phone: formData.get("phone") ?? "",
       companyName: formData.get("companyName") ?? "",
@@ -80,11 +85,13 @@ export async function updateClientProfileAction(
 
     const ipAddress = await getClientIp();
     await updateClientProfileUseCase(
-      user.id,
+      actor,
       parsed.data,
       updateClientDeps,
       ipAddress,
     );
+    revalidatePath("/client/profile");
+    revalidatePath("/client/dashboard");
     return { success: true };
   } catch (error) {
     return mapError(error);
@@ -96,7 +103,7 @@ export async function updateLawyerProfileAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const user = await requireSessionUser(UserRole.LAWYER);
+    const actor = await requireSessionUser(UserRole.LAWYER);
     const parsed = updateLawyerProfileSchema.safeParse({
       headline: formData.get("headline") ?? "",
       bio: formData.get("bio") ?? "",
@@ -111,11 +118,13 @@ export async function updateLawyerProfileAction(
 
     const ipAddress = await getClientIp();
     await updateLawyerProfileUseCase(
-      user.id,
+      actor,
       parsed.data,
       updateLawyerDeps,
       ipAddress,
     );
+    revalidatePath("/lawyer/profile");
+    revalidatePath("/lawyer/dashboard");
     return { success: true };
   } catch (error) {
     return mapError(error);

@@ -6,11 +6,18 @@ import type {
 import type { TermsAcceptanceRepository } from "@/domain/repositories/terms-acceptance-repository";
 import { TermsType } from "@/domain/enums";
 import { mapTermsAcceptance } from "@/infrastructure/mappers/terms-acceptance.mapper";
-import { prisma } from "@/infrastructure/database/prisma";
+import {
+  getPrismaClient,
+  type PrismaDbClient,
+} from "@/infrastructure/database/prisma-client";
 
-export class PrismaTermsAcceptanceRepository implements TermsAcceptanceRepository {
+export class PrismaTermsAcceptanceRepository
+  implements TermsAcceptanceRepository
+{
+  constructor(private readonly db: PrismaDbClient = getPrismaClient()) {}
+
   async create(input: AcceptTermsInput): Promise<TermsAcceptance> {
-    const record = await prisma.termsAcceptance.create({
+    const record = await this.db.termsAcceptance.create({
       data: {
         userId: input.userId,
         termsType: input.termsType,
@@ -22,8 +29,10 @@ export class PrismaTermsAcceptanceRepository implements TermsAcceptanceRepositor
   }
 
   async createBundle(input: TermsBundleInput): Promise<TermsAcceptance[]> {
-    const records = await prisma.$transaction([
-      prisma.termsAcceptance.create({
+    // Sequential writes so this works both standalone and nested in a
+    // parent interactive transaction (avoid nested $transaction).
+    const records = [
+      await this.db.termsAcceptance.create({
         data: {
           userId: input.userId,
           termsType: TermsType.TERMS_OF_SERVICE,
@@ -31,7 +40,7 @@ export class PrismaTermsAcceptanceRepository implements TermsAcceptanceRepositor
           ipAddress: input.ipAddress,
         },
       }),
-      prisma.termsAcceptance.create({
+      await this.db.termsAcceptance.create({
         data: {
           userId: input.userId,
           termsType: TermsType.PRIVACY_POLICY,
@@ -39,7 +48,7 @@ export class PrismaTermsAcceptanceRepository implements TermsAcceptanceRepositor
           ipAddress: input.ipAddress,
         },
       }),
-      prisma.termsAcceptance.create({
+      await this.db.termsAcceptance.create({
         data: {
           userId: input.userId,
           termsType: TermsType.MARKETPLACE_DISCLAIMER,
@@ -47,7 +56,7 @@ export class PrismaTermsAcceptanceRepository implements TermsAcceptanceRepositor
           ipAddress: input.ipAddress,
         },
       }),
-    ]);
+    ];
 
     return records.map(mapTermsAcceptance);
   }
@@ -57,7 +66,7 @@ export class PrismaTermsAcceptanceRepository implements TermsAcceptanceRepositor
     termsType: TermsType,
     termsVersion: string,
   ): Promise<boolean> {
-    const record = await prisma.termsAcceptance.findUnique({
+    const record = await this.db.termsAcceptance.findUnique({
       where: {
         userId_termsType_termsVersion: {
           userId,

@@ -14,11 +14,8 @@ import { DomainError } from "@/domain/errors/domain-error";
 import { getDashboardPath } from "@/domain/services/rbac";
 import { UserRole } from "@/domain/enums";
 import {
-  auditLogRepository,
-  clientProfileRepository,
-  lawyerProfileRepository,
   platformSettingRepository,
-  termsAcceptanceRepository,
+  unitOfWork,
   userRepository,
 } from "@/infrastructure/repositories";
 import { signIn, signOut, auth } from "@/lib/auth";
@@ -47,18 +44,14 @@ async function getClientIp(): Promise<string | undefined> {
 
 const registerClientDeps = {
   userRepository,
-  clientProfileRepository,
-  termsAcceptanceRepository,
   platformSettingRepository,
-  auditLogRepository,
+  unitOfWork,
 };
 
 const registerLawyerDeps = {
   userRepository,
-  lawyerProfileRepository,
-  termsAcceptanceRepository,
   platformSettingRepository,
-  auditLogRepository,
+  unitOfWork,
 };
 
 export async function registerClientAction(

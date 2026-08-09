@@ -2,14 +2,19 @@ import bcrypt from "bcryptjs";
 
 import type { User } from "@/domain/entities/user";
 import { UnauthorizedError } from "@/domain/errors/domain-error";
+import type { UserRepository } from "@/domain/repositories/user-repository";
 import { isAccountUsable } from "@/domain/services/rbac";
-import { userRepository } from "@/infrastructure/repositories";
+
+export type VerifyCredentialsDeps = {
+  userRepository: UserRepository;
+};
 
 export async function verifyCredentials(
   email: string,
   password: string,
+  deps: VerifyCredentialsDeps,
 ): Promise<User> {
-  const record = await userRepository.findByEmailWithPasswordHash(email);
+  const record = await deps.userRepository.findByEmailWithPasswordHash(email);
 
   if (!record) {
     throw new UnauthorizedError("Invalid email or password");

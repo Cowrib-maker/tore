@@ -25,7 +25,7 @@ export const authConfig = {
         const { verifyCredentials } = await import(
           "@/application/use-cases/auth/verify-credentials"
         );
-        const { auditLogRepository } = await import(
+        const { auditLogRepository, userRepository } = await import(
           "@/infrastructure/repositories"
         );
         const { AuditAction } = await import("@/domain/enums");
@@ -34,6 +34,7 @@ export const authConfig = {
           const user = await verifyCredentials(
             parsed.data.email,
             parsed.data.password,
+            { userRepository },
           );
 
           await auditLogRepository.create({

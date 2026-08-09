@@ -13,11 +13,17 @@ import {
   lawyerProfileSelect,
   mapLawyerProfile,
 } from "@/infrastructure/mappers/profile.mapper";
-import { prisma } from "@/infrastructure/database/prisma";
+import {
+  getPrismaClient,
+  type PrismaDbClient,
+} from "@/infrastructure/database/prisma-client";
+import { mapUniqueViolation } from "@/infrastructure/database/prisma-errors";
 
 export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
+  constructor(private readonly db: PrismaDbClient = getPrismaClient()) {}
+
   async findById(id: string): Promise<LawyerProfile | null> {
-    const record = await prisma.lawyerProfile.findFirst({
+    const record = await this.db.lawyerProfile.findFirst({
       where: { id, deletedAt: null },
       select: lawyerProfileSelect,
     });
@@ -25,7 +31,7 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
   }
 
   async findByUserId(userId: string): Promise<LawyerProfile | null> {
-    const record = await prisma.lawyerProfile.findFirst({
+    const record = await this.db.lawyerProfile.findFirst({
       where: { userId, deletedAt: null },
       select: lawyerProfileSelect,
     });
@@ -33,7 +39,7 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
   }
 
   async findBySlug(slug: string): Promise<LawyerProfile | null> {
-    const record = await prisma.lawyerProfile.findFirst({
+    const record = await this.db.lawyerProfile.findFirst({
       where: { slug, deletedAt: null },
       select: lawyerProfileSelect,
     });
@@ -41,32 +47,36 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
   }
 
   async slugExists(slug: string): Promise<boolean> {
-    const count = await prisma.lawyerProfile.count({
+    const count = await this.db.lawyerProfile.count({
       where: { slug },
     });
     return count > 0;
   }
 
   async create(input: CreateLawyerProfileInput): Promise<LawyerProfile> {
-    const record = await prisma.lawyerProfile.create({
-      data: {
-        userId: input.userId,
-        slug: input.slug,
-        headline: input.headline,
-        timezone: input.timezone ?? "Asia/Ulaanbaatar",
-        verificationStatus: LawyerVerificationStatusEnum.PENDING,
-        isListed: false,
-      },
-      select: lawyerProfileSelect,
-    });
-    return mapLawyerProfile(record);
+    try {
+      const record = await this.db.lawyerProfile.create({
+        data: {
+          userId: input.userId,
+          slug: input.slug,
+          headline: input.headline,
+          timezone: input.timezone ?? "Asia/Ulaanbaatar",
+          verificationStatus: LawyerVerificationStatusEnum.PENDING,
+          isListed: false,
+        },
+        select: lawyerProfileSelect,
+      });
+      return mapLawyerProfile(record);
+    } catch (error) {
+      mapUniqueViolation(error, "Lawyer profile slug or user already exists");
+    }
   }
 
   async update(
     id: string,
     input: UpdateLawyerProfileInput,
   ): Promise<LawyerProfile> {
-    const record = await prisma.lawyerProfile.update({
+    const record = await this.db.lawyerProfile.update({
       where: { id },
       data: {
         headline: input.headline,
@@ -85,7 +95,7 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
     status: LawyerVerificationStatus,
     verifiedAt?: Date,
   ): Promise<LawyerProfile> {
-    const record = await prisma.lawyerProfile.update({
+    const record = await this.db.lawyerProfile.update({
       where: { id },
       data: {
         verificationStatus: status,
@@ -105,7 +115,7 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
     averageRating: number,
     reviewCount: number,
   ): Promise<LawyerProfile> {
-    const record = await prisma.lawyerProfile.update({
+    const record = await this.db.lawyerProfile.update({
       where: { id },
       data: {
         averageRating,
@@ -117,7 +127,7 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
   }
 
   async findListed(filters?: LawyerDiscoveryFilters): Promise<LawyerProfile[]> {
-    const records = await prisma.lawyerProfile.findMany({
+    const records = await this.db.lawyerProfile.findMany({
       where: {
         deletedAt: null,
         isListed: true,

@@ -8,11 +8,17 @@ import {
   clientProfileSelect,
   mapClientProfile,
 } from "@/infrastructure/mappers/profile.mapper";
-import { prisma } from "@/infrastructure/database/prisma";
+import {
+  getPrismaClient,
+  type PrismaDbClient,
+} from "@/infrastructure/database/prisma-client";
+import { mapUniqueViolation } from "@/infrastructure/database/prisma-errors";
 
 export class PrismaClientProfileRepository implements ClientProfileRepository {
+  constructor(private readonly db: PrismaDbClient = getPrismaClient()) {}
+
   async findById(id: string): Promise<ClientProfile | null> {
-    const record = await prisma.clientProfile.findFirst({
+    const record = await this.db.clientProfile.findFirst({
       where: { id, deletedAt: null },
       select: clientProfileSelect,
     });
@@ -20,7 +26,7 @@ export class PrismaClientProfileRepository implements ClientProfileRepository {
   }
 
   async findByUserId(userId: string): Promise<ClientProfile | null> {
-    const record = await prisma.clientProfile.findFirst({
+    const record = await this.db.clientProfile.findFirst({
       where: { userId, deletedAt: null },
       select: clientProfileSelect,
     });
@@ -28,22 +34,26 @@ export class PrismaClientProfileRepository implements ClientProfileRepository {
   }
 
   async create(input: CreateClientProfileInput): Promise<ClientProfile> {
-    const record = await prisma.clientProfile.create({
-      data: {
-        userId: input.userId,
-        phone: input.phone,
-        companyName: input.companyName,
-      },
-      select: clientProfileSelect,
-    });
-    return mapClientProfile(record);
+    try {
+      const record = await this.db.clientProfile.create({
+        data: {
+          userId: input.userId,
+          phone: input.phone,
+          companyName: input.companyName,
+        },
+        select: clientProfileSelect,
+      });
+      return mapClientProfile(record);
+    } catch (error) {
+      mapUniqueViolation(error, "Client profile already exists for this user");
+    }
   }
 
   async update(
     id: string,
     input: UpdateClientProfileInput,
   ): Promise<ClientProfile> {
-    const record = await prisma.clientProfile.update({
+    const record = await this.db.clientProfile.update({
       where: { id },
       data: {
         phone: input.phone,

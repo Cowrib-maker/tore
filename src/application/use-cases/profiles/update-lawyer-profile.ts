@@ -1,7 +1,9 @@
+import type { ActorContext } from "@/application/common/actor-context";
 import type { UpdateLawyerProfileFormInput } from "@/application/validators/profile.schema";
 import type { LawyerProfile } from "@/domain/entities/profile";
-import { AuditAction } from "@/domain/enums";
+import { AuditAction, UserRole } from "@/domain/enums";
 import {
+  ForbiddenError,
   NotFoundError,
   ValidationError,
 } from "@/domain/errors/domain-error";
@@ -15,14 +17,24 @@ export type UpdateLawyerProfileDeps = {
 };
 
 export async function updateLawyerProfileUseCase(
-  userId: string,
+  actor: ActorContext,
   input: UpdateLawyerProfileFormInput,
   deps: UpdateLawyerProfileDeps,
   ipAddress?: string,
 ): Promise<LawyerProfile> {
-  const existing = await deps.lawyerProfileRepository.findByUserId(userId);
+  if (actor.role !== UserRole.LAWYER) {
+    throw new ForbiddenError();
+  }
+
+  const existing = await deps.lawyerProfileRepository.findByUserId(
+    actor.userId,
+  );
   if (!existing) {
     throw new NotFoundError("LawyerProfile");
+  }
+
+  if (existing.userId !== actor.userId) {
+    throw new ForbiddenError();
   }
 
   if (input.isListed && !isLawyerVerified(existing)) {
@@ -40,7 +52,7 @@ export async function updateLawyerProfileUseCase(
   });
 
   await deps.auditLogRepository.create({
-    actorUserId: userId,
+    actorUserId: actor.userId,
     action: AuditAction.UPDATE,
     entityType: "LawyerProfile",
     entityId: updated.id,

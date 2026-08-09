@@ -1,15 +1,13 @@
 import type { NextAuthConfig } from "next-auth";
 
 export const authCallbacks: NonNullable<NextAuthConfig["callbacks"]> = {
-  async jwt({ token, user, trigger, session }) {
+  async jwt({ token, user }) {
+    // Role/status are set only at sign-in from verified credentials.
+    // Never accept privilege fields from session.update payloads.
     if (user) {
       token.id = user.id!;
       token.role = user.role;
       token.status = user.status;
-    }
-
-    if (trigger === "update" && session?.role) {
-      token.role = session.role;
     }
 
     return token;

@@ -51,6 +51,7 @@ export {
   generateSlugSuffix,
   generateLawyerSlug,
 } from "./slug-generator";
+export { createLawyerProfileWithUniqueSlug } from "./allocate-lawyer-slug";
 export {
   formatBookingNumber,
   DEFAULT_BOOKING_NUMBER_PREFIX,
