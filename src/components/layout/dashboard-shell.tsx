@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { logoutAction } from "@/application/actions/auth.actions";
+import { BRAND_LOGO_SHELL, BRAND_NAME } from "@/components/brand/tokens";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { BrandLink } from "@/components/layout/brand-link";
 import { DashboardMobileNav } from "@/components/layout/dashboard-mobile-nav";
@@ -37,7 +38,7 @@ export function DashboardShell({
   locale,
   languageLabel,
   signOutLabel,
-  brand = "TORE",
+  brand = BRAND_NAME,
   navAriaLabel = "Main navigation",
   mobileNavLabel = "Navigate",
 }: DashboardShellProps) {
@@ -46,7 +47,7 @@ export function DashboardShell({
       <header className="border-b">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 sm:gap-4 sm:px-6">
           <div className="flex min-w-0 items-center gap-3 sm:gap-6">
-            <BrandLink brand={brand} />
+            <BrandLink brand={brand} logo={BRAND_LOGO_SHELL} />
             {nav && nav.length > 0 && (
               <>
                 <nav

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { BRAND_LOGO_SHELL } from "@/components/brand/tokens";
 import { BrandLink } from "@/components/layout/brand-link";
 import { buttonVariants } from "@/components/ui/button";
 import { getDictionary } from "@/i18n/get-dictionary";
@@ -13,7 +14,7 @@ export default async function NotFound() {
     <div className="flex min-h-svh flex-col bg-[#FAFBFA]">
       <header className="border-b border-[#0F3D33]/10 bg-white">
         <div className="mx-auto flex h-14 max-w-6xl items-center px-5 sm:px-8">
-          <BrandLink brand={dict.common.brand} />
+          <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_SHELL} />
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center px-5 py-16 text-center sm:px-8">

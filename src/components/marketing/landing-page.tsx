@@ -1,3 +1,5 @@
+import { ToreMark } from "@/components/brand/tore-logo";
+import { BRAND_LOGO_LANDING } from "@/components/brand/tokens";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { BrandLink } from "@/components/layout/brand-link";
 import { LandingFaq } from "@/components/marketing/landing-faq";
@@ -55,14 +57,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
 
       <header className="sticky top-0 z-40 border-b border-[#0F3D33]/08 bg-[#FAFBFA]/80 shadow-[0_1px_0_rgb(15_61_51/0.03)] backdrop-blur-2xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 sm:h-[4.25rem] sm:px-8">
-          <BrandLink
-            brand={dict.common.brand}
-            logo={{
-              markClassName: "size-8 sm:size-9",
-              wordmarkClassName: "text-base sm:text-[1.125rem]",
-              className: "gap-3",
-            }}
-          />
+          <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_LANDING} />
           <nav
             className="hidden items-center gap-8 md:flex"
             aria-label="Primary"
@@ -140,9 +135,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
               </div>
 
               <div className="mt-7 flex items-center gap-3.5">
-                <div className="flex size-9 items-center justify-center rounded-full border border-[#0F3D33]/12 bg-[#E4EFEB] text-[11px] font-semibold text-[#0F3D33]">
-                  TORE
-                </div>
+                <ToreMark className="size-9" decorative />
                 <p className="max-w-[18rem] text-xs leading-snug text-[#5A6B64] sm:max-w-md">
                   {t.proofAvatars}
                 </p>
@@ -435,14 +428,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
         <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-16">
           <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
             <div className="sm:col-span-2 lg:col-span-1">
-              <BrandLink
-                brand={dict.common.brand}
-                logo={{
-                  markClassName: "size-8",
-                  wordmarkClassName: "text-base",
-                  className: "gap-3",
-                }}
-              />
+              <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_LANDING} />
               <p className="mt-4 max-w-xs text-sm leading-relaxed text-[#5A6B64]">
                 {t.footerTagline}
               </p>
@@ -533,7 +519,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
           </div>
           <div className="mt-12 flex flex-col gap-3 border-t border-[#0F3D33]/1 pt-8 text-xs text-[#5A6B64] sm:flex-row sm:items-center sm:justify-between">
             <p>
-              © {new Date().getFullYear()} TORE. {t.footerRights}
+              © {new Date().getFullYear()} {dict.common.brand}. {t.footerRights}
             </p>
             <p>{t.footerBuilt}</p>
           </div>

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { getSessionUser } from "@/application/actions/auth.actions";
 import { getPublicLawyerProfile } from "@/application/use-cases/discovery/public-directory";
+import { BRAND_LOGO_SHELL } from "@/components/brand/tokens";
 import { BrandLink } from "@/components/layout/brand-link";
 import { BookingRequestForm } from "@/components/marketplace/booking-request-form";
 import { Badge } from "@/components/ui/badge";
@@ -83,7 +84,7 @@ export default async function PublicLawyerProfilePage({
     <div className="min-h-svh bg-[#FAFBFA]">
       <header className="border-b border-[#0F3D33]/10 bg-white">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:px-8">
-          <BrandLink brand={dict.common.brand} />
+          <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_SHELL} />
           <Link
             href="/lawyers"
             className="cursor-pointer text-sm text-[#5A6B64] hover:text-[#0F3D33]"

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import type { MouseEvent, ReactNode } from "react";
 
 import { ToreLogo, type ToreLogoProps } from "@/components/brand/tore-logo";
+import { BRAND_LOGO_SHELL, BRAND_NAME } from "@/components/brand/tokens";
 import { cn } from "@/lib/utils";
 
 type BrandLinkProps = {
@@ -21,9 +22,9 @@ type BrandLinkProps = {
  * (Next.js Link alone is a no-op when the pathname is already `/`).
  */
 export function BrandLink({
-  brand = "TORE",
+  brand = BRAND_NAME,
   className,
-  logo,
+  logo = BRAND_LOGO_SHELL,
   children,
 }: BrandLinkProps) {
   const pathname = usePathname();

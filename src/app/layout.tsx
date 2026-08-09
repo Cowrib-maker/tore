@@ -24,31 +24,35 @@ const geistMono = Geist_Mono({
 export async function generateMetadata(): Promise<Metadata> {
   const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
   const base = env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
+  const appName = env.NEXT_PUBLIC_APP_NAME || "TORE";
 
   return {
     metadataBase: new URL(base),
     title: {
       default: dict.meta.title,
-      template: "%s | TORE",
+      template: `%s | ${appName}`,
     },
     description: dict.meta.description,
-    applicationName: "TORE",
+    applicationName: appName,
     openGraph: {
       type: "website",
       locale: localeMeta[locale].htmlLang.replace("-", "_"),
       url: base,
-      siteName: "TORE",
+      siteName: appName,
       title: dict.meta.title,
       description: dict.meta.description,
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: dict.meta.title,
       description: dict.meta.description,
     },
     icons: {
-      icon: [{ url: "/brand/tore-mark.svg", type: "image/svg+xml" }],
-      apple: [{ url: "/brand/tore-mark.svg" }],
+      icon: [
+        { url: "/favicon.svg", type: "image/svg+xml" },
+        { url: "/brand/tore-mark.svg", type: "image/svg+xml" },
+      ],
+      apple: [{ url: "/brand/tore-mark.svg", type: "image/svg+xml" }],
     },
   };
 }

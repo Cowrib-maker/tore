@@ -3,6 +3,7 @@ import Link from "next/link";
 import { searchListedLawyers } from "@/application/use-cases/discovery/public-directory";
 import { getMarketplaceFilterOptions } from "@/application/actions/marketplace.actions";
 import { getSessionUser } from "@/application/actions/auth.actions";
+import { BRAND_LOGO_SHELL } from "@/components/brand/tokens";
 import { BrandLink } from "@/components/layout/brand-link";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -85,7 +86,7 @@ export default async function LawyersDirectoryPage({
     <div className="min-h-svh bg-[#FAFBFA]">
       <header className="border-b border-[#0F3D33]/10 bg-white">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:px-8">
-          <BrandLink brand={dict.common.brand} />
+          <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_SHELL} />
           <div className="flex items-center gap-3 text-sm">
             {dashboardHref ? (
               <Link

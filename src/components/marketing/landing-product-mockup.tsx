@@ -5,6 +5,7 @@ import {
   Video,
 } from "lucide-react";
 
+import { ToreMark } from "@/components/brand/tore-logo";
 import { cn } from "@/lib/utils";
 import type { Dictionary } from "@/i18n/types";
 
@@ -34,8 +35,9 @@ export function LandingProductMockup({
           <span className="size-2.5 rounded-full bg-[#D4B5A8]" />
           <span className="size-2.5 rounded-full bg-[#D2C6A4]" />
           <span className="size-2.5 rounded-full bg-[#A8C4B4]" />
-          <div className="ml-3 flex-1 rounded-lg border border-[#0F3D33]/08 bg-white px-3 py-1.5 text-[11px] text-[#5A6B64] shadow-sm">
-            {copy.urlBar}
+          <div className="ml-3 flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-[#0F3D33]/08 bg-white px-3 py-1.5 text-[11px] text-[#5A6B64] shadow-sm">
+            <ToreMark className="size-3.5" decorative />
+            <span className="truncate">{copy.urlBar}</span>
           </div>
         </div>
 
