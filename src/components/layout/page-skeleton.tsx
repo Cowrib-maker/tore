@@ -1,3 +1,4 @@
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 /** Shared route-level loading skeleton for marketplace dashboards. */
@@ -17,13 +18,13 @@ export function PageSkeleton({
       aria-live="polite"
       aria-label={label}
     >
-      <div className="h-7 w-48 animate-pulse rounded-md bg-muted" />
-      <div className="h-4 w-full max-w-lg animate-pulse rounded-md bg-muted/80" />
+      <Skeleton className="h-7 w-48" />
+      <Skeleton className="h-4 w-full max-w-lg bg-muted/80" />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: cards }).map((_, i) => (
-          <div
+          <Skeleton
             key={i}
-            className="h-36 animate-pulse rounded-xl border border-border/60 bg-muted/50"
+            className="h-36 rounded-xl border border-border/60 bg-muted/50"
           />
         ))}
       </div>

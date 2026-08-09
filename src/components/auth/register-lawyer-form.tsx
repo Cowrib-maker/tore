@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
 import { localeMeta, type Locale } from "@/i18n/config";
 import { localeMenuOrder } from "@/i18n/client-storage";
 import type { Dictionary } from "@/i18n/types";
@@ -99,11 +100,10 @@ export function RegisterLawyerForm({
           </div>
           <div className="space-y-2">
             <Label htmlFor="preferredLanguage">{copy.preferredLanguage}</Label>
-            <select
+            <NativeSelect
               id="preferredLanguage"
               name="preferredLanguage"
               defaultValue={locale}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs"
               aria-invalid={Boolean(state.error)}
               aria-describedby={
                 state.error ? "register-lawyer-form-error" : undefined
@@ -114,7 +114,7 @@ export function RegisterLawyerForm({
                   {localeMeta[code].nativeLabel}
                 </option>
               ))}
-            </select>
+            </NativeSelect>
           </div>
           <div className="flex items-start gap-2">
             <input

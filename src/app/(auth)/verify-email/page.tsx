@@ -63,7 +63,7 @@ export default async function VerifyEmailPage({
         <CardContent className="flex flex-col gap-3">
           <Link
             href="/login"
-            className={cn(buttonVariants(), "w-full bg-[#0F3D33] text-white")}
+            className={cn(buttonVariants(), "w-full")}
           >
             {dict.auth.backToSignIn}
           </Link>

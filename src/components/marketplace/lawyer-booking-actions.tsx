@@ -55,7 +55,6 @@ export function LawyerBookingActions({
           <Button
             type="submit"
             size="sm"
-            className="bg-[#0F3D33] text-white hover:bg-[#0F3D33]/90"
             disabled={pending}
           >
             {pending ? copy.saving : copy.accept}

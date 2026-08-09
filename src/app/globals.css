@@ -39,6 +39,15 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  /* TORE brand palette (existing identity — not a rebrand) */
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-muted: var(--brand-muted);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-canvas: var(--canvas);
+  --color-ink: var(--ink);
+  --color-moss: var(--moss);
+  --color-gold: var(--gold);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -46,27 +55,66 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  /* Elevation — forest-tinted, matches current marketing shadows */
+  --shadow-elevate-sm: var(--elevate-sm);
+  --shadow-elevate-md: var(--elevate-md);
+  --shadow-elevate-lg: var(--elevate-lg);
+  /* Typography scale (sizes only — font family unchanged) */
+  --text-ds-caption: 0.6875rem;
+  --text-ds-xs: 0.75rem;
+  --text-ds-sm: 0.875rem;
+  --text-ds-body: 0.9375rem;
+  --text-ds-md: 1rem;
+  --text-ds-lg: 1.125rem;
+  --text-ds-xl: 1.25rem;
+  --text-ds-2xl: 1.5rem;
+  --text-ds-3xl: 1.875rem;
 }
 
 :root {
+  /* Brand primitives */
+  --brand: #0f3d33;
+  --brand-foreground: #f7faf8;
+  --brand-muted: #5a6b64;
+  --brand-subtle: #f4f8f6;
+  --canvas: #fafbfa;
+  --ink: #0a0f14;
+  --moss: #3d4f48;
+  --gold: #c8a45d;
+  --elevate-sm:
+    0 1px 2px rgb(15 61 51 / 0.04), 0 8px 24px -12px rgb(15 61 51 / 0.12);
+  --elevate-md:
+    0 1px 2px rgb(15 61 51 / 0.05), 0 12px 32px -14px rgb(15 61 51 / 0.16),
+    0 28px 56px -28px rgb(15 61 51 / 0.14);
+  --elevate-lg:
+    0 2px 4px rgb(15 61 51 / 0.04), 0 18px 40px -16px rgb(15 61 51 / 0.2),
+    0 40px 72px -36px rgb(15 61 51 / 0.18);
+  /* Responsive page gutters (consumed by .ds-page) */
+  --page-max: 72rem;
+  --page-px: 1.25rem;
+  --page-py: 2.5rem;
+  --section-gap: 1.5rem;
+  --header-h: 3.5rem;
+
   --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --foreground: var(--ink);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: var(--ink);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --popover-foreground: var(--ink);
+  /* Primary aligns with brand forest used across marketplace CTAs */
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-foreground);
+  --secondary: var(--brand-subtle);
+  --secondary-foreground: var(--brand);
+  --muted: var(--brand-subtle);
+  --muted-foreground: var(--brand-muted);
+  --accent: var(--brand-subtle);
+  --accent-foreground: var(--brand);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: color-mix(in srgb, var(--brand) 12%, white);
+  --input: color-mix(in srgb, var(--brand) 14%, white);
+  --ring: color-mix(in srgb, var(--brand) 35%, white);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -74,13 +122,29 @@
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: var(--brand-foreground);
+  --sidebar-accent: var(--brand-subtle);
+  --sidebar-accent-foreground: var(--brand);
+  --sidebar-border: color-mix(in srgb, var(--brand) 12%, white);
+  --sidebar-ring: color-mix(in srgb, var(--brand) 35%, white);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --page-px: 2rem;
+    --page-py: 2.5rem;
+    --section-gap: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --page-px: 2rem;
+    --page-py: 2.75rem;
+    --section-gap: 2rem;
+  }
 }
 
 .dark {
@@ -128,6 +192,76 @@
     @apply font-sans;
   }
 }
+
+/* Shared marketplace / app chrome utilities (not landing redesign) */
+@layer components {
+  .ds-page {
+    width: 100%;
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding-inline: var(--page-px);
+  }
+
+  .ds-page-y {
+    padding-block: var(--page-py);
+  }
+
+  .ds-shell {
+    @apply min-h-svh bg-canvas text-ink;
+  }
+
+  .ds-chrome {
+    @apply border-b border-brand/10 bg-white;
+  }
+
+  .ds-chrome-inner {
+    @apply mx-auto flex h-14 max-w-6xl items-center;
+    padding-inline: var(--page-px);
+  }
+
+  .ds-surface {
+    @apply rounded-2xl border border-brand/12 bg-white;
+  }
+
+  .ds-surface-pad {
+    @apply rounded-2xl border border-brand/12 bg-white p-6 sm:p-8;
+  }
+
+  .ds-chip {
+    @apply rounded-md border border-brand/10 bg-brand-subtle px-2 py-0.5 text-[11px] text-ink;
+  }
+
+  .ds-title {
+    @apply text-3xl font-semibold tracking-tight text-ink;
+  }
+
+  .ds-subtitle {
+    @apply text-sm leading-relaxed text-brand-muted;
+  }
+
+  .ds-section-title {
+    @apply text-lg font-semibold tracking-tight text-ink;
+  }
+
+  .ds-eyebrow {
+    @apply text-xs font-semibold tracking-[0.12em] text-brand-muted uppercase;
+  }
+
+  .ds-field {
+    @apply flex h-9 w-full rounded-lg border border-input bg-transparent px-3 text-sm outline-none transition-colors;
+    @apply focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
+    @apply aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20;
+  }
+
+  .ds-textarea {
+    @apply w-full rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors;
+    @apply focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
+    @apply aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20;
+  }
+}
+
 /* Landing page motion + polish — scoped to .landing-page */
 @layer components {
   .landing-hero-atmosphere {

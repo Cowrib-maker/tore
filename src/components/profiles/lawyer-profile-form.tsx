@@ -9,6 +9,7 @@ import { LAWYER_TIMEZONE_OPTIONS } from "@/application/validators/profile.schema
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
 import type { MarketplaceDictionary } from "@/i18n/marketplace-types";
 import { cn } from "@/lib/utils";
 
@@ -155,11 +156,10 @@ export function LawyerProfileForm({
       </div>
       <div className="space-y-2">
         <Label htmlFor="timezone">{copy.timezone}</Label>
-        <select
+        <NativeSelect
           id="timezone"
           name="timezone"
           defaultValue={timezone ?? ""}
-          className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs"
           aria-invalid={Boolean(state.error)}
           aria-describedby={
             state.error ? "lawyer-profile-form-error" : undefined
@@ -170,7 +170,7 @@ export function LawyerProfileForm({
               {option}
             </option>
           ))}
-        </select>
+        </NativeSelect>
       </div>
       <div className="flex items-start gap-2">
         {!canRequestListing ? (

@@ -99,10 +99,7 @@ export default async function ClientBookingsPage() {
         <p className="text-sm text-muted-foreground">{b.intro}</p>
         <Link
           href="/lawyers"
-          className={cn(
-            buttonVariants({ size: "sm" }),
-            "bg-[#0F3D33] text-white hover:bg-[#0F3D33]/90",
-          )}
+          className={cn(buttonVariants({ size: "sm" }))}
         >
           {m.common.browseLawyers}
         </Link>

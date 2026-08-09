@@ -102,10 +102,7 @@ export default async function ClientDashboardPage() {
           <CardFooter className="flex flex-wrap gap-2">
             <Link
               href="/lawyers"
-              className={cn(
-                buttonVariants({ size: "sm" }),
-                "bg-[#0F3D33] text-white hover:bg-[#0F3D33]/90",
-              )}
+              className={cn(buttonVariants({ size: "sm" }))}
             >
               {m.common.browseLawyers}
             </Link>

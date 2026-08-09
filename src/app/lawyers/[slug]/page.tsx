@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Surface } from "@/components/ui/surface";
 import { DomainError } from "@/domain/errors/domain-error";
 import { UserRole } from "@/domain/enums";
 import { getDictionary } from "@/i18n/get-dictionary";
@@ -81,40 +82,36 @@ export default async function PublicLawyerProfilePage({
   };
 
   return (
-    <div className="min-h-svh bg-[#FAFBFA]">
-      <header className="border-b border-[#0F3D33]/10 bg-white">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5 sm:px-8">
+    <div className="ds-shell">
+      <header className="ds-chrome">
+        <div className="ds-chrome-inner justify-between">
           <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_SHELL} />
           <Link
             href="/lawyers"
-            className="cursor-pointer text-sm text-[#5A6B64] hover:text-[#0F3D33]"
+            className="cursor-pointer text-sm text-brand-muted hover:text-brand"
           >
             {p.back}
           </Link>
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-6xl gap-6 px-5 py-10 sm:px-8 lg:grid-cols-[1.2fr_0.8fr]">
+      <main className="ds-page ds-page-y grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="space-y-6">
-          <section className="rounded-2xl border border-[#0F3D33]/12 bg-white p-6 sm:p-8">
+          <Surface as="section" padded>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h1 className="text-3xl font-semibold tracking-tight text-[#0A0F14]">
-                  {view.displayName}
-                </h1>
-                <p className="mt-1 text-[#5A6B64]">
+                <h1 className="ds-title">{view.displayName}</h1>
+                <p className="mt-1 text-brand-muted">
                   {view.profile.headline ?? m.common.legalCounsel}
                 </p>
                 {view.profile.city && (
-                  <p className="mt-2 text-sm text-[#5A6B64]">{view.profile.city}</p>
+                  <p className="mt-2 text-sm text-brand-muted">{view.profile.city}</p>
                 )}
               </div>
-              <Badge className="bg-[#0F3D33] text-white">
-                {m.common.verified}
-              </Badge>
+              <Badge>{m.common.verified}</Badge>
             </div>
             {view.profile.yearsOfExperience != null && (
-              <p className="mt-4 text-sm text-[#3D4F48]">
+              <p className="mt-4 text-sm text-ink/80">
                 {p.yearsExperience.replace(
                   "{n}",
                   String(view.profile.yearsOfExperience),
@@ -122,64 +119,57 @@ export default async function PublicLawyerProfilePage({
               </p>
             )}
             {view.profile.bio && (
-              <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-[#3D4F48]">
+              <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-ink/80">
                 {view.profile.bio}
               </p>
             )}
             {view.profile.education && (
               <div className="mt-5">
-                <h2 className="text-sm font-semibold text-[#0A0F14]">
-                  {p.education}
-                </h2>
-                <p className="mt-1 whitespace-pre-wrap text-sm text-[#5A6B64]">
+                <h2 className="text-sm font-semibold text-ink">{p.education}</h2>
+                <p className="mt-1 whitespace-pre-wrap text-sm text-brand-muted">
                   {view.profile.education}
                 </p>
               </div>
             )}
             <div className="mt-5 flex flex-wrap gap-2">
               {view.practiceAreas.map((area) => (
-                <span
-                  key={area.id}
-                  className="rounded-md border border-[#0F3D33]/10 bg-[#F4F8F6] px-2 py-1 text-xs text-[#0A0F14]"
-                >
+                <span key={area.id} className="ds-chip py-1 text-xs">
                   {localizedTaxonomyName(area, locale)}
                 </span>
               ))}
               {view.languages.map((lang) => (
                 <span
                   key={lang.id}
-                  className="rounded-md border border-[#0F3D33]/10 px-2 py-1 text-xs text-[#5A6B64]"
+                  className="ds-chip py-1 text-xs text-brand-muted"
                 >
                   {localizedTaxonomyName(lang, locale)}
                 </span>
               ))}
             </div>
-          </section>
+          </Surface>
 
-          <section className="rounded-2xl border border-[#0F3D33]/12 bg-white p-6 sm:p-8">
-            <h2 className="text-lg font-semibold text-[#0A0F14]">
-              {p.offeringsTitle}
-            </h2>
-            <p className="mt-1 text-sm text-[#5A6B64]">{p.offeringsHelp}</p>
+          <Surface as="section" padded>
+            <h2 className="ds-section-title">{p.offeringsTitle}</h2>
+            <p className="mt-1 text-sm text-brand-muted">{p.offeringsHelp}</p>
             <div className="mt-4 space-y-3">
               {view.offerings.length === 0 ? (
-                <p className="text-sm text-[#5A6B64]">{p.noOfferings}</p>
+                <p className="text-sm text-brand-muted">{p.noOfferings}</p>
               ) : (
                 view.offerings.map((offering) => (
                   <div
                     key={offering.id}
-                    className="rounded-xl border border-[#0F3D33]/10 p-4"
+                    className="rounded-xl border border-brand/10 p-4"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="font-medium text-[#0A0F14]">
+                        <p className="font-medium text-ink">
                           {localizedOfferingTitle(offering, locale)}
                         </p>
                         {offering.titleEn &&
                           offering.titleMn &&
                           offering.titleEn !== offering.titleMn &&
                           locale === "en" && (
-                          <p className="text-xs text-[#5A6B64]">
+                          <p className="text-xs text-brand-muted">
                             {offering.titleMn}
                           </p>
                         )}
@@ -187,16 +177,16 @@ export default async function PublicLawyerProfilePage({
                           offering.titleMn &&
                           offering.titleEn !== offering.titleMn &&
                           locale !== "en" && (
-                          <p className="text-xs text-[#5A6B64]">
+                          <p className="text-xs text-brand-muted">
                             {offering.titleEn}
                           </p>
                         )}
-                        <p className="mt-1 text-xs text-[#5A6B64]">
+                        <p className="mt-1 text-xs text-brand-muted">
                           {offering.durationMinutes} {m.common.minutesSuffix} ·{" "}
                           {formatModality(offering.modality, locale)}
                         </p>
                       </div>
-                      <p className="shrink-0 font-semibold text-[#0F3D33]">
+                      <p className="shrink-0 font-semibold text-brand">
                         {offering.priceMnt.toLocaleString()} ₮
                       </p>
                     </div>
@@ -204,7 +194,7 @@ export default async function PublicLawyerProfilePage({
                 ))
               )}
             </div>
-          </section>
+          </Surface>
         </div>
 
         <div className="space-y-4 lg:sticky lg:top-6 lg:self-start">
@@ -236,13 +226,7 @@ export default async function PublicLawyerProfilePage({
             </CardHeader>
             <CardContent>
               {!session?.user ? (
-                <Link
-                  href="/login"
-                  className={cn(
-                    buttonVariants(),
-                    "w-full bg-[#0F3D33] text-white hover:bg-[#0F3D33]/90",
-                  )}
-                >
+                <Link href="/login" className={cn(buttonVariants(), "w-full")}>
                   {p.signIn}
                 </Link>
               ) : !isClient ? (

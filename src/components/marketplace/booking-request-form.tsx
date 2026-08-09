@@ -6,6 +6,7 @@ import type { ActionState } from "@/application/actions/auth.actions";
 import { createBookingRequestAction } from "@/application/actions/marketplace.actions";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { NativeSelect, NativeTextarea } from "@/components/ui/native-select";
 import type { ConsultationOffering } from "@/domain/entities/consultation-offering";
 import type { PracticeArea } from "@/domain/entities/taxonomy";
 import type { InstantSlot } from "@/domain/value-objects/time-slot";
@@ -70,13 +71,12 @@ export function BookingRequestForm({
       )}
       <div className="space-y-1">
         <Label htmlFor="offeringId">{copy.offering}</Label>
-        <select
+        <NativeSelect
           id="offeringId"
           name="offeringId"
           required
           aria-invalid={Boolean(state.error)}
           aria-describedby={state.error ? "booking-form-error" : undefined}
-          className="flex h-9 w-full rounded-md border px-3 text-sm"
           defaultValue={offerings[0]?.id}
         >
           {offerings.map((o) => (
@@ -85,16 +85,15 @@ export function BookingRequestForm({
               {copy.minutesSuffix} — {o.priceMnt.toLocaleString()} ₮
             </option>
           ))}
-        </select>
+        </NativeSelect>
       </div>
       <div className="space-y-1">
         <Label htmlFor="scheduledStartAt">{copy.time}</Label>
-        <select
+        <NativeSelect
           id="scheduledStartAt"
           name="scheduledStartAt"
           required
           aria-invalid={Boolean(state.error)}
-          className="flex h-9 w-full rounded-md border px-3 text-sm"
         >
           {slots.map((slot) => (
             <option
@@ -104,15 +103,14 @@ export function BookingRequestForm({
               {formatDateTimeUtc(slot.startAt, locale)} {copy.utc}
             </option>
           ))}
-        </select>
+        </NativeSelect>
       </div>
       {practiceAreas.length > 0 && (
         <div className="space-y-1">
           <Label htmlFor="practiceAreaId">{copy.practiceArea}</Label>
-          <select
+          <NativeSelect
             id="practiceAreaId"
             name="practiceAreaId"
-            className="flex h-9 w-full rounded-md border px-3 text-sm"
             defaultValue=""
           >
             <option value="">{copy.selectPlaceholder}</option>
@@ -121,12 +119,12 @@ export function BookingRequestForm({
                 {localizedTaxonomyName(area, locale)}
               </option>
             ))}
-          </select>
+          </NativeSelect>
         </div>
       )}
       <div className="space-y-1">
         <Label htmlFor="issueSummary">{copy.summary}</Label>
-        <textarea
+        <NativeTextarea
           id="issueSummary"
           name="issueSummary"
           required
@@ -134,15 +132,10 @@ export function BookingRequestForm({
           rows={4}
           aria-invalid={Boolean(state.error)}
           aria-describedby={state.error ? "booking-form-error" : undefined}
-          className="w-full rounded-md border px-3 py-2 text-sm"
           placeholder={copy.summaryPh}
         />
       </div>
-      <Button
-        type="submit"
-        className="w-full bg-[#0F3D33] text-white hover:bg-[#0F3D33]/90"
-        disabled={pending}
-      >
+      <Button type="submit" className="w-full" disabled={pending}>
         {pending ? copy.submitting : copy.submit}
       </Button>
     </form>

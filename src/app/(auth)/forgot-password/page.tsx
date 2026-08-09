@@ -26,7 +26,7 @@ export default async function ForgotPasswordPage() {
         <CardContent className="flex flex-col gap-3">
           <a
             href="mailto:support@tore.mn?subject=Password%20recovery"
-            className={cn(buttonVariants(), "w-full bg-[#0F3D33] text-white")}
+            className={cn(buttonVariants(), "w-full")}
           >
             {dict.auth.sendReset}
           </a>

@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
 import type {
   AvailabilityException,
   AvailabilityRule,
@@ -61,10 +62,9 @@ export function CreateAvailabilityRuleForm({
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="space-y-1">
           <Label htmlFor="dayOfWeek">{copy.day}</Label>
-          <select
+          <NativeSelect
             id="dayOfWeek"
             name="dayOfWeek"
-            className="flex h-9 w-full rounded-md border px-3 text-sm"
             defaultValue={DayOfWeek.MONDAY}
             aria-invalid={Boolean(state.error)}
             aria-describedby={
@@ -76,7 +76,7 @@ export function CreateAvailabilityRuleForm({
                 {formatWeekday(day, locale)}
               </option>
             ))}
-          </select>
+          </NativeSelect>
         </div>
         <div className="space-y-1">
           <Label htmlFor="startTime">{copy.start}</Label>

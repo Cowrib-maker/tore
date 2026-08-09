@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
 import type { ConsultationOffering } from "@/domain/entities/consultation-offering";
 import { ConsultationModality } from "@/domain/enums";
 import type { MarketplaceDictionary } from "@/i18n/marketplace-types";
@@ -116,10 +117,9 @@ export function CreateOfferingForm({ copy }: { copy: OfferingCopy }) {
         </div>
         <div className="space-y-1">
           <Label htmlFor="modality">{copy.format}</Label>
-          <select
+          <NativeSelect
             id="modality"
             name="modality"
-            className="flex h-9 w-full rounded-md border px-3 text-sm"
             defaultValue={ConsultationModality.ONLINE}
             aria-invalid={Boolean(state.error)}
             aria-describedby={
@@ -130,7 +130,7 @@ export function CreateOfferingForm({ copy }: { copy: OfferingCopy }) {
             <option value={ConsultationModality.IN_PERSON}>
               {copy.inPerson}
             </option>
-          </select>
+          </NativeSelect>
         </div>
       </div>
       <Button type="submit" disabled={pending}>
@@ -242,9 +242,8 @@ export function OfferingRow({
           </div>
           <div className="space-y-1">
             <Label>{copy.format}</Label>
-            <select
+            <NativeSelect
               name="modality"
-              className="flex h-9 w-full rounded-md border px-3 text-sm"
               defaultValue={offering.modality}
               aria-invalid={Boolean(formError)}
               aria-describedby={
@@ -255,7 +254,7 @@ export function OfferingRow({
               <option value={ConsultationModality.IN_PERSON}>
                 {copy.inPerson}
               </option>
-            </select>
+            </NativeSelect>
           </div>
           <div className="flex items-end gap-2 pb-1">
             <label className="flex items-center gap-2 text-sm">
