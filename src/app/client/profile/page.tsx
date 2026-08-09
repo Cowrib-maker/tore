@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/application/actions/auth.actions";
 import { getClientProfileForSession } from "@/application/actions/profile.actions";
 import { ClientProfileForm } from "@/components/profiles/client-profile-form";
+import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import {
   Card,
@@ -27,19 +28,28 @@ export default async function ClientProfilePage() {
   }
 
   const data = await getClientProfileForSession();
-  if (!data) {
+  if (data.status === "unauthenticated") {
     redirect("/login");
   }
 
+  const nav = [
+    { href: "/client/dashboard", label: "Dashboard" },
+    { href: "/client/profile", label: "Profile" },
+  ];
+
+  if (data.status === "profile_missing") {
+    return (
+      <DashboardShell user={session.user} title="Profile settings" nav={nav}>
+        <ProfileMissingState
+          dashboardHref="/client/dashboard"
+          roleLabel="client"
+        />
+      </DashboardShell>
+    );
+  }
+
   return (
-    <DashboardShell
-      user={session.user}
-      title="Profile settings"
-      nav={[
-        { href: "/client/dashboard", label: "Dashboard" },
-        { href: "/client/profile", label: "Profile" },
-      ]}
-    >
+    <DashboardShell user={session.user} title="Profile settings" nav={nav}>
       <Card>
         <CardHeader>
           <CardTitle>Your client profile</CardTitle>

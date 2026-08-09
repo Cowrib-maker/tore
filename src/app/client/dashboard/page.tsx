@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/application/actions/auth.actions";
 import { getClientProfileForSession } from "@/application/actions/profile.actions";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -29,20 +30,33 @@ export default async function ClientDashboardPage() {
   }
 
   const data = await getClientProfileForSession();
-  const emailVerified = Boolean(data?.user.emailVerified);
+  if (data.status === "unauthenticated") {
+    redirect("/login");
+  }
+
+  const nav = [
+    { href: "/client/dashboard", label: "Dashboard" },
+    { href: "/client/profile", label: "Profile" },
+  ];
+
+  if (data.status === "profile_missing") {
+    return (
+      <DashboardShell user={session.user} title="Client dashboard" nav={nav}>
+        <ProfileMissingState
+          dashboardHref="/client/dashboard"
+          roleLabel="client"
+        />
+      </DashboardShell>
+    );
+  }
+
+  const emailVerified = Boolean(data.user.emailVerified);
   const profileFilled = Boolean(
-    data?.profile.phone || data?.profile.companyName,
+    data.profile.phone || data.profile.companyName,
   );
 
   return (
-    <DashboardShell
-      user={session.user}
-      title="Client dashboard"
-      nav={[
-        { href: "/client/dashboard", label: "Dashboard" },
-        { href: "/client/profile", label: "Profile" },
-      ]}
-    >
+    <DashboardShell user={session.user} title="Client dashboard" nav={nav}>
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>
           <CardHeader>

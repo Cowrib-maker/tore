@@ -125,8 +125,8 @@ export function LawyerProfileForm({
           </Label>
           {!canRequestListing && (
             <p className="text-xs text-muted-foreground">
-              Available after license verification (Sprint 3). Offerings are
-              required before you appear publicly (Sprint 4).
+              Listing requires license verification and at least one active
+              consultation offering.
             </p>
           )}
         </div>

@@ -37,10 +37,20 @@ export async function updateLawyerProfileUseCase(
     throw new ForbiddenError();
   }
 
-  if (input.isListed && !isLawyerVerified(existing)) {
-    throw new ValidationError(
-      "Your profile must be verified before it can be listed",
-    );
+  if (input.isListed) {
+    if (!isLawyerVerified(existing)) {
+      throw new ValidationError(
+        "Your profile must be verified before it can be listed",
+      );
+    }
+
+    const hasActiveOffering =
+      await deps.lawyerProfileRepository.hasActiveOffering(existing.id);
+    if (!hasActiveOffering) {
+      throw new ValidationError(
+        "Add at least one active consultation offering before listing your profile",
+      );
+    }
   }
 
   const updated = await deps.lawyerProfileRepository.update(existing.id, {

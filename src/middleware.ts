@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 
-import { UserRole } from "@/domain/enums";
+import { UserRole, UserStatus } from "@/domain/enums";
 import { canAccessRoute, getDashboardPath } from "@/domain/services/rbac";
 import { edgeAuthConfig } from "@/infrastructure/auth/auth.edge.config";
 
@@ -10,6 +10,7 @@ export default auth((req) => {
   const { pathname } = req.nextUrl;
   const isLoggedIn = !!req.auth;
   const role = req.auth?.user?.role as UserRole | undefined;
+  const status = req.auth?.user?.status;
 
   const isAuthRoute =
     pathname.startsWith("/login") ||
@@ -25,7 +26,18 @@ export default auth((req) => {
     return Response.redirect(new URL("/login", req.nextUrl));
   }
 
-  if (isAuthRoute && isLoggedIn && role) {
+  if (
+    isProtectedRoute &&
+    isLoggedIn &&
+    status &&
+    status !== UserStatus.ACTIVE
+  ) {
+    return Response.redirect(
+      new URL("/login?error=account_inactive", req.nextUrl),
+    );
+  }
+
+  if (isAuthRoute && isLoggedIn && role && status === UserStatus.ACTIVE) {
     return Response.redirect(new URL(getDashboardPath(role), req.nextUrl));
   }
 

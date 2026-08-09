@@ -1,7 +1,7 @@
 import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-import { authCallbacks } from "@/infrastructure/auth/auth.callbacks";
+import { nodeAuthCallbacks } from "@/infrastructure/auth/auth.callbacks.node";
 import { loginSchema } from "@/application/validators/auth.schema";
 
 export const authConfig = {
@@ -59,5 +59,5 @@ export const authConfig = {
       },
     }),
   ],
-  callbacks: authCallbacks,
+  callbacks: nodeAuthCallbacks,
 } satisfies NextAuthConfig;

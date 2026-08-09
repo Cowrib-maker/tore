@@ -1,13 +1,17 @@
 import type { NextAuthConfig } from "next-auth";
 
-export const authCallbacks: NonNullable<NextAuthConfig["callbacks"]> = {
+import { UserStatus } from "@/domain/enums";
+
+/**
+ * Edge-safe callbacks (no Prisma). Privilege fields set only at sign-in.
+ */
+export const edgeAuthCallbacks: NonNullable<NextAuthConfig["callbacks"]> = {
   async jwt({ token, user }) {
-    // Role/status are set only at sign-in from verified credentials.
-    // Never accept privilege fields from session.update payloads.
     if (user) {
       token.id = user.id!;
       token.role = user.role;
       token.status = user.status;
+      token.statusCheckedAt = Date.now();
     }
 
     return token;
@@ -16,7 +20,7 @@ export const authCallbacks: NonNullable<NextAuthConfig["callbacks"]> = {
     if (session.user) {
       session.user.id = token.id;
       session.user.role = token.role ?? "CLIENT";
-      session.user.status = token.status ?? "ACTIVE";
+      session.user.status = token.status ?? UserStatus.ACTIVE;
     }
     return session;
   },
@@ -45,5 +49,6 @@ declare module "@auth/core/jwt" {
     id: string;
     role?: string;
     status?: string;
+    statusCheckedAt?: number;
   }
 }

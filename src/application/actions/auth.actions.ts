@@ -11,13 +11,18 @@ import {
   registerLawyerSchema,
 } from "@/application/validators/auth.schema";
 import { DomainError } from "@/domain/errors/domain-error";
+import { UserRole, UserStatus } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
-import { UserRole } from "@/domain/enums";
 import {
   platformSettingRepository,
   unitOfWork,
   userRepository,
 } from "@/infrastructure/repositories";
+import {
+  LOGIN_RATE_LIMIT,
+  REGISTER_RATE_LIMIT,
+  consumeRateLimit,
+} from "@/infrastructure/security/rate-limiter";
 import { signIn, signOut, auth } from "@/lib/auth";
 
 export type ActionState = {
@@ -54,10 +59,26 @@ const registerLawyerDeps = {
   unitOfWork,
 };
 
+function tooManyRequests(retryAfterSeconds: number): ActionState {
+  return {
+    error: `Too many attempts. Try again in ${retryAfterSeconds} seconds.`,
+  };
+}
+
 export async function registerClientAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  const ipAddress = await getClientIp();
+  const rate = consumeRateLimit(
+    `register:${ipAddress ?? "unknown"}`,
+    REGISTER_RATE_LIMIT.limit,
+    REGISTER_RATE_LIMIT.windowMs,
+  );
+  if (!rate.ok) {
+    return tooManyRequests(rate.retryAfterSeconds);
+  }
+
   const parsed = registerClientSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
@@ -71,7 +92,6 @@ export async function registerClientAction(
   }
 
   try {
-    const ipAddress = await getClientIp();
     await registerClientUseCase(parsed.data, registerClientDeps, ipAddress);
   } catch (error) {
     return mapError(error);
@@ -94,6 +114,16 @@ export async function registerLawyerAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  const ipAddress = await getClientIp();
+  const rate = consumeRateLimit(
+    `register:${ipAddress ?? "unknown"}`,
+    REGISTER_RATE_LIMIT.limit,
+    REGISTER_RATE_LIMIT.windowMs,
+  );
+  if (!rate.ok) {
+    return tooManyRequests(rate.retryAfterSeconds);
+  }
+
   const parsed = registerLawyerSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
@@ -107,7 +137,6 @@ export async function registerLawyerAction(
   }
 
   try {
-    const ipAddress = await getClientIp();
     await registerLawyerUseCase(parsed.data, registerLawyerDeps, ipAddress);
   } catch (error) {
     return mapError(error);
@@ -139,17 +168,38 @@ export async function loginAction(
     return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
   }
 
-  const result = await signIn("credentials", {
-    email: parsed.data.email,
-    password: parsed.data.password,
-    redirect: false,
-  });
-
-  if (result?.error) {
-    return { error: "Invalid email or password" };
+  const ipAddress = await getClientIp();
+  const rate = consumeRateLimit(
+    `login:${ipAddress ?? "unknown"}:${parsed.data.email.toLowerCase()}`,
+    LOGIN_RATE_LIMIT.limit,
+    LOGIN_RATE_LIMIT.windowMs,
+  );
+  if (!rate.ok) {
+    return tooManyRequests(rate.retryAfterSeconds);
   }
 
-  const session = await auth();
+  let session;
+  try {
+    const result = await signIn("credentials", {
+      email: parsed.data.email,
+      password: parsed.data.password,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      return { error: "Invalid email or password" };
+    }
+
+    session = await auth();
+  } catch (error) {
+    return mapError(error);
+  }
+
+  if (session?.user?.status && session.user.status !== UserStatus.ACTIVE) {
+    await signOut({ redirect: false });
+    return { error: "Your account is not active" };
+  }
+
   const role = session?.user?.role as UserRole | undefined;
 
   if (role && role in UserRole) {
@@ -164,5 +214,15 @@ export async function logoutAction() {
 }
 
 export async function getSessionUser() {
-  return auth();
+  const session = await auth();
+  if (!session?.user) {
+    return null;
+  }
+
+  if (session.user.status !== UserStatus.ACTIVE) {
+    await signOut({ redirect: false });
+    return null;
+  }
+
+  return session;
 }

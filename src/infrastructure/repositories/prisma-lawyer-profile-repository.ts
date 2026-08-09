@@ -48,7 +48,18 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
 
   async slugExists(slug: string): Promise<boolean> {
     const count = await this.db.lawyerProfile.count({
-      where: { slug },
+      where: { slug, deletedAt: null },
+    });
+    return count > 0;
+  }
+
+  async hasActiveOffering(lawyerProfileId: string): Promise<boolean> {
+    const count = await this.db.consultationOffering.count({
+      where: {
+        lawyerProfileId,
+        isActive: true,
+        deletedAt: null,
+      },
     });
     return count > 0;
   }
@@ -132,6 +143,12 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
         deletedAt: null,
         isListed: true,
         verificationStatus: LawyerVerificationStatusEnum.APPROVED,
+        offerings: {
+          some: {
+            isActive: true,
+            deletedAt: null,
+          },
+        },
         ...(filters?.minRating != null
           ? { averageRating: { gte: filters.minRating } }
           : {}),

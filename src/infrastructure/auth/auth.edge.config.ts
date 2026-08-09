@@ -1,6 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 
-import { authCallbacks } from "@/infrastructure/auth/auth.callbacks";
+import { edgeAuthCallbacks } from "@/infrastructure/auth/auth.callbacks";
 
 export const edgeAuthConfig = {
   session: { strategy: "jwt" },
@@ -8,5 +8,5 @@ export const edgeAuthConfig = {
     signIn: "/login",
   },
   providers: [],
-  callbacks: authCallbacks,
+  callbacks: edgeAuthCallbacks,
 } satisfies NextAuthConfig;

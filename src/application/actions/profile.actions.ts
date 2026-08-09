@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
 import type { ActionState } from "@/application/actions/auth.actions";
+import { getSessionUser } from "@/application/actions/auth.actions";
 import type { ActorContext } from "@/application/common/actor-context";
 import { updateClientProfileUseCase } from "@/application/use-cases/profiles/update-client-profile";
 import { updateLawyerProfileUseCase } from "@/application/use-cases/profiles/update-lawyer-profile";
@@ -25,7 +26,6 @@ import {
   lawyerProfileRepository,
   userRepository,
 } from "@/infrastructure/repositories";
-import { auth } from "@/lib/auth";
 
 function mapError(error: unknown): ActionState {
   if (error instanceof DomainError) {
@@ -55,7 +55,7 @@ const updateLawyerDeps = {
 };
 
 async function requireSessionUser(role: UserRole): Promise<ActorContext> {
-  const session = await auth();
+  const session = await getSessionUser();
   if (!session?.user?.id) {
     throw new UnauthorizedError("You must be signed in");
   }
@@ -131,13 +131,25 @@ export async function updateLawyerProfileAction(
   }
 }
 
-export async function getClientProfileForSession(): Promise<{
-  user: User;
-  profile: ClientProfile;
-} | null> {
-  const session = await auth();
+export type ClientProfileSessionResult =
+  | { status: "ok"; user: User; profile: ClientProfile }
+  | { status: "unauthenticated" }
+  | { status: "profile_missing"; user: User };
+
+export type LawyerProfileSessionResult =
+  | {
+      status: "ok";
+      user: User;
+      profile: LawyerProfile;
+      hasActiveOffering: boolean;
+    }
+  | { status: "unauthenticated" }
+  | { status: "profile_missing"; user: User };
+
+export async function getClientProfileForSession(): Promise<ClientProfileSessionResult> {
+  const session = await getSessionUser();
   if (!session?.user?.id || session.user.role !== UserRole.CLIENT) {
-    return null;
+    return { status: "unauthenticated" };
   }
 
   const [user, profile] = await Promise.all([
@@ -145,20 +157,21 @@ export async function getClientProfileForSession(): Promise<{
     clientProfileRepository.findByUserId(session.user.id),
   ]);
 
-  if (!user || !profile) {
-    return null;
+  if (!user) {
+    return { status: "unauthenticated" };
   }
 
-  return { user, profile };
+  if (!profile) {
+    return { status: "profile_missing", user };
+  }
+
+  return { status: "ok", user, profile };
 }
 
-export async function getLawyerProfileForSession(): Promise<{
-  user: User;
-  profile: LawyerProfile;
-} | null> {
-  const session = await auth();
+export async function getLawyerProfileForSession(): Promise<LawyerProfileSessionResult> {
+  const session = await getSessionUser();
   if (!session?.user?.id || session.user.role !== UserRole.LAWYER) {
-    return null;
+    return { status: "unauthenticated" };
   }
 
   const [user, profile] = await Promise.all([
@@ -166,9 +179,17 @@ export async function getLawyerProfileForSession(): Promise<{
     lawyerProfileRepository.findByUserId(session.user.id),
   ]);
 
-  if (!user || !profile) {
-    return null;
+  if (!user) {
+    return { status: "unauthenticated" };
   }
 
-  return { user, profile };
+  if (!profile) {
+    return { status: "profile_missing", user };
+  }
+
+  const hasActiveOffering = await lawyerProfileRepository.hasActiveOffering(
+    profile.id,
+  );
+
+  return { status: "ok", user, profile, hasActiveOffering };
 }

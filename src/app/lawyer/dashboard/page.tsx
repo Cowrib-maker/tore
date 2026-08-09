@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/application/actions/auth.actions";
 import { getLawyerProfileForSession } from "@/application/actions/profile.actions";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -44,23 +45,36 @@ export default async function LawyerDashboardPage() {
   }
 
   const data = await getLawyerProfileForSession();
-  const emailVerified = Boolean(data?.user.emailVerified);
+  if (data.status === "unauthenticated") {
+    redirect("/login");
+  }
+
+  const nav = [
+    { href: "/lawyer/dashboard", label: "Dashboard" },
+    { href: "/lawyer/profile", label: "Profile" },
+  ];
+
+  if (data.status === "profile_missing") {
+    return (
+      <DashboardShell user={session.user} title="Lawyer dashboard" nav={nav}>
+        <ProfileMissingState
+          dashboardHref="/lawyer/dashboard"
+          roleLabel="lawyer"
+        />
+      </DashboardShell>
+    );
+  }
+
+  const emailVerified = Boolean(data.user.emailVerified);
   const profileFilled = Boolean(
-    data?.profile.headline || data?.profile.bio,
+    data.profile.headline || data.profile.bio,
   );
-  const verificationStatus = data?.profile.verificationStatus ?? "PENDING";
-  const verified = data ? isLawyerVerified(data.profile) : false;
-  const listed = Boolean(data?.profile.isListed);
+  const verificationStatus = data.profile.verificationStatus;
+  const verified = isLawyerVerified(data.profile);
+  const listed = data.profile.isListed;
 
   return (
-    <DashboardShell
-      user={session.user}
-      title="Lawyer dashboard"
-      nav={[
-        { href: "/lawyer/dashboard", label: "Dashboard" },
-        { href: "/lawyer/profile", label: "Profile" },
-      ]}
-    >
+    <DashboardShell user={session.user} title="Lawyer dashboard" nav={nav}>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
@@ -72,7 +86,7 @@ export default async function LawyerDashboardPage() {
             </div>
             <CardDescription>
               {profileFilled
-                ? `Slug: ${data?.profile.slug}`
+                ? `Slug: ${data.profile.slug}`
                 : "Add a headline and bio in profile settings."}
             </CardDescription>
           </CardHeader>
@@ -114,8 +128,8 @@ export default async function LawyerDashboardPage() {
               </div>
             </div>
             <CardDescription>
-              Listing requires verification. Public directory appears after
-              offerings (Sprint 4–5).
+              Listing requires verification and an active offering. Public
+              directory ships with discovery (Sprint 5).
             </CardDescription>
           </CardHeader>
         </Card>

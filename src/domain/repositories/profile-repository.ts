@@ -23,6 +23,7 @@ export interface LawyerProfileRepository {
   findByUserId(userId: string): Promise<LawyerProfile | null>;
   findBySlug(slug: string): Promise<LawyerProfile | null>;
   slugExists(slug: string): Promise<boolean>;
+  hasActiveOffering(lawyerProfileId: string): Promise<boolean>;
   create(input: CreateLawyerProfileInput): Promise<LawyerProfile>;
   update(id: string, input: UpdateLawyerProfileInput): Promise<LawyerProfile>;
   updateVerificationStatus(

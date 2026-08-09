@@ -10,17 +10,24 @@ export function isLawyerVerified(profile: LawyerProfile): boolean {
   return profile.verificationStatus === LawyerVerificationStatus.APPROVED;
 }
 
-export function isLawyerPubliclyListed(profile: LawyerProfile): boolean {
+export function isLawyerPubliclyListed(
+  profile: LawyerProfile,
+  hasActiveOffering: boolean,
+): boolean {
   return (
     profile.deletedAt === null &&
     profile.isListed &&
     isLawyerVerified(profile) &&
+    hasActiveOffering &&
     profile.verificationStatus !== LawyerVerificationStatus.SUSPENDED
   );
 }
 
-export function canClientBookLawyer(profile: LawyerProfile): boolean {
-  return isLawyerPubliclyListed(profile);
+export function canClientBookLawyer(
+  profile: LawyerProfile,
+  hasActiveOffering: boolean,
+): boolean {
+  return isLawyerPubliclyListed(profile, hasActiveOffering);
 }
 
 export function canLawyerManageOfferings(profile: LawyerProfile): boolean {

@@ -133,7 +133,8 @@ enum LanguageProficiency {
 
 model User {
   id                String     @id @default(cuid())
-  email             String     @unique
+  /// Uniqueness for active users enforced by partial index `users_email_active_unique`.
+  email             String
   emailVerified     DateTime?  @map("email_verified_at")
   passwordHash      String?    @map("password_hash")
   name              String?
@@ -170,6 +171,7 @@ model User {
   reviewsModerated         Review[]               @relation("ReviewModerator")
 
   @@index([role, status])
+  @@index([email])
   @@index([deletedAt])
   @@map("users")
 }
@@ -251,7 +253,8 @@ model ClientProfile {
 model LawyerProfile {
   id                 String                   @id @default(cuid())
   userId             String                   @unique @map("user_id")
-  slug               String                   @unique
+  /// Uniqueness for active profiles enforced by partial index `lawyer_profiles_slug_active_unique`.
+  slug               String
   headline           String?
   bio                String?                  @db.Text
   yearsOfExperience  Int?                     @map("years_of_experience")
@@ -280,6 +283,7 @@ model LawyerProfile {
   @@index([verificationStatus])
   @@index([isListed, verificationStatus])
   @@index([averageRating(sort: Desc)])
+  @@index([slug])
   @@index([deletedAt])
   @@map("lawyer_profiles")
 }
