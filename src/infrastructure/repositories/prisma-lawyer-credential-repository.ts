@@ -5,6 +5,8 @@ import type {
 } from "@/domain/entities/profile";
 import { CredentialReviewStatus } from "@/domain/enums";
 import type { LawyerCredentialRepository } from "@/domain/repositories/profile-repository";
+import type { ListPage, ListPageOptions } from "@/application/common/list-page";
+import { resolveTake } from "@/application/common/list-page";
 import {
   getPrismaClient,
   type PrismaDbClient,
@@ -38,13 +40,25 @@ export class PrismaLawyerCredentialRepository
     return records.map(mapLawyerCredential);
   }
 
-  async findPendingReview(): Promise<LawyerCredential[]> {
+  async findPendingReview(
+    options?: ListPageOptions,
+  ): Promise<ListPage<LawyerCredential>> {
+    const take = resolveTake(options);
     const records = await this.db.lawyerCredential.findMany({
       where: { status: CredentialReviewStatus.SUBMITTED },
-      orderBy: { submittedAt: "asc" },
+      take: take + 1,
+      ...(options?.cursor
+        ? { cursor: { id: options.cursor }, skip: 1 }
+        : {}),
+      orderBy: [{ submittedAt: "asc" }, { id: "asc" }],
       select: lawyerCredentialSelect,
     });
-    return records.map(mapLawyerCredential);
+    const hasMore = records.length > take;
+    const page = hasMore ? records.slice(0, take) : records;
+    return {
+      items: page.map(mapLawyerCredential),
+      nextCursor: hasMore ? page[page.length - 1]!.id : null,
+    };
   }
 
   async create(input: SubmitLawyerCredentialInput): Promise<LawyerCredential> {

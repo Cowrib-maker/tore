@@ -172,8 +172,10 @@ export async function getPublicLawyerProfile(
       from.toISOString().slice(0, 10),
       to.toISOString().slice(0, 10),
     );
-  const bookings = await deps.bookingRepository.findByLawyerProfileId(
+  const bookings = await deps.bookingRepository.findBusyForLawyerInRange(
     profile.id,
+    from,
+    to,
   );
   const candidates = generateCandidateSlots({
     rules,

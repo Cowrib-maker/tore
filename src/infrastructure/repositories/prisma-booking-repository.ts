@@ -7,6 +7,8 @@ import type {
 } from "@/domain/entities/booking";
 import { BookingStatus } from "@/domain/enums";
 import type { BookingRepository } from "@/domain/repositories/booking-repository";
+import type { ListPage, ListPageOptions } from "@/application/common/list-page";
+import { resolveTake } from "@/application/common/list-page";
 import type { InstantSlot } from "@/domain/value-objects/time-slot";
 import {
   getPrismaClient,
@@ -17,6 +19,13 @@ import {
   mapBooking,
 } from "@/infrastructure/mappers/booking.mapper";
 import { mapUniqueViolation } from "@/infrastructure/database/prisma-errors";
+
+const ACTIVE_BOOKING_STATUSES = [
+  BookingStatus.PENDING_PAYMENT,
+  BookingStatus.PENDING_ACCEPTANCE,
+  BookingStatus.CONFIRMED,
+  BookingStatus.IN_PROGRESS,
+] as const;
 
 export class PrismaBookingRepository implements BookingRepository {
   constructor(private readonly db: PrismaDbClient = getPrismaClient()) {}
@@ -40,22 +49,61 @@ export class PrismaBookingRepository implements BookingRepository {
   async findByClientUserId(
     clientUserId: string,
     status?: BookingStatus,
-  ): Promise<Booking[]> {
+    options?: ListPageOptions,
+  ): Promise<ListPage<Booking>> {
+    const take = resolveTake(options);
     const records = await this.db.booking.findMany({
       where: { clientUserId, ...(status ? { status } : {}) },
-      orderBy: { scheduledStartAt: "desc" },
+      take: take + 1,
+      ...(options?.cursor
+        ? { cursor: { id: options.cursor }, skip: 1 }
+        : {}),
+      orderBy: [{ scheduledStartAt: "desc" }, { id: "desc" }],
       select: bookingSelect,
     });
-    return records.map(mapBooking);
+    const hasMore = records.length > take;
+    const page = hasMore ? records.slice(0, take) : records;
+    return {
+      items: page.map(mapBooking),
+      nextCursor: hasMore ? page[page.length - 1]!.id : null,
+    };
   }
 
   async findByLawyerProfileId(
     lawyerProfileId: string,
     status?: BookingStatus,
-  ): Promise<Booking[]> {
+    options?: ListPageOptions,
+  ): Promise<ListPage<Booking>> {
+    const take = resolveTake(options);
     const records = await this.db.booking.findMany({
       where: { lawyerProfileId, ...(status ? { status } : {}) },
-      orderBy: { scheduledStartAt: "desc" },
+      take: take + 1,
+      ...(options?.cursor
+        ? { cursor: { id: options.cursor }, skip: 1 }
+        : {}),
+      orderBy: [{ scheduledStartAt: "desc" }, { id: "desc" }],
+      select: bookingSelect,
+    });
+    const hasMore = records.length > take;
+    const page = hasMore ? records.slice(0, take) : records;
+    return {
+      items: page.map(mapBooking),
+      nextCursor: hasMore ? page[page.length - 1]!.id : null,
+    };
+  }
+
+  async findBusyForLawyerInRange(
+    lawyerProfileId: string,
+    from: Date,
+    to: Date,
+  ): Promise<Booking[]> {
+    const records = await this.db.booking.findMany({
+      where: {
+        lawyerProfileId,
+        status: { in: [...ACTIVE_BOOKING_STATUSES] },
+        scheduledStartAt: { lt: to },
+        scheduledEndAt: { gt: from },
+      },
       select: bookingSelect,
     });
     return records.map(mapBooking);
@@ -70,14 +118,7 @@ export class PrismaBookingRepository implements BookingRepository {
       where: {
         lawyerProfileId,
         id: excludeBookingId ? { not: excludeBookingId } : undefined,
-        status: {
-          in: [
-            BookingStatus.PENDING_PAYMENT,
-            BookingStatus.PENDING_ACCEPTANCE,
-            BookingStatus.CONFIRMED,
-            BookingStatus.IN_PROGRESS,
-          ],
-        },
+        status: { in: [...ACTIVE_BOOKING_STATUSES] },
         scheduledStartAt: { lt: slot.endAt },
         scheduledEndAt: { gt: slot.startAt },
       },

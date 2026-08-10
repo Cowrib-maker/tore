@@ -10,6 +10,7 @@ import type {
   UpdateLawyerProfileInput,
 } from "@/domain/entities/profile";
 import type { LawyerVerificationStatus } from "@/domain/enums";
+import type { ListPage, ListPageOptions } from "@/application/common/list-page";
 
 export interface ClientProfileRepository {
   findById(id: string): Promise<ClientProfile | null>;
@@ -52,7 +53,7 @@ export interface LawyerDiscoveryFilters {
 export interface LawyerCredentialRepository {
   findById(id: string): Promise<LawyerCredential | null>;
   findByLawyerProfileId(lawyerProfileId: string): Promise<LawyerCredential[]>;
-  findPendingReview(): Promise<LawyerCredential[]>;
+  findPendingReview(options?: ListPageOptions): Promise<ListPage<LawyerCredential>>;
   create(input: SubmitLawyerCredentialInput): Promise<LawyerCredential>;
   review(id: string, input: ReviewLawyerCredentialInput): Promise<LawyerCredential>;
 }

@@ -7,6 +7,7 @@ import type {
 } from "@/domain/entities/booking";
 import type { BookingStatus } from "@/domain/enums";
 import type { InstantSlot } from "@/domain/value-objects/time-slot";
+import type { ListPage, ListPageOptions } from "@/application/common/list-page";
 
 export interface BookingRepository {
   findById(id: string): Promise<Booking | null>;
@@ -14,10 +15,18 @@ export interface BookingRepository {
   findByClientUserId(
     clientUserId: string,
     status?: BookingStatus,
-  ): Promise<Booking[]>;
+    options?: ListPageOptions,
+  ): Promise<ListPage<Booking>>;
   findByLawyerProfileId(
     lawyerProfileId: string,
     status?: BookingStatus,
+    options?: ListPageOptions,
+  ): Promise<ListPage<Booking>>;
+  /** Active bookings overlapping [from, to) — used for public slot generation. */
+  findBusyForLawyerInRange(
+    lawyerProfileId: string,
+    from: Date,
+    to: Date,
   ): Promise<Booking[]>;
   findOverlappingForLawyer(
     lawyerProfileId: string,

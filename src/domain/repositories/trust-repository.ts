@@ -4,6 +4,7 @@ import type {
   Notification,
   Review,
 } from "@/domain/entities/trust";
+import type { ListPage, ListPageOptions } from "@/application/common/list-page";
 
 export interface ReviewRepository {
   findById(id: string): Promise<Review | null>;
@@ -16,7 +17,15 @@ export interface ReviewRepository {
 
 export interface NotificationRepository {
   findById(id: string): Promise<Notification | null>;
-  findByUserId(userId: string, unreadOnly?: boolean): Promise<Notification[]>;
+  /**
+   * Paginated inbox (newest first). Defaults to a bounded page when options omitted.
+   * `unreadOnly` kept as second arg for call-site compatibility.
+   */
+  findByUserId(
+    userId: string,
+    unreadOnly?: boolean,
+    options?: ListPageOptions,
+  ): Promise<ListPage<Notification>>;
   create(input: CreateNotificationInput): Promise<Notification>;
   markRead(ids: string[], readAt?: Date): Promise<void>;
   markAllReadForUser(userId: string): Promise<void>;

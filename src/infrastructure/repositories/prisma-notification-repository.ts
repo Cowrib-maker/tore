@@ -4,6 +4,8 @@ import type {
 } from "@/domain/entities/trust";
 import type { NotificationType } from "@/domain/enums";
 import type { NotificationRepository } from "@/domain/repositories/trust-repository";
+import type { ListPage, ListPageOptions } from "@/application/common/list-page";
+import { resolveTake } from "@/application/common/list-page";
 import type { Prisma } from "@/generated/prisma/client";
 import {
   getPrismaClient,
@@ -62,16 +64,27 @@ export class PrismaNotificationRepository implements NotificationRepository {
   async findByUserId(
     userId: string,
     unreadOnly?: boolean,
-  ): Promise<Notification[]> {
+    options?: ListPageOptions,
+  ): Promise<ListPage<Notification>> {
+    const take = resolveTake(options);
     const records = await this.db.notification.findMany({
       where: {
         userId,
         ...(unreadOnly ? { readAt: null } : {}),
       },
-      orderBy: { createdAt: "desc" },
+      take: take + 1,
+      ...(options?.cursor
+        ? { cursor: { id: options.cursor }, skip: 1 }
+        : {}),
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       select: notificationSelect,
     });
-    return records.map(mapNotification);
+    const hasMore = records.length > take;
+    const page = hasMore ? records.slice(0, take) : records;
+    return {
+      items: page.map(mapNotification),
+      nextCursor: hasMore ? page[page.length - 1]!.id : null,
+    };
   }
 
   async create(input: CreateNotificationInput): Promise<Notification> {

@@ -7,7 +7,6 @@ import { getClientIp } from "@/application/common/client-ip";
 import { mapActionError } from "@/application/common/map-action-error";
 import { parseWithSchema } from "@/application/common/parse-form";
 import { enforceRateLimit } from "@/application/common/rate-limit-action";
-import { getSessionUser } from "@/application/common/session";
 import { issueVerificationEmailAfterRegister, getEmailVerificationDeps } from "@/application/services/issue-verification-email";
 import { registerClientUseCase } from "@/application/use-cases/auth/register-client";
 import { registerLawyerUseCase } from "@/application/use-cases/auth/register-lawyer";

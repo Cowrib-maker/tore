@@ -76,7 +76,9 @@ export default async function ClientBookingsPage() {
     );
   }
 
-  const bookings = await bookingRepository.findByClientUserId(session.user.id);
+  const { items: bookings } = await bookingRepository.findByClientUserId(
+    session.user.id,
+  );
   const lawyerSlugs = new Map<string, string>();
   await Promise.all(
     bookings.map(async (booking) => {

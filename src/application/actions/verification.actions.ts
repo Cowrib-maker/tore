@@ -200,7 +200,8 @@ export async function getAdminLawyerVerificationQueue(): Promise<
     return { status: "forbidden" };
   }
 
-  const pending = await lawyerCredentialRepository.findPendingReview();
+  const { items: pending } =
+    await lawyerCredentialRepository.findPendingReview();
   const storage = getFileStorage();
   const { userRepository } = await import("@/infrastructure/repositories");
 

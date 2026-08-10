@@ -78,7 +78,7 @@ export default async function LawyerBookingsPage() {
 
   const profile = await lawyerProfileRepository.findByUserId(session.user.id);
   const bookings = profile
-    ? await bookingRepository.findByLawyerProfileId(profile.id)
+    ? (await bookingRepository.findByLawyerProfileId(profile.id)).items
     : [];
 
   const clientNames = new Map<string, string>();

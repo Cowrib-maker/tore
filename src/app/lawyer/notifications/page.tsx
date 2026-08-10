@@ -28,7 +28,7 @@ export default async function LawyerNotificationsPage() {
   const i18n = await getShellI18n("lawyer");
   const m = i18n.dict.marketplace;
   const locale = i18n.locale;
-  const notifications = await notificationRepository.findByUserId(
+  const { items: notifications } = await notificationRepository.findByUserId(
     session.user.id,
   );
   const unread = notifications.filter((n) => !n.readAt).length;

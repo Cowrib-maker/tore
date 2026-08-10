@@ -32,7 +32,8 @@ export default async function AdminDashboardPage() {
   const a = m.admin;
   const nav = i18n.nav;
 
-  const pending = await lawyerCredentialRepository.findPendingReview();
+  const { items: pending } =
+    await lawyerCredentialRepository.findPendingReview();
 
   return (
     <DashboardShell
