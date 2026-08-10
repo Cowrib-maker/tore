@@ -2,6 +2,11 @@ import { z } from "zod";
 
 const nodeEnv = process.env.NODE_ENV ?? "development";
 
+/** Explicit MVP / exceptional-deploy bypass — must be exactly "1". */
+function allowFlag(name: string): boolean {
+  return process.env[name] === "1";
+}
+
 const baseSchema = z.object({
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   AUTH_SECRET:
@@ -33,7 +38,8 @@ const baseSchema = z.object({
   S3_PUBLIC_BASE_URL: z.string().url().optional(),
   /**
    * Redis for distributed rate limiting.
-   * Required in production; optional in development (falls back to in-memory).
+   * Required in production unless TORE_ALLOW_NO_REDIS=1 (MVP / single-instance).
+   * Optional in development (falls back to in-memory).
    */
   REDIS_URL: z.string().url().optional(),
   /** auto (default) | console | resend | smtp — local auto always resolves to console */
@@ -89,20 +95,24 @@ function validateEnv(): Env {
     }
   }
 
-  // Set TORE_ALLOW_LOCAL_STORAGE=1 only for exceptional non-S3 production deploys.
+  // Set TORE_ALLOW_LOCAL_STORAGE=1 only for MVP / exceptional non-S3 production deploys.
   if (
     env.NODE_ENV === "production" &&
     env.FILE_STORAGE !== "s3" &&
-    process.env.TORE_ALLOW_LOCAL_STORAGE !== "1"
+    !allowFlag("TORE_ALLOW_LOCAL_STORAGE")
   ) {
     throw new Error(
       "Production requires FILE_STORAGE=s3 (set TORE_ALLOW_LOCAL_STORAGE=1 only for exceptional deploys)",
     );
   }
 
-  if (env.NODE_ENV === "production" && !env.REDIS_URL) {
+  if (
+    env.NODE_ENV === "production" &&
+    !env.REDIS_URL &&
+    !allowFlag("TORE_ALLOW_NO_REDIS")
+  ) {
     throw new Error(
-      "Production requires REDIS_URL for shared rate limiting across instances",
+      "Production requires REDIS_URL for shared rate limiting across instances (set TORE_ALLOW_NO_REDIS=1 for MVP single-instance)",
     );
   }
 
@@ -118,24 +128,31 @@ function validateEnv(): Env {
     env.NODE_ENV === "production" &&
     env.EMAIL_PROVIDER === "auto" &&
     !env.RESEND_API_KEY &&
-    !env.SMTP_HOST
+    !env.SMTP_HOST &&
+    !allowFlag("TORE_ALLOW_NO_EMAIL")
   ) {
     throw new Error(
-      "Production email requires RESEND_API_KEY (preferred) or SMTP_HOST",
+      "Production email requires RESEND_API_KEY (preferred) or SMTP_HOST (set TORE_ALLOW_NO_EMAIL=1 for MVP)",
     );
   }
 
-  if (env.NODE_ENV === "production" && env.EMAIL_PROVIDER === "console") {
-    throw new Error(
-      "EMAIL_PROVIDER=console is not allowed in production; use auto/resend/smtp",
-    );
-  }
-
-  // Set TORE_ALLOW_INSECURE_PROD_URLS=1 only for local production builds.
   if (
     env.NODE_ENV === "production" &&
-    process.env.TORE_ALLOW_INSECURE_PROD_URLS !== "1"
+    env.EMAIL_PROVIDER === "console" &&
+    !allowFlag("TORE_ALLOW_NO_EMAIL")
   ) {
+    throw new Error(
+      "EMAIL_PROVIDER=console is not allowed in production; use auto/resend/smtp (set TORE_ALLOW_NO_EMAIL=1 for MVP)",
+    );
+  }
+
+  // Set TORE_ALLOW_INSECURE_URLS=1 (or legacy TORE_ALLOW_INSECURE_PROD_URLS=1)
+  // only for MVP / local production builds.
+  const allowInsecureUrls =
+    allowFlag("TORE_ALLOW_INSECURE_URLS") ||
+    allowFlag("TORE_ALLOW_INSECURE_PROD_URLS");
+
+  if (env.NODE_ENV === "production" && !allowInsecureUrls) {
     const appUrl = new URL(env.NEXT_PUBLIC_APP_URL);
     if (appUrl.protocol !== "https:") {
       throw new Error("Production NEXT_PUBLIC_APP_URL must use https://");
