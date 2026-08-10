@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
 import { getClientProfileForSession } from "@/application/actions/profile.actions";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -49,54 +49,44 @@ export default async function ClientBookingsPage() {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 
-  const data = await getClientProfileForSession();
+  const [data, i18n] = await Promise.all([
+    getClientProfileForSession(),
+    getShellI18n("client"),
+  ]);
   if (data.status === "unauthenticated") redirect("/login");
 
-  const i18n = await getShellI18n("client");
   const m = i18n.dict.marketplace;
   const locale = i18n.locale;
-  const nav = i18n.nav;
   const pageTitle = i18n.pages.bookings;
   const b = m.clientBookings;
 
   if (data.status === "profile_missing") {
     return (
-      <DashboardShell
-        user={session.user}
-        title={pageTitle}
-        nav={nav}
-        {...i18n.shellProps}
-      >
+      <>
+        <DashboardPageHeading>{pageTitle}</DashboardPageHeading>
         <ProfileMissingState
           dashboardHref="/client/dashboard"
           roleLabel="client"
           copy={m.profileMissing}
         />
-      </DashboardShell>
+      </>
     );
   }
 
   const { items: bookings } = await bookingRepository.findByClientUserId(
     session.user.id,
   );
-  const lawyerSlugs = new Map<string, string>();
-  await Promise.all(
-    bookings.map(async (booking) => {
-      if (lawyerSlugs.has(booking.lawyerProfileId)) return;
-      const profile = await lawyerProfileRepository.findById(
-        booking.lawyerProfileId,
-      );
-      lawyerSlugs.set(booking.lawyerProfileId, profile?.slug ?? "");
-    }),
+  const uniqueLawyerIds = [
+    ...new Set(bookings.map((booking) => booking.lawyerProfileId)),
+  ];
+  const lawyers = await lawyerProfileRepository.findByIds(uniqueLawyerIds);
+  const lawyerSlugs = new Map(
+    lawyers.map((profile) => [profile.id, profile.slug]),
   );
 
   return (
-    <DashboardShell
-      user={session.user}
-      title={pageTitle}
-      nav={nav}
-      {...i18n.shellProps}
-    >
+    <>
+      <DashboardPageHeading>{pageTitle}</DashboardPageHeading>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">{b.intro}</p>
         <Link
@@ -159,6 +149,6 @@ export default async function ClientBookingsPage() {
           })
         )}
       </div>
-    </DashboardShell>
+    </>
   );
 }

@@ -1,9 +1,6 @@
 import { PageSkeleton } from "@/components/layout/page-skeleton";
-import { getDictionary } from "@/i18n/get-dictionary";
 
-export default async function Loading() {
-  const dict = await getDictionary();
-  return (
-    <PageSkeleton cards={3} label={dict.marketplace.common.loading} />
-  );
+/** Sync loading UI — avoid awaiting dictionary on every soft navigation. */
+export default function Loading() {
+  return <PageSkeleton cards={3} />;
 }

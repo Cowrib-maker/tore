@@ -21,6 +21,7 @@ export interface ClientProfileRepository {
 
 export interface LawyerProfileRepository {
   findById(id: string): Promise<LawyerProfile | null>;
+  findByIds(ids: string[]): Promise<LawyerProfile[]>;
   findByUserId(userId: string): Promise<LawyerProfile | null>;
   findBySlug(slug: string): Promise<LawyerProfile | null>;
   slugExists(slug: string): Promise<boolean>;

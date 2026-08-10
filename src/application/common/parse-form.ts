@@ -10,6 +10,15 @@ export function firstZodMessage(
 }
 
 /**
+ * Read a checkbox from FormData when a hidden "off" sentinel may share the same
+ * name. Prefer getAll: formData.get() returns only the first value, so a leading
+ * hidden field would always win over a checked checkbox.
+ */
+export function isFormCheckboxOn(formData: FormData, name: string): boolean {
+  return formData.getAll(name).some((value) => value === "on");
+}
+
+/**
  * Parse with Zod; on failure return ActionState error for form actions.
  */
 export function parseWithSchema<T extends ZodTypeAny>(

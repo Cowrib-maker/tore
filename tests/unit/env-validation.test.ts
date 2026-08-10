@@ -58,6 +58,23 @@ describe("assertProductionEnvGuards", () => {
     ).not.toThrow();
   });
 
+  it("treats missing or non-1 allow flags as denied", () => {
+    process.env.TORE_ALLOW_LOCAL_STORAGE = "true";
+    expect(() =>
+      assertProductionEnvGuards(prodEnv({ FILE_STORAGE: "local" })),
+    ).toThrow(/FILE_STORAGE=s3/);
+
+    process.env.TORE_ALLOW_LOCAL_STORAGE = " 1 ";
+    expect(() =>
+      assertProductionEnvGuards(prodEnv({ FILE_STORAGE: "local" })),
+    ).not.toThrow();
+
+    process.env.TORE_ALLOW_LOCAL_STORAGE = '"1"';
+    expect(() =>
+      assertProductionEnvGuards(prodEnv({ FILE_STORAGE: "local" })),
+    ).not.toThrow();
+  });
+
   it("requires REDIS_URL unless TORE_ALLOW_NO_REDIS=1", () => {
     expect(() =>
       assertProductionEnvGuards(prodEnv({ REDIS_URL: undefined })),

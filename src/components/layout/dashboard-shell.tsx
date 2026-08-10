@@ -5,6 +5,7 @@ import { BRAND_LOGO_SHELL, BRAND_NAME } from "@/components/brand/tokens";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { BrandLink } from "@/components/layout/brand-link";
 import { DashboardMobileNav } from "@/components/layout/dashboard-mobile-nav";
+import { DashboardNavLinks } from "@/components/layout/dashboard-nav-links";
 import { buttonVariants } from "@/components/ui/button";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
@@ -20,7 +21,8 @@ interface DashboardShellProps {
     name?: string | null;
     email?: string | null;
   };
-  title: string;
+  /** Page title rendered above children. Omit when the page supplies its own heading. */
+  title?: string;
   nav?: DashboardNavItem[];
   locale: Locale;
   languageLabel: string;
@@ -28,6 +30,18 @@ interface DashboardShellProps {
   brand?: string;
   navAriaLabel?: string;
   mobileNavLabel?: string;
+}
+
+export function DashboardPageHeading({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <h1 className="mb-5 text-xl font-semibold tracking-tight sm:mb-6 sm:text-2xl">
+      {children}
+    </h1>
+  );
 }
 
 export function DashboardShell({
@@ -54,15 +68,7 @@ export function DashboardShell({
                   className="hidden items-center gap-4 sm:flex"
                   aria-label={navAriaLabel}
                 >
-                  {nav.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="cursor-pointer text-sm text-muted-foreground hover:text-foreground"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
+                  <DashboardNavLinks items={nav} />
                 </nav>
                 <DashboardMobileNav items={nav} label={mobileNavLabel} />
               </>
@@ -88,9 +94,7 @@ export function DashboardShell({
         </div>
       </header>
       <main className="mx-auto w-full max-w-6xl flex-1 p-4 sm:p-6">
-        <h1 className="mb-5 text-xl font-semibold tracking-tight sm:mb-6 sm:text-2xl">
-          {title}
-        </h1>
+        {title ? <DashboardPageHeading>{title}</DashboardPageHeading> : null}
         {children}
       </main>
     </div>

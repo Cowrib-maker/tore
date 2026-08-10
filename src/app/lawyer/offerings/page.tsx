@@ -7,7 +7,7 @@ import {
   CreateOfferingForm,
   OfferingRow,
 } from "@/components/marketplace/offering-forms";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import {
   Card,
@@ -19,10 +19,7 @@ import {
 import { UserRole } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
-import {
-  consultationOfferingRepository,
-  lawyerProfileRepository,
-} from "@/infrastructure/repositories";
+import { consultationOfferingRepository } from "@/infrastructure/repositories";
 
 export default async function LawyerOfferingsPage() {
   const session = await getSessionUser();
@@ -31,36 +28,32 @@ export default async function LawyerOfferingsPage() {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 
-  const data = await getLawyerProfileForSession();
+  const [data, i18n] = await Promise.all([
+    getLawyerProfileForSession(),
+    getShellI18n("lawyer"),
+  ]);
   if (data.status === "unauthenticated") redirect("/login");
 
-  const i18n = await getShellI18n("lawyer");
   const m = i18n.dict.marketplace;
-  const nav = i18n.nav;
   const pageTitle = i18n.pages.offerings;
   const o = m.offerings;
 
   if (data.status === "profile_missing") {
     return (
-      <DashboardShell
-        user={session.user}
-        title={pageTitle}
-        nav={nav}
-        {...i18n.shellProps}
-      >
+      <>
+        <DashboardPageHeading>{pageTitle}</DashboardPageHeading>
         <ProfileMissingState
           dashboardHref="/lawyer/dashboard"
           roleLabel="lawyer"
           copy={m.profileMissing}
         />
-      </DashboardShell>
+      </>
     );
   }
 
-  const profile = await lawyerProfileRepository.findByUserId(session.user.id);
-  const offerings = profile
-    ? await consultationOfferingRepository.findByLawyerProfileId(profile.id)
-    : [];
+  const offerings = await consultationOfferingRepository.findByLawyerProfileId(
+    data.profile.id,
+  );
 
   const offeringCopy = {
     ...m.offeringForm,
@@ -71,12 +64,8 @@ export default async function LawyerOfferingsPage() {
   };
 
   return (
-    <DashboardShell
-      user={session.user}
-      title={pageTitle}
-      nav={nav}
-      {...i18n.shellProps}
-    >
+    <>
+      <DashboardPageHeading>{pageTitle}</DashboardPageHeading>
       <p className="mb-5 text-sm text-muted-foreground">
         {o.intro}{" "}
         <Link href="/lawyer/dashboard" className="underline underline-offset-4">
@@ -118,6 +107,6 @@ export default async function LawyerOfferingsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardShell>
+    </>
   );
 }

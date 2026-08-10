@@ -1,7 +1,9 @@
+import { cache } from "react";
+
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 
-export async function getShellI18n(role: "client" | "lawyer" | "admin") {
+export const getShellI18n = cache(async (role: "client" | "lawyer" | "admin") => {
   const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
   const d = dict.dashboard;
   const m = dict.marketplace;
@@ -61,4 +63,4 @@ export async function getShellI18n(role: "client" | "lawyer" | "admin") {
       mobileNavLabel: m.common.navigate,
     },
   };
-}
+});

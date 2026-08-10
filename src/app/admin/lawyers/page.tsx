@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
 import { getAdminLawyerVerificationQueue } from "@/application/actions/verification.actions";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { ReviewCredentialActions } from "@/components/verification/review-credential-actions";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -27,25 +27,22 @@ export default async function AdminLawyersPage() {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 
-  const i18n = await getShellI18n("admin");
+  const [i18n, queue] = await Promise.all([
+    getShellI18n("admin"),
+    getAdminLawyerVerificationQueue(),
+  ]);
   const m = i18n.dict.marketplace;
   const locale = i18n.locale;
   const a = m.admin;
-  const nav = i18n.nav;
 
-  const queue = await getAdminLawyerVerificationQueue();
   if (queue.status === "unauthenticated") redirect("/login");
   if (queue.status === "forbidden") {
     redirect(getDashboardPath(UserRole.ADMIN));
   }
 
   return (
-    <DashboardShell
-      user={session.user}
-      title={a.pageTitle}
-      nav={nav}
-      {...i18n.shellProps}
-    >
+    <>
+      <DashboardPageHeading>{a.pageTitle}</DashboardPageHeading>
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>{a.pendingTitle}</CardTitle>
@@ -119,6 +116,6 @@ export default async function AdminLawyersPage() {
           ))}
         </div>
       )}
-    </DashboardShell>
+    </>
   );
 }

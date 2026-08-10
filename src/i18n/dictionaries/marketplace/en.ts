@@ -119,7 +119,12 @@ export const marketplaceEn: MarketplaceDictionary = {
     listed: "Listed",
     notListed: "Not listed",
     listingHelp:
-      "Public listing requires approved credentials and an active offering. Once listed, clients find you in the",
+      "Listing needs approved credentials, an active offering, and the directory checkbox on your profile. Clients find you in the",
+    listingGateVerification: "Credentials approved",
+    listingGateOffering: "Active offering published",
+    listingGateOptIn: "Directory opt-in enabled on profile",
+    listingGateIncomplete:
+      "Complete each step below before clients can find you in the directory.",
     directoryLink: "lawyer directory",
     offerings: "Offerings",
     offeringsHelp: "Publish fixed-fee services with duration and format.",

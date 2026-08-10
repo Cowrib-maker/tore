@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import type { ActionState } from "@/application/common/action-state";
@@ -43,10 +43,20 @@ export function LawyerProfileForm({
     updateLawyerProfileAction,
     initialState,
   );
+  // Single hidden field carries isListed. The visible checkbox has no `name`, so
+  // FormData cannot lose the value to a disabled control or get()/getAll ordering.
+  const [listed, setListed] = useState(isListed);
+
+  useEffect(() => {
+    setListed(isListed);
+  }, [isListed]);
 
   useEffect(() => {
     if (state.success) {
       toast.success(copy.savedToast);
+    }
+    if (state.error) {
+      toast.error(state.error);
     }
   }, [state, copy.savedToast]);
 
@@ -173,15 +183,13 @@ export function LawyerProfileForm({
         </NativeSelect>
       </div>
       <div className="flex items-start gap-2">
-        {!canRequestListing ? (
-          <input type="hidden" name="isListed" value={isListed ? "on" : ""} />
-        ) : null}
+        <input type="hidden" name="isListed" value={listed ? "on" : "off"} />
         <input
           id="isListed"
-          name="isListed"
           type="checkbox"
-          defaultChecked={isListed ?? false}
+          checked={listed}
           disabled={!canRequestListing}
+          onChange={(event) => setListed(event.target.checked)}
           className="mt-1 size-4 rounded border-input"
         />
         <div className="space-y-1">
@@ -189,7 +197,9 @@ export function LawyerProfileForm({
             {copy.listProfile}
           </Label>
           {!canRequestListing && (
-            <p className="text-xs text-muted-foreground">{copy.listHelp}</p>
+            <p id="isListed-help" className="text-xs text-muted-foreground">
+              {copy.listHelp}
+            </p>
           )}
         </div>
       </div>

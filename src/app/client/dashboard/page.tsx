@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
 import { getClientProfileForSession } from "@/application/actions/profile.actions";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -30,30 +30,27 @@ export default async function ClientDashboardPage() {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 
-  const data = await getClientProfileForSession();
+  const [data, i18n] = await Promise.all([
+    getClientProfileForSession(),
+    getShellI18n("client"),
+  ]);
   if (data.status === "unauthenticated") {
     redirect("/login");
   }
 
-  const i18n = await getShellI18n("client");
   const m = i18n.dict.marketplace;
-  const nav = i18n.nav;
   const cd = m.clientDashboard;
 
   if (data.status === "profile_missing") {
     return (
-      <DashboardShell
-        user={session.user}
-        title={i18n.title}
-        nav={nav}
-        {...i18n.shellProps}
-      >
+      <>
+        <DashboardPageHeading>{i18n.title}</DashboardPageHeading>
         <ProfileMissingState
           dashboardHref="/client/dashboard"
           roleLabel="client"
           copy={m.profileMissing}
         />
-      </DashboardShell>
+      </>
     );
   }
 
@@ -63,12 +60,8 @@ export default async function ClientDashboardPage() {
   );
 
   return (
-    <DashboardShell
-      user={session.user}
-      title={i18n.title}
-      nav={nav}
-      {...i18n.shellProps}
-    >
+    <>
+      <DashboardPageHeading>{i18n.title}</DashboardPageHeading>
       <p className="mb-5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
         {cd.intro}
       </p>
@@ -128,6 +121,6 @@ export default async function ClientDashboardPage() {
           </CardHeader>
         </Card>
       </div>
-    </DashboardShell>
+    </>
   );
 }

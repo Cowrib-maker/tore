@@ -117,7 +117,12 @@ export const marketplaceKo: MarketplaceDictionary = {
     listed: "등록됨",
     notListed: "미등록",
     listingHelp:
-      "공개 등록에는 승인된 자격과 활성 서비스가 필요합니다. 등록되면 고객이",
+      "공개 등록에는 승인된 자격, 활성 서비스, 프로필의 디렉터리 체크가 필요합니다. 고객이",
+    listingGateVerification: "자격 승인 완료",
+    listingGateOffering: "활성 서비스 게시",
+    listingGateOptIn: "프로필에서 디렉터리 등록 선택",
+    listingGateIncomplete:
+      "디렉터리에 표시되려면 아래 단계를 모두 완료하세요.",
     directoryLink: "변호사 디렉터리",
     offerings: "서비스",
     offeringsHelp: "기간과 형식이 포함된 고정 요금 서비스를 게시하십시오.",

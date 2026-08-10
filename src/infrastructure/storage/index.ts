@@ -26,7 +26,10 @@ export function createFileStorage(): FileStorage {
 
   const rootDir = path.isAbsolute(env.FILE_STORAGE_LOCAL_ROOT)
     ? env.FILE_STORAGE_LOCAL_ROOT
-    : path.join(process.cwd(), env.FILE_STORAGE_LOCAL_ROOT);
+    : path.join(
+        /* turbopackIgnore: true */ process.cwd(),
+        env.FILE_STORAGE_LOCAL_ROOT,
+      );
 
   return new LocalFileStorage({
     rootDir,

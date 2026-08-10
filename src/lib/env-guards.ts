@@ -1,8 +1,13 @@
 import type { Env } from "@/lib/env-schema";
 
-/** Explicit MVP / exceptional-deploy bypass — must be exactly "1". */
+/** Explicit MVP / exceptional-deploy bypass — must be exactly "1" (after trim). */
 export function allowFlag(name: string): boolean {
-  return process.env[name] === "1";
+  const raw = process.env[name];
+  if (raw == null) return false;
+  // Strip optional surrounding quotes / whitespace from dotenv-style values.
+  // Still requires the semantic value to be exactly 1 — empty / true / yes stay false.
+  const normalized = raw.trim().replace(/^['"]|['"]$/g, "");
+  return normalized === "1";
 }
 
 /**

@@ -113,6 +113,10 @@ export type MarketplaceDictionary = {
     listed: string;
     notListed: string;
     listingHelp: string;
+    listingGateVerification: string;
+    listingGateOffering: string;
+    listingGateOptIn: string;
+    listingGateIncomplete: string;
     directoryLink: string;
     offerings: string;
     offeringsHelp: string;

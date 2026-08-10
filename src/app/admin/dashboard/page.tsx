@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import {
   Card,
   CardDescription,
@@ -27,21 +27,16 @@ export default async function AdminDashboardPage() {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 
-  const i18n = await getShellI18n("admin");
+  const [i18n, { items: pending }] = await Promise.all([
+    getShellI18n("admin"),
+    lawyerCredentialRepository.findPendingReview(),
+  ]);
   const m = i18n.dict.marketplace;
   const a = m.admin;
-  const nav = i18n.nav;
-
-  const { items: pending } =
-    await lawyerCredentialRepository.findPendingReview();
 
   return (
-    <DashboardShell
-      user={session.user}
-      title={i18n.title}
-      nav={nav}
-      {...i18n.shellProps}
-    >
+    <>
+      <DashboardPageHeading>{i18n.title}</DashboardPageHeading>
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>
           <CardHeader>
@@ -68,6 +63,6 @@ export default async function AdminDashboardPage() {
           </CardHeader>
         </Card>
       </div>
-    </DashboardShell>
+    </>
   );
 }

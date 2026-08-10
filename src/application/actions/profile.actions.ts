@@ -1,11 +1,15 @@
 "use server";
 
+import { cache } from "react";
 import { revalidatePath } from "next/cache";
 
 import type { ActionState } from "@/application/common/action-state";
 import { getClientIp } from "@/application/common/client-ip";
 import { mapActionError } from "@/application/common/map-action-error";
-import { parseWithSchema } from "@/application/common/parse-form";
+import {
+  isFormCheckboxOn,
+  parseWithSchema,
+} from "@/application/common/parse-form";
 import { enforceRateLimit } from "@/application/common/rate-limit-action";
 import { requireActor } from "@/application/common/require-actor";
 import { getSessionUser } from "@/application/common/session";
@@ -86,12 +90,12 @@ export async function updateLawyerProfileAction(
       city: formData.get("city") ?? "",
       education: formData.get("education") ?? "",
       timezone: formData.get("timezone") ?? "Asia/Ulaanbaatar",
-      isListed: formData.get("isListed") === "on",
+      isListed: isFormCheckboxOn(formData, "isListed"),
     });
     if (!parsed.ok) return parsed.state;
 
     const ipAddress = await getClientIp();
-    await updateLawyerProfileUseCase(
+    const updated = await updateLawyerProfileUseCase(
       actor,
       parsed.data,
       updateLawyerDeps,
@@ -99,6 +103,8 @@ export async function updateLawyerProfileAction(
     );
     revalidatePath("/lawyer/profile");
     revalidatePath("/lawyer/dashboard");
+    revalidatePath("/lawyers");
+    revalidatePath(`/lawyers/${updated.slug}`);
     return { success: true };
   } catch (error) {
     return mapActionError(error);
@@ -120,50 +126,54 @@ export type LawyerProfileSessionResult =
   | { status: "unauthenticated" }
   | { status: "profile_missing"; user: User };
 
-export async function getClientProfileForSession(): Promise<ClientProfileSessionResult> {
-  const session = await getSessionUser();
-  if (!session?.user?.id || session.user.role !== UserRole.CLIENT) {
-    return { status: "unauthenticated" };
-  }
+export const getClientProfileForSession = cache(
+  async (): Promise<ClientProfileSessionResult> => {
+    const session = await getSessionUser();
+    if (!session?.user?.id || session.user.role !== UserRole.CLIENT) {
+      return { status: "unauthenticated" };
+    }
 
-  const [user, profile] = await Promise.all([
-    userRepository.findById(session.user.id),
-    clientProfileRepository.findByUserId(session.user.id),
-  ]);
+    const [user, profile] = await Promise.all([
+      userRepository.findById(session.user.id),
+      clientProfileRepository.findByUserId(session.user.id),
+    ]);
 
-  if (!user) {
-    return { status: "unauthenticated" };
-  }
+    if (!user) {
+      return { status: "unauthenticated" };
+    }
 
-  if (!profile) {
-    return { status: "profile_missing", user };
-  }
+    if (!profile) {
+      return { status: "profile_missing", user };
+    }
 
-  return { status: "ok", user, profile };
-}
+    return { status: "ok", user, profile };
+  },
+);
 
-export async function getLawyerProfileForSession(): Promise<LawyerProfileSessionResult> {
-  const session = await getSessionUser();
-  if (!session?.user?.id || session.user.role !== UserRole.LAWYER) {
-    return { status: "unauthenticated" };
-  }
+export const getLawyerProfileForSession = cache(
+  async (): Promise<LawyerProfileSessionResult> => {
+    const session = await getSessionUser();
+    if (!session?.user?.id || session.user.role !== UserRole.LAWYER) {
+      return { status: "unauthenticated" };
+    }
 
-  const [user, profile] = await Promise.all([
-    userRepository.findById(session.user.id),
-    lawyerProfileRepository.findByUserId(session.user.id),
-  ]);
+    const [user, profile] = await Promise.all([
+      userRepository.findById(session.user.id),
+      lawyerProfileRepository.findByUserId(session.user.id),
+    ]);
 
-  if (!user) {
-    return { status: "unauthenticated" };
-  }
+    if (!user) {
+      return { status: "unauthenticated" };
+    }
 
-  if (!profile) {
-    return { status: "profile_missing", user };
-  }
+    if (!profile) {
+      return { status: "profile_missing", user };
+    }
 
-  const hasActiveOffering = await lawyerProfileRepository.hasActiveOffering(
-    profile.id,
-  );
+    const hasActiveOffering = await lawyerProfileRepository.hasActiveOffering(
+      profile.id,
+    );
 
-  return { status: "ok", user, profile, hasActiveOffering };
-}
+    return { status: "ok", user, profile, hasActiveOffering };
+  },
+);

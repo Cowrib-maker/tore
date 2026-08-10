@@ -117,7 +117,11 @@ export const marketplaceZh: MarketplaceDictionary = {
     listed: "已上架",
     notListed: "未上架",
     listingHelp:
-      "公开上架需完成资质核验并通过审核，且需设有有效服务。上架后，客户可在",
+      "公开上架需完成资质核验、至少一项有效服务，并在个人资料中勾选上架。客户可在",
+    listingGateVerification: "资质已通过审核",
+    listingGateOffering: "已发布有效服务",
+    listingGateOptIn: "已在资料中勾选上架",
+    listingGateIncomplete: "请完成以下步骤后才会出现在公开目录中。",
     directoryLink: "律师目录",
     offerings: "服务",
     offeringsHelp: "发布含时长与形式的固定费用服务。",

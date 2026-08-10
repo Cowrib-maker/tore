@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
 import { getLawyerProfileForSession } from "@/application/actions/profile.actions";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -46,30 +46,27 @@ export default async function LawyerDashboardPage() {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 
-  const data = await getLawyerProfileForSession();
+  const [data, i18n] = await Promise.all([
+    getLawyerProfileForSession(),
+    getShellI18n("lawyer"),
+  ]);
   if (data.status === "unauthenticated") {
     redirect("/login");
   }
 
-  const i18n = await getShellI18n("lawyer");
   const m = i18n.dict.marketplace;
   const locale = i18n.locale;
-  const nav = i18n.nav;
 
   if (data.status === "profile_missing") {
     return (
-      <DashboardShell
-        user={session.user}
-        title={i18n.title}
-        nav={nav}
-        {...i18n.shellProps}
-      >
+      <>
+        <DashboardPageHeading>{i18n.title}</DashboardPageHeading>
         <ProfileMissingState
           dashboardHref="/lawyer/dashboard"
           roleLabel="lawyer"
           copy={m.profileMissing}
         />
-      </DashboardShell>
+      </>
     );
   }
 
@@ -77,16 +74,13 @@ export default async function LawyerDashboardPage() {
   const profileFilled = Boolean(data.profile.headline || data.profile.bio);
   const verificationStatus = data.profile.verificationStatus;
   const verified = isLawyerVerified(data.profile);
+  const hasActiveOffering = data.hasActiveOffering;
   const listed = data.profile.isListed;
   const ld = m.lawyerDashboard;
 
   return (
-    <DashboardShell
-      user={session.user}
-      title={i18n.title}
-      nav={nav}
-      {...i18n.shellProps}
-    >
+    <>
+      <DashboardPageHeading>{i18n.title}</DashboardPageHeading>
       <p className="mb-5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
         {ld.intro}
       </p>
@@ -149,13 +143,32 @@ export default async function LawyerDashboardPage() {
               </div>
             </div>
             <CardDescription>
-              {ld.listingHelp}{" "}
-              <Link href="/lawyers" className="underline underline-offset-4">
-                {ld.directoryLink}
-              </Link>
-              .
+              {listed ? (
+                <>
+                  {ld.listingHelp}{" "}
+                  <Link href="/lawyers" className="underline underline-offset-4">
+                    {ld.directoryLink}
+                  </Link>
+                  .
+                </>
+              ) : (
+                ld.listingGateIncomplete
+              )}
             </CardDescription>
           </CardHeader>
+          <CardFooter>
+            <ul className="w-full space-y-1.5 text-sm text-muted-foreground">
+              <li className={verified ? "text-foreground" : undefined}>
+                {verified ? "✓" : "○"} {ld.listingGateVerification}
+              </li>
+              <li className={hasActiveOffering ? "text-foreground" : undefined}>
+                {hasActiveOffering ? "✓" : "○"} {ld.listingGateOffering}
+              </li>
+              <li className={listed ? "text-foreground" : undefined}>
+                {listed ? "✓" : "○"} {ld.listingGateOptIn}
+              </li>
+            </ul>
+          </CardFooter>
         </Card>
       </div>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -202,6 +215,6 @@ export default async function LawyerDashboardPage() {
           </CardFooter>
         </Card>
       </div>
-    </DashboardShell>
+    </>
   );
 }

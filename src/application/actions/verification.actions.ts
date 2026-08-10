@@ -127,7 +127,9 @@ export async function reviewLawyerCredentialAction(
 
     revalidatePath("/admin/lawyers");
     revalidatePath("/lawyer/verification");
+    revalidatePath("/lawyer/profile");
     revalidatePath("/lawyer/dashboard");
+    revalidatePath("/lawyers");
     return { success: true };
   } catch (error) {
     return mapActionError(error);
@@ -205,22 +207,27 @@ export async function getAdminLawyerVerificationQueue(): Promise<
   const storage = getFileStorage();
   const { userRepository } = await import("@/infrastructure/repositories");
 
-  const items: AdminCredentialQueueItem[] = [];
-  for (const credential of pending) {
-    const lawyer = await lawyerProfileRepository.findById(
-      credential.lawyerProfileId,
-    );
-    if (!lawyer) continue;
-    const user = await userRepository.findById(lawyer.userId);
-    const documentUrl = await storage.getUrl(credential.documentUrl);
-    items.push({
-      credential,
-      lawyer,
-      lawyerEmail: user?.email ?? null,
-      lawyerName: user?.name ?? null,
-      documentUrl,
-    });
-  }
+  const items = (
+    await Promise.all(
+      pending.map(async (credential) => {
+        const lawyer = await lawyerProfileRepository.findById(
+          credential.lawyerProfileId,
+        );
+        if (!lawyer) return null;
+        const [user, documentUrl] = await Promise.all([
+          userRepository.findById(lawyer.userId),
+          storage.getUrl(credential.documentUrl),
+        ]);
+        return {
+          credential,
+          lawyer,
+          lawyerEmail: user?.email ?? null,
+          lawyerName: user?.name ?? null,
+          documentUrl,
+        } satisfies AdminCredentialQueueItem;
+      }),
+    )
+  ).filter((item): item is AdminCredentialQueueItem => item != null);
 
   return { status: "ok", items };
 }

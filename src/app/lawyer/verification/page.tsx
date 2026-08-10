@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
 import { getLawyerVerificationForSession } from "@/application/actions/verification.actions";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { SubmitCredentialForm } from "@/components/verification/submit-credential-form";
 import { Badge } from "@/components/ui/badge";
@@ -47,32 +47,29 @@ export default async function LawyerVerificationPage() {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 
-  const i18n = await getShellI18n("lawyer");
+  const [i18n, data] = await Promise.all([
+    getShellI18n("lawyer"),
+    getLawyerVerificationForSession(),
+  ]);
   const m = i18n.dict.marketplace;
   const locale = i18n.locale;
-  const nav = i18n.nav;
   const pageTitle = i18n.pages.verification;
   const v = m.verification;
 
-  const data = await getLawyerVerificationForSession();
   if (data.status === "unauthenticated") redirect("/login");
   if (data.status === "forbidden") {
     redirect(getDashboardPath(UserRole.LAWYER));
   }
   if (data.status === "profile_missing") {
     return (
-      <DashboardShell
-        user={session.user}
-        title={pageTitle}
-        nav={nav}
-        {...i18n.shellProps}
-      >
+      <>
+        <DashboardPageHeading>{pageTitle}</DashboardPageHeading>
         <ProfileMissingState
           dashboardHref="/lawyer/dashboard"
           roleLabel="lawyer"
           copy={m.profileMissing}
         />
-      </DashboardShell>
+      </>
     );
   }
 
@@ -87,12 +84,8 @@ export default async function LawyerVerificationPage() {
   const status = data.data.profile.verificationStatus;
 
   return (
-    <DashboardShell
-      user={session.user}
-      title={pageTitle}
-      nav={nav}
-      {...i18n.shellProps}
-    >
+    <>
+      <DashboardPageHeading>{pageTitle}</DashboardPageHeading>
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
@@ -185,6 +178,6 @@ export default async function LawyerVerificationPage() {
           )}
         </CardContent>
       </Card>
-    </DashboardShell>
+    </>
   );
 }

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/application/common/session";
 import { getLawyerProfileForSession } from "@/application/actions/profile.actions";
 import { LawyerBookingActions } from "@/components/marketplace/lawyer-booking-actions";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -19,7 +19,6 @@ import { getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 import {
   bookingRepository,
-  lawyerProfileRepository,
   userRepository,
 } from "@/infrastructure/repositories";
 import {
@@ -49,48 +48,41 @@ export default async function LawyerBookingsPage() {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 
-  const data = await getLawyerProfileForSession();
+  const [data, i18n] = await Promise.all([
+    getLawyerProfileForSession(),
+    getShellI18n("lawyer"),
+  ]);
   if (data.status === "unauthenticated") redirect("/login");
 
-  const i18n = await getShellI18n("lawyer");
   const m = i18n.dict.marketplace;
   const locale = i18n.locale;
-  const nav = i18n.nav;
   const pageTitle = i18n.pages.bookings;
   const b = m.lawyerBookings;
 
   if (data.status === "profile_missing") {
     return (
-      <DashboardShell
-        user={session.user}
-        title={pageTitle}
-        nav={nav}
-        {...i18n.shellProps}
-      >
+      <>
+        <DashboardPageHeading>{pageTitle}</DashboardPageHeading>
         <ProfileMissingState
           dashboardHref="/lawyer/dashboard"
           roleLabel="lawyer"
           copy={m.profileMissing}
         />
-      </DashboardShell>
+      </>
     );
   }
 
-  const profile = await lawyerProfileRepository.findByUserId(session.user.id);
-  const bookings = profile
-    ? (await bookingRepository.findByLawyerProfileId(profile.id)).items
-    : [];
+  const { items: bookings } = await bookingRepository.findByLawyerProfileId(
+    data.profile.id,
+  );
 
-  const clientNames = new Map<string, string>();
-  await Promise.all(
-    bookings.map(async (booking) => {
-      if (clientNames.has(booking.clientUserId)) return;
-      const user = await userRepository.findById(booking.clientUserId);
-      clientNames.set(
-        booking.clientUserId,
-        user?.name ?? user?.email ?? m.common.clientFallback,
-      );
-    }),
+  const uniqueClientIds = [...new Set(bookings.map((b) => b.clientUserId))];
+  const clients = await userRepository.findByIds(uniqueClientIds);
+  const clientNames = new Map(
+    clients.map((user) => [
+      user.id,
+      user.name ?? user.email ?? m.common.clientFallback,
+    ]),
   );
 
   const actionsCopy = {
@@ -99,12 +91,8 @@ export default async function LawyerBookingsPage() {
   };
 
   return (
-    <DashboardShell
-      user={session.user}
-      title={pageTitle}
-      nav={nav}
-      {...i18n.shellProps}
-    >
+    <>
+      <DashboardPageHeading>{pageTitle}</DashboardPageHeading>
       <p className="mb-5 text-sm text-muted-foreground">
         {b.intro}{" "}
         <Link
@@ -135,8 +123,9 @@ export default async function LawyerBookingsPage() {
                   </Badge>
                 </div>
                 <CardDescription>
-                  {clientNames.get(booking.clientUserId)} ·{" "}
-                  {formatDateTimeUtc(booking.scheduledStartAt, locale)} –{" "}
+                  {clientNames.get(booking.clientUserId) ??
+                    m.common.clientFallback}{" "}
+                  · {formatDateTimeUtc(booking.scheduledStartAt, locale)} –{" "}
                   {formatDateTimeUtc(booking.scheduledEndAt, locale)}{" "}
                   {m.common.utc}
                 </CardDescription>
@@ -156,6 +145,6 @@ export default async function LawyerBookingsPage() {
           ))
         )}
       </div>
-    </DashboardShell>
+    </>
   );
 }

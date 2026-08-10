@@ -30,6 +30,16 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
     return record ? mapLawyerProfile(record) : null;
   }
 
+  async findByIds(ids: string[]): Promise<LawyerProfile[]> {
+    if (ids.length === 0) return [];
+    const uniqueIds = [...new Set(ids)];
+    const records = await this.db.lawyerProfile.findMany({
+      where: { id: { in: uniqueIds }, deletedAt: null },
+      select: lawyerProfileSelect,
+    });
+    return records.map(mapLawyerProfile);
+  }
+
   async findByUserId(userId: string): Promise<LawyerProfile | null> {
     const record = await this.db.lawyerProfile.findFirst({
       where: { userId, deletedAt: null },
@@ -87,17 +97,30 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
     id: string,
     input: UpdateLawyerProfileInput,
   ): Promise<LawyerProfile> {
+    // Only patch provided fields so partial callers (e.g. unlist on reject)
+    // cannot null out headline/bio/timezone via undefined.
+    const data: {
+      headline?: string | null;
+      bio?: string | null;
+      yearsOfExperience?: number | null;
+      city?: string | null;
+      education?: string | null;
+      timezone?: string;
+      isListed?: boolean;
+    } = {};
+    if (input.headline !== undefined) data.headline = input.headline;
+    if (input.bio !== undefined) data.bio = input.bio;
+    if (input.yearsOfExperience !== undefined) {
+      data.yearsOfExperience = input.yearsOfExperience;
+    }
+    if (input.city !== undefined) data.city = input.city;
+    if (input.education !== undefined) data.education = input.education;
+    if (input.timezone !== undefined) data.timezone = input.timezone;
+    if (input.isListed !== undefined) data.isListed = input.isListed;
+
     const record = await this.db.lawyerProfile.update({
       where: { id },
-      data: {
-        headline: input.headline,
-        bio: input.bio,
-        yearsOfExperience: input.yearsOfExperience,
-        city: input.city,
-        education: input.education,
-        timezone: input.timezone,
-        isListed: input.isListed,
-      },
+      data,
       select: lawyerProfileSelect,
     });
     return mapLawyerProfile(record);

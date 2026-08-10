@@ -5,7 +5,7 @@ import {
   MarkAllNotificationsReadButton,
   NotificationList,
 } from "@/components/marketplace/notification-list";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import {
   Card,
   CardContent,
@@ -25,12 +25,12 @@ export default async function ClientNotificationsPage() {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 
-  const i18n = await getShellI18n("client");
+  const [i18n, { items: notifications }] = await Promise.all([
+    getShellI18n("client"),
+    notificationRepository.findByUserId(session.user.id),
+  ]);
   const m = i18n.dict.marketplace;
   const locale = i18n.locale;
-  const { items: notifications } = await notificationRepository.findByUserId(
-    session.user.id,
-  );
   const unread = notifications.filter((n) => !n.readAt).length;
 
   const copy = {
@@ -41,12 +41,8 @@ export default async function ClientNotificationsPage() {
   };
 
   return (
-    <DashboardShell
-      user={session.user}
-      title={i18n.pages.notifications}
-      nav={i18n.nav}
-      {...i18n.shellProps}
-    >
+    <>
+      <DashboardPageHeading>{i18n.pages.notifications}</DashboardPageHeading>
       <Card>
         <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-3">
           <div>
@@ -69,6 +65,6 @@ export default async function ClientNotificationsPage() {
           />
         </CardContent>
       </Card>
-    </DashboardShell>
+    </>
   );
 }

@@ -6,7 +6,7 @@ import { getLawyerProfileForSession } from "@/application/actions/profile.action
 import { LawyerTaxonomyForm } from "@/components/marketplace/lawyer-taxonomy-form";
 import { LawyerProfileForm } from "@/components/profiles/lawyer-profile-form";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -37,31 +37,28 @@ export default async function LawyerProfilePage() {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 
-  const data = await getLawyerProfileForSession();
+  const [data, i18n] = await Promise.all([
+    getLawyerProfileForSession(),
+    getShellI18n("lawyer"),
+  ]);
   if (data.status === "unauthenticated") {
     redirect("/login");
   }
 
-  const i18n = await getShellI18n("lawyer");
   const m = i18n.dict.marketplace;
   const locale = i18n.locale;
-  const nav = i18n.nav;
   const lp = m.lawyerProfile;
 
   if (data.status === "profile_missing") {
     return (
-      <DashboardShell
-        user={session.user}
-        title={lp.title}
-        nav={nav}
-        {...i18n.shellProps}
-      >
+      <>
+        <DashboardPageHeading>{lp.title}</DashboardPageHeading>
         <ProfileMissingState
           dashboardHref="/lawyer/dashboard"
           roleLabel="lawyer"
           copy={m.profileMissing}
         />
-      </DashboardShell>
+      </>
     );
   }
 
@@ -86,12 +83,8 @@ export default async function LawyerProfilePage() {
   };
 
   return (
-    <DashboardShell
-      user={session.user}
-      title={lp.title}
-      nav={nav}
-      {...i18n.shellProps}
-    >
+    <>
+      <DashboardPageHeading>{lp.title}</DashboardPageHeading>
       <div className="mb-5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         <span>
           {lp.publicProfile}{" "}
@@ -159,6 +152,6 @@ export default async function LawyerProfilePage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardShell>
+    </>
   );
 }
