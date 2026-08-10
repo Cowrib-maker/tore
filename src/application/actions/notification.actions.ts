@@ -2,45 +2,30 @@
 
 import { revalidatePath } from "next/cache";
 
-import type { ActionState } from "@/application/actions/auth.actions";
-import { getSessionUser } from "@/application/actions/auth.actions";
+import type { ActionState } from "@/application/common/action-state";
 import { mapActionError } from "@/application/common/map-action-error";
-import { UnauthorizedError } from "@/domain/errors/domain-error";
+import { enforceRateLimit } from "@/application/common/rate-limit-action";
+import { requireActor } from "@/application/common/require-actor";
 import { notificationRepository } from "@/infrastructure/repositories";
-import {
-  NOTIFICATION_WRITE_RATE_LIMIT,
-  consumeRateLimit,
-} from "@/infrastructure/security/rate-limiter";
-
-function mapError(error: unknown): ActionState {
-  return mapActionError(error);
-}
-
-function tooManyWrites(retryAfterSeconds: number): ActionState {
-  return {
-    error: `Too many requests. Try again in ${retryAfterSeconds} seconds.`,
-  };
-}
+import { NOTIFICATION_WRITE_RATE_LIMIT } from "@/infrastructure/security/rate-limiter";
 
 export async function markAllNotificationsReadAction(
   _prev: ActionState = {},
   _formData?: FormData,
 ): Promise<ActionState> {
   try {
-    const session = await getSessionUser();
-    if (!session?.user?.id) throw new UnauthorizedError();
-    const rate = await consumeRateLimit(
-      `notification:write:${session.user.id}`,
-      NOTIFICATION_WRITE_RATE_LIMIT.limit,
-      NOTIFICATION_WRITE_RATE_LIMIT.windowMs,
+    const actor = await requireActor();
+    const limited = await enforceRateLimit(
+      `notification:write:${actor.userId}`,
+      NOTIFICATION_WRITE_RATE_LIMIT,
     );
-    if (!rate.ok) return tooManyWrites(rate.retryAfterSeconds);
-    await notificationRepository.markAllReadForUser(session.user.id);
+    if (limited) return limited;
+    await notificationRepository.markAllReadForUser(actor.userId);
     revalidatePath("/client/notifications");
     revalidatePath("/lawyer/notifications");
     return { success: true };
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 }
 
@@ -49,17 +34,15 @@ export async function markNotificationReadAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const session = await getSessionUser();
-    if (!session?.user?.id) throw new UnauthorizedError();
-    const rate = await consumeRateLimit(
-      `notification:write:${session.user.id}`,
-      NOTIFICATION_WRITE_RATE_LIMIT.limit,
-      NOTIFICATION_WRITE_RATE_LIMIT.windowMs,
+    const actor = await requireActor();
+    const limited = await enforceRateLimit(
+      `notification:write:${actor.userId}`,
+      NOTIFICATION_WRITE_RATE_LIMIT,
     );
-    if (!rate.ok) return tooManyWrites(rate.retryAfterSeconds);
+    if (limited) return limited;
     const id = String(formData.get("notificationId") ?? "");
     const note = await notificationRepository.findById(id);
-    if (!note || note.userId !== session.user.id) {
+    if (!note || note.userId !== actor.userId) {
       return { error: "Notification not found" };
     }
     await notificationRepository.markRead([id]);
@@ -67,6 +50,6 @@ export async function markNotificationReadAction(
     revalidatePath("/lawyer/notifications");
     return { success: true };
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 }

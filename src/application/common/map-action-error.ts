@@ -1,10 +1,5 @@
+import type { ActionState } from "@/application/common/action-state";
 import { DomainError } from "@/domain/errors/domain-error";
-
-type ActionState = {
-  error?: string;
-  success?: boolean;
-  message?: string;
-};
 
 /**
  * Maps domain/unknown errors to safe, user-facing ActionState messages.

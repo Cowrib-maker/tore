@@ -1,11 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 
-import type { ActionState } from "@/application/actions/auth.actions";
-import { getSessionUser } from "@/application/actions/auth.actions";
-import type { ActorContext } from "@/application/common/actor-context";
+import type { ActionState } from "@/application/common/action-state";
+import { getClientIp } from "@/application/common/client-ip";
+import { mapActionError } from "@/application/common/map-action-error";
+import { parseWithSchema } from "@/application/common/parse-form";
+import { enforceRateLimit } from "@/application/common/rate-limit-action";
+import { requireActor } from "@/application/common/require-actor";
+import { getSessionUser } from "@/application/common/session";
 import { reviewLawyerCredentialUseCase } from "@/application/use-cases/verification/review-lawyer-credential";
 import { submitLawyerCredentialUseCase } from "@/application/use-cases/verification/submit-lawyer-credential";
 import {
@@ -15,12 +18,7 @@ import {
   submitLawyerCredentialSchema,
 } from "@/application/validators/verification.schema";
 import type { LawyerCredential, LawyerProfile } from "@/domain/entities/profile";
-import {
-  ForbiddenError,
-  UnauthorizedError,
-} from "@/domain/errors/domain-error";
 import { CredentialReviewStatus, UserRole } from "@/domain/enums";
-import { mapActionError } from "@/application/common/map-action-error";
 import { unitOfWork } from "@/infrastructure/database/prisma-unit-of-work";
 import {
   auditLogRepository,
@@ -30,42 +28,8 @@ import {
 import {
   CREDENTIAL_REVIEW_RATE_LIMIT,
   CREDENTIAL_SUBMIT_RATE_LIMIT,
-  consumeRateLimit,
 } from "@/infrastructure/security/rate-limiter";
 import { getFileStorage } from "@/infrastructure/storage";
-
-function mapError(error: unknown): ActionState {
-  return mapActionError(error);
-}
-
-function tooManyWrites(retryAfterSeconds: number): ActionState {
-  return {
-    error: `Too many requests. Try again in ${retryAfterSeconds} seconds.`,
-  };
-}
-
-async function getClientIp(): Promise<string | undefined> {
-  const headerStore = await headers();
-  return (
-    headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    headerStore.get("x-real-ip") ??
-    undefined
-  );
-}
-
-async function requireSessionUser(role: UserRole): Promise<ActorContext> {
-  const session = await getSessionUser();
-  if (!session?.user?.id) {
-    throw new UnauthorizedError("You must be signed in");
-  }
-  if (session.user.role !== role) {
-    throw new ForbiddenError();
-  }
-  return {
-    userId: session.user.id,
-    role: session.user.role as UserRole,
-  };
-}
 
 const submitDeps = {
   lawyerProfileRepository,
@@ -85,20 +49,17 @@ export async function submitLawyerCredentialAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const actor = await requireSessionUser(UserRole.LAWYER);
-    const rate = await consumeRateLimit(
+    const actor = await requireActor(UserRole.LAWYER);
+    const limited = await enforceRateLimit(
       `credential:submit:${actor.userId}`,
-      CREDENTIAL_SUBMIT_RATE_LIMIT.limit,
-      CREDENTIAL_SUBMIT_RATE_LIMIT.windowMs,
+      CREDENTIAL_SUBMIT_RATE_LIMIT,
     );
-    if (!rate.ok) return tooManyWrites(rate.retryAfterSeconds);
-    const parsed = submitLawyerCredentialSchema.safeParse({
+    if (limited) return limited;
+    const parsed = parseWithSchema(submitLawyerCredentialSchema, {
       licenseNumber: formData.get("licenseNumber") ?? "",
       issuingAuthority: formData.get("issuingAuthority") ?? "",
     });
-    if (!parsed.success) {
-      return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
-    }
+    if (!parsed.ok) return parsed.state;
 
     const file = formData.get("document");
     if (!(file instanceof File) || file.size === 0) {
@@ -134,7 +95,7 @@ export async function submitLawyerCredentialAction(
     revalidatePath("/admin/lawyers");
     return { success: true };
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 }
 
@@ -143,21 +104,18 @@ export async function reviewLawyerCredentialAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const actor = await requireSessionUser(UserRole.ADMIN);
-    const rate = await consumeRateLimit(
+    const actor = await requireActor(UserRole.ADMIN);
+    const limited = await enforceRateLimit(
       `credential:review:${actor.userId}`,
-      CREDENTIAL_REVIEW_RATE_LIMIT.limit,
-      CREDENTIAL_REVIEW_RATE_LIMIT.windowMs,
+      CREDENTIAL_REVIEW_RATE_LIMIT,
     );
-    if (!rate.ok) return tooManyWrites(rate.retryAfterSeconds);
-    const parsed = reviewLawyerCredentialSchema.safeParse({
+    if (limited) return limited;
+    const parsed = parseWithSchema(reviewLawyerCredentialSchema, {
       credentialId: formData.get("credentialId") ?? "",
       decision: formData.get("decision") ?? "",
       rejectionReason: formData.get("rejectionReason") ?? "",
     });
-    if (!parsed.success) {
-      return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
-    }
+    if (!parsed.ok) return parsed.state;
 
     const ipAddress = await getClientIp();
     await reviewLawyerCredentialUseCase(
@@ -172,7 +130,7 @@ export async function reviewLawyerCredentialAction(
     revalidatePath("/lawyer/dashboard");
     return { success: true };
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 }
 

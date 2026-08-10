@@ -1,8 +1,13 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import type { ActionState } from "@/application/common/action-state";
+import { getClientIp } from "@/application/common/client-ip";
+import { mapActionError } from "@/application/common/map-action-error";
+import { parseWithSchema } from "@/application/common/parse-form";
+import { enforceRateLimit } from "@/application/common/rate-limit-action";
+import { getSessionUser } from "@/application/common/session";
 import { issueVerificationEmailAfterRegister, getEmailVerificationDeps } from "@/application/services/issue-verification-email";
 import { registerClientUseCase } from "@/application/use-cases/auth/register-client";
 import { registerLawyerUseCase } from "@/application/use-cases/auth/register-lawyer";
@@ -13,7 +18,6 @@ import {
   registerLawyerSchema,
   resendVerificationSchema,
 } from "@/application/validators/auth.schema";
-import { mapActionError } from "@/application/common/map-action-error";
 import { UserRole, UserStatus } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
 import {
@@ -25,28 +29,11 @@ import {
   LOGIN_RATE_LIMIT,
   REGISTER_RATE_LIMIT,
   RESEND_VERIFICATION_RATE_LIMIT,
-  consumeRateLimit,
 } from "@/infrastructure/security/rate-limiter";
 import { signIn, signOut, auth } from "@/lib/auth";
 
-export type ActionState = {
-  error?: string;
-  success?: boolean;
-  message?: string;
-};
-
-function mapError(error: unknown): ActionState {
-  return mapActionError(error);
-}
-
-async function getClientIp(): Promise<string | undefined> {
-  const headerStore = await headers();
-  return (
-    headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    headerStore.get("x-real-ip") ??
-    undefined
-  );
-}
+export type { ActionState } from "@/application/common/action-state";
+export { getSessionUser } from "@/application/common/session";
 
 const registerClientDeps = {
   userRepository,
@@ -60,42 +47,31 @@ const registerLawyerDeps = {
   unitOfWork,
 };
 
-function tooManyRequests(retryAfterSeconds: number): ActionState {
-  return {
-    error: `Too many attempts. Try again in ${retryAfterSeconds} seconds.`,
-  };
-}
-
 export async function registerClientAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
   const ipAddress = await getClientIp();
-  const rate = await consumeRateLimit(
+  const limited = await enforceRateLimit(
     `register:${ipAddress ?? "unknown"}`,
-    REGISTER_RATE_LIMIT.limit,
-    REGISTER_RATE_LIMIT.windowMs,
+    REGISTER_RATE_LIMIT,
+    "attempts",
   );
-  if (!rate.ok) {
-    return tooManyRequests(rate.retryAfterSeconds);
-  }
+  if (limited) return limited;
 
-  const parsed = registerClientSchema.safeParse({
+  const parsed = parseWithSchema(registerClientSchema, {
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
     acceptTerms: formData.get("acceptTerms") === "on",
     preferredLanguage: formData.get("preferredLanguage") ?? "mn",
   });
-
-  if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
-  }
+  if (!parsed.ok) return parsed.state;
 
   try {
     await registerClientUseCase(parsed.data, registerClientDeps, ipAddress);
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 
   await issueVerificationEmailAfterRegister(parsed.data.email);
@@ -118,31 +94,26 @@ export async function registerLawyerAction(
   formData: FormData,
 ): Promise<ActionState> {
   const ipAddress = await getClientIp();
-  const rate = await consumeRateLimit(
+  const limited = await enforceRateLimit(
     `register:${ipAddress ?? "unknown"}`,
-    REGISTER_RATE_LIMIT.limit,
-    REGISTER_RATE_LIMIT.windowMs,
+    REGISTER_RATE_LIMIT,
+    "attempts",
   );
-  if (!rate.ok) {
-    return tooManyRequests(rate.retryAfterSeconds);
-  }
+  if (limited) return limited;
 
-  const parsed = registerLawyerSchema.safeParse({
+  const parsed = parseWithSchema(registerLawyerSchema, {
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
     acceptTerms: formData.get("acceptTerms") === "on",
     preferredLanguage: formData.get("preferredLanguage") ?? "mn",
   });
-
-  if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
-  }
+  if (!parsed.ok) return parsed.state;
 
   try {
     await registerLawyerUseCase(parsed.data, registerLawyerDeps, ipAddress);
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 
   await issueVerificationEmailAfterRegister(parsed.data.email);
@@ -164,24 +135,19 @@ export async function loginAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  const parsed = loginSchema.safeParse({
+  const parsed = parseWithSchema(loginSchema, {
     email: formData.get("email"),
     password: formData.get("password"),
   });
-
-  if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
-  }
+  if (!parsed.ok) return parsed.state;
 
   const ipAddress = await getClientIp();
-  const rate = await consumeRateLimit(
+  const limited = await enforceRateLimit(
     `login:${ipAddress ?? "unknown"}:${parsed.data.email}`,
-    LOGIN_RATE_LIMIT.limit,
-    LOGIN_RATE_LIMIT.windowMs,
+    LOGIN_RATE_LIMIT,
+    "attempts",
   );
-  if (!rate.ok) {
-    return tooManyRequests(rate.retryAfterSeconds);
-  }
+  if (limited) return limited;
 
   let session;
   try {
@@ -197,7 +163,7 @@ export async function loginAction(
 
     session = await auth();
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 
   if (session?.user?.status && session.user.status !== UserStatus.ACTIVE) {
@@ -218,23 +184,18 @@ export async function resendVerificationEmailAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  const parsed = resendVerificationSchema.safeParse({
+  const parsed = parseWithSchema(resendVerificationSchema, {
     email: formData.get("email"),
   });
-
-  if (!parsed.success) {
-    return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
-  }
+  if (!parsed.ok) return parsed.state;
 
   const ipAddress = await getClientIp();
-  const rate = await consumeRateLimit(
+  const limited = await enforceRateLimit(
     `resend-verify:${ipAddress ?? "unknown"}:${parsed.data.email}`,
-    RESEND_VERIFICATION_RATE_LIMIT.limit,
-    RESEND_VERIFICATION_RATE_LIMIT.windowMs,
+    RESEND_VERIFICATION_RATE_LIMIT,
+    "attempts",
   );
-  if (!rate.ok) {
-    return tooManyRequests(rate.retryAfterSeconds);
-  }
+  if (limited) return limited;
 
   try {
     const result = await resendEmailVerificationUseCase(
@@ -254,24 +215,10 @@ export async function resendVerificationEmailAction(
     };
   } catch (error) {
     console.error("[email:verification] resend action failed", error);
-    return mapError(error);
+    return mapActionError(error);
   }
 }
 
 export async function logoutAction() {
   await signOut({ redirectTo: "/login" });
-}
-
-export async function getSessionUser() {
-  const session = await auth();
-  if (!session?.user) {
-    return null;
-  }
-
-  if (session.user.status !== UserStatus.ACTIVE) {
-    await signOut({ redirect: false });
-    return null;
-  }
-
-  return session;
 }

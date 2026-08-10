@@ -1,11 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 
-import type { ActionState } from "@/application/actions/auth.actions";
-import { getSessionUser } from "@/application/actions/auth.actions";
-import type { ActorContext } from "@/application/common/actor-context";
+import type { ActionState } from "@/application/common/action-state";
+import { getClientIp } from "@/application/common/client-ip";
+import { mapActionError } from "@/application/common/map-action-error";
+import { parseWithSchema } from "@/application/common/parse-form";
+import { enforceRateLimit } from "@/application/common/rate-limit-action";
+import { requireActor } from "@/application/common/require-actor";
 import {
   createAvailabilityExceptionUseCase,
   createAvailabilityRuleUseCase,
@@ -29,12 +31,8 @@ import {
   setLawyerTaxonomySchema,
   upsertOfferingSchema,
 } from "@/application/validators/marketplace.schema";
-import {
-  ForbiddenError,
-  UnauthorizedError,
-} from "@/domain/errors/domain-error";
+import { ForbiddenError } from "@/domain/errors/domain-error";
 import { ConsultationModality, UserRole } from "@/domain/enums";
-import { mapActionError } from "@/application/common/map-action-error";
 import {
   auditLogRepository,
   availabilityRepository,
@@ -53,34 +51,7 @@ import {
   BOOKING_RESPOND_RATE_LIMIT,
   OFFERING_WRITE_RATE_LIMIT,
   PROFILE_WRITE_RATE_LIMIT,
-  consumeRateLimit,
 } from "@/infrastructure/security/rate-limiter";
-
-function mapError(error: unknown): ActionState {
-  return mapActionError(error);
-}
-
-function tooManyWrites(retryAfterSeconds: number): ActionState {
-  return {
-    error: `Too many requests. Try again in ${retryAfterSeconds} seconds.`,
-  };
-}
-
-async function getClientIp(): Promise<string | undefined> {
-  const headerStore = await headers();
-  return (
-    headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    headerStore.get("x-real-ip") ??
-    undefined
-  );
-}
-
-async function requireRole(role: UserRole): Promise<ActorContext> {
-  const session = await getSessionUser();
-  if (!session?.user?.id) throw new UnauthorizedError();
-  if (session.user.role !== role) throw new ForbiddenError();
-  return { userId: session.user.id, role };
-}
 
 const offeringDeps = {
   lawyerProfileRepository,
@@ -109,14 +80,13 @@ export async function createOfferingAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const actor = await requireRole(UserRole.LAWYER);
-    const rate = await consumeRateLimit(
+    const actor = await requireActor(UserRole.LAWYER);
+    const limited = await enforceRateLimit(
       `offering:write:${actor.userId}`,
-      OFFERING_WRITE_RATE_LIMIT.limit,
-      OFFERING_WRITE_RATE_LIMIT.windowMs,
+      OFFERING_WRITE_RATE_LIMIT,
     );
-    if (!rate.ok) return tooManyWrites(rate.retryAfterSeconds);
-    const parsed = upsertOfferingSchema.safeParse({
+    if (limited) return limited;
+    const parsed = parseWithSchema(upsertOfferingSchema, {
       titleMn: formData.get("titleMn") ?? "",
       titleEn: formData.get("titleEn") ?? "",
       descriptionMn: formData.get("descriptionMn") ?? "",
@@ -125,16 +95,14 @@ export async function createOfferingAction(
       modality: formData.get("modality") ?? ConsultationModality.ONLINE,
       isActive: formData.get("isActive") !== "off",
     });
-    if (!parsed.success) {
-      return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
-    }
+    if (!parsed.ok) return parsed.state;
     await createOfferingUseCase(actor, parsed.data, offeringDeps, await getClientIp());
     revalidatePath("/lawyer/offerings");
     revalidatePath("/lawyer/profile");
     revalidatePath("/lawyers");
     return { success: true };
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 }
 
@@ -143,15 +111,14 @@ export async function updateOfferingAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const actor = await requireRole(UserRole.LAWYER);
-    const rate = await consumeRateLimit(
+    const actor = await requireActor(UserRole.LAWYER);
+    const limited = await enforceRateLimit(
       `offering:write:${actor.userId}`,
-      OFFERING_WRITE_RATE_LIMIT.limit,
-      OFFERING_WRITE_RATE_LIMIT.windowMs,
+      OFFERING_WRITE_RATE_LIMIT,
     );
-    if (!rate.ok) return tooManyWrites(rate.retryAfterSeconds);
+    if (limited) return limited;
     const offeringId = String(formData.get("offeringId") ?? "");
-    const parsed = upsertOfferingSchema.safeParse({
+    const parsed = parseWithSchema(upsertOfferingSchema, {
       titleMn: formData.get("titleMn") ?? "",
       titleEn: formData.get("titleEn") ?? "",
       descriptionMn: formData.get("descriptionMn") ?? "",
@@ -160,9 +127,7 @@ export async function updateOfferingAction(
       modality: formData.get("modality") ?? ConsultationModality.ONLINE,
       isActive: formData.get("isActive") === "on",
     });
-    if (!parsed.success) {
-      return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
-    }
+    if (!parsed.ok) return parsed.state;
     await updateOfferingUseCase(
       actor,
       offeringId,
@@ -174,7 +139,7 @@ export async function updateOfferingAction(
     revalidatePath("/lawyers");
     return { success: true };
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 }
 
@@ -183,13 +148,12 @@ export async function deleteOfferingAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const actor = await requireRole(UserRole.LAWYER);
-    const rate = await consumeRateLimit(
+    const actor = await requireActor(UserRole.LAWYER);
+    const limited = await enforceRateLimit(
       `offering:write:${actor.userId}`,
-      OFFERING_WRITE_RATE_LIMIT.limit,
-      OFFERING_WRITE_RATE_LIMIT.windowMs,
+      OFFERING_WRITE_RATE_LIMIT,
     );
-    if (!rate.ok) return tooManyWrites(rate.retryAfterSeconds);
+    if (limited) return limited;
     const offeringId = String(formData.get("offeringId") ?? "");
     await deleteOfferingUseCase(
       actor,
@@ -201,7 +165,7 @@ export async function deleteOfferingAction(
     revalidatePath("/lawyers");
     return { success: true };
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 }
 
@@ -210,21 +174,18 @@ export async function createAvailabilityRuleAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const actor = await requireRole(UserRole.LAWYER);
-    const rate = await consumeRateLimit(
+    const actor = await requireActor(UserRole.LAWYER);
+    const limited = await enforceRateLimit(
       `availability:write:${actor.userId}`,
-      AVAILABILITY_WRITE_RATE_LIMIT.limit,
-      AVAILABILITY_WRITE_RATE_LIMIT.windowMs,
+      AVAILABILITY_WRITE_RATE_LIMIT,
     );
-    if (!rate.ok) return tooManyWrites(rate.retryAfterSeconds);
-    const parsed = createAvailabilityRuleSchema.safeParse({
+    if (limited) return limited;
+    const parsed = parseWithSchema(createAvailabilityRuleSchema, {
       dayOfWeek: formData.get("dayOfWeek") ?? "",
       startTime: formData.get("startTime") ?? "",
       endTime: formData.get("endTime") ?? "",
     });
-    if (!parsed.success) {
-      return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
-    }
+    if (!parsed.ok) return parsed.state;
     await createAvailabilityRuleUseCase(
       actor,
       parsed.data,
@@ -234,7 +195,7 @@ export async function createAvailabilityRuleAction(
     revalidatePath("/lawyer/availability");
     return { success: true };
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 }
 
@@ -243,13 +204,12 @@ export async function deleteAvailabilityRuleAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const actor = await requireRole(UserRole.LAWYER);
-    const rate = await consumeRateLimit(
+    const actor = await requireActor(UserRole.LAWYER);
+    const limited = await enforceRateLimit(
       `availability:write:${actor.userId}`,
-      AVAILABILITY_WRITE_RATE_LIMIT.limit,
-      AVAILABILITY_WRITE_RATE_LIMIT.windowMs,
+      AVAILABILITY_WRITE_RATE_LIMIT,
     );
-    if (!rate.ok) return tooManyWrites(rate.retryAfterSeconds);
+    if (limited) return limited;
     await deleteAvailabilityRuleUseCase(
       actor,
       String(formData.get("ruleId") ?? ""),
@@ -259,7 +219,7 @@ export async function deleteAvailabilityRuleAction(
     revalidatePath("/lawyer/availability");
     return { success: true };
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 }
 
@@ -268,23 +228,20 @@ export async function createAvailabilityExceptionAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const actor = await requireRole(UserRole.LAWYER);
-    const rate = await consumeRateLimit(
+    const actor = await requireActor(UserRole.LAWYER);
+    const limited = await enforceRateLimit(
       `availability:write:${actor.userId}`,
-      AVAILABILITY_WRITE_RATE_LIMIT.limit,
-      AVAILABILITY_WRITE_RATE_LIMIT.windowMs,
+      AVAILABILITY_WRITE_RATE_LIMIT,
     );
-    if (!rate.ok) return tooManyWrites(rate.retryAfterSeconds);
-    const parsed = createAvailabilityExceptionSchema.safeParse({
+    if (limited) return limited;
+    const parsed = parseWithSchema(createAvailabilityExceptionSchema, {
       exceptionDate: formData.get("exceptionDate") ?? "",
       startTime: formData.get("startTime") ?? "",
       endTime: formData.get("endTime") ?? "",
       isAvailable: formData.get("isAvailable") === "on",
       reason: formData.get("reason") ?? "",
     });
-    if (!parsed.success) {
-      return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
-    }
+    if (!parsed.ok) return parsed.state;
     await createAvailabilityExceptionUseCase(
       actor,
       {
@@ -300,7 +257,7 @@ export async function createAvailabilityExceptionAction(
     revalidatePath("/lawyer/availability");
     return { success: true };
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 }
 
@@ -309,13 +266,12 @@ export async function deleteAvailabilityExceptionAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const actor = await requireRole(UserRole.LAWYER);
-    const rate = await consumeRateLimit(
+    const actor = await requireActor(UserRole.LAWYER);
+    const limited = await enforceRateLimit(
       `availability:write:${actor.userId}`,
-      AVAILABILITY_WRITE_RATE_LIMIT.limit,
-      AVAILABILITY_WRITE_RATE_LIMIT.windowMs,
+      AVAILABILITY_WRITE_RATE_LIMIT,
     );
-    if (!rate.ok) return tooManyWrites(rate.retryAfterSeconds);
+    if (limited) return limited;
     await deleteAvailabilityExceptionUseCase(
       actor,
       String(formData.get("exceptionId") ?? ""),
@@ -325,7 +281,7 @@ export async function deleteAvailabilityExceptionAction(
     revalidatePath("/lawyer/availability");
     return { success: true };
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 }
 
@@ -334,22 +290,19 @@ export async function setLawyerTaxonomyAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const actor = await requireRole(UserRole.LAWYER);
-    const rate = await consumeRateLimit(
+    const actor = await requireActor(UserRole.LAWYER);
+    const limited = await enforceRateLimit(
       `taxonomy:write:${actor.userId}`,
-      PROFILE_WRITE_RATE_LIMIT.limit,
-      PROFILE_WRITE_RATE_LIMIT.windowMs,
+      PROFILE_WRITE_RATE_LIMIT,
     );
-    if (!rate.ok) return tooManyWrites(rate.retryAfterSeconds);
+    if (limited) return limited;
     const practiceAreaIds = formData.getAll("practiceAreaIds").map(String);
     const languageIds = formData.getAll("languageIds").map(String);
-    const parsed = setLawyerTaxonomySchema.safeParse({
+    const parsed = parseWithSchema(setLawyerTaxonomySchema, {
       practiceAreaIds,
       languageIds,
     });
-    if (!parsed.success) {
-      return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
-    }
+    if (!parsed.ok) return parsed.state;
     const profile = await lawyerProfileRepository.findByUserId(actor.userId);
     if (!profile) throw new ForbiddenError();
     await lawyerTaxonomyRepository.setPracticeAreas({
@@ -364,7 +317,7 @@ export async function setLawyerTaxonomyAction(
     revalidatePath("/lawyers");
     return { success: true };
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 }
 
@@ -373,27 +326,20 @@ export async function createBookingRequestAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const actor = await requireRole(UserRole.CLIENT);
-    const rate = await consumeRateLimit(
+    const actor = await requireActor(UserRole.CLIENT);
+    const limited = await enforceRateLimit(
       `booking:create:${actor.userId}`,
-      BOOKING_CREATE_RATE_LIMIT.limit,
-      BOOKING_CREATE_RATE_LIMIT.windowMs,
+      BOOKING_CREATE_RATE_LIMIT,
     );
-    if (!rate.ok) {
-      return {
-        error: `Too many booking requests. Try again in ${rate.retryAfterSeconds} seconds.`,
-      };
-    }
-    const parsed = createBookingRequestSchema.safeParse({
+    if (limited) return limited;
+    const parsed = parseWithSchema(createBookingRequestSchema, {
       lawyerSlug: formData.get("lawyerSlug") ?? "",
       offeringId: formData.get("offeringId") ?? "",
       scheduledStartAt: formData.get("scheduledStartAt") ?? "",
       issueSummary: formData.get("issueSummary") ?? "",
       practiceAreaId: formData.get("practiceAreaId") ?? "",
     });
-    if (!parsed.success) {
-      return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
-    }
+    if (!parsed.ok) return parsed.state;
     const booking = await createBookingRequestUseCase(
       actor,
       parsed.data,
@@ -405,7 +351,7 @@ export async function createBookingRequestAction(
     revalidatePath(`/lawyers/${parsed.data.lawyerSlug}`);
     return { success: true, message: booking.bookingNumber };
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 }
 
@@ -414,25 +360,18 @@ export async function respondBookingAction(
   formData: FormData,
 ): Promise<ActionState> {
   try {
-    const actor = await requireRole(UserRole.LAWYER);
-    const rate = await consumeRateLimit(
+    const actor = await requireActor(UserRole.LAWYER);
+    const limited = await enforceRateLimit(
       `booking:respond:${actor.userId}`,
-      BOOKING_RESPOND_RATE_LIMIT.limit,
-      BOOKING_RESPOND_RATE_LIMIT.windowMs,
+      BOOKING_RESPOND_RATE_LIMIT,
     );
-    if (!rate.ok) {
-      return {
-        error: `Too many responses. Try again in ${rate.retryAfterSeconds} seconds.`,
-      };
-    }
-    const parsed = respondBookingSchema.safeParse({
+    if (limited) return limited;
+    const parsed = parseWithSchema(respondBookingSchema, {
       bookingId: formData.get("bookingId") ?? "",
       decision: formData.get("decision") ?? "",
       declineReason: formData.get("declineReason") ?? "",
     });
-    if (!parsed.success) {
-      return { error: parsed.error.errors[0]?.message ?? "Invalid input" };
-    }
+    if (!parsed.ok) return parsed.state;
     await respondToBookingRequestUseCase(
       actor,
       parsed.data,
@@ -443,7 +382,7 @@ export async function respondBookingAction(
     revalidatePath("/client/bookings");
     return { success: true };
   } catch (error) {
-    return mapError(error);
+    return mapActionError(error);
   }
 }
 
