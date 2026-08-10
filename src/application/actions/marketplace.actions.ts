@@ -33,6 +33,7 @@ import {
 } from "@/application/validators/marketplace.schema";
 import { ForbiddenError } from "@/domain/errors/domain-error";
 import { ConsultationModality, UserRole } from "@/domain/enums";
+import { unitOfWork } from "@/infrastructure/database/prisma-unit-of-work";
 import {
   auditLogRepository,
   availabilityRepository,
@@ -73,6 +74,7 @@ const bookingDeps = {
   notificationRepository,
   auditLogRepository,
   platformSettingRepository,
+  unitOfWork,
 };
 
 export async function createOfferingAction(

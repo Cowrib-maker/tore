@@ -117,6 +117,24 @@ describe("booking-requests", () => {
       platformSettingRepository: {
         findByKey: vi.fn().mockResolvedValue(null),
       } as never,
+      unitOfWork: {
+        runInTransaction: async (work) =>
+          work({
+            bookingRepository: deps.bookingRepository,
+            notificationRepository: { create: notifyCreate },
+            auditLogRepository: deps.auditLogRepository,
+          } as never),
+      },
+    };
+
+    // Wire UoW to the same booking mocks after deps object exists
+    deps.unitOfWork = {
+      runInTransaction: async (work) =>
+        work({
+          bookingRepository: deps.bookingRepository,
+          notificationRepository: deps.notificationRepository,
+          auditLogRepository: deps.auditLogRepository,
+        } as never),
     };
   });
 

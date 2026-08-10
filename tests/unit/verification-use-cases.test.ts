@@ -90,6 +90,7 @@ describe("submitLawyerCredentialUseCase", () => {
             create: vi.fn().mockResolvedValue(created),
           } as never,
           termsAcceptanceRepository: {} as never,
+          bookingRepository: {} as never,
           auditLogRepository: {
             create: vi.fn().mockResolvedValue({}),
           } as never,
@@ -188,6 +189,7 @@ describe("reviewLawyerCredentialUseCase", () => {
           } as never,
           lawyerCredentialRepository: { review } as never,
           termsAcceptanceRepository: {} as never,
+          bookingRepository: {} as never,
           auditLogRepository: { create: auditCreate } as never,
           notificationRepository: { create: notifyCreate } as never,
         }),

@@ -13,6 +13,7 @@ import {
   NotFoundError,
   ValidationError,
 } from "@/domain/errors/domain-error";
+import type { UnitOfWork } from "@/domain/ports/unit-of-work";
 import type { AvailabilityRepository } from "@/domain/repositories/availability-repository";
 import type { AuditLogRepository } from "@/domain/repositories/audit-log-repository";
 import type { BookingRepository } from "@/domain/repositories/booking-repository";
@@ -38,6 +39,7 @@ export type BookingRequestDeps = {
   notificationRepository: NotificationRepository;
   auditLogRepository: AuditLogRepository;
   platformSettingRepository: PlatformSettingRepository;
+  unitOfWork: UnitOfWork;
 };
 
 export async function createBookingRequestUseCase(
@@ -90,21 +92,6 @@ export async function createBookingRequestUseCase(
       from,
       to,
     );
-  const overlapping = await deps.bookingRepository.findOverlappingForLawyer(
-    profile.id,
-    { startAt, endAt },
-  );
-
-  if (
-    !isSlotAvailable(
-      { startAt, endAt },
-      rules,
-      exceptions,
-      overlapping,
-    )
-  ) {
-    throw new ConflictError("That time slot is no longer available");
-  }
 
   const prefixSetting = await deps.platformSettingRepository.findByKey(
     "booking_number_prefix",
@@ -119,44 +106,62 @@ export async function createBookingRequestUseCase(
     }
   }
 
-  const booking = await deps.bookingRepository.create({
-    clientUserId: actor.userId,
-    lawyerProfileId: profile.id,
-    offeringId: offering.id,
-    practiceAreaId: input.practiceAreaId || undefined,
-    issueSummary: input.issueSummary,
-    scheduledStartAt: startAt,
-    scheduledEndAt: endAt,
-    bookingNumber,
-    status: BookingStatus.PENDING_ACCEPTANCE,
-  });
+  return deps.unitOfWork.runInTransaction(async (tx) => {
+    const overlapping = await tx.bookingRepository.findOverlappingForLawyer(
+      profile.id,
+      { startAt, endAt },
+    );
 
-  await deps.bookingRepository.recordStatusChange({
-    bookingId: booking.id,
-    fromStatus: null,
-    toStatus: BookingStatus.PENDING_ACCEPTANCE,
-    changedByUserId: actor.userId,
-    reason: "Client booking request",
-  });
+    if (
+      !isSlotAvailable(
+        { startAt, endAt },
+        rules,
+        exceptions,
+        overlapping,
+      )
+    ) {
+      throw new ConflictError("That time slot is no longer available");
+    }
 
-  await deps.notificationRepository.create({
-    userId: profile.userId,
-    type: NotificationType.BOOKING_CREATED,
-    title: "New booking request",
-    body: `Request ${booking.bookingNumber} is awaiting your response.`,
-    metadata: { bookingId: booking.id },
-  });
+    const booking = await tx.bookingRepository.create({
+      clientUserId: actor.userId,
+      lawyerProfileId: profile.id,
+      offeringId: offering.id,
+      practiceAreaId: input.practiceAreaId || undefined,
+      issueSummary: input.issueSummary,
+      scheduledStartAt: startAt,
+      scheduledEndAt: endAt,
+      bookingNumber,
+      status: BookingStatus.PENDING_ACCEPTANCE,
+    });
 
-  await deps.auditLogRepository.create({
-    actorUserId: actor.userId,
-    action: AuditAction.CREATE,
-    entityType: "Booking",
-    entityId: booking.id,
-    metadata: { status: booking.status, bookingNumber },
-    ipAddress,
-  });
+    await tx.bookingRepository.recordStatusChange({
+      bookingId: booking.id,
+      fromStatus: null,
+      toStatus: BookingStatus.PENDING_ACCEPTANCE,
+      changedByUserId: actor.userId,
+      reason: "Client booking request",
+    });
 
-  return booking;
+    await tx.notificationRepository.create({
+      userId: profile.userId,
+      type: NotificationType.BOOKING_CREATED,
+      title: "New booking request",
+      body: `Request ${booking.bookingNumber} is awaiting your response.`,
+      metadata: { bookingId: booking.id },
+    });
+
+    await tx.auditLogRepository.create({
+      actorUserId: actor.userId,
+      action: AuditAction.CREATE,
+      entityType: "Booking",
+      entityId: booking.id,
+      metadata: { status: booking.status, bookingNumber },
+      ipAddress,
+    });
+
+    return booking;
+  });
 }
 
 export async function respondToBookingRequestUseCase(
@@ -184,28 +189,30 @@ export async function respondToBookingRequestUseCase(
       BookingStatus.PENDING_ACCEPTANCE,
       BookingStatus.CONFIRMED,
     );
-    const updated = await deps.bookingRepository.accept(booking.id);
-    await deps.bookingRepository.recordStatusChange({
-      bookingId: booking.id,
-      fromStatus: BookingStatus.PENDING_ACCEPTANCE,
-      toStatus: BookingStatus.CONFIRMED,
-      changedByUserId: actor.userId,
+    return deps.unitOfWork.runInTransaction(async (tx) => {
+      const updated = await tx.bookingRepository.accept(booking.id);
+      await tx.bookingRepository.recordStatusChange({
+        bookingId: booking.id,
+        fromStatus: BookingStatus.PENDING_ACCEPTANCE,
+        toStatus: BookingStatus.CONFIRMED,
+        changedByUserId: actor.userId,
+      });
+      await tx.notificationRepository.create({
+        userId: booking.clientUserId,
+        type: NotificationType.BOOKING_ACCEPTED,
+        title: "Booking accepted",
+        body: `Your request ${booking.bookingNumber} was accepted.`,
+        metadata: { bookingId: booking.id },
+      });
+      await tx.auditLogRepository.create({
+        actorUserId: actor.userId,
+        action: AuditAction.APPROVE,
+        entityType: "Booking",
+        entityId: booking.id,
+        ipAddress,
+      });
+      return updated;
     });
-    await deps.notificationRepository.create({
-      userId: booking.clientUserId,
-      type: NotificationType.BOOKING_ACCEPTED,
-      title: "Booking accepted",
-      body: `Your request ${booking.bookingNumber} was accepted.`,
-      metadata: { bookingId: booking.id },
-    });
-    await deps.auditLogRepository.create({
-      actorUserId: actor.userId,
-      action: AuditAction.APPROVE,
-      entityType: "Booking",
-      entityId: booking.id,
-      ipAddress,
-    });
-    return updated;
   }
 
   if (!input.declineReason || input.declineReason.trim().length < 3) {
@@ -215,29 +222,33 @@ export async function respondToBookingRequestUseCase(
     BookingStatus.PENDING_ACCEPTANCE,
     BookingStatus.CANCELLED,
   );
-  const updated = await deps.bookingRepository.decline(booking.id, {
-    declineReason: input.declineReason.trim(),
+
+  const reason = input.declineReason.trim();
+  return deps.unitOfWork.runInTransaction(async (tx) => {
+    const updated = await tx.bookingRepository.decline(booking.id, {
+      declineReason: reason,
+    });
+    await tx.bookingRepository.recordStatusChange({
+      bookingId: booking.id,
+      fromStatus: BookingStatus.PENDING_ACCEPTANCE,
+      toStatus: BookingStatus.CANCELLED,
+      changedByUserId: actor.userId,
+      reason,
+    });
+    await tx.notificationRepository.create({
+      userId: booking.clientUserId,
+      type: NotificationType.BOOKING_DECLINED,
+      title: "Booking declined",
+      body: `Your request ${booking.bookingNumber} was declined. ${reason}`,
+      metadata: { bookingId: booking.id },
+    });
+    await tx.auditLogRepository.create({
+      actorUserId: actor.userId,
+      action: AuditAction.REJECT,
+      entityType: "Booking",
+      entityId: booking.id,
+      ipAddress,
+    });
+    return updated;
   });
-  await deps.bookingRepository.recordStatusChange({
-    bookingId: booking.id,
-    fromStatus: BookingStatus.PENDING_ACCEPTANCE,
-    toStatus: BookingStatus.CANCELLED,
-    changedByUserId: actor.userId,
-    reason: input.declineReason.trim(),
-  });
-  await deps.notificationRepository.create({
-    userId: booking.clientUserId,
-    type: NotificationType.BOOKING_DECLINED,
-    title: "Booking declined",
-    body: `Your request ${booking.bookingNumber} was declined. ${input.declineReason.trim()}`,
-    metadata: { bookingId: booking.id },
-  });
-  await deps.auditLogRepository.create({
-    actorUserId: actor.userId,
-    action: AuditAction.REJECT,
-    entityType: "Booking",
-    entityId: booking.id,
-    ipAddress,
-  });
-  return updated;
 }

@@ -1,4 +1,5 @@
 import type { AuditLogRepository } from "@/domain/repositories/audit-log-repository";
+import type { BookingRepository } from "@/domain/repositories/booking-repository";
 import type { NotificationRepository } from "@/domain/repositories/trust-repository";
 import type {
   ClientProfileRepository,
@@ -18,6 +19,7 @@ export type UnitOfWorkRepositories = {
   lawyerProfileRepository: LawyerProfileRepository;
   lawyerCredentialRepository: LawyerCredentialRepository;
   termsAcceptanceRepository: TermsAcceptanceRepository;
+  bookingRepository: BookingRepository;
   auditLogRepository: AuditLogRepository;
   notificationRepository: NotificationRepository;
 };
