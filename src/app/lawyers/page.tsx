@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { searchListedLawyers } from "@/application/use-cases/discovery/public-directory";
 import { getMarketplaceFilterOptions } from "@/application/actions/marketplace.actions";
-import { getSessionUser } from "@/application/actions/auth.actions";
+import { getSessionUser } from "@/application/common/session";
 import { BRAND_LOGO_SHELL } from "@/components/brand/tokens";
 import { BrandLink } from "@/components/layout/brand-link";
 import { Badge } from "@/components/ui/badge";

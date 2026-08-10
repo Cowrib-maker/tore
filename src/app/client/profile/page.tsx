@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { getSessionUser } from "@/application/actions/auth.actions";
+import { getSessionUser } from "@/application/common/session";
 import { getClientProfileForSession } from "@/application/actions/profile.actions";
 import { ClientProfileForm } from "@/components/profiles/client-profile-form";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";

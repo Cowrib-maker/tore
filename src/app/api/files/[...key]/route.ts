@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getSessionUser } from "@/application/actions/auth.actions";
+import { getSessionUser } from "@/application/common/session";
 import { assertCanAccessStoredFile } from "@/application/services/assert-can-access-stored-file";
 import { DomainError } from "@/domain/errors/domain-error";
 import { UserRole } from "@/domain/enums";

@@ -3,10 +3,8 @@
 import Link from "next/link";
 import { useActionState } from "react";
 
-import {
-  registerLawyerAction,
-  type ActionState,
-} from "@/application/actions/auth.actions";
+import { registerLawyerAction } from "@/application/actions/auth.actions";
+import type { ActionState } from "@/application/common/action-state";
 import { Button } from "@/components/ui/button";
 import {
   Card,

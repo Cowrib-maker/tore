@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { getSessionUser } from "@/application/actions/auth.actions";
+import { getSessionUser } from "@/application/common/session";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import {
   Card,

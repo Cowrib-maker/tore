@@ -31,9 +31,6 @@ import {
 } from "@/infrastructure/security/rate-limiter";
 import { signIn, signOut, auth } from "@/lib/auth";
 
-export type { ActionState } from "@/application/common/action-state";
-export { getSessionUser } from "@/application/common/session";
-
 const registerClientDeps = {
   userRepository,
   platformSettingRepository,

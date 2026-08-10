@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useActionState } from "react";
 
-import { loginAction, type ActionState } from "@/application/actions/auth.actions";
+import { loginAction } from "@/application/actions/auth.actions";
+import type { ActionState } from "@/application/common/action-state";
 import { ResendVerificationForm } from "@/components/auth/resend-verification-form";
 import { Button } from "@/components/ui/button";
 import {

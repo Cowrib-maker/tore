@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { getSessionUser } from "@/application/actions/auth.actions";
+import { getSessionUser } from "@/application/common/session";
 import {
   MarkAllNotificationsReadButton,
   NotificationList,

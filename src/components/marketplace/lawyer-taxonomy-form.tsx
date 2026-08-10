@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 
-import type { ActionState } from "@/application/actions/auth.actions";
+import type { ActionState } from "@/application/common/action-state";
 import { setLawyerTaxonomyAction } from "@/application/actions/marketplace.actions";
 import { Button } from "@/components/ui/button";
 import type { Language, PracticeArea } from "@/domain/entities/taxonomy";

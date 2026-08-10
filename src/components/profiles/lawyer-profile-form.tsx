@@ -3,7 +3,7 @@
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 
-import type { ActionState } from "@/application/actions/auth.actions";
+import type { ActionState } from "@/application/common/action-state";
 import { updateLawyerProfileAction } from "@/application/actions/profile.actions";
 import { LAWYER_TIMEZONE_OPTIONS } from "@/application/validators/profile.schema";
 import { Button } from "@/components/ui/button";

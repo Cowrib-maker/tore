@@ -2,10 +2,8 @@
 
 import { useActionState } from "react";
 
-import {
-  resendVerificationEmailAction,
-  type ActionState,
-} from "@/application/actions/auth.actions";
+import { resendVerificationEmailAction } from "@/application/actions/auth.actions";
+import type { ActionState } from "@/application/common/action-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

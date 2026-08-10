@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { getSessionUser } from "@/application/actions/auth.actions";
+import { getSessionUser } from "@/application/common/session";
 import { getAdminLawyerVerificationQueue } from "@/application/actions/verification.actions";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { ReviewCredentialActions } from "@/components/verification/review-credential-actions";

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   updateClientProfileAction,
 } from "@/application/actions/profile.actions";
-import type { ActionState } from "@/application/actions/auth.actions";
+import type { ActionState } from "@/application/common/action-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

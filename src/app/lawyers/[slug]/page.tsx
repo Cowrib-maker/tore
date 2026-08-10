@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { getSessionUser } from "@/application/actions/auth.actions";
+import { getSessionUser } from "@/application/common/session";
 import { getPublicLawyerProfile } from "@/application/use-cases/discovery/public-directory";
 import { BRAND_LOGO_SHELL } from "@/components/brand/tokens";
 import { BrandLink } from "@/components/layout/brand-link";

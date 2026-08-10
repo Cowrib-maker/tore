@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { getSessionUser } from "@/application/actions/auth.actions";
+import { getSessionUser } from "@/application/common/session";
 import { getLawyerProfileForSession } from "@/application/actions/profile.actions";
 import {
   CreateOfferingForm,

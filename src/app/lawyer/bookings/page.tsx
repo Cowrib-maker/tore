@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { getSessionUser } from "@/application/actions/auth.actions";
+import { getSessionUser } from "@/application/common/session";
 import { getLawyerProfileForSession } from "@/application/actions/profile.actions";
 import { LawyerBookingActions } from "@/components/marketplace/lawyer-booking-actions";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
