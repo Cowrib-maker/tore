@@ -1,4 +1,5 @@
 export type { TenantRepository } from "./tenant-repository";
+export type { OrganizationRepository } from "./organization-repository";
 export type { UserRepository } from "./user-repository";
 export type { TermsAcceptanceRepository } from "./terms-acceptance-repository";
 export type { AuditLogRepository } from "./audit-log-repository";

@@ -6,6 +6,7 @@ import type {
   LawyerCredentialRepository,
   LawyerProfileRepository,
 } from "@/domain/repositories/profile-repository";
+import type { OrganizationRepository } from "@/domain/repositories/organization-repository";
 import type { TermsAcceptanceRepository } from "@/domain/repositories/terms-acceptance-repository";
 import type { TenantRepository } from "@/domain/repositories/tenant-repository";
 import type { UserRepository } from "@/domain/repositories/user-repository";
@@ -17,6 +18,7 @@ import type { UserRepository } from "@/domain/repositories/user-repository";
 export type UnitOfWorkRepositories = {
   userRepository: UserRepository;
   tenantRepository: TenantRepository;
+  organizationRepository: OrganizationRepository;
   clientProfileRepository: ClientProfileRepository;
   lawyerProfileRepository: LawyerProfileRepository;
   lawyerCredentialRepository: LawyerCredentialRepository;

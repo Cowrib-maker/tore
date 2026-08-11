@@ -1,5 +1,6 @@
 export { userRepository } from "./prisma-user-repository";
 export { tenantRepository } from "./prisma-tenant-repository";
+export { organizationRepository } from "./prisma-organization-repository";
 export { auditLogRepository } from "./prisma-audit-log-repository";
 export { termsAcceptanceRepository } from "./prisma-terms-acceptance-repository";
 export { platformSettingRepository } from "./prisma-platform-setting-repository";

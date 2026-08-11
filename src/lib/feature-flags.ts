@@ -20,3 +20,14 @@ export const FOUNDATION_PROFESSIONAL_V1_FLAG = "TORE_FOUNDATION_PROFESSIONAL_V1"
 export function isFoundationProfessionalV1Enabled(): boolean {
   return allowFlag(FOUNDATION_PROFESSIONAL_V1_FLAG);
 }
+
+/**
+ * EPIC 02 · Sprint 2.3 Wave 1 — Organization foundation product flag.
+ * Must be exactly "1" to enable. Default: OFF (missing / any other value).
+ * Independent of Tenant and Professional flags.
+ */
+export const FOUNDATION_ORGS_V1_FLAG = "TORE_FOUNDATION_ORGS_V1";
+
+export function isFoundationOrgsV1Enabled(): boolean {
+  return allowFlag(FOUNDATION_ORGS_V1_FLAG);
+}

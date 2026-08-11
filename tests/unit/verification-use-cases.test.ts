@@ -83,6 +83,7 @@ describe("submitLawyerCredentialUseCase", () => {
         work({
           userRepository: {} as never,
           tenantRepository: {} as never,
+          organizationRepository: {} as never,
           clientProfileRepository: {} as never,
           lawyerProfileRepository: {
             updateVerificationStatus: vi.fn(),
@@ -183,6 +184,7 @@ describe("reviewLawyerCredentialUseCase", () => {
         work({
           userRepository: {} as never,
           tenantRepository: {} as never,
+          organizationRepository: {} as never,
           clientProfileRepository: {} as never,
           lawyerProfileRepository: {
             updateVerificationStatus,

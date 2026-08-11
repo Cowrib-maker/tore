@@ -1,6 +1,11 @@
 export type { User, CreateUserInput } from "./user";
 export type { Professional } from "./professional";
 export type {
+  Organization,
+  OrganizationMembership,
+  CreateOrganizationWithFoundingOwnerInput,
+} from "./organization";
+export type {
   AuditLog,
   CreateAuditLogInput,
 } from "./audit-log";

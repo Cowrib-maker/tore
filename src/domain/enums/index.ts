@@ -138,3 +138,30 @@ export enum TenantStatus {
 export enum ProfessionalType {
   LAWYER = "LAWYER",
 }
+
+/** EPIC 02 · Sprint 2.3 — Organization types (writable set only). */
+export enum OrganizationType {
+  LAW_FIRM = "LAW_FIRM",
+  LEGAL_ENTITY = "LEGAL_ENTITY",
+}
+
+export enum OrganizationStatus {
+  ACTIVE = "ACTIVE",
+  SUSPENDED = "SUSPENDED",
+  DEACTIVATED = "DEACTIVATED",
+}
+
+/** Coarse org RBAC labels; Foundation writers only use OWNER. */
+export enum OrganizationRole {
+  OWNER = "OWNER",
+  ADMIN = "ADMIN",
+  MEMBER = "MEMBER",
+}
+
+/** Membership status; Foundation writers only create ACTIVE. */
+export enum OrganizationMembershipStatus {
+  ACTIVE = "ACTIVE",
+  INVITED = "INVITED",
+  REVOKED = "REVOKED",
+  SUSPENDED = "SUSPENDED",
+}

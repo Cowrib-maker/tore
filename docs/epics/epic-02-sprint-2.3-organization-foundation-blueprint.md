@@ -19,6 +19,7 @@
 |------|--------|
 | 2026-08-11 | Initial Sprint 2.3 Organization Foundation blueprint (design only). |
 | 2026-08-11 | **Audit lock:** create authz matrix; last ACTIVE OWNER invariant; Tenant lifecycle + `onDelete=RESTRICT`; omit slug; internal Tenant create independent of `TORE_FOUNDATION_TENANT_V1`; one membership row + status transitions; immutable org type; no RBAC/`requireActor` integration; founding-OWNER-only membership repo; DoD freezes; name policy (no uniqueness/normalization). |
+| 2026-08-11 | **Wave 1 create-only deferral (D12):** Organization ↔ Tenant suspend/deactivate/soft-delete **lifecycle is deferred to Wave 1.5+**. Wave 1 ships transactional **create** only (Tenant + Org + founding OWNER). Do not implement retirement APIs in Wave 1. |
 
 ---
 
@@ -69,13 +70,13 @@ Define a **100% additive** plan to introduce the **Organization** aggregate (Law
 | D9 | **companyName** | Remains; no backfill to Legal Entity. |
 | D10 | **Create authorization** | See **§ Create authorization matrix** (locked). |
 | D11 | **Last ACTIVE OWNER** | See **§ Last ACTIVE OWNER invariant** (locked). |
-| D12 | **Tenant lifecycle** | See **§ Tenant lifecycle** (locked). |
-| D13 | **FK `onDelete`** | `Organization.tenantId` → `tenants.id` = **`RESTRICT`**. |
+| D12 | **Tenant lifecycle** | **Deferred to Wave 1.5+ (explicit).** Wave 1 is **create-only**: insert `ORGANIZATION` Tenant with Org; do **not** ship suspend/deactivate/soft-delete lifecycle APIs in Wave 1. Locked rules below remain binding when Wave 1.5 implements them. |
+| D13 | **FK `onDelete`** | `Organization.tenantId` → `tenants.id` = **`RESTRICT`**. `OrganizationMembership.userId` → `users.id` = **`RESTRICT`** (OWNER integrity under User hard-delete). |
 | D14 | **Slug** | **Omitted entirely** from Sprint 2.3 schema. Firm Directory chooses slug later. |
 | D15 | **Tenant insert** | **Internal only** to org create (UoW / private helper). **Independent** of `TORE_FOUNDATION_TENANT_V1`. Must **not** revive unconstrained product `Tenant.create`. |
 | D16 | **Membership row model** | **Exactly one row** per `(organizationId, userId)`. Status transitions only (no second row for re-invite). |
 | D17 | **Type immutability** | `Organization.type` is **immutable** after create. |
-| D18 | **Membership repository surface** | **Founding OWNER create only** for this ship. No invite/role/revoke methods in the Foundation port. |
+| D18 | **Membership write surface** | **Sole path:** `OrganizationRepository.createWithFoundingOwner` (inline founding OWNER). **No** separate `OrganizationMembershipRepository` in Wave 1. |
 | D19 | **Name policy** | See **§ Organization name policy** (locked). |
 | D20 | **Flag independence** | Org foundation must **not** depend on `TORE_FOUNDATION_TENANT_V1` or `TORE_FOUNDATION_PROFESSIONAL_V1`. |
 
@@ -115,14 +116,16 @@ Sprint 2.3 ships **no UI**; if a dark/server API is authorized later, it **must*
 
 ---
 
-## Tenant lifecycle (locked)
+## Tenant lifecycle (locked for Wave 1.5+; deferred in Wave 1)
+
+> **Wave 1 authorization = create-only.** Suspend / deactivate / soft-delete pairing is **not** implemented in Wave 1. The rules below are the binding contract for **Wave 1.5+** and must not be weakened.
 
 | Event | Required Tenant effect |
 |-------|------------------------|
-| Org create | Insert `Tenant(kind=ORGANIZATION, status=ACTIVE)` in same TX; link `Organization.tenantId`. |
-| Org `SUSPENDED` | Paired Tenant → `SUSPENDED` (same TX / use-case). |
-| Org `DEACTIVATED` or soft-delete (`deletedAt` set) | Paired Tenant → soft-delete **or** `DEACTIVATED` (same TX). Prefer soft-delete Tenant for symmetry with Wave 1 Tenant model. |
-| Org reactivation (future) | Requires explicit later ADR; **out of Sprint 2.3**. |
+| Org create (Wave 1) | Insert `Tenant(kind=ORGANIZATION, status=ACTIVE)` in same TX; link `Organization.tenantId`. |
+| Org `SUSPENDED` (Wave 1.5+) | Paired Tenant → `SUSPENDED` (same TX / use-case). |
+| Org `DEACTIVATED` or soft-delete (Wave 1.5+) | Paired Tenant → soft-delete **or** `DEACTIVATED` (same TX). Prefer soft-delete Tenant for symmetry with Wave 1 Tenant model. |
+| Org reactivation | Requires explicit later ADR; **out of Sprint 2.3 Wave 1**. |
 
 **Forbidden:**
 
