@@ -9,6 +9,8 @@ export interface User {
   role: UserRole;
   status: UserStatus;
   preferredLanguage: string;
+  /** Personal tenant id when provisioned (ADR-001). Null until backfill / flag path. */
+  personalTenantId: string | null;
   deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;

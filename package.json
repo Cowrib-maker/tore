@@ -17,6 +17,7 @@
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
     "db:backfill-profiles": "tsx scripts/backfill-missing-profiles.ts",
+    "db:backfill-personal-tenants": "tsx scripts/backfill-personal-tenants.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {

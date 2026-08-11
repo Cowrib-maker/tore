@@ -134,6 +134,17 @@ enum ConsultationModality {
   IN_PERSON
 }
 
+enum TenantKind {
+  INDIVIDUAL
+  ORGANIZATION
+}
+
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
 // ─── Identity & Authentication (Auth.js) ─────────────────────────────────────
 
 model User {
@@ -147,6 +158,8 @@ model User {
   role              UserRole
   status            UserStatus @default(ACTIVE)
   preferredLanguage String     @default("mn") @map("preferred_language")
+  /// Personal isolation tenant (ADR-001). Nullable until backfill / flag-enabled provisioning.
+  personalTenantId  String?    @unique @map("personal_tenant_id")
   deletedAt         DateTime?  @map("deleted_at")
   createdAt         DateTime   @default(now()) @map("created_at")
   updatedAt         DateTime   @updatedAt @map("updated_at")
@@ -154,6 +167,8 @@ model User {
   accounts  Account[]
   sessions  Session[]
   terms     TermsAcceptance[]
+
+  personalTenant Tenant? @relation("UserPersonalTenant", fields: [personalTenantId], references: [id], onDelete: SetNull)
 
   clientProfile ClientProfile?
   lawyerProfile LawyerProfile?
@@ -236,6 +251,24 @@ model TermsAcceptance {
   @@unique([userId, termsType, termsVersion])
   @@index([userId])
   @@map("terms_acceptances")
+}
+
+// ─── Tenancy (Foundation · ADR-001) ───────────────────────────────────────────
+
+model Tenant {
+  id        String       @id @default(cuid())
+  kind      TenantKind
+  status    TenantStatus @default(ACTIVE)
+  deletedAt DateTime?    @map("deleted_at")
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  /// Inverse of User.personalTenantId (Individual tenants only).
+  personalUser User? @relation("UserPersonalTenant")
+
+  @@index([kind, status])
+  @@index([deletedAt])
+  @@map("tenants")
 }
 
 // ─── Profiles ─────────────────────────────────────────────────────────────────

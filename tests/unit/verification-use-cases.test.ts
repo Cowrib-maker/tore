@@ -82,6 +82,7 @@ describe("submitLawyerCredentialUseCase", () => {
       runInTransaction: async (work) =>
         work({
           userRepository: {} as never,
+          tenantRepository: {} as never,
           clientProfileRepository: {} as never,
           lawyerProfileRepository: {
             updateVerificationStatus: vi.fn(),
@@ -181,6 +182,7 @@ describe("reviewLawyerCredentialUseCase", () => {
       runInTransaction: async (work) =>
         work({
           userRepository: {} as never,
+          tenantRepository: {} as never,
           clientProfileRepository: {} as never,
           lawyerProfileRepository: {
             updateVerificationStatus,

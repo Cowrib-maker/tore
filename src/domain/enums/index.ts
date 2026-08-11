@@ -119,3 +119,14 @@ export enum ConsultationModality {
   ONLINE = "ONLINE",
   IN_PERSON = "IN_PERSON",
 }
+
+export enum TenantKind {
+  INDIVIDUAL = "INDIVIDUAL",
+  ORGANIZATION = "ORGANIZATION",
+}
+
+export enum TenantStatus {
+  ACTIVE = "ACTIVE",
+  SUSPENDED = "SUSPENDED",
+  DEACTIVATED = "DEACTIVATED",
+}

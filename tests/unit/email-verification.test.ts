@@ -102,6 +102,7 @@ describe("email-verification use-cases", () => {
     role: "CLIENT" as const,
     status: "ACTIVE" as const,
     preferredLanguage: "en",
+    personalTenantId: null,
     deletedAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),

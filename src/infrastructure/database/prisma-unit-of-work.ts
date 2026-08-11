@@ -10,6 +10,7 @@ import { PrismaLawyerCredentialRepository } from "@/infrastructure/repositories/
 import { PrismaLawyerProfileRepository } from "@/infrastructure/repositories/prisma-lawyer-profile-repository";
 import { PrismaNotificationRepository } from "@/infrastructure/repositories/prisma-notification-repository";
 import { PrismaTermsAcceptanceRepository } from "@/infrastructure/repositories/prisma-terms-acceptance-repository";
+import { PrismaTenantRepository } from "@/infrastructure/repositories/prisma-tenant-repository";
 import { PrismaUserRepository } from "@/infrastructure/repositories/prisma-user-repository";
 
 export class PrismaUnitOfWork implements UnitOfWork {
@@ -19,6 +20,7 @@ export class PrismaUnitOfWork implements UnitOfWork {
     return prisma.$transaction(async (tx) => {
       const repos: UnitOfWorkRepositories = {
         userRepository: new PrismaUserRepository(tx),
+        tenantRepository: new PrismaTenantRepository(tx),
         clientProfileRepository: new PrismaClientProfileRepository(tx),
         lawyerProfileRepository: new PrismaLawyerProfileRepository(tx),
         lawyerCredentialRepository: new PrismaLawyerCredentialRepository(tx),

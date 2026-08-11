@@ -7,7 +7,7 @@
 | **Constitution** | [**20 — Master Architecture v1.0.1**](./20-tore-master-architecture-v1.md) — binding long-term blueprint (Freeze Errata applied) |
 | **Baseline** | Phase 1 Stabilization complete · Client↔Lawyer marketplace live |
 | **Sources** | Master Architecture · Review & Freeze · Ecosystem Architecture · Sprint plans |
-| **Next** | Docs gate complete for Identity design clarity · Phase 2 Identity implementation still requires explicit build authorization |
+| **Next** | EPIC 02 Sprint 2.1 blueprint complete · Sprint 2.2 Identity implementation awaits authorization |
 
 ---
 
@@ -17,8 +17,10 @@
 2. [Master Architecture Changelog](./20-tore-master-architecture-CHANGELOG.md) — errata history
 3. Decision Log entries inside the Master Architecture (and future ADRs)
 4. [Review & Freeze](./21-master-architecture-review-freeze.md) — adversarial review record
-5. Phase implementation plans
-6. Older MVP docs — tactical/historical; yield on conflict
+5. [EPIC 02 · Sprint 2.1 Foundation Blueprint](./epics/epic-02-sprint-2.1-foundation-blueprint.md) — Identity implementation plan (design)
+6. [Architecture Decision Records](./architecture/README.md) — ADR-001…005 (Foundation)
+7. Phase implementation plans
+8. Older MVP docs — tactical/historical; yield on conflict
 
 ---
 
@@ -28,6 +30,9 @@
 |---|----------|-------------|
 | **20** | [**Master Architecture v1.0.1**](./20-tore-master-architecture-v1.md) | **Constitution** — Freeze Errata applied |
 | — | [Master Architecture Changelog](./20-tore-master-architecture-CHANGELOG.md) | v1.0 → v1.0.1 errata history |
+| — | [EPIC 02 · Sprint 2.1 Foundation Blueprint](./epics/epic-02-sprint-2.1-foundation-blueprint.md) | Identity foundation plan — **design only** |
+| — | [EPIC 02 · Sprint 2.2 Compatibility Charter](./epics/epic-02-sprint-2.2-compatibility-charter.md) | **100% additive** · zero-breakage gate for 2.2 |
+| — | [ADRs (Foundation)](./architecture/README.md) | ADR-001 Tenant · 002 Professional · 003 Organization · 004 Membership · 005 LawyerProfile compatibility |
 | **21** | [Master Architecture Review & Freeze](./21-master-architecture-review-freeze.md) | Adversarial review · freeze + errata gates |
 | 1 | [Executive Summary](./01-executive-summary.md) | Verdict, reuse/remove, approval gate |
 | 2 | [Gap Analysis](./02-gap-analysis.md) | Current implementation vs target MVP |
