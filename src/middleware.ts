@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import NextAuth from "next-auth";
 
 import { UserRole, UserStatus } from "@/domain/enums";
-import { canAccessRoute, getDashboardPath } from "@/domain/services/rbac";
+import {
+  canAccessRoute,
+  getDashboardPath,
+  isProtectedAppRoute,
+} from "@/domain/services/rbac";
 import { isLocale, LOCALE_COOKIE } from "@/i18n/config";
 import { negotiateLocale } from "@/i18n/negotiate";
 import { edgeAuthConfig } from "@/infrastructure/auth/auth.edge.config";
@@ -37,10 +41,8 @@ export default auth((req) => {
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/verify-email");
 
-  const isProtectedRoute =
-    pathname.startsWith("/client") ||
-    pathname.startsWith("/lawyer") ||
-    pathname.startsWith("/admin");
+  // Boundary-aware prefixes — `/lawyer` must not match public `/lawyers`.
+  const isProtectedRoute = isProtectedAppRoute(pathname);
 
   let response: NextResponse | undefined;
 

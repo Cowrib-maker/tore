@@ -16,6 +16,20 @@ export function getDashboardPath(role: UserRole): string {
   return DASHBOARD_PATH[role];
 }
 
+/** True when pathname is exactly `prefix` or under `prefix/` (not `/lawyer` vs `/lawyers`). */
+export function matchesRoutePrefix(pathname: string, prefix: string): boolean {
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+}
+
+/** Role app shells (`/client`, `/lawyer`, `/admin`) — excludes public `/lawyers`. */
+export function isProtectedAppRoute(pathname: string): boolean {
+  return (
+    matchesRoutePrefix(pathname, ROLE_ROUTE_PREFIX[UserRole.CLIENT]) ||
+    matchesRoutePrefix(pathname, ROLE_ROUTE_PREFIX[UserRole.LAWYER]) ||
+    matchesRoutePrefix(pathname, ROLE_ROUTE_PREFIX[UserRole.ADMIN])
+  );
+}
+
 export function canAccessRoute(role: UserRole, pathname: string): boolean {
   if (role === UserRole.ADMIN) {
     return true;
