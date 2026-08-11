@@ -1,12 +1,24 @@
-# TORE LegalTech Marketplace — Documentation Index
+# TORE LegalTech — Documentation Index
 
 | Field | Value |
 |-------|-------|
-| **Status** | Sprint 1–4 **COMPLETE** |
-| **Product** | TORE LegalTech Marketplace (Mongolia) |
-| **Baseline** | Marketplace request loop live · do **not** re-run Sprint 1–4 |
-| **Sources** | Ecosystem Architecture · Sprint 4 MVP (request-only bookings) |
-| **Next** | Sprint 5 — Payments (insert pay step; gateways deferred until provider chosen) |
+| **Status** | Platform constitution adopted · Marketplace MVP in production |
+| **Product** | TORE Legal Operating Platform (Mongolia-first) |
+| **Constitution** | [**20 — Master Architecture v1.0.1**](./20-tore-master-architecture-v1.md) — binding long-term blueprint (Freeze Errata applied) |
+| **Baseline** | Phase 1 Stabilization complete · Client↔Lawyer marketplace live |
+| **Sources** | Master Architecture · Review & Freeze · Ecosystem Architecture · Sprint plans |
+| **Next** | Docs gate complete for Identity design clarity · Phase 2 Identity implementation still requires explicit build authorization |
+
+---
+
+## Authority order
+
+1. [Master Architecture v1.0.1](./20-tore-master-architecture-v1.md) — **constitution**
+2. [Master Architecture Changelog](./20-tore-master-architecture-CHANGELOG.md) — errata history
+3. Decision Log entries inside the Master Architecture (and future ADRs)
+4. [Review & Freeze](./21-master-architecture-review-freeze.md) — adversarial review record
+5. Phase implementation plans
+6. Older MVP docs — tactical/historical; yield on conflict
 
 ---
 
@@ -14,10 +26,13 @@
 
 | # | Document | Description |
 |---|----------|-------------|
+| **20** | [**Master Architecture v1.0.1**](./20-tore-master-architecture-v1.md) | **Constitution** — Freeze Errata applied |
+| — | [Master Architecture Changelog](./20-tore-master-architecture-CHANGELOG.md) | v1.0 → v1.0.1 errata history |
+| **21** | [Master Architecture Review & Freeze](./21-master-architecture-review-freeze.md) | Adversarial review · freeze + errata gates |
 | 1 | [Executive Summary](./01-executive-summary.md) | Verdict, reuse/remove, approval gate |
 | 2 | [Gap Analysis](./02-gap-analysis.md) | Current implementation vs target MVP |
 | 3 | [Target Architecture](./03-target-architecture.md) | Modular monolith, layers, adapters |
-| 4 | [Domain Model](./04-domain-model.md) | Bounded contexts, aggregates, services |
+| 4 | [Domain Model](./04-domain-model.md) | Bounded contexts, aggregates, services (MVP-era) |
 | 5 | [Database Design](./05-database-design.md) | Schema, enums, relationships, seeds |
 | 6 | [Folder Structure](./06-folder-structure.md) | Target tree and growth rules |
 | 7 | [Module Breakdown](./07-module-breakdown.md) | MVP modules, ports, ownership |
@@ -32,7 +47,7 @@
 | 16 | [Architecture Review Report](./16-architecture-review-report.md) | Consistency, gaps, risks, SRS↔sprint audit |
 | 17 | [Architecture summary (S2)](./17-architecture-summary.md) | Post–Sprint 2 architecture snapshot |
 | 18 | [Remaining roadmap](./18-remaining-roadmap.md) | Deferred S2 items + S3–S10 plan |
-| 19 | [TORE Ecosystem Architecture](./19-tore-ecosystem-architecture.md) | Dual-product vision: Client + Pro AI legal ecosystem (V1–V5) |
+| 19 | [TORE Ecosystem Architecture](./19-tore-ecosystem-architecture.md) | Dual-product vision: Client + Pro (subordinate to Master) |
 | — | [Sprint 1 milestones](./sprints/sprint-1-milestones.md) | Sprint 1 milestone log |
 | — | [Sprint 2 checklist](./sprints/sprint-2-checklist.md) | Sprint 2 implementation checklist (**COMPLETE**) |
 | — | [Sprint 2 milestones](./sprints/sprint-2-milestones.md) | Sprint 2 milestone log (**COMPLETE**) |
@@ -58,7 +73,9 @@
 
 | Gate | Status |
 |------|--------|
-| Architecture docs + review | Approved (implementation authorized) |
-| Sprint 1 | Complete |
-| Sprint 2 | **Complete — Product approved 2026-08-09** |
-| Sprint 3 | **Not started** |
+| Master Architecture v1.0 | **Frozen 2026-08-11** (principles) |
+| Master Architecture v1.0.1 | **Freeze Errata published 2026-08-11** (docs only — does not authorize Phase 2 code) |
+| Architecture docs + review (MVP) | Approved (implementation authorized for marketplace track) |
+| Phase 1 Stabilization | **Complete** |
+| Sprint 1–4 | Complete (marketplace request loop) |
+| Phase 2 Identity | Not started (requires implementation authorization) |
