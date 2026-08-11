@@ -148,7 +148,7 @@ describe("email-verification use-cases", () => {
     expect(emailSend).toHaveBeenCalledWith(
       expect.objectContaining({
         to: "client@example.com",
-        subject: expect.stringContaining("Verify"),
+        subject: expect.stringContaining("Confirm"),
         text: expect.stringContaining("/verify-email?token="),
       }),
     );

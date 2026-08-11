@@ -1,4 +1,5 @@
 export type { User, CreateUserInput } from "./user";
+export type { Professional } from "./professional";
 export type {
   AuditLog,
   CreateAuditLogInput,

@@ -130,3 +130,11 @@ export enum TenantStatus {
   SUSPENDED = "SUSPENDED",
   DEACTIVATED = "DEACTIVATED",
 }
+
+/**
+ * EPIC 02 · Sprint 2.2 Wave 2 — Professional type (domain only).
+ * LAWYER only — do not add future professions here in Wave 2.
+ */
+export enum ProfessionalType {
+  LAWYER = "LAWYER",
+}
