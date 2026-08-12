@@ -214,6 +214,8 @@ model User {
   platformSettingsUpdated  PlatformSetting[]      @relation("PlatformSettingUpdater")
   reviewsModerated         Review[]               @relation("ReviewModerator")
   organizationMemberships  OrganizationMembership[]
+  aiConversations AIConversation[]
+  aiUsage        AIUsage[]
 
   @@index([role, status])
   @@index([email])
@@ -817,4 +819,81 @@ model PlatformSetting {
   updatedBy User? @relation("PlatformSettingUpdater", fields: [updatedByUserId], references: [id], onDelete: SetNull)
 
   @@map("platform_settings")
+}
+// ─── TORE Legal AI ────────────────────────────────────────────────────────────
+
+enum AIProvider {
+  OPENAI
+  CLAUDE
+}
+
+enum AIMessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+model AIConversation {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  title     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AIMessage[]
+
+  @@index([userId, updatedAt(sort: Desc)])
+  @@map("ai_conversations")
+}
+
+model AIMessage {
+  id             String         @id @default(cuid())
+  conversationId String         @map("conversation_id")
+  role           AIMessageRole
+  content        String         @db.Text
+  provider       AIProvider?
+  model          String?
+  inputTokens    Int?           @map("input_tokens")
+  outputTokens   Int?           @map("output_tokens")
+  createdAt      DateTime       @default(now()) @map("created_at")
+
+  conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  citations    AICitation[]
+
+  @@index([conversationId, createdAt])
+  @@map("ai_messages")
+}
+
+model AICitation {
+  id         String   @id @default(cuid())
+  messageId  String   @map("message_id")
+  title      String
+  sourceType String   @map("source_type")
+  sourceUrl  String?  @map("source_url")
+  reference  String?
+  excerpt    String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  message AIMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@map("ai_citations")
+}
+
+model AIUsage {
+  id            String      @id @default(cuid())
+  userId        String      @map("user_id")
+  provider      AIProvider
+  model         String
+  inputTokens   Int         @default(0) @map("input_tokens")
+  outputTokens  Int         @default(0) @map("output_tokens")
+  estimatedCost Decimal?    @map("estimated_cost") @db.Decimal(12, 6)
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([provider, model, createdAt])
+  @@map("ai_usage")
 }

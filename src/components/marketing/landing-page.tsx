@@ -1,7 +1,7 @@
 import { Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google";
 
-import { LandingEcosystem } from "@/components/marketing/landing-ecosystem";
 import { LandingEnterprise } from "@/components/marketing/landing-enterprise";
+import { LandingExperiences } from "@/components/marketing/landing-experiences";
 import { LandingFaq } from "@/components/marketing/landing-faq";
 import { LandingFooter } from "@/components/marketing/landing-footer";
 import { LandingHero } from "@/components/marketing/landing-hero";
@@ -49,15 +49,14 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
       className={cn(
         display.variable,
         sans.variable,
-        "landing-page min-h-screen bg-[#F7F8FA] text-[#0A0F14] antialiased",
+        "landing-page min-h-screen bg-white text-[#0A0F14] antialiased",
         "font-[family-name:var(--font-landing-sans)]",
       )}
     >
-      <div className="pointer-events-none fixed inset-0 -z-10 landing-hero-atmosphere" />
       <LandingNav dict={dict} locale={locale} />
       <main>
         <LandingHero t={t} />
-        <LandingEcosystem t={t} />
+        <LandingExperiences t={t} />
         <LandingLegalAi t={t} />
         <LandingKnowledge t={t} />
         <LandingWorkspace t={t} />

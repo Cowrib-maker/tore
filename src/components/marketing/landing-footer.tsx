@@ -25,9 +25,9 @@ export function LandingFooter({ dict }: { dict: Dictionary }) {
           </div>
           <FooterColumn title={t.footerProduct}>
             <a href="#platform">{t.footerPlatform}</a>
-            <a href="#solutions">{t.footerSolutions}</a>
+            <a href="#citizens">{t.footerSolutions}</a>
             <a href="#workspace">{t.footerLawyers}</a>
-            <a href="#solutions">{t.footerBusinesses}</a>
+            <a href="#businesses">{t.footerBusinesses}</a>
             <a href="#enterprise">{t.footerEnterprise}</a>
             <a href="#how">{t.footerHow}</a>
           </FooterColumn>

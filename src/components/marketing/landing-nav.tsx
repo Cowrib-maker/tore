@@ -21,15 +21,14 @@ export function LandingNav({ dict, locale }: LandingNavProps) {
   const [open, setOpen] = useState(false);
   const links = [
     { href: "#platform", label: dict.nav.platform },
-    { href: "#solutions", label: dict.nav.solutions },
+    { href: "#citizens", label: dict.nav.forCitizens },
+    { href: "#businesses", label: dict.nav.forBusinesses },
     { href: "#workspace", label: dict.nav.forLawyers },
-    { href: "#solutions", label: dict.nav.forBusinesses },
-    { href: "#enterprise", label: dict.nav.enterprise },
-    { href: "#resources", label: dict.nav.resources },
+    { href: "#government", label: dict.nav.forGovernment },
   ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[#0B1F3A]/10 bg-[#F7F8FA]/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-[#0B1F3A]/8 bg-white/90 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-5 sm:h-[4.25rem] sm:px-8">
         <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_LANDING} />
 
@@ -59,7 +58,7 @@ export function LandingNav({ dict, locale }: LandingNavProps) {
               "hidden h-9 rounded-lg bg-[#0B1F3A] px-3.5 text-[13px] font-semibold text-white hover:bg-[#0B1F3A]/92 sm:inline-flex",
             )}
           >
-            {dict.common.getStarted}
+            {dict.landing.ctaStart}
           </Link>
           <button
             type="button"
@@ -103,7 +102,7 @@ export function LandingNav({ dict, locale }: LandingNavProps) {
               className="mt-2 inline-flex h-10 items-center justify-center rounded-lg bg-[#0B1F3A] px-4 text-sm font-semibold text-white"
               onClick={() => setOpen(false)}
             >
-              {dict.common.getStarted}
+              {dict.landing.ctaStart}
             </Link>
           </div>
         </nav>

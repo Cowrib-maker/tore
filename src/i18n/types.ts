@@ -16,8 +16,10 @@ export type Dictionary = {
     lawyers: string;
     platform: string;
     solutions: string;
+    forCitizens: string;
     forLawyers: string;
     forBusinesses: string;
+    forGovernment: string;
     enterprise: string;
     resources: string;
     howItWorks: string;
@@ -52,8 +54,10 @@ export type Dictionary = {
     aiEyebrow: string;
     aiTitle: string;
     aiSupport: string;
+    aiSupportDetail: string;
     aiDisclaimer: string;
     aiDirection: string;
+    aiTrustFlow: [string, string, string];
     aiTabs: string[];
     aiPrompt: string;
     aiConclusion: string;

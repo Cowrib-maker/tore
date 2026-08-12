@@ -1,40 +1,60 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { LandingExperiences } from "@/components/marketing/landing-experiences";
 import { LandingOsPreview } from "@/components/marketing/landing-os-preview";
 import { LandingReveal } from "@/components/marketing/landing-reveal";
 import type { Dictionary } from "@/i18n/types";
+import { cn } from "@/lib/utils";
 
 export function LandingHero({ t }: { t: Dictionary["landing"] }) {
   return (
     <section className="relative overflow-hidden border-b border-[#0B1F3A]/8 bg-white">
-      <div className="mx-auto grid max-w-7xl items-center gap-8 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10 lg:py-12">
-        <LandingReveal>
-          <p className="text-[11px] font-semibold tracking-[0.18em] text-[#0B1F3A] uppercase">
-            {t.osEyebrow}
-          </p>
-          <h1 className="mt-3 max-w-xl font-[family-name:var(--font-landing-display)] text-[2.35rem] leading-[1.08] tracking-[-0.035em] text-[#0A0F14] sm:text-[3.15rem] lg:text-[3.45rem]">
-            {t.headline}
-          </h1>
-          <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-[#5C6570] sm:text-base">
-            {t.support}
-          </p>
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Link href="#platform" className="landing-btn-primary">
-              {t.ctaExplore}
-              <ArrowRight className="size-4 opacity-90" />
-            </Link>
-            <Link href="/register/client" className="landing-btn-secondary">
-              {t.ctaStart}
-            </Link>
-          </div>
-        </LandingReveal>
-        <LandingReveal delayMs={80} className="min-w-0">
-          <LandingOsPreview t={t} />
-        </LandingReveal>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(11,31,58,0.06),transparent_55%),linear-gradient(180deg,#FFFFFF_0%,#F7F9FC_100%)]"
+      />
+
+      <div className="relative mx-auto max-w-7xl px-5 pb-14 pt-12 sm:px-8 sm:pb-16 sm:pt-16 lg:pb-20 lg:pt-20">
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-14">
+          <LandingReveal>
+            <p className="text-[11px] font-semibold tracking-[0.18em] text-[#5C6570] uppercase">
+  {t.osEyebrow}
+</p>
+
+<h1
+  className="mt-4 max-w-2xl font-[family-name:var(--font-landing-display)] text-[2.8rem] leading-[1.08] tracking-[-0.035em] text-[#0A0F14] sm:text-[3.6rem] lg:text-[4.1rem]"
+>
+  {t.headline}
+</h1>
+
+            <p className="mt-5 max-w-lg text-[15px] leading-7 text-[#5C6570] sm:text-base">
+              {t.support}
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Link
+                href="#platform"
+                className={cn(
+                  "inline-flex h-11 items-center justify-center rounded-lg bg-[#0B1F3A] px-5 text-[13px] font-semibold text-white transition hover:bg-[#16365F]",
+                )}
+              >
+                {t.ctaExplore}
+              </Link>
+              <Link
+                href="/register/client"
+                className="inline-flex h-11 items-center gap-1.5 rounded-lg border border-[#0B1F3A]/15 bg-white px-5 text-[13px] font-semibold text-[#0B1F3A] transition hover:bg-[#F4F6F8]"
+              >
+                {t.ctaStart}
+                <ArrowRight className="size-3.5" />
+              </Link>
+            </div>
+          </LandingReveal>
+
+          <LandingReveal delayMs={80} className="lg:pl-2">
+            <LandingOsPreview t={t} />
+          </LandingReveal>
+        </div>
       </div>
-      <LandingExperiences t={t} />
     </section>
   );
 }
