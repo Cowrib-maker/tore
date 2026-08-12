@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 
+import { provisionPersonalTenantOnRegister } from "@/application/use-cases/auth/provision-personal-tenant-on-register";
 import type { RegisterClientInput } from "@/application/validators/auth.schema";
 import { PLATFORM_SETTING_KEYS } from "@/domain/constants/platform-settings";
 import type { User } from "@/domain/entities/user";
@@ -74,6 +75,7 @@ export async function registerClientUseCase(
       ipAddress,
     });
 
-    return user;
+    // Flag-gated: same UoW so failed ensure rolls back the new user.
+    return provisionPersonalTenantOnRegister(user, repos.tenantRepository);
   });
 }

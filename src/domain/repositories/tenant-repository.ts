@@ -11,6 +11,11 @@ export type TenantProvisioningOptions = {
 export interface TenantRepository {
   findById(id: string): Promise<Tenant | null>;
   /**
+   * Load the user's linked PERSONAL (INDIVIDUAL) tenant when present.
+   * Read-only — not gated by TORE_FOUNDATION_TENANT_V1 (column must exist).
+   */
+  findPersonalTenantForUser(userId: string): Promise<Tenant | null>;
+  /**
    * Create an INDIVIDUAL tenant and link it to the user when the user has no
    * personalTenantId yet. Idempotent if already linked.
    * Flag-gated unless `force` is true.

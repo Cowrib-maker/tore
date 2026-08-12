@@ -102,6 +102,28 @@ export const marketplaceMn: MarketplaceDictionary = {
     emptyTitle: "Мэдэгдэл байхгүй",
     emptyBody:
       "Баталгаажуулалт болон зөвлөгөөний хүсэлттэй холбоотой мэдээлэл энд харагдана.",
+    messages: {
+      BOOKING_CREATED: {
+        title: "Шинэ захиалгын хүсэлт",
+        body: "{bookingNumber} дугаартай хүсэлт таны хариуг хүлээж байна.",
+      },
+      BOOKING_ACCEPTED: {
+        title: "Захиалга зөвшөөрөгдлөө",
+        body: "Таны {bookingNumber} хүсэлтийг зөвшөөрсөн.",
+      },
+      BOOKING_DECLINED: {
+        title: "Захиалга татгалзагдлаа",
+        body: "Таны {bookingNumber} хүсэлтийг татгалзсан.{declineReasonSuffix}",
+      },
+      LAWYER_APPROVED: {
+        title: "Лиценз зөвшөөрөгдлөө",
+        body: "Таны өмгөөлөгчийн итгэмжлэл зөвшөөрөгдлөө. Лавлахад гарахаас өмнө идэвхтэй үйлчилгээ нэмнэ үү.",
+      },
+      LAWYER_REJECTED: {
+        title: "Лиценз татгалзагдлаа",
+        body: "Таны өмгөөлөгчийн итгэмжлэл татгалзагдлаа.{rejectionReasonSuffix}",
+      },
+    },
   },
   lawyerDashboard: {
     intro:

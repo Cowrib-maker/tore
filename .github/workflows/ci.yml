@@ -46,4 +46,12 @@ jobs:
       - name: Production build
         env:
           NODE_ENV: production
+          # Explicit MVP deployment allow-flags for CI (non-secrets).
+          # Real multi-tenant production must omit these and set Redis/S3/email/https.
+          TORE_ALLOW_LOCAL_STORAGE: "1"
+          TORE_ALLOW_NO_REDIS: "1"
+          TORE_ALLOW_NO_EMAIL: "1"
+          TORE_ALLOW_INSECURE_URLS: "1"
+          FILE_STORAGE: local
+          EMAIL_PROVIDER: console
         run: npm run build

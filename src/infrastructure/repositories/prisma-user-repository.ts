@@ -118,6 +118,18 @@ export class PrismaUserRepository implements UserRepository {
     });
     return mapUser(record);
   }
+
+  async updatePasswordHash(
+    userId: string,
+    passwordHash: string,
+  ): Promise<User> {
+    const record = await this.db.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+      select: userSelect,
+    });
+    return mapUser(record);
+  }
 }
 
 export const userRepository = new PrismaUserRepository();

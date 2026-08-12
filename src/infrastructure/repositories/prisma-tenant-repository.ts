@@ -31,6 +31,25 @@ export class PrismaTenantRepository implements TenantRepository {
     return record ? mapTenant(record) : null;
   }
 
+  async findPersonalTenantForUser(userId: string): Promise<Tenant | null> {
+    const user = await this.db.user.findFirst({
+      where: { id: userId, deletedAt: null },
+      select: { personalTenantId: true },
+    });
+    if (!user?.personalTenantId) {
+      return null;
+    }
+    const record = await this.db.tenant.findFirst({
+      where: {
+        id: user.personalTenantId,
+        deletedAt: null,
+        kind: TenantKind.INDIVIDUAL,
+      },
+      select: tenantSelect,
+    });
+    return record ? mapTenant(record) : null;
+  }
+
   async ensurePersonalTenantForUser(
     userId: string,
     options: TenantProvisioningOptions = {},

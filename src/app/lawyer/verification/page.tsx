@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/card";
 import { UserRole } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
-import { getFileStorage } from "@/infrastructure/storage";
+import { buildAppFilePath } from "@/infrastructure/storage/file-access";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 import {
   formatCredentialStatus,
@@ -73,11 +73,10 @@ export default async function LawyerVerificationPage() {
     );
   }
 
-  const storage = getFileStorage();
   const credentialsWithUrls = await Promise.all(
     data.data.credentials.map(async (credential) => ({
       credential,
-      documentUrl: await storage.getUrl(credential.documentUrl),
+      documentUrl: buildAppFilePath(credential.documentUrl),
     })),
   );
 

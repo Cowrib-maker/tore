@@ -123,7 +123,21 @@ export function RegisterClientForm({
               className="mt-1 size-4 rounded border-input"
             />
             <Label htmlFor="acceptTerms" className="text-sm font-normal leading-snug">
-              {copy.acceptTerms}
+              {copy.acceptTermsLead}{" "}
+              <Link
+                href="/terms"
+                className="text-primary underline-offset-4 hover:underline"
+              >
+                {copy.termsOfService}
+              </Link>
+              {", "}
+              <Link
+                href="/privacy"
+                className="text-primary underline-offset-4 hover:underline"
+              >
+                {copy.privacyPolicy}
+              </Link>
+              {copy.acceptTermsTrail}
             </Label>
           </div>
         </CardContent>

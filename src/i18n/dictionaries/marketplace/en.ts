@@ -102,6 +102,28 @@ export const marketplaceEn: MarketplaceDictionary = {
     emptyTitle: "No notifications",
     emptyBody:
       "Updates about verification and consultation requests will appear here.",
+    messages: {
+      BOOKING_CREATED: {
+        title: "New booking request",
+        body: "Request {bookingNumber} is awaiting your response.",
+      },
+      BOOKING_ACCEPTED: {
+        title: "Booking accepted",
+        body: "Your request {bookingNumber} was accepted.",
+      },
+      BOOKING_DECLINED: {
+        title: "Booking declined",
+        body: "Your request {bookingNumber} was declined.{declineReasonSuffix}",
+      },
+      LAWYER_APPROVED: {
+        title: "License approved",
+        body: "Your lawyer credentials were approved. Add an active offering before listing on the marketplace.",
+      },
+      LAWYER_REJECTED: {
+        title: "License rejected",
+        body: "Your lawyer credentials were rejected.{rejectionReasonSuffix}",
+      },
+    },
   },
   lawyerDashboard: {
     intro:

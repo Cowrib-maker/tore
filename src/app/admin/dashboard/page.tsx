@@ -62,6 +62,23 @@ export default async function AdminDashboardPage() {
             <CardDescription>{a.adminHelp}</CardDescription>
           </CardHeader>
         </Card>
+        {process.env.NODE_ENV !== "production" ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Developer tools</CardTitle>
+              <CardDescription>
+                Impersonation, bulk verification, and lifecycle toggles for
+                local testing. Disabled in production.
+              </CardDescription>
+              <Link
+                href="/admin/dev"
+                className={cn(buttonVariants({ size: "sm" }), "mt-2 w-fit")}
+              >
+                Open dev console
+              </Link>
+            </CardHeader>
+          </Card>
+        ) : null}
       </div>
     </>
   );

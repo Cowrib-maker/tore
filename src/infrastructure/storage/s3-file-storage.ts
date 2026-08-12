@@ -114,6 +114,23 @@ export class S3FileStorage implements FileStorage {
 
   async getUrl(key: string, options?: GetUrlOptions): Promise<string> {
     assertSafeStorageKey(key);
+    const purpose = key.split("/")[0] ?? "";
+
+    // Sensitive objects never use a permanent public/CDN base URL.
+    // Callers should prefer /api/files for session-authorized access.
+    if (purpose === "lawyer-credential" || purpose === "contract" || purpose === "evidence" || purpose === "message-attachment") {
+      const expiresIn = Math.min(options?.expiresInSeconds ?? 60, 120);
+      return getSignedUrl(
+        this.client,
+        new GetObjectCommand({
+          Bucket: this.bucket,
+          Key: key,
+          ResponseContentDisposition: "attachment",
+        }),
+        { expiresIn },
+      );
+    }
+
     if (this.publicBaseUrl) {
       return `${this.publicBaseUrl}/${key.split("/").map(encodeURIComponent).join("/")}`;
     }

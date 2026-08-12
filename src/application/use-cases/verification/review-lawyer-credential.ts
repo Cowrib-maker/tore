@@ -116,6 +116,9 @@ export async function reviewLawyerCredentialUseCase(
       metadata: {
         credentialId: reviewed.id,
         lawyerProfileId: lawyerProfile.id,
+        ...(reviewed.rejectionReason
+          ? { rejectionReason: reviewed.rejectionReason }
+          : {}),
       },
     });
 

@@ -97,6 +97,13 @@ export type MarketplaceDictionary = {
     markRead: string;
     emptyTitle: string;
     emptyBody: string;
+    messages: {
+      BOOKING_CREATED: { title: string; body: string };
+      BOOKING_ACCEPTED: { title: string; body: string };
+      BOOKING_DECLINED: { title: string; body: string };
+      LAWYER_APPROVED: { title: string; body: string };
+      LAWYER_REJECTED: { title: string; body: string };
+    };
   };
   lawyerDashboard: {
     intro: string;

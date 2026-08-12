@@ -30,6 +30,7 @@ import {
   CREDENTIAL_SUBMIT_RATE_LIMIT,
 } from "@/infrastructure/security/rate-limiter";
 import { getFileStorage } from "@/infrastructure/storage";
+import { buildAppFilePath } from "@/infrastructure/storage/file-access";
 
 const submitDeps = {
   lawyerProfileRepository,
@@ -204,7 +205,6 @@ export async function getAdminLawyerVerificationQueue(): Promise<
 
   const { items: pending } =
     await lawyerCredentialRepository.findPendingReview();
-  const storage = getFileStorage();
   const { userRepository } = await import("@/infrastructure/repositories");
 
   const items = (
@@ -214,16 +214,13 @@ export async function getAdminLawyerVerificationQueue(): Promise<
           credential.lawyerProfileId,
         );
         if (!lawyer) return null;
-        const [user, documentUrl] = await Promise.all([
-          userRepository.findById(lawyer.userId),
-          storage.getUrl(credential.documentUrl),
-        ]);
+        const user = await userRepository.findById(lawyer.userId);
         return {
           credential,
           lawyer,
           lawyerEmail: user?.email ?? null,
           lawyerName: user?.name ?? null,
-          documentUrl,
+          documentUrl: buildAppFilePath(credential.documentUrl),
         } satisfies AdminCredentialQueueItem;
       }),
     )

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { LocalePersistence } from "@/components/i18n/locale-persistence";
+import { ImpersonationBannerHost } from "@/components/admin/impersonation-banner-host";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { getDictionary } from "@/i18n/get-dictionary";
@@ -70,6 +71,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <TooltipProvider>
           <LocalePersistence locale={locale} />
+          <ImpersonationBannerHost />
           {children}
           <Toaster richColors closeButton />
         </TooltipProvider>

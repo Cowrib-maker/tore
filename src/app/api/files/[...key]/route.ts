@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 
-import { getSessionUser } from "@/application/common/session";
+import { requireActor } from "@/application/common/require-actor";
 import { assertCanAccessStoredFile } from "@/application/services/assert-can-access-stored-file";
 import { DomainError } from "@/domain/errors/domain-error";
-import { UserRole } from "@/domain/enums";
 import {
   lawyerCredentialRepository,
   lawyerProfileRepository,
 } from "@/infrastructure/repositories";
 import { getFileStorage } from "@/infrastructure/storage";
+import { isSensitiveStorageKey } from "@/infrastructure/storage/file-access";
 
 type RouteContext = {
   params: Promise<{ key: string[] }>;
@@ -16,33 +16,29 @@ type RouteContext = {
 
 export async function GET(_request: Request, context: RouteContext) {
   try {
-    const session = await getSessionUser();
-    if (!session?.user?.id || !session.user.role) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const actor = await requireActor();
 
     const { key: segments } = await context.params;
     const key = segments.map(decodeURIComponent).join("/");
 
-    await assertCanAccessStoredFile(
-      {
-        userId: session.user.id,
-        role: session.user.role as UserRole,
-      },
-      key,
-      { lawyerProfileRepository, lawyerCredentialRepository },
-    );
+    await assertCanAccessStoredFile(actor, key, {
+      lawyerProfileRepository,
+      lawyerCredentialRepository,
+    });
 
     const object = await getFileStorage().getObject(key);
     const safeName = sanitizeContentDispositionFilename(
       object.originalFileName ?? "file",
     );
+    const disposition = isSensitiveStorageKey(key) ? "attachment" : "inline";
+
     return new NextResponse(Buffer.from(object.body), {
       status: 200,
       headers: {
         "Content-Type": object.contentType,
-        "Content-Disposition": `inline; filename="${safeName}"`,
+        "Content-Disposition": `${disposition}; filename="${safeName}"`,
         "Cache-Control": "private, no-store",
+        "X-Content-Type-Options": "nosniff",
       },
     });
   } catch (error) {
@@ -63,8 +59,10 @@ export async function GET(_request: Request, context: RouteContext) {
 }
 
 function sanitizeContentDispositionFilename(name: string): string {
-  return name
-    .replace(/[\r\n"]/g, "")
-    .replace(/[^\w.\- ()[\]]+/g, "_")
-    .slice(0, 180) || "file";
+  return (
+    name
+      .replace(/[\r\n"]/g, "")
+      .replace(/[^\w.\- ()[\]]+/g, "_")
+      .slice(0, 180) || "file"
+  );
 }

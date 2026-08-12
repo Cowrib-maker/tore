@@ -16,7 +16,10 @@ import {
   NotFoundError,
   ValidationError,
 } from "@/domain/errors/domain-error";
-import type { OrganizationRepository } from "@/domain/repositories/organization-repository";
+import type {
+  OrganizationMembershipView,
+  OrganizationRepository,
+} from "@/domain/repositories/organization-repository";
 import {
   assertOrganizationCreateAuthorization,
   resolveOrganizationFoundingOwnerUserId,
@@ -125,6 +128,51 @@ export class PrismaOrganizationRepository implements OrganizationRepository {
         tenant: mapTenant(tenantRecord),
       };
     });
+  }
+
+  async listActiveMembershipsForUser(
+    userId: string,
+  ): Promise<OrganizationMembershipView[]> {
+    const rows = await this.db.organizationMembership.findMany({
+      where: {
+        userId,
+        status: OrganizationMembershipStatus.ACTIVE,
+        organization: { deletedAt: null },
+      },
+      select: {
+        ...organizationMembershipSelect,
+        organization: { select: organizationSelect },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return rows.map((row) => ({
+      organization: mapOrganization(row.organization),
+      membership: mapOrganizationMembership(row),
+    }));
+  }
+
+  async findActiveMembershipForUser(
+    organizationId: string,
+    userId: string,
+  ): Promise<OrganizationMembershipView | null> {
+    const row = await this.db.organizationMembership.findFirst({
+      where: {
+        organizationId,
+        userId,
+        status: OrganizationMembershipStatus.ACTIVE,
+        organization: { deletedAt: null },
+      },
+      select: {
+        ...organizationMembershipSelect,
+        organization: { select: organizationSelect },
+      },
+    });
+    if (!row) return null;
+    return {
+      organization: mapOrganization(row.organization),
+      membership: mapOrganizationMembership(row),
+    };
   }
 
   private async withTransaction<T>(

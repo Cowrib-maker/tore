@@ -165,3 +165,12 @@ export enum OrganizationMembershipStatus {
   REVOKED = "REVOKED",
   SUSPENDED = "SUSPENDED",
 }
+
+/**
+ * EPIC 02 · Wave 2 Step 3 — Active Context kind.
+ * PERSONAL = user's personal tenant; ORGANIZATION = org tenant via membership.
+ */
+export enum ActiveContextType {
+  PERSONAL = "PERSONAL",
+  ORGANIZATION = "ORGANIZATION",
+}

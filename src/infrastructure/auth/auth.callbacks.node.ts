@@ -1,48 +1,151 @@
 import type { NextAuthConfig } from "next-auth";
 
-import { UserStatus } from "@/domain/enums";
+import { UserRole, UserStatus } from "@/domain/enums";
+import { isAdminDevtoolsEnabled } from "@/lib/feature-flags";
+
+const ROLE_VALUES = new Set<string>(Object.values(UserRole));
+const STATUS_VALUES = new Set<string>(Object.values(UserStatus));
+
+/** Privilege fields refresh at most once per minute per JWT (Node only). */
+export const PRIVILEGE_REFRESH_MS = 60_000;
+
+function isUserRole(value: unknown): value is UserRole {
+  return typeof value === "string" && ROLE_VALUES.has(value);
+}
+
+function isUserStatus(value: unknown): value is UserStatus {
+  return typeof value === "string" && STATUS_VALUES.has(value);
+}
+
+type ImpersonationUpdate = {
+  impersonateUserId?: string;
+  stopImpersonation?: boolean;
+};
 
 /**
- * Node runtime callbacks: refresh account status from the database so
- * suspended/deactivated users lose access without waiting for JWT expiry.
+ * Node runtime callbacks: refresh role + status from the database so demotions
+ * and suspensions take effect without waiting for full JWT expiry.
+ * Privilege fields are never accepted from session.update payloads — except
+ * admin-devtools impersonation, which is verified server-side against the DB.
  */
 export const nodeAuthCallbacks: NonNullable<NextAuthConfig["callbacks"]> = {
-  async jwt({ token, user }) {
-    // Role/status are set only at sign-in from verified credentials.
-    // Never accept privilege fields from session.update payloads.
+  async jwt({ token, user, trigger, session }) {
     if (user) {
-      token.id = user.id!;
+      if (!user.id || !isUserRole(user.role) || !isUserStatus(user.status)) {
+        // Fail closed — corrupt sign-in principal.
+        return {};
+      }
+      token.id = user.id;
       token.role = user.role;
       token.status = user.status;
       token.statusCheckedAt = Date.now();
+      delete token.impersonatorId;
     }
 
-    if (!token.id) {
-      return token;
+    if (trigger === "update" && session && typeof session === "object") {
+      const update = session as ImpersonationUpdate;
+      const { userRepository } = await import(
+        "@/infrastructure/repositories"
+      );
+
+      if (update.stopImpersonation && token.impersonatorId) {
+        const admin = await userRepository.findById(token.impersonatorId);
+        if (
+          admin &&
+          !admin.deletedAt &&
+          admin.role === UserRole.ADMIN &&
+          admin.status === UserStatus.ACTIVE
+        ) {
+          token.id = admin.id;
+          token.role = admin.role;
+          token.status = admin.status;
+          token.statusCheckedAt = Date.now();
+          delete token.impersonatorId;
+          return token;
+        }
+      }
+
+      if (
+        update.impersonateUserId &&
+        typeof update.impersonateUserId === "string" &&
+        isAdminDevtoolsEnabled()
+      ) {
+        const adminId =
+          typeof token.impersonatorId === "string"
+            ? token.impersonatorId
+            : typeof token.id === "string"
+              ? token.id
+              : null;
+        if (adminId) {
+          const admin = await userRepository.findById(adminId);
+          const target = await userRepository.findById(update.impersonateUserId);
+          if (
+            admin &&
+            !admin.deletedAt &&
+            admin.role === UserRole.ADMIN &&
+            admin.status === UserStatus.ACTIVE &&
+            target &&
+            !target.deletedAt &&
+            target.status === UserStatus.ACTIVE &&
+            target.role !== UserRole.ADMIN
+          ) {
+            token.impersonatorId = admin.id;
+            token.id = target.id;
+            token.role = target.role;
+            token.status = target.status;
+            token.statusCheckedAt = Date.now();
+            return token;
+          }
+        }
+      }
+    }
+
+    if (!token.id || typeof token.id !== "string") {
+      return {};
     }
 
     const checkedAt =
       typeof token.statusCheckedAt === "number" ? token.statusCheckedAt : 0;
     const now = Date.now();
-    const STATUS_REFRESH_MS = 60_000;
 
-    if (user || now - checkedAt >= STATUS_REFRESH_MS) {
+    if (user || now - checkedAt >= PRIVILEGE_REFRESH_MS) {
       const { userRepository } = await import(
         "@/infrastructure/repositories"
       );
-      const active = await userRepository.isActiveUser(token.id);
-      token.status = active ? UserStatus.ACTIVE : UserStatus.SUSPENDED;
+      const record = await userRepository.findById(token.id);
+      if (!record || record.deletedAt) {
+        return {};
+      }
+      token.role = record.role;
+      token.status = record.status;
       token.statusCheckedAt = now;
     }
 
     return token;
   },
   async session({ session, token }) {
-    if (session.user) {
-      session.user.id = token.id;
-      session.user.role = token.role ?? "CLIENT";
-      session.user.status = token.status ?? UserStatus.ACTIVE;
+    if (!session.user) {
+      return session;
     }
+
+    if (
+      !token.id ||
+      typeof token.id !== "string" ||
+      !isUserRole(token.role) ||
+      !isUserStatus(token.status)
+    ) {
+      // Fail closed: incomplete privilege claims → empty session user id.
+      session.user.id = undefined as unknown as string;
+      return session;
+    }
+
+    session.user.id = token.id;
+    session.user.role = token.role;
+    session.user.status = token.status;
+    session.user.impersonatorId =
+      typeof token.impersonatorId === "string"
+        ? token.impersonatorId
+        : undefined;
     return session;
   },
 };

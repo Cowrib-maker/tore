@@ -12,14 +12,14 @@ export function LandingFaq({ faqs }: { faqs: FaqItem[] }) {
   const [open, setOpen] = useState(0);
 
   return (
-    <div className="divide-y divide-[#0F3D33]/8 overflow-hidden rounded-2xl border border-[#0F3D33]/10 bg-white landing-shadow-sm">
+    <div className="divide-y divide-[#0B1F3A]/8 overflow-hidden rounded-2xl border border-[#0B1F3A]/10 bg-white landing-shadow-sm">
       {faqs.map((item, index) => {
         const isOpen = open === index;
         return (
           <div key={item.q} className="px-5 sm:px-6">
             <button
               type="button"
-              className="flex w-full cursor-pointer items-center justify-between gap-4 py-5 text-left transition-colors hover:text-[#0F3D33] sm:py-6"
+              className="flex w-full cursor-pointer items-center justify-between gap-4 py-5 text-left transition-colors hover:text-[#0B1F3A] sm:py-6"
               aria-expanded={isOpen}
               onClick={() => setOpen(isOpen ? -1 : index)}
             >
@@ -29,7 +29,7 @@ export function LandingFaq({ faqs }: { faqs: FaqItem[] }) {
               <ChevronDown
                 className={cn(
                   "size-4 shrink-0 text-[#5A6B64] transition-transform duration-300 ease-out",
-                  isOpen && "rotate-180 text-[#0F3D33]",
+                  isOpen && "rotate-180 text-[#0B1F3A]",
                 )}
               />
             </button>

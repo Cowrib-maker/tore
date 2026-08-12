@@ -13,4 +13,5 @@ export interface UserRepository {
   isActiveUser(id: string): Promise<boolean>;
   findByRole(role: UserRole): Promise<User[]>;
   markEmailVerified(userId: string, verifiedAt?: Date): Promise<User>;
+  updatePasswordHash(userId: string, passwordHash: string): Promise<User>;
 }

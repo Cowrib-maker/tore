@@ -100,6 +100,28 @@ export const marketplaceKo: MarketplaceDictionary = {
     markRead: "읽음으로 표시",
     emptyTitle: "알림 없음",
     emptyBody: "자격 검증 및 상담 신청에 관한 업데이트가 여기에 표시됩니다.",
+    messages: {
+      BOOKING_CREATED: {
+        title: "새 예약 요청",
+        body: "요청 {bookingNumber}에 대한 응답을 기다리고 있습니다.",
+      },
+      BOOKING_ACCEPTED: {
+        title: "예약이 수락되었습니다",
+        body: "요청 {bookingNumber}이(가) 수락되었습니다.",
+      },
+      BOOKING_DECLINED: {
+        title: "예약이 거절되었습니다",
+        body: "요청 {bookingNumber}이(가) 거절되었습니다.{declineReasonSuffix}",
+      },
+      LAWYER_APPROVED: {
+        title: "자격 승인",
+        body: "변호사 자격이 승인되었습니다. 마켓플레이스에 등록하기 전에 활성 상담 서비스를 추가하세요.",
+      },
+      LAWYER_REJECTED: {
+        title: "자격 거절",
+        body: "변호사 자격이 거절되었습니다.{rejectionReasonSuffix}",
+      },
+    },
   },
   lawyerDashboard: {
     intro:

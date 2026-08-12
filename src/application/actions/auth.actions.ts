@@ -12,10 +12,27 @@ import { registerClientUseCase } from "@/application/use-cases/auth/register-cli
 import { registerLawyerUseCase } from "@/application/use-cases/auth/register-lawyer";
 import { resendEmailVerificationUseCase } from "@/application/use-cases/auth/email-verification";
 import {
+  LOGIN_RATE_LIMIT,
+  PASSWORD_RESET_REQUEST_RATE_LIMIT,
+  PASSWORD_RESET_SUBMIT_RATE_LIMIT,
+  REGISTER_RATE_LIMIT,
+  RESEND_VERIFICATION_RATE_LIMIT,
+} from "@/infrastructure/security/rate-limiter";
+import { signIn, signOut, auth } from "@/lib/auth";
+import { env } from "@/lib/env";
+import { getEmailSender } from "@/infrastructure/email";
+import { emailVerificationTokenRepository } from "@/infrastructure/repositories";
+import {
+  requestPasswordResetUseCase,
+  resetPasswordWithTokenUseCase,
+} from "@/application/use-cases/auth/password-reset";
+import {
+  forgotPasswordSchema,
   loginSchema,
   registerClientSchema,
   registerLawyerSchema,
   resendVerificationSchema,
+  resetPasswordSchema,
 } from "@/application/validators/auth.schema";
 import { UserRole, UserStatus } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
@@ -24,12 +41,6 @@ import {
   unitOfWork,
   userRepository,
 } from "@/infrastructure/repositories";
-import {
-  LOGIN_RATE_LIMIT,
-  REGISTER_RATE_LIMIT,
-  RESEND_VERIFICATION_RATE_LIMIT,
-} from "@/infrastructure/security/rate-limiter";
-import { signIn, signOut, auth } from "@/lib/auth";
 
 const registerClientDeps = {
   userRepository,
@@ -213,6 +224,81 @@ export async function resendVerificationEmailAction(
     console.error("[email:verification] resend action failed", error);
     return mapActionError(error);
   }
+}
+
+function getPasswordResetDeps() {
+  return {
+    userRepository,
+    emailVerificationTokenRepository,
+    emailSender: getEmailSender(),
+    appUrl: env.NEXT_PUBLIC_APP_URL,
+    appName: env.NEXT_PUBLIC_APP_NAME,
+  };
+}
+
+export async function requestPasswordResetAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const parsed = parseWithSchema(forgotPasswordSchema, {
+    email: formData.get("email"),
+  });
+  if (!parsed.ok) return parsed.state;
+
+  const ipAddress = await getClientIp();
+  const limited = await enforceRateLimit(
+    `pwd-reset-req:${ipAddress ?? "unknown"}:${parsed.data.email}`,
+    PASSWORD_RESET_REQUEST_RATE_LIMIT,
+    "attempts",
+  );
+  if (limited) return limited;
+
+  try {
+    await requestPasswordResetUseCase(parsed.data.email, getPasswordResetDeps());
+    return {
+      success: true,
+      message:
+        "If an account exists for that email, a password reset link has been sent.",
+    };
+  } catch (error) {
+    console.error("[email:password-reset] request action failed", error);
+    return {
+      success: true,
+      message:
+        "If an account exists for that email, a password reset link has been sent.",
+    };
+  }
+}
+
+export async function resetPasswordAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const parsed = parseWithSchema(resetPasswordSchema, {
+    token: formData.get("token"),
+    password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+  if (!parsed.ok) return parsed.state;
+
+  const ipAddress = await getClientIp();
+  const limited = await enforceRateLimit(
+    `pwd-reset-submit:${ipAddress ?? "unknown"}`,
+    PASSWORD_RESET_SUBMIT_RATE_LIMIT,
+    "attempts",
+  );
+  if (limited) return limited;
+
+  try {
+    await resetPasswordWithTokenUseCase(
+      { rawToken: parsed.data.token, newPassword: parsed.data.password },
+      getPasswordResetDeps(),
+    );
+  } catch (error) {
+    return mapActionError(error);
+  }
+
+  redirect("/login");
 }
 
 export async function logoutAction() {

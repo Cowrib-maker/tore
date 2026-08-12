@@ -102,6 +102,18 @@ export const RESEND_VERIFICATION_RATE_LIMIT = {
   windowMs: 15 * 60 * 1000,
 };
 
+/** Password reset request: 5 attempts / 15 minutes / IP+email */
+export const PASSWORD_RESET_REQUEST_RATE_LIMIT = {
+  limit: 5,
+  windowMs: 15 * 60 * 1000,
+};
+
+/** Password reset submit: 10 attempts / 15 minutes / IP */
+export const PASSWORD_RESET_SUBMIT_RATE_LIMIT = {
+  limit: 10,
+  windowMs: 15 * 60 * 1000,
+};
+
 /** Booking requests: 20 attempts / 15 minutes / user */
 export const BOOKING_CREATE_RATE_LIMIT = {
   limit: 20,

@@ -100,6 +100,28 @@ export const marketplaceZh: MarketplaceDictionary = {
     markRead: "标为已读",
     emptyTitle: "暂无通知",
     emptyBody: "有关资质核验与咨询申请的更新将显示于此。",
+    messages: {
+      BOOKING_CREATED: {
+        title: "新的预约申请",
+        body: "申请 {bookingNumber} 正在等待您的回复。",
+      },
+      BOOKING_ACCEPTED: {
+        title: "预约已接受",
+        body: "您的申请 {bookingNumber} 已被接受。",
+      },
+      BOOKING_DECLINED: {
+        title: "预约已拒绝",
+        body: "您的申请 {bookingNumber} 已被拒绝。{declineReasonSuffix}",
+      },
+      LAWYER_APPROVED: {
+        title: "资质已通过",
+        body: "您的律师资质已获批准。上架市场前请先添加有效的咨询服务。",
+      },
+      LAWYER_REJECTED: {
+        title: "资质已拒绝",
+        body: "您的律师资质已被拒绝。{rejectionReasonSuffix}",
+      },
+    },
   },
   lawyerDashboard: {
     intro:

@@ -15,6 +15,7 @@ import {
   formatDateTimeUtc,
   formatNotificationType,
 } from "@/lib/format-labels";
+import { localizeNotification } from "@/lib/localize-notification";
 
 const initialState: ActionState = {};
 
@@ -70,31 +71,36 @@ export function NotificationList({
 
   return (
     <ul className="space-y-3">
-      {notifications.map((note) => (
-        <li
-          key={note.id}
-          className={
-            note.readAt
-              ? "rounded-xl border px-4 py-3 opacity-70"
-              : "rounded-xl border border-[#0F3D33]/25 bg-[#F4F8F6] px-4 py-3"
-          }
-        >
-          <div className="flex flex-wrap items-start justify-between gap-2">
-            <div>
-              <p className="text-sm font-semibold">{note.title}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{note.body}</p>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {formatDateTimeUtc(note.createdAt, locale)} {copy.utc}
-                {" · "}
-                {formatNotificationType(note.type, locale)}
-              </p>
+      {notifications.map((note) => {
+        const localized = localizeNotification(note, copy.messages);
+        return (
+          <li
+            key={note.id}
+            className={
+              note.readAt
+                ? "rounded-xl border px-4 py-3 opacity-70"
+                : "rounded-xl border border-[#0F3D33]/25 bg-[#F4F8F6] px-4 py-3"
+            }
+          >
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <p className="text-sm font-semibold">{localized.title}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {localized.body}
+                </p>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {formatDateTimeUtc(note.createdAt, locale)} {copy.utc}
+                  {" · "}
+                  {formatNotificationType(note.type, locale)}
+                </p>
+              </div>
+              {!note.readAt && (
+                <MarkOneReadButton id={note.id} copy={copy} />
+              )}
             </div>
-            {!note.readAt && (
-              <MarkOneReadButton id={note.id} copy={copy} />
-            )}
-          </div>
-        </li>
-      ))}
+          </li>
+        );
+      })}
     </ul>
   );
 }

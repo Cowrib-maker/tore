@@ -148,7 +148,10 @@ export async function createBookingRequestUseCase(
       type: NotificationType.BOOKING_CREATED,
       title: "New booking request",
       body: `Request ${booking.bookingNumber} is awaiting your response.`,
-      metadata: { bookingId: booking.id },
+      metadata: {
+        bookingId: booking.id,
+        bookingNumber: booking.bookingNumber,
+      },
     });
 
     await tx.auditLogRepository.create({
@@ -202,7 +205,10 @@ export async function respondToBookingRequestUseCase(
         type: NotificationType.BOOKING_ACCEPTED,
         title: "Booking accepted",
         body: `Your request ${booking.bookingNumber} was accepted.`,
-        metadata: { bookingId: booking.id },
+        metadata: {
+          bookingId: booking.id,
+          bookingNumber: booking.bookingNumber,
+        },
       });
       await tx.auditLogRepository.create({
         actorUserId: actor.userId,
@@ -240,7 +246,11 @@ export async function respondToBookingRequestUseCase(
       type: NotificationType.BOOKING_DECLINED,
       title: "Booking declined",
       body: `Your request ${booking.bookingNumber} was declined. ${reason}`,
-      metadata: { bookingId: booking.id },
+      metadata: {
+        bookingId: booking.id,
+        bookingNumber: booking.bookingNumber,
+        declineReason: reason,
+      },
     });
     await tx.auditLogRepository.create({
       actorUserId: actor.userId,

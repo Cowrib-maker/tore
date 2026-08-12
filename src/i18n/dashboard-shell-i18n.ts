@@ -2,11 +2,16 @@ import { cache } from "react";
 
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
+import { isFoundationOrgsV1Enabled } from "@/lib/feature-flags";
 
 export const getShellI18n = cache(async (role: "client" | "lawyer" | "admin") => {
   const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
   const d = dict.dashboard;
   const m = dict.marketplace;
+  const orgsEnabled = isFoundationOrgsV1Enabled();
+  const orgNav = orgsEnabled
+    ? [{ href: "/organizations", label: d.navOrganizations }]
+    : [];
 
   const nav =
     role === "client"
@@ -16,6 +21,7 @@ export const getShellI18n = cache(async (role: "client" | "lawyer" | "admin") =>
           { href: "/client/bookings", label: d.navBookings },
           { href: "/client/notifications", label: d.navNotifications },
           { href: "/lawyers", label: d.navFindLawyers },
+          ...orgNav,
         ]
       : role === "lawyer"
         ? [
@@ -26,11 +32,16 @@ export const getShellI18n = cache(async (role: "client" | "lawyer" | "admin") =>
             { href: "/lawyer/availability", label: d.navAvailability },
             { href: "/lawyer/bookings", label: d.navBookings },
             { href: "/lawyer/notifications", label: d.navNotifications },
+            ...orgNav,
           ]
         : role === "admin"
           ? [
               { href: "/admin/dashboard", label: d.navDashboard },
               { href: "/admin/lawyers", label: d.navLawyerReview },
+              ...(process.env.NODE_ENV !== "production"
+                ? [{ href: "/admin/dev", label: d.navAdminDev }]
+                : []),
+              ...orgNav,
             ]
           : undefined;
 
