@@ -9,10 +9,7 @@ import { requireActor } from "@/application/common/require-actor";
 import { notificationRepository } from "@/infrastructure/repositories";
 import { NOTIFICATION_WRITE_RATE_LIMIT } from "@/infrastructure/security/rate-limiter";
 
-export async function markAllNotificationsReadAction(
-  _prev: ActionState = {},
-  _formData?: FormData,
-): Promise<ActionState> {
+export async function markAllNotificationsReadAction(): Promise<ActionState> {
   try {
     const actor = await requireActor();
     const limited = await enforceRateLimit(

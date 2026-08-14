@@ -1,8 +1,6 @@
 import type { Dictionary } from "@/i18n/types";
 
-export function LandingOsPreview({
-  t: _t,
-}: {
+export function LandingOsPreview({}: {
   t: Dictionary["landing"];
 }) {
   return (

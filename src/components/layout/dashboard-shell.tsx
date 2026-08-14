@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { logoutAction } from "@/application/actions/auth.actions";
 import { BRAND_LOGO_SHELL, BRAND_NAME } from "@/components/brand/tokens";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";

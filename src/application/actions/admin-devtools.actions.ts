@@ -192,10 +192,7 @@ export async function adminDevMakeDirectoryReadyAction(
   }
 }
 
-export async function adminDevBulkApproveAction(
-  _prev: ActionState,
-  _formData: FormData,
-): Promise<ActionState> {
+export async function adminDevBulkApproveAction(): Promise<ActionState> {
   try {
     const actor = await requireActor(UserRole.ADMIN);
     const { approved } = await bulkApprovePendingCredentialsDev(

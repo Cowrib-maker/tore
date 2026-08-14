@@ -43,13 +43,10 @@ export function LawyerProfileForm({
     updateLawyerProfileAction,
     initialState,
   );
-  // Single hidden field carries isListed. The visible checkbox has no `name`, so
-  // FormData cannot lose the value to a disabled control or get()/getAll ordering.
+  // Draft listing flag until submit. The parent remounts this form (key=updatedAt)
+  // after a successful save, so we do not mirror the isListed prop into state.
+  // Hidden field carries the value because a disabled checkbox is omitted from FormData.
   const [listed, setListed] = useState(isListed);
-
-  useEffect(() => {
-    setListed(isListed);
-  }, [isListed]);
 
   useEffect(() => {
     if (state.success) {
