@@ -9,7 +9,7 @@ import { LandingHow } from "@/components/marketing/landing-how";
 import { LandingKnowledge } from "@/components/marketing/landing-knowledge";
 import { LandingLegalAi } from "@/components/marketing/landing-legal-ai";
 import { LandingMarketplace } from "@/components/marketing/landing-marketplace";
-import { LandingNav } from "@/components/marketing/landing-nav";
+import { LandingNav, type LandingAuthUser } from "@/components/marketing/landing-nav";
 import { LandingReveal } from "@/components/marketing/landing-reveal";
 import {
   LandingEyebrow,
@@ -39,9 +39,20 @@ const sans = Plus_Jakarta_Sans({
 type LandingPageProps = {
   dict: Dictionary;
   locale: Locale;
+  authUser?: LandingAuthUser | null;
+  composerMode: "guest" | "client" | "other";
+  exploreHref: string;
+  dashboardHref: string;
 };
 
-export function LandingPage({ dict, locale }: LandingPageProps) {
+export function LandingPage({
+  dict,
+  locale,
+  authUser,
+  composerMode,
+  exploreHref,
+  dashboardHref,
+}: LandingPageProps) {
   const t = dict.landing;
 
   return (
@@ -53,11 +64,16 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
         "font-[family-name:var(--font-landing-sans)]",
       )}
     >
-      <LandingNav dict={dict} locale={locale} />
+      <LandingNav dict={dict} locale={locale} authUser={authUser} />
       <main>
-        <LandingHero t={t} />
+        <LandingHero
+          t={t}
+          exploreHref={exploreHref}
+          composerMode={composerMode}
+          dashboardHref={dashboardHref}
+        />
         <LandingExperiences t={t} />
-        <LandingLegalAi t={t} />
+        <LandingLegalAi t={t} exploreHref={exploreHref} />
         <LandingKnowledge t={t} />
         <LandingWorkspace t={t} />
         <LandingMarketplace t={t} />
@@ -77,7 +93,7 @@ export function LandingPage({ dict, locale }: LandingPageProps) {
           </div>
         </LandingSection>
       </main>
-      <LandingFooter dict={dict} />
+      <LandingFooter dict={dict} authUser={authUser} />
     </div>
   );
 }

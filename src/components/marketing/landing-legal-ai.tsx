@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { LandingReveal } from "@/components/marketing/landing-reveal";
 import {
   LandingEyebrow,
@@ -8,7 +10,13 @@ import {
 import type { Dictionary } from "@/i18n/types";
 import { cn } from "@/lib/utils";
 
-export function LandingLegalAi({ t }: { t: Dictionary["landing"] }) {
+export function LandingLegalAi({
+  t,
+  exploreHref,
+}: {
+  t: Dictionary["landing"];
+  exploreHref: string;
+}) {
   return (
     <LandingSection id="ai">
       <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-14">
@@ -18,6 +26,13 @@ export function LandingLegalAi({ t }: { t: Dictionary["landing"] }) {
           <LandingLead>{t.aiSupport}</LandingLead>
           <p className="mt-5 text-[14px] leading-7 text-[#5C6570]">{t.aiSupportDetail}</p>
           <p className="mt-5 text-sm font-medium text-[#0B1F3A]">{t.aiDisclaimer}</p>
+
+          <Link
+            href={exploreHref}
+            className="mt-8 inline-flex h-11 items-center rounded-lg bg-[#0B1F3A] px-5 text-[13px] font-semibold text-white transition hover:bg-[#16365F]"
+          >
+            {t.aiComposerSubmit}
+          </Link>
 
           <div className="mt-8 flex flex-wrap items-center gap-2 text-[11px] text-[#5C6570]">
             {t.aiTrustFlow.map((step, index) => (

@@ -171,6 +171,10 @@ export const marketplaceMn: MarketplaceDictionary = {
     consultations: "Хууль зүйн зөвлөгөө",
     consultationsHelp:
       "Лавлахаас лицензтэй өмгөөлөгч сонгож, уулзалтын хүсэлт илгээнэ үү.",
+    legalAi: "TORE Legal AI",
+    legalAiHelp:
+      "Хуулийн асуудлаа асууж, эрх зүйн мэдээлэл авч, шаардлагатай үед мэргэжлийн хуульчтай холбогдоно.",
+    legalAiCta: "Хууль зүйн тусламж авах →",
     emailTitle: "И-мэйл баталгаажуулалт",
     emailConfirmed: "И-мэйл хаяг баталгаажсан.",
     emailPending:

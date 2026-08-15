@@ -107,6 +107,9 @@ export const en: Dictionary = {
     aiSource: "Source · uploaded contract, clause 8.2",
     aiConfidence: "Needs professional review",
     aiAuthority: "Related authority · court interpretation on contractual limitation",
+    aiComposerPlaceholder: "Describe your legal question…",
+    aiComposerSubmit: "Get legal help →",
+    aiComposerGuestHint: "Sign in or register to continue.",
     knowledgeEyebrow: "Legal knowledge system",
     knowledgeTitle: "Reliable legal information. The foundation of TORE.",
     knowledgeSupport:
@@ -312,6 +315,7 @@ export const en: Dictionary = {
     navBookings: "Bookings",
     navNotifications: "Notifications",
     navFindLawyers: "Find lawyers",
+    navLegalAi: "TORE Legal AI",
     navVerification: "Verification",
     navOfferings: "Offerings",
     navAvailability: "Availability",

@@ -2,13 +2,15 @@
 
 import { FormEvent, useState } from "react";
 
+import { loginHrefForLegalAi } from "@/domain/services/rbac";
+
 type Message = {
   role: "USER" | "ASSISTANT";
   content: string;
 };
 
-export function LegalAiChat() {
-  const [message, setMessage] = useState("");
+export function LegalAiChat({ initialQuestion = "" }: { initialQuestion?: string }) {
+  const [message, setMessage] = useState(initialQuestion);
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversationId, setConversationId] = useState<string>();
   const [loading, setLoading] = useState(false);
@@ -49,6 +51,11 @@ export function LegalAiChat() {
       });
 
       const data = await response.json();
+
+      if (response.status === 401) {
+        window.location.assign(loginHrefForLegalAi(text));
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(data.error ?? "AI үйлчилгээтэй холбогдоход алдаа гарлаа.");

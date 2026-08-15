@@ -142,6 +142,9 @@ export type MarketplaceDictionary = {
     profileIncomplete: string;
     consultations: string;
     consultationsHelp: string;
+    legalAi: string;
+    legalAiHelp: string;
+    legalAiCta: string;
     emailTitle: string;
     emailConfirmed: string;
     emailPending: string;

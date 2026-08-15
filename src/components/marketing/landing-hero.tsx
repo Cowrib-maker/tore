@@ -6,7 +6,17 @@ import { LandingReveal } from "@/components/marketing/landing-reveal";
 import type { Dictionary } from "@/i18n/types";
 import { cn } from "@/lib/utils";
 
-export function LandingHero({ t }: { t: Dictionary["landing"] }) {
+export function LandingHero({
+  t,
+  exploreHref,
+  composerMode,
+  dashboardHref,
+}: {
+  t: Dictionary["landing"];
+  exploreHref: string;
+  composerMode: "guest" | "client" | "other";
+  dashboardHref: string;
+}) {
   return (
     <section className="relative overflow-hidden border-b border-[#0B1F3A]/8 bg-white">
       <div
@@ -33,7 +43,7 @@ export function LandingHero({ t }: { t: Dictionary["landing"] }) {
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
-                href="#platform"
+                href={exploreHref}
                 className={cn(
                   "inline-flex h-11 items-center justify-center rounded-lg bg-[#0B1F3A] px-5 text-[13px] font-semibold text-white transition hover:bg-[#16365F]",
                 )}
@@ -41,7 +51,7 @@ export function LandingHero({ t }: { t: Dictionary["landing"] }) {
                 {t.ctaExplore}
               </Link>
               <Link
-                href="/register/client"
+                href={composerMode === "guest" ? "/register/client" : "/lawyers"}
                 className="inline-flex h-11 items-center gap-1.5 rounded-lg border border-[#0B1F3A]/15 bg-white px-5 text-[13px] font-semibold text-[#0B1F3A] transition hover:bg-[#F4F6F8]"
               >
                 {t.ctaStart}
@@ -51,7 +61,11 @@ export function LandingHero({ t }: { t: Dictionary["landing"] }) {
           </LandingReveal>
 
           <LandingReveal delayMs={80} className="lg:pl-2">
-            <LandingOsPreview t={t} />
+            <LandingOsPreview
+              t={t}
+              composerMode={composerMode}
+              dashboardHref={dashboardHref}
+            />
           </LandingReveal>
         </div>
       </div>

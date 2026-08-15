@@ -18,6 +18,7 @@ describe("protected app route boundaries", () => {
     expect(isProtectedAppRoute("/lawyers/bat-erdene")).toBe(false);
     expect(isProtectedAppRoute("/lawyer")).toBe(true);
     expect(isProtectedAppRoute("/lawyer/dashboard")).toBe(true);
+    expect(isProtectedAppRoute("/legal-ai")).toBe(false);
   });
 
   it("treats /organizations as a shared authenticated surface", () => {

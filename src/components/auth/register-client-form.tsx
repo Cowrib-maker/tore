@@ -26,9 +26,11 @@ const initialState: ActionState = {};
 export function RegisterClientForm({
   copy,
   locale,
+  callbackUrl,
 }: {
   copy: Dictionary["auth"];
   locale: Locale;
+  callbackUrl?: string | null;
 }) {
   const [state, formAction, pending] = useActionState(
     registerClientAction,
@@ -41,8 +43,11 @@ export function RegisterClientForm({
         <CardTitle>{copy.clientTitle}</CardTitle>
         <CardDescription>{copy.clientDescription}</CardDescription>
       </CardHeader>
-      <form action={formAction}>
-        <CardContent className="space-y-4">
+        <form action={formAction}>
+          {callbackUrl ? (
+            <input type="hidden" name="callbackUrl" value={callbackUrl} />
+          ) : null}
+          <CardContent className="space-y-4">
           {state.error && (
             <div
               id="register-client-form-error"
@@ -157,7 +162,11 @@ export function RegisterClientForm({
           <p className="text-center text-sm text-muted-foreground">
             {copy.alreadyHave}{" "}
             <Link
-              href="/login"
+              href={
+                callbackUrl
+                  ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}`
+                  : "/login"
+              }
               className="text-primary underline-offset-4 hover:underline"
             >
               {copy.signInSubmit}

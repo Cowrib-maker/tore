@@ -78,6 +78,9 @@ export const zh: Dictionary = {
     aiSource: "来源 · 已上传合同第 8.2 条",
     aiConfidence: "需要专业审查",
     aiAuthority: "相关权威 · 关于合同限制的司法解释",
+    aiComposerPlaceholder: "请描述您的法律问题…",
+    aiComposerSubmit: "获取法律帮助 →",
+    aiComposerGuestHint: "请登录或注册后继续。",
     knowledgeEyebrow: "法律知识引擎",
     knowledgeTitle: "AI 的可靠程度，取决于其背后的法律知识",
     knowledgeSupport:
@@ -255,6 +258,7 @@ export const zh: Dictionary = {
     navBookings: "咨询申请",
     navNotifications: "通知",
     navFindLawyers: "查找律师",
+    navLegalAi: "TORE Legal AI",
     navVerification: "资质核验",
     navOfferings: "咨询服务",
     navAvailability: "可预约时段",

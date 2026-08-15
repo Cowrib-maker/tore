@@ -168,6 +168,10 @@ export const marketplaceEn: MarketplaceDictionary = {
     consultations: "Legal consultations",
     consultationsHelp:
       "Find licensed counsel in the directory and request an appointment.",
+    legalAi: "TORE Legal AI",
+    legalAiHelp:
+      "Ask a legal question, get legal information, and connect with a professional lawyer when you need one.",
+    legalAiCta: "Get legal help →",
     emailTitle: "Email confirmation",
     emailConfirmed: "Your email address is confirmed.",
     emailPending: "Confirm your email when prompted to keep your account secure.",

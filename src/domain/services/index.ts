@@ -1,7 +1,13 @@
 export {
   DASHBOARD_PATH,
   ROLE_ROUTE_PREFIX,
+  LEGAL_AI_PATH,
   getDashboardPath,
+  getPostAuthRedirect,
+  safeLegalAiCallback,
+  legalAiHref,
+  loginHrefForLegalAi,
+  registerClientHrefForLegalAi,
   canAccessRoute,
   isAccountUsable,
   assertRole,

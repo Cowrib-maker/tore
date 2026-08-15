@@ -5,7 +5,13 @@ import {
   PRIVILEGE_REFRESH_MS,
 } from "@/infrastructure/auth/auth.callbacks.node";
 import { UserRole, UserStatus } from "@/domain/enums";
-import { canAccessRoute, getDashboardPath } from "@/domain/services/rbac";
+import {
+  canAccessRoute,
+  getDashboardPath,
+  getPostAuthRedirect,
+  legalAiHref,
+  safeLegalAiCallback,
+} from "@/domain/services/rbac";
 
 const findById = vi.fn();
 
@@ -26,6 +32,27 @@ describe("RBAC route guards", () => {
     expect(canAccessRoute(UserRole.LAWYER, "/client/bookings")).toBe(false);
     expect(canAccessRoute(UserRole.ADMIN, "/admin/lawyers")).toBe(true);
     expect(canAccessRoute(UserRole.ADMIN, "/lawyer/dashboard")).toBe(true);
+  });
+});
+
+describe("Legal AI post-auth redirect", () => {
+  it("allows CLIENT to return to /legal-ai and rejects open redirects", () => {
+    expect(safeLegalAiCallback("/legal-ai")).toBe("/legal-ai");
+    expect(safeLegalAiCallback("/legal-ai?q=hello")).toBe("/legal-ai?q=hello");
+    expect(safeLegalAiCallback("https://evil.example/legal-ai")).toBeNull();
+    expect(safeLegalAiCallback("//evil.example")).toBeNull();
+    expect(safeLegalAiCallback("/client/dashboard")).toBeNull();
+
+    expect(getPostAuthRedirect(UserRole.CLIENT, "/legal-ai?q=hi")).toBe(
+      "/legal-ai?q=hi",
+    );
+    expect(getPostAuthRedirect(UserRole.LAWYER, "/legal-ai")).toBe(
+      "/lawyer/dashboard",
+    );
+    expect(getPostAuthRedirect(UserRole.ADMIN, "/legal-ai")).toBe(
+      "/admin/dashboard",
+    );
+    expect(legalAiHref("contract")).toBe("/legal-ai?q=contract");
   });
 });
 

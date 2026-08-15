@@ -1,12 +1,20 @@
 import { Children, type ReactNode } from "react";
 import Link from "next/link";
 
+import { logoutAction } from "@/application/actions/auth.actions";
 import { BrandTagline } from "@/components/brand/brand-tagline";
 import { BRAND_LOGO_LANDING } from "@/components/brand/tokens";
 import { BrandLink } from "@/components/layout/brand-link";
+import type { LandingAuthUser } from "@/components/marketing/landing-nav";
 import type { Dictionary } from "@/i18n/types";
 
-export function LandingFooter({ dict }: { dict: Dictionary }) {
+export function LandingFooter({
+  dict,
+  authUser,
+}: {
+  dict: Dictionary;
+  authUser?: LandingAuthUser | null;
+}) {
   const t = dict.landing;
   const year = new Date().getFullYear();
 
@@ -32,10 +40,27 @@ export function LandingFooter({ dict }: { dict: Dictionary }) {
             <a href="#how">{t.footerHow}</a>
           </FooterColumn>
           <FooterColumn title={t.footerAccounts}>
-            <Link href="/login">{dict.common.signIn}</Link>
-            <Link href="/register/client">{t.footerClientReg}</Link>
-            <Link href="/register/lawyer">{t.footerLawyerReg}</Link>
-            <Link href="/lawyers">{t.footerDirectory}</Link>
+            {authUser ? (
+              <>
+                <Link href={authUser.dashboardHref}>{authUser.displayName}</Link>
+                <form action={logoutAction}>
+                  <button
+                    type="submit"
+                    className="cursor-pointer text-left transition-colors hover:text-[#0B1F3A]"
+                  >
+                    {dict.common.signOut}
+                  </button>
+                </form>
+                <Link href="/lawyers">{t.footerDirectory}</Link>
+              </>
+            ) : (
+              <>
+                <Link href="/login">{dict.common.signIn}</Link>
+                <Link href="/register/client">{t.footerClientReg}</Link>
+                <Link href="/register/lawyer">{t.footerLawyerReg}</Link>
+                <Link href="/lawyers">{t.footerDirectory}</Link>
+              </>
+            )}
           </FooterColumn>
           <FooterColumn title={t.footerCompany}>
             <a href="#resources">{t.footerFaq}</a>

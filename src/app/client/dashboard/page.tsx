@@ -66,6 +66,17 @@ export default async function ClientDashboardPage() {
         {cd.intro}
       </p>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Card className="border-[#0B1F3A]/15 sm:col-span-2 lg:col-span-3">
+          <CardHeader>
+            <CardTitle>{cd.legalAi}</CardTitle>
+            <CardDescription>{cd.legalAiHelp}</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Link href="/legal-ai" className={cn(buttonVariants({ size: "sm" }))}>
+              {cd.legalAiCta}
+            </Link>
+          </CardFooter>
+        </Card>
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between gap-2">

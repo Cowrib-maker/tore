@@ -163,6 +163,10 @@ export const marketplaceZh: MarketplaceDictionary = {
     profileIncomplete: "请填写电话号码或机构名称以完善档案。",
     consultations: "法律咨询",
     consultationsHelp: "在目录中查找持证律师并申请预约。",
+    legalAi: "TORE Legal AI",
+    legalAiHelp:
+      "提出法律问题、获取法律信息，并在需要时联系专业律师。",
+    legalAiCta: "获取法律帮助 →",
     emailTitle: "邮箱确认",
     emailConfirmed: "您的邮箱地址已确认。",
     emailPending: "请按提示确认邮箱，以保障账户安全。",

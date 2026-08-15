@@ -78,6 +78,9 @@ export const ko: Dictionary = {
     aiSource: "출처 · 업로드된 계약, 8.2조",
     aiConfidence: "전문가 검토 필요",
     aiAuthority: "관련 권위 · 계약상 제한에 관한 해석",
+    aiComposerPlaceholder: "법률 질문을 입력하세요…",
+    aiComposerSubmit: "법률 도움 받기 →",
+    aiComposerGuestHint: "계속하려면 로그인하거나 회원가입하세요.",
     knowledgeEyebrow: "법률 지식 엔진",
     knowledgeTitle: "AI의 신뢰성은 그 뒤에 있는 법률 지식에 달려 있습니다",
     knowledgeSupport:
@@ -256,6 +259,7 @@ export const ko: Dictionary = {
     navBookings: "상담 신청",
     navNotifications: "알림",
     navFindLawyers: "변호사 찾기",
+    navLegalAi: "TORE Legal AI",
     navVerification: "자격 검증",
     navOfferings: "상담 서비스",
     navAvailability: "가능 시간",

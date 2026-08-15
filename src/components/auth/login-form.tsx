@@ -21,8 +21,17 @@ import type { Dictionary } from "@/i18n/types";
 
 const initialState: ActionState = {};
 
-export function LoginForm({ copy }: { copy: Dictionary["auth"] }) {
+export function LoginForm({
+  copy,
+  callbackUrl,
+}: {
+  copy: Dictionary["auth"];
+  callbackUrl?: string | null;
+}) {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
+  const registerHref = callbackUrl
+    ? `/register/client?callbackUrl=${encodeURIComponent(callbackUrl)}`
+    : "/register/client";
 
   return (
     <div className="flex w-full max-w-md flex-col gap-4">
@@ -32,6 +41,9 @@ export function LoginForm({ copy }: { copy: Dictionary["auth"] }) {
           <CardDescription>{copy.loginDescription}</CardDescription>
         </CardHeader>
         <form action={formAction}>
+          {callbackUrl ? (
+            <input type="hidden" name="callbackUrl" value={callbackUrl} />
+          ) : null}
           <CardContent className="space-y-4">
             {state.error && (
               <div
@@ -84,7 +96,7 @@ export function LoginForm({ copy }: { copy: Dictionary["auth"] }) {
             <p className="text-center text-sm text-muted-foreground">
               {copy.newToTore}{" "}
               <Link
-                href="/register/client"
+                href={registerHref}
                 className="text-primary underline-offset-4 hover:underline"
               >
                 {copy.registerClientLink}

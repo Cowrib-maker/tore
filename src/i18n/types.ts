@@ -65,6 +65,9 @@ export type Dictionary = {
     aiSource: string;
     aiConfidence: string;
     aiAuthority: string;
+    aiComposerPlaceholder: string;
+    aiComposerSubmit: string;
+    aiComposerGuestHint: string;
     knowledgeEyebrow: string;
     knowledgeTitle: string;
     knowledgeSupport: string;
@@ -199,6 +202,7 @@ export type Dictionary = {
     navBookings: string;
     navNotifications: string;
     navFindLawyers: string;
+    navLegalAi: string;
     navVerification: string;
     navOfferings: string;
     navAvailability: string;

@@ -164,6 +164,10 @@ export const marketplaceKo: MarketplaceDictionary = {
     profileIncomplete: "프로필을 완료하려면 전화번호 또는 기관명을 추가하십시오.",
     consultations: "법률 상담",
     consultationsHelp: "디렉터리에서 면허 변호사를 찾아 예약을 신청하십시오.",
+    legalAi: "TORE Legal AI",
+    legalAiHelp:
+      "법률 질문을 하고 법률 정보를 받으며, 필요할 때 전문 변호사와 연결됩니다.",
+    legalAiCta: "법률 도움 받기 →",
     emailTitle: "이메일 확인",
     emailConfirmed: "이메일 주소가 확인되었습니다.",
     emailPending: "계정 보안을 위해 안내에 따라 이메일을 확인해 주십시오.",

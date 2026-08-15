@@ -35,7 +35,7 @@ import {
   resetPasswordSchema,
 } from "@/application/validators/auth.schema";
 import { UserRole, UserStatus } from "@/domain/enums";
-import { getDashboardPath } from "@/domain/services/rbac";
+import { getDashboardPath, getPostAuthRedirect } from "@/domain/services/rbac";
 import {
   platformSettingRepository,
   unitOfWork,
@@ -93,7 +93,7 @@ export async function registerClientAction(
     redirect("/login");
   }
 
-  redirect(getDashboardPath(UserRole.CLIENT));
+  redirect(getPostAuthRedirect(UserRole.CLIENT, formData.get("callbackUrl")));
 }
 
 export async function registerLawyerAction(
@@ -181,7 +181,7 @@ export async function loginAction(
   const role = session?.user?.role as UserRole | undefined;
 
   if (role && role in UserRole) {
-    redirect(getDashboardPath(role));
+    redirect(getPostAuthRedirect(role, formData.get("callbackUrl")));
   }
 
   redirect("/");

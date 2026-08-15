@@ -5,6 +5,7 @@ import { UserRole, UserStatus } from "@/domain/enums";
 import {
   canAccessRoute,
   getDashboardPath,
+  getPostAuthRedirect,
   isProtectedAppRoute,
 } from "@/domain/services/rbac";
 import { isLocale, LOCALE_COOKIE } from "@/i18n/config";
@@ -58,7 +59,10 @@ export default auth((req) => {
       new URL("/login?error=account_inactive", req.nextUrl),
     );
   } else if (isAuthRoute && isLoggedIn && role && status === UserStatus.ACTIVE) {
-    response = NextResponse.redirect(new URL(getDashboardPath(role), req.nextUrl));
+    const callbackUrl = req.nextUrl.searchParams.get("callbackUrl");
+    response = NextResponse.redirect(
+      new URL(getPostAuthRedirect(role, callbackUrl), req.nextUrl),
+    );
   } else if (isProtectedRoute && isLoggedIn && role) {
     if (!canAccessRoute(role, pathname)) {
       response = NextResponse.redirect(new URL(getDashboardPath(role), req.nextUrl));
