@@ -57,6 +57,14 @@ export const envSchema = z.object({
     .transform((v) => v === "true"),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
+  /**
+   * Internal legal-data-engine HTTP base URL (server-only).
+   * Example: http://localhost:8080
+   */
+  ENGINE_BASE_URL: z.string().url().optional(),
+  /** Shared secret for Authorization: Bearer. Never expose to the browser. */
+  ENGINE_SERVICE_TOKEN: z.string().min(8).optional(),
+  ENGINE_TIMEOUT_MS: z.coerce.number().int().min(1000).max(30_000).default(8000),
 });
 
 export type Env = z.infer<typeof envSchema>;

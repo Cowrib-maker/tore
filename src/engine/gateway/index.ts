@@ -35,6 +35,7 @@ export type {
   PromptBuildInput,
   PromptBundle,
   UserTypeContext,
+  VerifiedLegalAuthority,
 } from "./types";
 
 export {

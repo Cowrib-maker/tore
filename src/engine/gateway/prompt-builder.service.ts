@@ -23,7 +23,10 @@ export class PromptBuilderService implements IPromptBuilder {
         audienceBlock(input.userType),
         turnKindBlock(turnKind, input),
         safetyBlock(),
-        corpusBlock(input.corpusAvailable === true),
+        corpusBlock(
+          input.corpusAvailable === true,
+          input.verifiedAuthorities,
+        ),
         intentBlock(input),
       ]
         .filter(Boolean)
@@ -120,11 +123,39 @@ function safetyBlock(): string {
 - Эх сурвалж ирээгүй бол "холбогдох эх сурвалжийг одоогоор татаж аваагүй" гэж хэл. Бүү зохио.`;
 }
 
-function corpusBlock(corpusAvailable: boolean): string {
-  if (corpusAvailable) {
-    return `Холбогдох эх сурвалж ирсэн. Зөвхөн өгсөн эхээс иш тат.`;
+function corpusBlock(
+  corpusAvailable: boolean,
+  authorities: PromptBuildInput["verifiedAuthorities"],
+): string {
+  if (corpusAvailable && authorities && authorities.length > 0) {
+    const sources = authorities
+      .map((item, index) => {
+        const effective = [
+          item.effectiveFrom ?? "effectiveFrom:unknown",
+          item.effectiveTo ?? "effectiveTo:unknown",
+        ].join(" → ");
+        return `[${index + 1}] ${item.title}
+locator: ${item.locator}
+documentId: ${item.documentId}
+documentVersionId: ${item.documentVersionId}
+nodeId: ${item.nodeId}
+effective: ${effective}
+excerpt:
+${item.excerpt}`;
+      })
+      .join("\n\n");
+    return `USER FACTS: хэрэглэгчийн мессеж дэх баримт. Үүнийг баталгаатай хууль гэж үзэхгүй.
+
+VERIFIED LEGAL SOURCES: доорх эх л баталгаатай. Зөвхөн эндээс иш тат.
+- Өгөгдөөгүй зүйл, заалт, шүүхийн хэрэг бүү зохио.
+- Retrieval хийгээгүй эхийг "шалгасан" гэж бүү хэл.
+- Олдсон дүрмийг энгийн монгол хэлээр тайлбарла.
+- Мэргэжлийн хууль зүйн зөвлөгөөнөөс ялга: энэ бол мэдээлэл.
+
+${sources}`;
   }
-  return `Хууль зүйн корпус / retrieval энэ шатанд холбогдоогүй. Иш, зүйлийн дугаар, шүүхийн шийдвэр бүү зохио.`;
+
+  return `Хууль зүйн корпус / retrieval энэ асуултад баталгаатай эх өгөөгүй. Иш, зүйлийн дугаар, шүүхийн шийдвэр бүү зохио.`;
 }
 
 function intentBlock(input: PromptBuildInput): string {

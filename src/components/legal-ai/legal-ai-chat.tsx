@@ -289,6 +289,121 @@ export function LegalAiChat({
     />
   );
 
+  const isEmpty = messages.length === 0;
+
+  const composer = (
+    <form
+      onSubmit={handleSubmit}
+      className={cn(
+        isEmpty
+          ? "mt-5 w-full"
+          : "border-t border-[#0B1F3A]/8 bg-white px-3 py-3 sm:px-6 sm:py-4",
+      )}
+    >
+      <div className={cn(isEmpty ? "w-full" : "mx-auto w-full max-w-3xl")}>
+        {pendingFiles.length > 0 ? (
+          <ul className="mb-2 flex flex-wrap gap-2">
+            {pendingFiles.map((file) => (
+              <li
+                key={file.id}
+                className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-[#F8FAFC] py-1 pr-1 pl-2.5 text-xs text-[#3F4852]"
+              >
+                {file.kind === "image" ? (
+                  <ImagePlus className="size-3.5 shrink-0" />
+                ) : (
+                  <Paperclip className="size-3.5 shrink-0" />
+                )}
+                <span className="truncate">{file.name}</span>
+                <button
+                  type="button"
+                  className="rounded-full p-1 hover:bg-[#0B1F3A]/8"
+                  aria-label={`${file.name} хасах`}
+                  onClick={() =>
+                    setPendingFiles((current) =>
+                      current.filter((item) => item.id !== file.id),
+                    )
+                  }
+                >
+                  <X className="size-3" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+
+        <div className="rounded-2xl border border-[#D9DEE5] bg-[#F8FAFC] p-2 shadow-[0_12px_32px_-24px_rgba(11,31,58,0.45)] focus-within:border-[#0B1F3A]/35">
+          <textarea
+            value={message}
+            onChange={(event) => setMessage(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                event.currentTarget.form?.requestSubmit();
+              }
+            }}
+            placeholder="Хууль зүйн асуудлаа бичих эсвэл файл хавсаргах..."
+            rows={2}
+            className="min-h-12 w-full resize-none bg-transparent px-3 py-2 text-sm leading-6 text-[#0A0F14] outline-none placeholder:text-[#9AA3AD]"
+            disabled={loading}
+          />
+          <div className="flex items-center justify-between gap-2 px-1 pb-1">
+            <div className="flex items-center gap-0.5">
+              <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                className="sr-only"
+                onChange={handleImageChange}
+              />
+              <input
+                ref={documentInputRef}
+                type="file"
+                accept="application/pdf,.pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                multiple
+                className="sr-only"
+                onChange={handleDocumentChange}
+              />
+              <ComposerIconButton
+                label="Зураг хавсаргах"
+                onClick={() => imageInputRef.current?.click()}
+              >
+                <ImagePlus className="size-4" />
+              </ComposerIconButton>
+              <ComposerIconButton
+                label="PDF, баримт хавсаргах"
+                onClick={() => documentInputRef.current?.click()}
+              >
+                <Paperclip className="size-4" />
+              </ComposerIconButton>
+              <ComposerIconButton
+                label={listening ? "Бичлэгийг зогсоох" : "Микрофон"}
+                pressed={listening}
+                onClick={toggleMicrophone}
+              >
+                <Mic className="size-4" />
+              </ComposerIconButton>
+            </div>
+            <Button
+              type="submit"
+              size="sm"
+              disabled={!message.trim() || loading}
+              className="gap-1.5 bg-[#0B1F3A] text-white hover:bg-[#173A66]"
+            >
+              <Send className="size-3.5" />
+              Илгээх
+            </Button>
+          </div>
+        </div>
+        <p className="mt-2 px-1 text-[11px] leading-4 text-[#8A939D]">
+          TORE Legal AI нь ерөнхий хууль зүйн мэдээлэл, урьдчилсан чиглэл
+          өгнө. Мэргэжлийн зөвлөгөө, төлөөлөл биш. Хавсаргасан файлыг
+          одоогоор шинжлэхгүй.
+        </p>
+      </div>
+    </form>
+  );
+
   return (
     <div className="flex h-svh min-h-0 flex-1 overflow-hidden bg-[#FAF9F7] text-[#0A0F14]">
       <aside className="hidden w-[17.5rem] shrink-0 lg:flex">{sidebar}</aside>
@@ -355,159 +470,57 @@ export function LegalAiChat({
           </div>
         </header>
 
-        <div
-          ref={transcriptRef}
-          className="min-h-0 flex-1 overflow-y-auto"
-        >
-          {messages.length === 0 ? (
-            <EmptyWorkspace
-              onQuickAction={(prompt) => {
-                setMessage(prompt);
-                setError("");
-              }}
-            />
-          ) : (
-            <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-8 sm:px-6">
-              {messages.map((item, index) => (
-                <MessageBubble key={`${item.role}-${index}`} message={item} />
-              ))}
-              {loading ? (
-                <div className="flex items-start gap-3">
-                  <WorkspaceMark />
-                  <div className="rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-white px-4 py-3 text-sm text-[#66717D] shadow-[0_8px_24px_-16px_rgba(11,31,58,0.35)]">
-                    TORE Legal AI хариулж байна...
-                  </div>
-                </div>
-              ) : null}
+        {isEmpty ? (
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+            <div className="mx-auto flex w-full max-w-[45rem] flex-1 flex-col justify-center px-4 py-8 sm:px-6">
+              <EmptyWorkspace
+                onQuickAction={(prompt) => {
+                  setMessage(prompt);
+                  setError("");
+                }}
+              />
               {error ? (
                 <div
                   role="alert"
-                  className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                  className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
                 >
                   {error}
                 </div>
               ) : null}
-            </div>
-          )}
-        </div>
-
-        {messages.length === 0 && error ? (
-          <div className="px-4 sm:px-6">
-            <div
-              role="alert"
-              className="mx-auto mb-3 max-w-3xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-            >
-              {error}
+              {composer}
             </div>
           </div>
-        ) : null}
-
-        <form
-          onSubmit={handleSubmit}
-          className="border-t border-[#0B1F3A]/8 bg-white px-3 py-3 sm:px-6 sm:py-4"
-        >
-          <div className="mx-auto w-full max-w-3xl">
-            {pendingFiles.length > 0 ? (
-              <ul className="mb-2 flex flex-wrap gap-2">
-                {pendingFiles.map((file) => (
-                  <li
-                    key={file.id}
-                    className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-[#F8FAFC] py-1 pr-1 pl-2.5 text-xs text-[#3F4852]"
-                  >
-                    {file.kind === "image" ? (
-                      <ImagePlus className="size-3.5 shrink-0" />
-                    ) : (
-                      <Paperclip className="size-3.5 shrink-0" />
-                    )}
-                    <span className="truncate">{file.name}</span>
-                    <button
-                      type="button"
-                      className="rounded-full p-1 hover:bg-[#0B1F3A]/8"
-                      aria-label={`${file.name} хасах`}
-                      onClick={() =>
-                        setPendingFiles((current) =>
-                          current.filter((item) => item.id !== file.id),
-                        )
-                      }
-                    >
-                      <X className="size-3" />
-                    </button>
-                  </li>
+        ) : (
+          <>
+            <div
+              ref={transcriptRef}
+              className="min-h-0 flex-1 overflow-y-auto"
+            >
+              <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-8 sm:px-6">
+                {messages.map((item, index) => (
+                  <MessageBubble key={`${item.role}-${index}`} message={item} />
                 ))}
-              </ul>
-            ) : null}
-
-            <div className="rounded-2xl border border-[#D9DEE5] bg-[#F8FAFC] p-2 shadow-[0_12px_32px_-24px_rgba(11,31,58,0.45)] focus-within:border-[#0B1F3A]/35">
-              <textarea
-                value={message}
-                onChange={(event) => setMessage(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" && !event.shiftKey) {
-                    event.preventDefault();
-                    event.currentTarget.form?.requestSubmit();
-                  }
-                }}
-                placeholder="Хууль зүйн асуудлаа бичих эсвэл файл хавсаргах..."
-                rows={2}
-                className="min-h-12 w-full resize-none bg-transparent px-3 py-2 text-sm leading-6 text-[#0A0F14] outline-none placeholder:text-[#9AA3AD]"
-                disabled={loading}
-              />
-              <div className="flex items-center justify-between gap-2 px-1 pb-1">
-                <div className="flex items-center gap-0.5">
-                  <input
-                    ref={imageInputRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    multiple
-                    className="sr-only"
-                    onChange={handleImageChange}
-                  />
-                  <input
-                    ref={documentInputRef}
-                    type="file"
-                    accept="application/pdf,.pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                    multiple
-                    className="sr-only"
-                    onChange={handleDocumentChange}
-                  />
-                  <ComposerIconButton
-                    label="Зураг хавсаргах"
-                    onClick={() => imageInputRef.current?.click()}
+                {loading ? (
+                  <div className="flex items-start gap-3">
+                    <WorkspaceMark />
+                    <div className="rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-white px-4 py-3 text-sm text-[#66717D] shadow-[0_8px_24px_-16px_rgba(11,31,58,0.35)]">
+                      TORE Legal AI хариулж байна...
+                    </div>
+                  </div>
+                ) : null}
+                {error ? (
+                  <div
+                    role="alert"
+                    className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
                   >
-                    <ImagePlus className="size-4" />
-                  </ComposerIconButton>
-                  <ComposerIconButton
-                    label="PDF, баримт хавсаргах"
-                    onClick={() => documentInputRef.current?.click()}
-                  >
-                    <Paperclip className="size-4" />
-                  </ComposerIconButton>
-                  <ComposerIconButton
-                    label={listening ? "Бичлэгийг зогсоох" : "Микрофон"}
-                    pressed={listening}
-                    onClick={toggleMicrophone}
-                  >
-                    <Mic className="size-4" />
-                  </ComposerIconButton>
-                </div>
-                <Button
-                  type="submit"
-                  size="sm"
-                  disabled={!message.trim() || loading}
-                  className="gap-1.5 bg-[#0B1F3A] text-white hover:bg-[#173A66]"
-                >
-                  <Send className="size-3.5" />
-                  Илгээх
-                </Button>
+                    {error}
+                  </div>
+                ) : null}
               </div>
             </div>
-            <p className="mt-2 px-1 text-[11px] leading-4 text-[#8A939D]">
-              TORE Legal AI нь ерөнхий хууль зүйн мэдээлэл, урьдчилсан чиглэл
-              өгнө. Мэргэжлийн зөвлөгөө, төлөөлөл биш. Хавсаргасан файлыг
-              одоогоор шинжлэхгүй.
-            </p>
-          </div>
-        </form>
+            {composer}
+          </>
+        )}
       </div>
     </div>
   );
@@ -601,7 +614,7 @@ function EmptyWorkspace({
   onQuickAction: (prompt: string) => void;
 }) {
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-2xl flex-col justify-center px-4 py-12 sm:px-6">
+    <div className="w-full">
       <div className="text-center">
         <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-[#0B1F3A]/8 bg-white shadow-[0_12px_32px_-18px_rgba(11,31,58,0.4)]">
           <ToreLogo variant="mark" tone="on-light" markClassName="size-8" />
@@ -609,16 +622,16 @@ function EmptyWorkspace({
         <p className="mt-6 text-[11px] font-semibold tracking-[0.18em] text-[#8A6B2A]">
           TORE LEGAL AI
         </p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-[#0A0F14] sm:text-[1.75rem]">
+        <h1 className="mt-2 text-[1.75rem] font-semibold leading-[1.2] tracking-[-0.03em] text-[#0A0F14] sm:text-[2rem]">
           Хууль зүйн асуудлаа бичнэ үү
         </h1>
-        <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-[#5C6570]">
+        <p className="mx-auto mt-3 max-w-lg text-[15px] leading-[1.6] text-[#5C6570]">
           Нөхцөл байдлаа энгийнээр тайлбарлаарай. Таны нөхцөл байдлыг ойлгож,
           холбогдох эрх зүйн чиглэлийг тодорхойлоход тусална.
         </p>
       </div>
 
-      <div className="mt-8 grid gap-2 sm:grid-cols-2">
+      <div className="mt-6 grid gap-2 sm:grid-cols-2">
         {QUICK_ACTIONS.map((action) => (
           <button
             key={action.id}

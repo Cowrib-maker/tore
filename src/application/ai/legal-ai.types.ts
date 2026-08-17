@@ -54,10 +54,10 @@ export type LegalAiStore = {
   createAssistantMessage(input: {
     conversationId: string;
     content: string;
-    provider: "OPENAI";
-    model: string;
-    inputTokens: number;
-    outputTokens: number;
+    provider?: "OPENAI";
+    model?: string;
+    inputTokens?: number;
+    outputTokens?: number;
   }): Promise<LegalAiAssistantMessage>;
   recordUsage(input: {
     userId: string;
@@ -65,6 +65,16 @@ export type LegalAiStore = {
     model: string;
     inputTokens: number;
     outputTokens: number;
+  }): Promise<void>;
+  createCitations(input: {
+    messageId: string;
+    citations: Array<{
+      title: string;
+      sourceType: string;
+      sourceUrl?: string | null;
+      reference?: string | null;
+      excerpt?: string | null;
+    }>;
   }): Promise<void>;
 };
 

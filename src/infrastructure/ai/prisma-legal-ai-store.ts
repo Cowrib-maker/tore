@@ -60,10 +60,10 @@ export class PrismaLegalAiStore implements LegalAiStore {
   async createAssistantMessage(input: {
     conversationId: string;
     content: string;
-    provider: "OPENAI";
-    model: string;
-    inputTokens: number;
-    outputTokens: number;
+    provider?: "OPENAI";
+    model?: string;
+    inputTokens?: number;
+    outputTokens?: number;
   }): Promise<LegalAiAssistantMessage> {
     const row = await prisma.aIMessage.create({
       data: {
@@ -99,6 +99,31 @@ export class PrismaLegalAiStore implements LegalAiStore {
         inputTokens: input.inputTokens,
         outputTokens: input.outputTokens,
       },
+    });
+  }
+
+  async createCitations(input: {
+    messageId: string;
+    citations: Array<{
+      title: string;
+      sourceType: string;
+      sourceUrl?: string | null;
+      reference?: string | null;
+      excerpt?: string | null;
+    }>;
+  }): Promise<void> {
+    if (input.citations.length === 0) {
+      return;
+    }
+    await prisma.aICitation.createMany({
+      data: input.citations.map((citation) => ({
+        messageId: input.messageId,
+        title: citation.title,
+        sourceType: citation.sourceType,
+        sourceUrl: citation.sourceUrl ?? null,
+        reference: citation.reference ?? null,
+        excerpt: citation.excerpt ?? null,
+      })),
     });
   }
 }

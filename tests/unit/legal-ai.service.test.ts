@@ -5,6 +5,8 @@ import {
   LegalAiService,
   resolveTurnKind,
 } from "@/application/ai/legal-ai.service";
+import type { LegalCorpusRetriever } from "@/application/ai/legal-corpus";
+import { CitationVerificationStatus } from "@/application/ai/legal-corpus";
 import type {
   LegalAiCompletionPort,
   LegalAiStore,
@@ -25,6 +27,7 @@ function createStore(): LegalAiStore & {
   userMessages: string[];
   assistantMessages: string[];
   usageCount: number;
+  citations: Array<{ messageId: string; title: string; sourceType: string }>;
 } {
   const conversations = new Map<string, { id: string; userId: string }>();
   const messages = new Map<string, LegalAiStoredMessage[]>();
@@ -35,6 +38,7 @@ function createStore(): LegalAiStore & {
     userMessages: [],
     assistantMessages: [],
     usageCount: 0,
+    citations: [],
     async findOwnedConversation(id, userId) {
       const row = conversations.get(id);
       if (!row || row.userId !== userId) {
@@ -74,6 +78,15 @@ function createStore(): LegalAiStore & {
     async recordUsage() {
       this.usageCount += 1;
     },
+    async createCitations(input) {
+      this.citations.push(
+        ...input.citations.map((citation) => ({
+          messageId: input.messageId,
+          title: citation.title,
+          sourceType: citation.sourceType,
+        })),
+      );
+    },
   };
 }
 
@@ -93,14 +106,83 @@ function createCompletion(
   };
 }
 
+function createRetriever(
+  retrieve: LegalCorpusRetriever["retrieveExactCitation"] = async () => ({
+    kind: "unavailable",
+    reason: "not_configured",
+    authorities: [],
+    retrievedAt: null,
+  }),
+  verify: LegalCorpusRetriever["verifyCitation"] = async () => ({
+    ok: false,
+    reason: "not_configured",
+  }),
+): LegalCorpusRetriever & {
+  retrieveExactCitation: ReturnType<typeof vi.fn>;
+  verifyCitation: ReturnType<typeof vi.fn>;
+} {
+  const retrieveExactCitation = vi.fn(retrieve);
+  const verifyCitation = vi.fn(verify);
+  return { retrieveExactCitation, verifyCitation };
+}
+
+function sampleVerdict(
+  status: (typeof CitationVerificationStatus)[keyof typeof CitationVerificationStatus] = CitationVerificationStatus.VALID,
+) {
+  if (status === CitationVerificationStatus.VALID) {
+    return {
+      query: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
+      status,
+      nodeId: "node-1",
+      documentVersionId: "ver-1",
+      locator: "art-17/p-1",
+      reasons: ["citation_unique"],
+    };
+  }
+  return {
+    query: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
+    status,
+    nodeId: null,
+    documentVersionId: null,
+    locator: null,
+    reasons:
+      status === CitationVerificationStatus.CONFLICT
+        ? ["citation_conflict"]
+        : ["citation_unresolved"],
+  };
+}
+
+function sampleAuthority(overrides: Partial<{
+  nodeId: string;
+  documentVersionId: string;
+  excerpt: string;
+}> = {}) {
+  return {
+    nodeId: overrides.nodeId ?? "node-1",
+    documentId: "doc-1",
+    documentVersionId: overrides.documentVersionId ?? "ver-1",
+    locator: "art-17/p-1",
+    title: "Эрүүгийн хууль",
+    excerpt: overrides.excerpt ?? "Гэмт хэрэг гэж хуулиар хориглосон үйлдэл.",
+    contentHash: "hash-node",
+    sourceContentHash: "hash-source",
+    parserId: "legalinfo-html-v1",
+    archiveRecordId: "arch-1",
+    effectiveFrom: "2017-07-01T00:00:00.000Z",
+    effectiveTo: null,
+  };
+}
+
 function createService(overrides?: {
   store?: ReturnType<typeof createStore>;
   completion?: ReturnType<typeof createCompletion>;
   reasoning?: ReturnType<typeof createReasoningEngine>;
+  corpusRetriever?: ReturnType<typeof createRetriever>;
 }) {
   const store = overrides?.store ?? createStore();
   const completion = overrides?.completion ?? createCompletion();
   const reasoning = overrides?.reasoning ?? createReasoningEngine();
+  const corpusRetriever = overrides?.corpusRetriever ?? createRetriever();
   const service = new LegalAiService({
     domainFilter: new RuleBasedDomainFilter(),
     userTypeService: new UserTypeService(),
@@ -109,8 +191,9 @@ function createService(overrides?: {
     reasoning,
     store,
     completion,
+    corpusRetriever,
   });
-  return { service, store, completion, reasoning };
+  return { service, store, completion, reasoning, corpusRetriever };
 }
 
 describe("resolveTurnKind", () => {
@@ -152,7 +235,9 @@ describe("LegalAiService", () => {
   it("answers an authenticated legal question and persists both messages", async () => {
     const reasoning = createReasoningEngine();
     const prepare = vi.spyOn(reasoning, "prepare");
-    const { service, store, completion } = createService({ reasoning });
+    const { service, store, completion, corpusRetriever } = createService({
+      reasoning,
+    });
 
     const result = await service.createTurn({
       userId: "user-1",
@@ -171,13 +256,15 @@ describe("LegalAiService", () => {
 
     const systemPrompt = completion.complete.mock.calls[0]?.[0]?.systemPrompt ?? "";
     expect(systemPrompt).toContain("хууль зүйн мэдээллийн асуулт");
-    expect(systemPrompt).toContain("холбогдоогүй");
+    expect(systemPrompt).toContain("баталгаатай эх өгөөгүй");
+    expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
+    expect(corpusRetriever.verifyCitation).not.toHaveBeenCalled();
   });
 
   it("answers an authenticated general question without legal retrieval", async () => {
     const reasoning = createReasoningEngine();
     const prepare = vi.spyOn(reasoning, "prepare");
-    const { service, completion } = createService({ reasoning });
+    const { service, completion, corpusRetriever } = createService({ reasoning });
 
     const result = await service.createTurn({
       userId: "user-1",
@@ -186,6 +273,8 @@ describe("LegalAiService", () => {
 
     expect(result.turnKind).toBe(PromptTurnKind.GENERAL);
     expect(prepare).not.toHaveBeenCalled();
+    expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
+    expect(corpusRetriever.verifyCitation).not.toHaveBeenCalled();
     const systemPrompt = completion.complete.mock.calls[0]?.[0]?.systemPrompt ?? "";
     expect(systemPrompt).toContain("ердийн / хууль зүйн бус");
     expect(systemPrompt).toContain("Хэвийн, тустай хариул");
@@ -339,5 +428,189 @@ describe("LegalAiService", () => {
       statusCode: 400,
     } satisfies Partial<LegalAiError>);
     expect(store.conversations.size).toBe(0);
+  });
+
+  it("passes a verified exact citation into OpenAI context and persists AICitation", async () => {
+    const corpusRetriever = createRetriever(
+      async () => ({
+        kind: "retrieved",
+        status: "ok",
+        retrievedAt: "2026-08-17T00:00:00.000Z",
+        authorities: [sampleAuthority()],
+      }),
+      async () => ({
+        ok: true,
+        verdict: sampleVerdict(CitationVerificationStatus.VALID),
+      }),
+    );
+    const { service, store, completion } = createService({ corpusRetriever });
+
+    const result = await service.createTurn({
+      userId: "user-1",
+      message: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
+    });
+
+    expect(corpusRetriever.retrieveExactCitation).toHaveBeenCalledWith({
+      question: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
+      query: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
+      locator: "art-17/p-1",
+    });
+    expect(corpusRetriever.verifyCitation).toHaveBeenCalledWith({
+      query: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
+      nodeId: "node-1",
+      documentId: "doc-1",
+      locator: "art-17/p-1",
+    });
+    const systemPrompt = completion.complete.mock.calls[0]?.[0]?.systemPrompt ?? "";
+    expect(systemPrompt).toContain("VERIFIED LEGAL SOURCES");
+    expect(systemPrompt).toContain("Гэмт хэрэг гэж хуулиар хориглосон үйлдэл.");
+    expect(systemPrompt).toContain("ver-1");
+    expect(store.citations).toEqual([
+      {
+        messageId: result.message.id,
+        title: "Эрүүгийн хууль",
+        sourceType: "legal-data-engine",
+      },
+    ]);
+    expect(store.usageCount).toBe(1);
+  });
+
+  it("does not treat a unique retrieve match as law until official verification is VALID", async () => {
+    const corpusRetriever = createRetriever(
+      async () => ({
+        kind: "retrieved",
+        status: "ok",
+        authorities: [sampleAuthority()],
+        retrievedAt: "2026-08-17T00:00:00.000Z",
+      }),
+      async () => ({
+        ok: true,
+        verdict: sampleVerdict(CitationVerificationStatus.UNRESOLVED),
+      }),
+    );
+    const { service, store, completion } = createService({ corpusRetriever });
+
+    const result = await service.createTurn({
+      userId: "user-1",
+      message: "Эрүүгийн хуулийн 17.1",
+    });
+
+    expect(corpusRetriever.retrieveExactCitation).toHaveBeenCalledOnce();
+    expect(corpusRetriever.verifyCitation).toHaveBeenCalledOnce();
+    expect(completion.complete).not.toHaveBeenCalled();
+    expect(store.citations).toEqual([]);
+    expect(store.usageCount).toBe(0);
+    expect(result.message.content).toContain("баталгаажуулж чадсангүй");
+    expect(result.message.content).toContain("таамгаар тайлбарлахгүй");
+  });
+
+  it("does not treat official CONFLICT as authoritative law", async () => {
+    const corpusRetriever = createRetriever(
+      async () => ({
+        kind: "retrieved",
+        status: "ok",
+        authorities: [
+          sampleAuthority(),
+          sampleAuthority({ nodeId: "node-2", documentVersionId: "ver-2" }),
+        ],
+        retrievedAt: "2026-08-17T00:00:00.000Z",
+      }),
+      async () => ({
+        ok: true,
+        verdict: sampleVerdict(CitationVerificationStatus.CONFLICT),
+      }),
+    );
+    const { service, completion, store } = createService({ corpusRetriever });
+
+    const result = await service.createTurn({
+      userId: "user-1",
+      message: "Хөдөлмөрийн тухай хуулийн 43 дугаар зүйл",
+    });
+
+    expect(corpusRetriever.verifyCitation).toHaveBeenCalledOnce();
+    expect(completion.complete).not.toHaveBeenCalled();
+    expect(store.citations).toEqual([]);
+    expect(result.message.content).toContain("нэг утгатай баталгаажуулж чадсангүй");
+  });
+
+  it("does not guess a version when AS_OF_UNAVAILABLE", async () => {
+    const corpusRetriever = createRetriever(async () => ({
+      kind: "as_of_unavailable",
+      authorities: [],
+      retrievedAt: "2026-08-17T00:00:00.000Z",
+    }));
+    const { service, completion, corpusRetriever: retriever } = createService({
+      corpusRetriever,
+    });
+
+    const result = await service.createTurn({
+      userId: "user-1",
+      message: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
+    });
+
+    expect(retriever.verifyCitation).not.toHaveBeenCalled();
+    expect(completion.complete).not.toHaveBeenCalled();
+    expect(result.message.content).toContain("хүчинтэй хувилбар");
+  });
+
+  it("returns a safe source-unavailable reply when retrieve times out", async () => {
+    const corpusRetriever = createRetriever(async () => ({
+      kind: "unavailable",
+      reason: "timeout",
+      authorities: [],
+      retrievedAt: null,
+    }));
+    const { service, completion, store } = createService({ corpusRetriever });
+
+    const result = await service.createTurn({
+      userId: "user-1",
+      message: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
+    });
+
+    expect(corpusRetriever.verifyCitation).not.toHaveBeenCalled();
+    expect(completion.complete).not.toHaveBeenCalled();
+    expect(store.citations).toEqual([]);
+    expect(result.message.content).toContain("холбогдож чадсангүй");
+  });
+
+  it("returns a safe source-unavailable reply when verify is 401/403/500/timeout", async () => {
+    for (const reason of [
+      "unauthorized",
+      "server_error",
+      "timeout",
+    ] as const) {
+      const corpusRetriever = createRetriever(
+        async () => ({
+          kind: "retrieved",
+          status: "ok",
+          authorities: [sampleAuthority()],
+          retrievedAt: "2026-08-17T00:00:00.000Z",
+        }),
+        async () => ({ ok: false, reason }),
+      );
+      const { service, completion, store } = createService({ corpusRetriever });
+
+      const result = await service.createTurn({
+        userId: "user-1",
+        message: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
+      });
+
+      expect(completion.complete).not.toHaveBeenCalled();
+      expect(store.citations).toEqual([]);
+      expect(result.message.content).toContain("холбогдож чадсангүй");
+    }
+  });
+
+  it("does not call retrieve or verify for a legal question without an exact citation", async () => {
+    const { service, corpusRetriever, completion } = createService();
+
+    await service.createTurn({
+      userId: "user-1",
+      message: "Ажлаас үндэслэлгүй халагдсан бол яах вэ?",
+    });
+
+    expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
+    expect(corpusRetriever.verifyCitation).not.toHaveBeenCalled();
+    expect(completion.complete).toHaveBeenCalledOnce();
   });
 });

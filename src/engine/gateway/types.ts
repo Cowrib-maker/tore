@@ -120,8 +120,21 @@ export type PromptBuildInput = {
   intentType?: string;
   intentConfidence?: number;
   missingInformation?: readonly string[];
-  /** Phase 1: always false. Do not claim corpus retrieval occurred. */
+  /** True only when verified corpus authorities are attached. */
   corpusAvailable?: boolean;
+  verifiedAuthorities?: readonly VerifiedLegalAuthority[];
+};
+
+/** A retrieved statute excerpt that may be cited. */
+export type VerifiedLegalAuthority = {
+  title: string;
+  locator: string;
+  excerpt: string;
+  documentId: string;
+  documentVersionId: string;
+  nodeId: string;
+  effectiveFrom: string | null;
+  effectiveTo: string | null;
 };
 
 /** Prompt payload a future completion adapter can send to a model. */

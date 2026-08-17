@@ -27,3 +27,7 @@ export {
   parseDottedPinpoint,
   pinpointKey,
 } from "./pinpoint";
+export {
+  detectExactCitation,
+} from "./parse-exact-citation-query";
+export type { DetectedExactCitation } from "./parse-exact-citation-query";
