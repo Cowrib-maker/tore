@@ -44,6 +44,9 @@ const AS_OF_UNAVAILABLE_MESSAGE =
 const ENGINE_UNAVAILABLE_MESSAGE =
   "Баталгаатай эрх зүйн эх сурвалжид одоогоор холбогдож чадсангүй. Тиймээс заалтын агуулгыг таамгаар тайлбарлахгүй.";
 
+const NON_LEGAL_REFUSAL_MESSAGE =
+  "Би TORE Legal AI — хууль зүйн асуудлаар туслах зориулалттай AI. Таны асуулт хууль зүйн асуудалтай холбоогүй байна. Хэрэв танд хууль, эрх зүйн асуудал байгаа бол нөхцөл байдлаа бичээрэй, би тусалъя.";
+
 export type LegalAiServiceDependencies = {
   domainFilter: IDomainFilter;
   userTypeService: IUserTypeService;
@@ -73,7 +76,10 @@ export class LegalAiService {
       throw new LegalAiError("Асуултаа оруулна уу.", 400);
     }
 
-    if (!this.dependencies.completion.isConfigured()) {
+    const domainResult = await this.dependencies.domainFilter.classify(message);
+    const isNonLegal = domainResult.domain === DomainLabel.NON_LEGAL;
+
+    if (!isNonLegal && !this.dependencies.completion.isConfigured()) {
       console.error("OPENAI_API_KEY is not configured.");
       throw new LegalAiError("AI үйлчилгээний тохиргоо хийгдээгүй байна.", 500);
     }
@@ -89,6 +95,14 @@ export class LegalAiService {
       content: message,
     });
 
+    if (isNonLegal) {
+      return this.persistSafeReply({
+        conversationId: conversation.id,
+        content: NON_LEGAL_REFUSAL_MESSAGE,
+        turnKind: PromptTurnKind.GENERAL,
+      });
+    }
+
     const history = await this.dependencies.store.listMessages(
       conversation.id,
       HISTORY_LIMIT,
@@ -97,7 +111,6 @@ export class LegalAiService {
     const userType = this.dependencies.userTypeService.resolve(
       input.userContext,
     );
-    const domainResult = await this.dependencies.domainFilter.classify(message);
     const intent = await this.dependencies.intent.classify(message);
     const turnKind = resolveTurnKind(domainResult.domain, intent);
     const exactCitation = detectExactCitation(message);
@@ -123,10 +136,7 @@ export class LegalAiService {
         ? verifiedResolution.authorities
         : undefined;
 
-    const reasoningPlan =
-      turnKind === PromptTurnKind.GENERAL
-        ? null
-        : this.prepareReasoningPlan(message, intent);
+    const reasoningPlan = this.prepareReasoningPlan(message, intent);
 
     const prompt = this.dependencies.promptBuilder.build({
       message,

@@ -173,6 +173,9 @@ function sampleAuthority(overrides: Partial<{
   };
 }
 
+const NON_LEGAL_REFUSAL_MESSAGE =
+  "Би TORE Legal AI — хууль зүйн асуудлаар туслах зориулалттай AI. Таны асуулт хууль зүйн асуудалтай холбоогүй байна. Хэрэв танд хууль, эрх зүйн асуудал байгаа бол нөхцөл байдлаа бичээрэй, би тусалъя.";
+
 function createService(overrides?: {
   store?: ReturnType<typeof createStore>;
   completion?: ReturnType<typeof createCompletion>;
@@ -183,17 +186,18 @@ function createService(overrides?: {
   const completion = overrides?.completion ?? createCompletion();
   const reasoning = overrides?.reasoning ?? createReasoningEngine();
   const corpusRetriever = overrides?.corpusRetriever ?? createRetriever();
+  const intent = createIntentEngine();
   const service = new LegalAiService({
     domainFilter: new RuleBasedDomainFilter(),
     userTypeService: new UserTypeService(),
     promptBuilder: new PromptBuilderService(),
-    intent: createIntentEngine(),
+    intent,
     reasoning,
     store,
     completion,
     corpusRetriever,
   });
-  return { service, store, completion, reasoning, corpusRetriever };
+  return { service, store, completion, reasoning, corpusRetriever, intent };
 }
 
 describe("resolveTurnKind", () => {
@@ -261,24 +265,31 @@ describe("LegalAiService", () => {
     expect(corpusRetriever.verifyCitation).not.toHaveBeenCalled();
   });
 
-  it("answers an authenticated general question without legal retrieval", async () => {
+  it("refuses a non-legal question without calling OpenAI or the legal corpus", async () => {
     const reasoning = createReasoningEngine();
     const prepare = vi.spyOn(reasoning, "prepare");
-    const { service, completion, corpusRetriever } = createService({ reasoning });
+    const { service, store, completion, corpusRetriever, intent } = createService({
+      reasoning,
+    });
+    const classify = vi.spyOn(intent, "classify");
 
     const result = await service.createTurn({
       userId: "user-1",
-      message: "Маргааш Улаанбаатарт цаг агаар ямар байх вэ?",
+      message: "Elon Musk хэдэн хүүхэдтэй вэ?",
     });
 
     expect(result.turnKind).toBe(PromptTurnKind.GENERAL);
+    expect(result.message.content).toBe(NON_LEGAL_REFUSAL_MESSAGE);
+    expect(result.usage).toEqual({ inputTokens: 0, outputTokens: 0 });
+    expect(store.conversations.size).toBe(1);
+    expect(store.userMessages).toEqual(["Elon Musk хэдэн хүүхэдтэй вэ?"]);
+    expect(store.assistantMessages).toEqual([NON_LEGAL_REFUSAL_MESSAGE]);
+    expect(store.usageCount).toBe(0);
+    expect(classify).not.toHaveBeenCalled();
     expect(prepare).not.toHaveBeenCalled();
+    expect(completion.complete).not.toHaveBeenCalled();
     expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
     expect(corpusRetriever.verifyCitation).not.toHaveBeenCalled();
-    const systemPrompt = completion.complete.mock.calls[0]?.[0]?.systemPrompt ?? "";
-    expect(systemPrompt).toContain("ердийн / хууль зүйн бус");
-    expect(systemPrompt).toContain("Хэвийн, тустай хариул");
-    expect(systemPrompt).not.toContain("Хууль зүйн горимыг идэвхжүүл");
   });
 
   it("treats an ambiguous legal question as clarification, not a firm conclusion", async () => {
@@ -606,11 +617,56 @@ describe("LegalAiService", () => {
 
     await service.createTurn({
       userId: "user-1",
-      message: "Ажлаас үндэслэлгүй халагдсан бол яах вэ?",
+      message: "Гэрээ цуцлах журам юу вэ?",
     });
 
     expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
     expect(corpusRetriever.verifyCitation).not.toHaveBeenCalled();
     expect(completion.complete).toHaveBeenCalledOnce();
+  });
+
+  it("still calls OpenAI for a legal question when no exact citation requires corpus retrieval", async () => {
+    const { service, completion, corpusRetriever } = createService();
+
+    const result = await service.createTurn({
+      userId: "user-1",
+      message: "Хөдөлмөрийн гэрээг хэрхэн цуцлах вэ?",
+    });
+
+    expect(result.turnKind).toBe(PromptTurnKind.LEGAL);
+    expect(result.message.content).toBe("mocked-answer");
+    expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
+    expect(corpusRetriever.verifyCitation).not.toHaveBeenCalled();
+    expect(completion.complete).toHaveBeenCalledOnce();
+  });
+
+  it("uses retrieve then verify then OpenAI for an exact legal citation", async () => {
+    const corpusRetriever = createRetriever(
+      async () => ({
+        kind: "retrieved",
+        status: "ok",
+        retrievedAt: "2026-08-17T00:00:00.000Z",
+        authorities: [sampleAuthority()],
+      }),
+      async () => ({
+        ok: true,
+        verdict: sampleVerdict(CitationVerificationStatus.VALID),
+      }),
+    );
+    const { service, completion } = createService({ corpusRetriever });
+
+    await service.createTurn({
+      userId: "user-1",
+      message: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
+    });
+
+    expect(corpusRetriever.retrieveExactCitation).toHaveBeenCalledOnce();
+    expect(corpusRetriever.verifyCitation).toHaveBeenCalledOnce();
+    expect(completion.complete).toHaveBeenCalledOnce();
+    const retrieveOrder = corpusRetriever.retrieveExactCitation.mock.invocationCallOrder[0];
+    const verifyOrder = corpusRetriever.verifyCitation.mock.invocationCallOrder[0];
+    const completeOrder = completion.complete.mock.invocationCallOrder[0];
+    expect(retrieveOrder).toBeLessThan(verifyOrder);
+    expect(verifyOrder).toBeLessThan(completeOrder);
   });
 });
