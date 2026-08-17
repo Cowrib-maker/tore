@@ -16,6 +16,7 @@ import { UserTypeService } from "./user-type.service";
 export {
   DomainLabel,
   GatewayResponseType,
+  PromptTurnKind,
   UserType,
 } from "./types";
 export type {

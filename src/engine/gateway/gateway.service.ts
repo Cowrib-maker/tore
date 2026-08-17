@@ -37,7 +37,8 @@ export class GatewayService {
 
   /**
    * Runs filter → user type → prompt (legal only) → unified response.
-   * Model completion is intentionally omitted until chat is migrated.
+   * The application chat adapter answers ordinary NON_LEGAL questions;
+   * this method still classifies them for the unused pipeline path.
    */
   async createTurn(request: GatewayRequest): Promise<GatewayTurn> {
     const message = request.message.trim();

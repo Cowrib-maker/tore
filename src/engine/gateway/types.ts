@@ -96,11 +96,32 @@ export type GatewayResponse = {
   metadata: Record<string, unknown>;
 };
 
+/**
+ * How the application adapter should instruct the model.
+ * `GENERAL` answers ordinary questions. `AMBIGUOUS` asks to clarify
+ * instead of asserting unsupported legal conclusions.
+ */
+export const PromptTurnKind = {
+  LEGAL: "LEGAL",
+  GENERAL: "GENERAL",
+  AMBIGUOUS: "AMBIGUOUS",
+} as const;
+
+export type PromptTurnKind =
+  (typeof PromptTurnKind)[keyof typeof PromptTurnKind];
+
 /** Inputs used to build a model prompt. No model is invoked here. */
 export type PromptBuildInput = {
   message: string;
   userType: UserType;
   domain: DomainLabel;
+  /** Defaults from {@link domain} when omitted (LEGAL vs GENERAL). */
+  turnKind?: PromptTurnKind;
+  intentType?: string;
+  intentConfidence?: number;
+  missingInformation?: readonly string[];
+  /** Phase 1: always false. Do not claim corpus retrieval occurred. */
+  corpusAvailable?: boolean;
 };
 
 /** Prompt payload a future completion adapter can send to a model. */
