@@ -17,11 +17,14 @@ export type LegalAiAssistantMessage = {
   content: string;
 };
 
+export type LegalAiMode = "CITIZEN" | "PROFESSIONAL";
+
 export type LegalAiCreateTurnInput = {
   userId: string;
   message: string;
   conversationId?: string;
   userContext?: UserTypeContext;
+  mode?: LegalAiMode;
 };
 
 export type LegalAiCreateTurnResult = {

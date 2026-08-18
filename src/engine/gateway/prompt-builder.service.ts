@@ -21,9 +21,9 @@ export class PromptBuilderService implements IPromptBuilder {
       systemPrompt: [
         SHARED_PREAMBLE,
         audienceBlock(input.userType),
-        turnKindBlock(turnKind, input),
-        safetyBlock(),
-        corpusBlock(
+turnKindBlock(turnKind, input),
+professionalModeBlock(input.mode),
+safetyBlock(),        corpusBlock(
           input.corpusAvailable === true,
           input.verifiedAuthorities,
         ),
@@ -164,4 +164,38 @@ function intentBlock(input: PromptBuildInput): string {
     return "";
   }
   return `Дутуу гэж тооцсон зүйлс (систем): ${gaps.join(", ")}. Эдгээрийг баримт гэж үзэхгүй. Шаардлагатай бол хэрэглэгчээс тодруул.`;
+}
+function professionalModeBlock(
+  mode: PromptBuildInput["mode"],
+): string {
+  if (mode !== "PROFESSIONAL") {
+    return "";
+  }
+
+  return `PROFESSIONAL LEGAL ASSISTANT MODE
+
+Та хуульч, өмгөөлөгч болон хуульчийн туслахад зориулсан
+мэргэжлийн эрх зүйн AI туслах байна.
+
+Хариултыг боломжтой үед дараах бүтэцтэй өг:
+
+1. Эрх зүйн асуудал
+2. Холбогдох эрх зүйн зохицуулалт
+3. Хэрэглэх боломжтой хууль, зүйл, заалт
+4. Эрх зүйн шинжилгээ
+5. Эрсдэл болон эсрэг тайлбар
+6. Нэмэлт шаардлагатай баримт, нөхцөл
+7. Дараагийн ажиллагааны санал
+
+Мэргэжлийн хэрэглэгчийн түвшинд нарийвчилж хариул.
+Гэхдээ баталгаажаагүй хууль, зүйл, заалт, шүүхийн шийдвэр,
+эх сурвалжийг зохиож болохгүй.
+
+Баталгаатай corpus source өгөгдсөн бол зөвхөн түүнийг
+эрх зүйн эх сурвалжийн үндэслэл болгон ашигла.
+Corpus source байхгүй бол тодорхой бус мэдээллийг
+баталгаатай мэт бүү илэрхийл.
+
+Хэрэглэгчийн өгсөн баримт, таамаглал, баталгаатай эрх зүйн
+эх сурвалжийг хооронд нь ялгаж ажилла.`;
 }

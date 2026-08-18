@@ -108,6 +108,7 @@ export function LegalAiChat({
 }: LegalAiChatProps) {
   const [message, setMessage] = useState(initialQuestion);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [mode, setMode] = useState<"CITIZEN" | "PROFESSIONAL">("CITIZEN");
   const [conversationId, setConversationId] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -226,10 +227,11 @@ export function LegalAiChat({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          message: text,
-          conversationId,
-        }),
+     body: JSON.stringify({
+  message: text,
+  conversationId,
+  mode,
+}),
       });
 
       const data = (await response.json()) as {
@@ -442,7 +444,60 @@ export function LegalAiChat({
                 Хууль зүйн ажлын талбар
               </p>
             </div>
-          </div>
+<div className="hidden items-center rounded-lg bg-[#F1F3F5] p-0.5 sm:flex">
+  <button
+    type="button"
+    onClick={() => setMode("CITIZEN")}
+    className={cn(
+      "rounded-md px-3 py-1.5 text-xs font-medium transition",
+      mode === "CITIZEN"
+        ? "bg-white text-[#0B1F3A] shadow-sm"
+        : "text-[#66717D]",
+    )}
+  >
+    Иргэн
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setMode("PROFESSIONAL")}
+    className={cn(
+      "rounded-md px-3 py-1.5 text-xs font-medium transition",
+      mode === "PROFESSIONAL"
+        ? "bg-[#0B1F3A] text-white shadow-sm"
+        : "text-[#66717D]",
+    )}
+  >
+    Хуульч / Өмгөөлөгч
+  </button>
+</div>
+          </div><div className="hidden items-center rounded-lg border border-[#D9DEE5] bg-[#F8FAFC] p-1 sm:flex">
+  <button
+    type="button"
+    onClick={() => setMode("CITIZEN")}
+    className={cn(
+      "rounded-md px-3 py-1.5 text-xs font-medium transition",
+      mode === "CITIZEN"
+        ? "bg-white text-[#0B1F3A] shadow-sm"
+        : "text-[#66717D] hover:text-[#0B1F3A]",
+    )}
+  >
+    Иргэн
+  </button>
+
+  <button
+    type="button"
+    onClick={() => setMode("PROFESSIONAL")}
+    className={cn(
+      "rounded-md px-3 py-1.5 text-xs font-medium transition",
+      mode === "PROFESSIONAL"
+        ? "bg-[#0B1F3A] text-white shadow-sm"
+        : "text-[#66717D] hover:text-[#0B1F3A]",
+    )}
+  >
+    Хуульч / Өмгөөлөгч
+  </button>
+</div>
           <div className="flex shrink-0 items-center gap-2 text-sm">
             {dashboardHref ? (
               <Link

@@ -139,18 +139,19 @@ export class LegalAiService {
     const reasoningPlan = this.prepareReasoningPlan(message, intent);
 
     const prompt = this.dependencies.promptBuilder.build({
-      message,
-      userType,
-      domain: domainResult.domain,
-      turnKind,
-      intentType: intent.intent,
-      intentConfidence: intent.confidence,
-      missingInformation: verifiedAuthorities?.length
-        ? undefined
-        : reasoningPlan?.missingInformation,
-      corpusAvailable: Boolean(verifiedAuthorities?.length),
-      verifiedAuthorities,
-    });
+  message,
+  userType,
+  domain: domainResult.domain,
+  turnKind,
+  mode: input.mode ?? "CITIZEN",
+  intentType: intent.intent,
+  intentConfidence: intent.confidence,
+  missingInformation: verifiedAuthorities?.length
+    ? undefined
+    : reasoningPlan?.missingInformation,
+  corpusAvailable: Boolean(verifiedAuthorities?.length),
+  verifiedAuthorities,
+});
 
     const completion = await this.dependencies.completion.complete({
       systemPrompt: prompt.systemPrompt,

@@ -123,6 +123,7 @@ export type PromptBuildInput = {
   /** True only when verified corpus authorities are attached. */
   corpusAvailable?: boolean;
   verifiedAuthorities?: readonly VerifiedLegalAuthority[];
+  mode?: "CITIZEN" | "PROFESSIONAL";
 };
 
 /** A retrieved statute excerpt that may be cited. */

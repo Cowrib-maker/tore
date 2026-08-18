@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth";
 type ChatRequest = {
   message?: string;
   conversationId?: string;
+  mode?: "CITIZEN" | "PROFESSIONAL";
 };
 
 export async function POST(request: Request) {
@@ -21,14 +22,15 @@ export async function POST(request: Request) {
     }
 
     const body = (await request.json()) as ChatRequest;
-    const result = await getLegalAiService().createTurn({
-      userId: session.user.id,
-      message: body.message ?? "",
-      conversationId: body.conversationId,
-      userContext: {
-        role: session.user.role,
-      },
-    });
+   const result = await getLegalAiService().createTurn({
+  userId: session.user.id,
+  message: body.message ?? "",
+  conversationId: body.conversationId,
+  userContext: {
+    role: session.user.role,
+  },
+  mode: body.mode,
+});
 
     return NextResponse.json({
       conversationId: result.conversationId,
