@@ -2,17 +2,15 @@ import type { ActorContext } from "@/application/common/actor-context";
 import type { UpdateLawyerProfileFormInput } from "@/application/validators/profile.schema";
 import type { LawyerProfile } from "@/domain/entities/profile";
 import { AuditAction, UserRole } from "@/domain/enums";
-import {
-  ForbiddenError,
-  NotFoundError,
-  ValidationError,
-} from "@/domain/errors/domain-error";
+import { ForbiddenError, NotFoundError } from "@/domain/errors/domain-error";
 import type { AuditLogRepository } from "@/domain/repositories/audit-log-repository";
 import type { LawyerProfileRepository } from "@/domain/repositories/profile-repository";
-import { isLawyerVerified } from "@/domain/services/lawyer-eligibility";
+import type { UserRepository } from "@/domain/repositories/user-repository";
+import { joinDisplayName } from "@/lib/person-name";
 
 export type UpdateLawyerProfileDeps = {
   lawyerProfileRepository: LawyerProfileRepository;
+  userRepository: UserRepository;
   auditLogRepository: AuditLogRepository;
 };
 
@@ -37,20 +35,9 @@ export async function updateLawyerProfileUseCase(
     throw new ForbiddenError();
   }
 
-  if (input.isListed) {
-    if (!isLawyerVerified(existing)) {
-      throw new ValidationError(
-        "Your profile must be verified before it can be listed",
-      );
-    }
-
-    const hasActiveOffering =
-      await deps.lawyerProfileRepository.hasActiveOffering(existing.id);
-    if (!hasActiveOffering) {
-      throw new ValidationError(
-        "Add at least one active consultation offering before listing your profile",
-      );
-    }
+  const displayName = joinDisplayName(input.lastName, input.firstName);
+  if (displayName) {
+    await deps.userRepository.updateProfile(actor.userId, { name: displayName });
   }
 
   const updated = await deps.lawyerProfileRepository.update(existing.id, {
@@ -59,8 +46,8 @@ export async function updateLawyerProfileUseCase(
     yearsOfExperience: input.yearsOfExperience,
     city: input.city,
     education: input.education,
+    phone: input.phone,
     timezone: input.timezone,
-    isListed: input.isListed,
   });
 
   await deps.auditLogRepository.create({
@@ -72,7 +59,7 @@ export async function updateLawyerProfileUseCase(
       headline: updated.headline,
       yearsOfExperience: updated.yearsOfExperience,
       timezone: updated.timezone,
-      isListed: updated.isListed,
+      phone: updated.phone,
     },
     ipAddress,
   });

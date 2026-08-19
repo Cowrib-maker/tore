@@ -25,12 +25,14 @@ import {
   lawyerTaxonomyRepository,
   practiceAreaRepository,
   userRepository,
+  lawyerCredentialRepository,
 } from "@/infrastructure/repositories";
 import { localizedTaxonomyName } from "@/lib/localized-content";
 import { cn } from "@/lib/utils";
 
 const discoveryDeps = {
   lawyerProfileRepository,
+  lawyerCredentialRepository,
   consultationOfferingRepository,
   availabilityRepository,
   bookingRepository,
@@ -61,6 +63,7 @@ export default async function LawyersDirectoryPage({
   const locale = await getLocale();
   const m = dict.marketplace;
   const d = m.directory;
+  const pYears = m.publicProfile.yearsExperience;
   const session = await getSessionUser();
   const dashboardHref =
     session?.user?.role &&
@@ -212,14 +215,37 @@ export default async function LawyersDirectoryPage({
                 className="ds-surface p-5 transition-colors hover:border-brand/28"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <h2 className="font-semibold text-ink">{card.displayName}</h2>
-                    <p className="mt-1 text-sm text-brand-muted">
-                      {card.profile.headline ?? m.common.legalCounsel}
-                    </p>
+                  <div className="flex items-start gap-3">
+                    {card.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={card.imageUrl}
+                        alt=""
+                        className="size-12 rounded-full object-cover"
+                      />
+                    ) : null}
+                    <div>
+                      <h2 className="font-semibold text-ink">{card.displayName}</h2>
+                      <p className="mt-1 text-sm text-brand-muted">
+                        {card.profile.headline ?? m.common.legalCounsel}
+                      </p>
+                    </div>
                   </div>
                   <Badge>{m.common.verified}</Badge>
                 </div>
+                {card.profile.yearsOfExperience != null && (
+                  <p className="mt-3 text-xs text-brand-muted">
+                    {pYears.replace("{n}", String(card.profile.yearsOfExperience))}
+                  </p>
+                )}
+                {card.phone && (
+                  <p className="mt-1 text-xs text-brand-muted">{card.phone}</p>
+                )}
+                {card.licenseNumber && (
+                  <p className="mt-1 text-xs text-brand-muted">
+                    {d.license}: {card.licenseNumber}
+                  </p>
+                )}
                 {card.profile.city && (
                   <p className="mt-3 text-xs text-brand-muted">{card.profile.city}</p>
                 )}

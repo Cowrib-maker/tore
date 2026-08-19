@@ -47,7 +47,18 @@ export const updateLawyerProfileSchema = z.object({
     .string()
     .min(1, "Timezone is required")
     .max(64, "Timezone must be at most 64 characters"),
-  isListed: z.boolean(),
+  lastName: z
+    .string()
+    .max(80, "Last name must be at most 80 characters")
+    .transform((value) => value.trim()),
+  firstName: z
+    .string()
+    .max(80, "First name must be at most 80 characters")
+    .transform((value) => value.trim()),
+  phone: z
+    .string()
+    .max(32, "Phone must be at most 32 characters")
+    .transform(emptyToNull),
 });
 
 export type UpdateLawyerProfileFormInput = z.infer<

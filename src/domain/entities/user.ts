@@ -23,3 +23,7 @@ export interface CreateUserInput {
   role: UserRole;
   preferredLanguage?: string;
 }
+
+export interface UpdateUserProfileInput {
+  name?: string | null;
+}

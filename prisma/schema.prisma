@@ -366,6 +366,7 @@ model LawyerProfile {
   yearsOfExperience  Int?                     @map("years_of_experience")
   city               String?
   education          String?                  @db.Text
+  phone              String?
   verificationStatus LawyerVerificationStatus @default(PENDING) @map("verification_status")
   verifiedAt         DateTime?                @map("verified_at")
   isListed           Boolean                  @default(false) @map("is_listed")

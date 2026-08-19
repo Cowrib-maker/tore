@@ -163,6 +163,12 @@ export type MarketplaceDictionary = {
   };
   lawyerProfileForm: {
     savedToast: string;
+    lastName: string;
+    lastNamePh: string;
+    firstName: string;
+    firstNamePh: string;
+    phone: string;
+    phonePh: string;
     headline: string;
     headlinePh: string;
     bio: string;
@@ -174,8 +180,6 @@ export type MarketplaceDictionary = {
     years: string;
     optionalPh: string;
     timezone: string;
-    listProfile: string;
-    listHelp: string;
     save: string;
   };
   clientProfileForm: {
@@ -197,9 +201,14 @@ export type MarketplaceDictionary = {
     statusHelp: string;
     approvedOn: string;
     listingLabel: string;
+    listingAdminOnly: string;
     profileSettings: string;
     submitTitle: string;
     submitHelp: string;
+    pendingReviewMsg: string;
+    approvedRecordMsg: string;
+    rejectedMsg: string;
+    suspendedListingMsg: string;
     approvedMsg: string;
     suspendedMsg: string;
     awaitingMsg: string;
@@ -330,10 +339,13 @@ export type MarketplaceDictionary = {
     clear: string;
     fromPrice: string;
     viewOfferings: string;
+    license: string;
   };
   publicProfile: {
     back: string;
     yearsExperience: string;
+    phone: string;
+    license: string;
     education: string;
     offeringsTitle: string;
     offeringsHelp: string;
@@ -363,6 +375,14 @@ export type MarketplaceDictionary = {
     submitted: string;
     license: string;
     authority: string;
+    experience: string;
+    phone: string;
+    practiceAreas: string;
+    listing: string;
+    list: string;
+    unlist: string;
+    directoryTitle: string;
+    directoryHelp: string;
     openDocument: string;
   };
 };

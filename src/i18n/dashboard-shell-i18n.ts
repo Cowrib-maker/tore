@@ -28,7 +28,6 @@ export const getShellI18n = cache(async (role: "client" | "lawyer" | "admin") =>
         ? [
             { href: "/lawyer/dashboard", label: d.navDashboard },
             { href: "/lawyer/profile", label: d.navProfile },
-            { href: "/lawyer/verification", label: d.navVerification },
             { href: "/lawyer/offerings", label: d.navOfferings },
             { href: "/lawyer/availability", label: d.navAvailability },
             { href: "/lawyer/bookings", label: d.navBookings },

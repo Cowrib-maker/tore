@@ -22,6 +22,7 @@ function profile(
     yearsOfExperience: null,
     city: null,
     education: null,
+    phone: null,
     verificationStatus: LawyerVerificationStatus.APPROVED,
     verifiedAt: now,
     isListed: true,
@@ -42,6 +43,21 @@ describe("lawyer listing eligibility", () => {
     expect(isLawyerPubliclyListed(p, true)).toBe(true);
     expect(isLawyerPubliclyListed(p, false)).toBe(false);
     expect(canClientBookLawyer(p, false)).toBe(false);
+  });
+
+  it("hides rejected and suspended lawyers from the public directory", () => {
+    expect(
+      isLawyerPubliclyListed(
+        profile({ verificationStatus: LawyerVerificationStatus.REJECTED }),
+        true,
+      ),
+    ).toBe(false);
+    expect(
+      isLawyerPubliclyListed(
+        profile({ verificationStatus: LawyerVerificationStatus.SUSPENDED }),
+        true,
+      ),
+    ).toBe(false);
   });
 
   it("rejects unlisted or unverified lawyers", () => {

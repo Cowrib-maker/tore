@@ -1,6 +1,9 @@
 import type { User } from "@/domain/entities/user";
 import type { UserRepository } from "@/domain/repositories/user-repository";
-import type { CreateUserInput } from "@/domain/entities/user";
+import type {
+  CreateUserInput,
+  UpdateUserProfileInput,
+} from "@/domain/entities/user";
 import { UserStatus } from "@/domain/enums";
 import type { UserRole } from "@/domain/enums";
 import { mapUser, userSelect } from "@/infrastructure/mappers/user.mapper";
@@ -126,6 +129,20 @@ export class PrismaUserRepository implements UserRepository {
     const record = await this.db.user.update({
       where: { id: userId },
       data: { passwordHash },
+      select: userSelect,
+    });
+    return mapUser(record);
+  }
+
+  async updateProfile(
+    userId: string,
+    input: UpdateUserProfileInput,
+  ): Promise<User> {
+    const record = await this.db.user.update({
+      where: { id: userId },
+      data: {
+        ...(input.name !== undefined ? { name: input.name } : {}),
+      },
       select: userSelect,
     });
     return mapUser(record);

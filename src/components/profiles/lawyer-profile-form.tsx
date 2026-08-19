@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 
 import type { ActionState } from "@/application/common/action-state";
@@ -16,37 +16,35 @@ import { cn } from "@/lib/utils";
 const initialState: ActionState = {};
 
 type LawyerProfileFormProps = {
+  lastName: string;
+  firstName: string;
+  phone: string;
   headline: string;
   bio: string;
   yearsOfExperience: number | null;
   city: string;
   education: string;
   timezone: string;
-  isListed: boolean;
-  canRequestListing: boolean;
   copy: MarketplaceDictionary["lawyerProfileForm"] &
     Pick<MarketplaceDictionary["common"], "saving">;
 };
 
 export function LawyerProfileForm({
+  lastName,
+  firstName,
+  phone,
   headline,
   bio,
   yearsOfExperience,
   city,
   education,
   timezone,
-  isListed,
-  canRequestListing,
   copy,
 }: LawyerProfileFormProps) {
   const [state, formAction, pending] = useActionState(
     updateLawyerProfileAction,
     initialState,
   );
-  // Draft listing flag until submit. The parent remounts this form (key=updatedAt)
-  // after a successful save, so we do not mirror the isListed prop into state.
-  // Hidden field carries the value because a disabled checkbox is omitted from FormData.
-  const [listed, setListed] = useState(isListed);
 
   useEffect(() => {
     if (state.success) {
@@ -75,6 +73,55 @@ export function LawyerProfileForm({
           {state.error}
         </div>
       )}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="lastName">{copy.lastName}</Label>
+          <Input
+            id="lastName"
+            name="lastName"
+            defaultValue={lastName}
+            placeholder={copy.lastNamePh}
+            maxLength={80}
+            autoComplete="family-name"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="firstName">{copy.firstName}</Label>
+          <Input
+            id="firstName"
+            name="firstName"
+            defaultValue={firstName}
+            placeholder={copy.firstNamePh}
+            maxLength={80}
+            autoComplete="given-name"
+          />
+        </div>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="phone">{copy.phone}</Label>
+          <Input
+            id="phone"
+            name="phone"
+            defaultValue={phone}
+            placeholder={copy.phonePh}
+            maxLength={32}
+            autoComplete="tel"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="yearsOfExperience">{copy.years}</Label>
+          <Input
+            id="yearsOfExperience"
+            name="yearsOfExperience"
+            type="number"
+            min={0}
+            max={70}
+            defaultValue={yearsOfExperience?.toString() ?? ""}
+            placeholder={copy.optionalPh}
+          />
+        </div>
+      </div>
       <div className="space-y-2">
         <Label htmlFor="headline">{copy.headline}</Label>
         <Input
@@ -138,66 +185,21 @@ export function LawyerProfileForm({
             defaultValue={city ?? ""}
             placeholder={copy.cityPh}
             maxLength={120}
-            aria-invalid={Boolean(state.error)}
-            aria-describedby={
-              state.error ? "lawyer-profile-form-error" : undefined
-            }
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="yearsOfExperience">{copy.years}</Label>
-          <Input
-            id="yearsOfExperience"
-            name="yearsOfExperience"
-            type="number"
-            min={0}
-            max={70}
-            defaultValue={yearsOfExperience?.toString() ?? ""}
-            placeholder={copy.optionalPh}
-            aria-invalid={Boolean(state.error)}
-            aria-describedby={
-              state.error ? "lawyer-profile-form-error" : undefined
-            }
-          />
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="timezone">{copy.timezone}</Label>
-        <NativeSelect
-          id="timezone"
-          name="timezone"
-          defaultValue={timezone ?? ""}
-          aria-invalid={Boolean(state.error)}
-          aria-describedby={
-            state.error ? "lawyer-profile-form-error" : undefined
-          }
-        >
-          {timezoneOptions.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </NativeSelect>
-      </div>
-      <div className="flex items-start gap-2">
-        <input type="hidden" name="isListed" value={listed ? "on" : "off"} />
-        <input
-          id="isListed"
-          type="checkbox"
-          checked={listed}
-          disabled={!canRequestListing}
-          onChange={(event) => setListed(event.target.checked)}
-          className="mt-1 size-4 rounded border-input"
-        />
-        <div className="space-y-1">
-          <Label htmlFor="isListed" className="text-sm font-normal leading-snug">
-            {copy.listProfile}
-          </Label>
-          {!canRequestListing && (
-            <p id="isListed-help" className="text-xs text-muted-foreground">
-              {copy.listHelp}
-            </p>
-          )}
+          <Label htmlFor="timezone">{copy.timezone}</Label>
+          <NativeSelect
+            id="timezone"
+            name="timezone"
+            defaultValue={timezone ?? ""}
+          >
+            {timezoneOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </NativeSelect>
         </div>
       </div>
       <Button type="submit" disabled={pending}>

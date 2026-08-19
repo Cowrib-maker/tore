@@ -3,9 +3,11 @@ import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
 import { getLawyerProfileForSession } from "@/application/actions/profile.actions";
+import { getLawyerVerificationForSession } from "@/application/actions/verification.actions";
 import { LawyerTaxonomyForm } from "@/components/marketplace/lawyer-taxonomy-form";
 import { LawyerProfileForm } from "@/components/profiles/lawyer-profile-form";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
+import { LawyerVerificationSection } from "@/components/verification/lawyer-verification-section";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,15 +18,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { UserRole } from "@/domain/enums";
-import { isLawyerVerified } from "@/domain/services/lawyer-eligibility";
 import { getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
+import { buildAppFilePath } from "@/infrastructure/storage/file-access";
 import {
   languageRepository,
   lawyerTaxonomyRepository,
   practiceAreaRepository,
 } from "@/infrastructure/repositories";
 import { formatVerificationStatus } from "@/lib/format-labels";
+import { splitDisplayName } from "@/lib/person-name";
 
 export default async function LawyerProfilePage() {
   const session = await getSessionUser();
@@ -37,8 +40,9 @@ export default async function LawyerProfilePage() {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 
-  const [data, i18n] = await Promise.all([
+  const [data, verification, i18n] = await Promise.all([
     getLawyerProfileForSession(),
+    getLawyerVerificationForSession(),
     getShellI18n("lawyer"),
   ]);
   if (data.status === "unauthenticated") {
@@ -62,9 +66,6 @@ export default async function LawyerProfilePage() {
     );
   }
 
-  const verified = isLawyerVerified(data.profile);
-  const canRequestListing = verified && data.hasActiveOffering;
-
   const [practiceAreas, languages, selectedPractice, selectedLanguages] =
     await Promise.all([
       practiceAreaRepository.findAllActive(),
@@ -81,6 +82,16 @@ export default async function LawyerProfilePage() {
     ...m.taxonomyForm,
     saving: m.common.saving,
   };
+  const names = splitDisplayName(data.user.name);
+  const credentials =
+    verification.status === "ok"
+      ? await Promise.all(
+          verification.data.credentials.map(async (credential) => ({
+            ...credential,
+            documentUrl: buildAppFilePath(credential.documentUrl),
+          })),
+        )
+      : [];
 
   return (
     <>
@@ -121,14 +132,15 @@ export default async function LawyerProfilePage() {
           <CardContent>
             <LawyerProfileForm
               key={data.profile.updatedAt.toISOString()}
+              lastName={names.lastName}
+              firstName={names.firstName}
+              phone={data.profile.phone ?? ""}
               headline={data.profile.headline ?? ""}
               bio={data.profile.bio ?? ""}
               yearsOfExperience={data.profile.yearsOfExperience}
               city={data.profile.city ?? ""}
               education={data.profile.education ?? ""}
               timezone={data.profile.timezone ?? "Asia/Ulaanbaatar"}
-              isListed={data.profile.isListed ?? false}
-              canRequestListing={canRequestListing}
               copy={formCopy}
             />
           </CardContent>
@@ -151,6 +163,16 @@ export default async function LawyerProfilePage() {
             />
           </CardContent>
         </Card>
+        {verification.status === "ok" ? (
+          <LawyerVerificationSection
+            profile={verification.data.profile}
+            credentials={credentials}
+            canSubmit={verification.data.canSubmit}
+            copy={{ ...m.verification, yes: m.common.yes, no: m.common.no }}
+            submitCopy={m.submitCredential}
+            locale={locale}
+          />
+        ) : null}
       </div>
     </>
   );

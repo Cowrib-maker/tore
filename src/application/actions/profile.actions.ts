@@ -6,10 +6,7 @@ import { revalidatePath } from "next/cache";
 import type { ActionState } from "@/application/common/action-state";
 import { getClientIp } from "@/application/common/client-ip";
 import { mapActionError } from "@/application/common/map-action-error";
-import {
-  isFormCheckboxOn,
-  parseWithSchema,
-} from "@/application/common/parse-form";
+import { parseWithSchema } from "@/application/common/parse-form";
 import { enforceRateLimit } from "@/application/common/rate-limit-action";
 import { requireActor } from "@/application/common/require-actor";
 import { getSessionUser } from "@/application/common/session";
@@ -37,6 +34,7 @@ const updateClientDeps = {
 
 const updateLawyerDeps = {
   lawyerProfileRepository,
+  userRepository,
   auditLogRepository,
 };
 
@@ -90,7 +88,9 @@ export async function updateLawyerProfileAction(
       city: formData.get("city") ?? "",
       education: formData.get("education") ?? "",
       timezone: formData.get("timezone") ?? "Asia/Ulaanbaatar",
-      isListed: isFormCheckboxOn(formData, "isListed"),
+      lastName: formData.get("lastName") ?? "",
+      firstName: formData.get("firstName") ?? "",
+      phone: formData.get("phone") ?? "",
     });
     if (!parsed.ok) return parsed.state;
 
