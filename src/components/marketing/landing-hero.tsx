@@ -10,12 +10,10 @@ export function LandingHero({
   t,
   exploreHref,
   composerMode,
-  dashboardHref,
 }: {
   t: Dictionary["landing"];
   exploreHref: string;
   composerMode: "guest" | "client" | "other";
-  dashboardHref: string;
 }) {
   return (
     <section className="relative overflow-hidden border-b border-[#0B1F3A]/8 bg-white">
@@ -61,11 +59,7 @@ export function LandingHero({
           </LandingReveal>
 
           <LandingReveal delayMs={80} className="lg:pl-2">
-            <LandingOsPreview
-              t={t}
-              composerMode={composerMode}
-              dashboardHref={dashboardHref}
-            />
+            <LandingOsPreview t={t} />
           </LandingReveal>
         </div>
       </div>

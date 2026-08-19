@@ -42,7 +42,6 @@ type LandingPageProps = {
   authUser?: LandingAuthUser | null;
   composerMode: "guest" | "client" | "other";
   exploreHref: string;
-  dashboardHref: string;
 };
 
 export function LandingPage({
@@ -51,7 +50,6 @@ export function LandingPage({
   authUser,
   composerMode,
   exploreHref,
-  dashboardHref,
 }: LandingPageProps) {
   const t = dict.landing;
 
@@ -70,7 +68,6 @@ export function LandingPage({
           t={t}
           exploreHref={exploreHref}
           composerMode={composerMode}
-          dashboardHref={dashboardHref}
         />
         <LandingExperiences t={t} />
         <LandingLegalAi t={t} exploreHref={exploreHref} />

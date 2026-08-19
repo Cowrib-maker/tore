@@ -40,7 +40,6 @@ export default async function HomePage() {
       authUser={authUser}
       composerMode={composerMode}
       exploreHref={exploreHref}
-      dashboardHref={dashboardHref}
     />
   );
 }

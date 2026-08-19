@@ -280,6 +280,20 @@ export class LegalAiService {
     };
   }
 
+  async getConversationMessages(
+    userId: string,
+    conversationId: string,
+  ): Promise<LegalAiStoredMessage[]> {
+    const conversation = await this.dependencies.store.findOwnedConversation(
+      conversationId,
+      userId,
+    );
+    if (!conversation) {
+      throw new LegalAiError("Яриа олдсонгүй.", 404);
+    }
+    return this.dependencies.store.listMessages(conversationId, HISTORY_LIMIT);
+  }
+
   private async persistSafeReply(input: {
     conversationId: string;
     content: string;

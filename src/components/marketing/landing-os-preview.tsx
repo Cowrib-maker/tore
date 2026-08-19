@@ -1,24 +1,20 @@
-import { LandingLegalAiComposer } from "@/components/marketing/landing-legal-ai-composer";
+"use client";
+
+import { OPEN_LEGAL_AI_WIDGET_EVENT } from "@/components/legal-ai/legal-ai-widget-events";
 import type { Dictionary } from "@/i18n/types";
 
 export function LandingOsPreview({
   t,
-  composerMode,
-  dashboardHref,
 }: {
   t: Dictionary["landing"];
-  composerMode: "guest" | "client" | "other";
-  dashboardHref: string;
 }) {
   return (
     <div className="landing-product-panel overflow-hidden rounded-2xl border border-[#0B1F3A]/10 bg-white shadow-[0_24px_60px_rgba(11,31,58,0.08)]">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-[#0B1F3A]/8 bg-[#F8FAFC] px-4 py-3">
-        <div className="flex items-center gap-1.5">
-          <span className="size-2 rounded-full bg-[#0B1F3A]/20" />
-          <span className="size-2 rounded-full bg-[#0B1F3A]/20" />
-          <span className="size-2 rounded-full bg-[#0B1F3A]/20" />
-        </div>
+        <span className="rounded-full bg-[#0B1F3A]/8 px-2 py-0.5 text-[9px] font-semibold tracking-[0.1em] text-[#0B1F3A] uppercase">
+          Жишээ
+        </span>
 
         <span className="text-[11px] font-semibold text-[#0B1F3A]">
           TORE Legal AI
@@ -94,13 +90,20 @@ export function LandingOsPreview({
           </div>
         </div>
 
-        <LandingLegalAiComposer
-          placeholder={t.aiComposerPlaceholder}
-          submitLabel={t.aiComposerSubmit}
-          guestHint={t.aiComposerGuestHint}
-          mode={composerMode}
-          dashboardHref={dashboardHref}
-        />
+        <div className="mt-5 border-t border-[#0B1F3A]/8 pt-4">
+          <p className="text-[10px] leading-4 text-[#7B8490]">
+            {t.aiComposerGuestHint}
+          </p>
+          <button
+            type="button"
+            onClick={() =>
+              window.dispatchEvent(new Event(OPEN_LEGAL_AI_WIDGET_EVENT))
+            }
+            className="mt-3 rounded-lg bg-[#0B1F3A] px-4 py-2 text-[11px] font-semibold text-white transition hover:bg-[#173A66]"
+          >
+            {t.aiComposerSubmit}
+          </button>
+        </div>
       </div>
     </div>
   );

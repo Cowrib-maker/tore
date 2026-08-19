@@ -56,6 +56,8 @@ type PendingFile = {
 
 type LegalAiChatProps = {
   initialQuestion?: string;
+  initialConversationId?: string;
+  initialMessages?: Message[];
   dashboardHref: string | null;
   displayName?: string | null;
   signInLabel: string;
@@ -100,6 +102,8 @@ function nextFileId() {
 
 export function LegalAiChat({
   initialQuestion = "",
+  initialConversationId,
+  initialMessages = [],
   dashboardHref,
   displayName,
   signInLabel,
@@ -107,9 +111,11 @@ export function LegalAiChat({
   dashboardLabel,
 }: LegalAiChatProps) {
   const [message, setMessage] = useState(initialQuestion);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [mode, setMode] = useState<"CITIZEN" | "PROFESSIONAL">("CITIZEN");
-  const [conversationId, setConversationId] = useState<string>();
+  const [conversationId, setConversationId] = useState<string | undefined>(
+    initialConversationId,
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
