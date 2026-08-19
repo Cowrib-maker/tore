@@ -1,6 +1,3 @@
-import { match } from "@formatjs/intl-localematcher";
-import Negotiator from "negotiator";
-
 import {
   defaultLocale,
   isLocale,
@@ -8,25 +5,16 @@ import {
   type Locale,
 } from "@/i18n/config";
 
-/** Map BCP-47 tags to our short locale codes for intl-localematcher. */
-const negotiatorLocales = ["mn", "en", "zh-CN", "zh", "ko"] as const;
-
-function toAppLocale(matched: string): Locale {
-  const base = matched.toLowerCase().split("-")[0] ?? matched;
-  if (base === "zh") return "zh";
-  if (isLocale(base)) return base;
+/**
+ * TORE targets the Mongolian market first, so an absent locale cookie
+ * always resolves to Mongolian rather than following the browser's
+ * Accept-Language header (English is a near-universal secondary/system
+ * language, which made most first-time visitors see English by default).
+ * Visitors can still switch language explicitly via the nav switcher,
+ * which sets the locale cookie and is respected by resolveLocale above.
+ */
+export function negotiateLocale(_acceptLanguage: string | null): Locale {
   return defaultLocale;
-}
-
-export function negotiateLocale(acceptLanguage: string | null): Locale {
-  try {
-    const headers = { "accept-language": acceptLanguage ?? defaultLocale };
-    const languages = new Negotiator({ headers }).languages();
-    const matched = match([...languages], [...negotiatorLocales], defaultLocale);
-    return toAppLocale(matched);
-  } catch {
-    return defaultLocale;
-  }
 }
 
 export function resolveLocale(cookieValue: string | undefined, acceptLanguage: string | null): Locale {
