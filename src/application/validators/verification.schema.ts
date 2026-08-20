@@ -52,3 +52,12 @@ export const reviewLawyerCredentialSchema = z
 export type ReviewLawyerCredentialFormInput = z.infer<
   typeof reviewLawyerCredentialSchema
 >;
+
+export const setLawyerDirectoryListingSchema = z.object({
+  lawyerProfileId: z.string().min(1),
+  isListed: z.enum(["true", "false"]).transform((value) => value === "true"),
+});
+
+export type SetLawyerDirectoryListingFormInput = z.infer<
+  typeof setLawyerDirectoryListingSchema
+>;

@@ -33,6 +33,7 @@ export interface LawyerProfile {
   yearsOfExperience: number | null;
   city: string | null;
   education: string | null;
+  phone: string | null;
   verificationStatus: LawyerVerificationStatus;
   verifiedAt: Date | null;
   isListed: boolean;
@@ -57,6 +58,7 @@ export interface UpdateLawyerProfileInput {
   yearsOfExperience?: number | null;
   city?: string | null;
   education?: string | null;
+  phone?: string | null;
   timezone?: string;
   isListed?: boolean;
 }

@@ -11,19 +11,25 @@ import { requireActor } from "@/application/common/require-actor";
 import { getSessionUser } from "@/application/common/session";
 import { reviewLawyerCredentialUseCase } from "@/application/use-cases/verification/review-lawyer-credential";
 import { submitLawyerCredentialUseCase } from "@/application/use-cases/verification/submit-lawyer-credential";
+import { setLawyerDirectoryListingUseCase } from "@/application/use-cases/profiles/set-lawyer-directory-listing";
 import {
   CREDENTIAL_ALLOWED_TYPES,
   CREDENTIAL_MAX_BYTES,
   reviewLawyerCredentialSchema,
+  setLawyerDirectoryListingSchema,
   submitLawyerCredentialSchema,
 } from "@/application/validators/verification.schema";
 import type { LawyerCredential, LawyerProfile } from "@/domain/entities/profile";
+import type { PracticeArea } from "@/domain/entities/taxonomy";
 import { CredentialReviewStatus, UserRole } from "@/domain/enums";
+import { canSubmitCredentials } from "@/domain/services/lawyer-eligibility";
 import { unitOfWork } from "@/infrastructure/database/prisma-unit-of-work";
 import {
   auditLogRepository,
   lawyerCredentialRepository,
   lawyerProfileRepository,
+  lawyerTaxonomyRepository,
+  practiceAreaRepository,
 } from "@/infrastructure/repositories";
 import {
   CREDENTIAL_REVIEW_RATE_LIMIT,
@@ -92,6 +98,7 @@ export async function submitLawyerCredentialAction(
     );
 
     revalidatePath("/lawyer/verification");
+    revalidatePath("/lawyer/profile");
     revalidatePath("/lawyer/dashboard");
     revalidatePath("/admin/lawyers");
     return { success: true };
@@ -137,6 +144,45 @@ export async function reviewLawyerCredentialAction(
   }
 }
 
+export async function setLawyerDirectoryListingAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  try {
+    const actor = await requireActor(UserRole.ADMIN);
+    const limited = await enforceRateLimit(
+      `credential:review:${actor.userId}`,
+      CREDENTIAL_REVIEW_RATE_LIMIT,
+    );
+    if (limited) return limited;
+    const parsed = parseWithSchema(setLawyerDirectoryListingSchema, {
+      lawyerProfileId: formData.get("lawyerProfileId") ?? "",
+      isListed: formData.get("isListed") ?? "",
+    });
+    if (!parsed.ok) return parsed.state;
+
+    const ipAddress = await getClientIp();
+    const updated = await setLawyerDirectoryListingUseCase(
+      actor,
+      parsed.data,
+      {
+        lawyerProfileRepository,
+        auditLogRepository,
+      },
+      ipAddress,
+    );
+
+    revalidatePath("/admin/lawyers");
+    revalidatePath("/lawyer/profile");
+    revalidatePath("/lawyer/dashboard");
+    revalidatePath("/lawyers");
+    revalidatePath(`/lawyers/${updated.slug}`);
+    return { success: true };
+  } catch (error) {
+    return mapActionError(error);
+  }
+}
+
 export type LawyerVerificationView = {
   profile: LawyerProfile;
   credentials: LawyerCredential[];
@@ -174,10 +220,7 @@ export async function getLawyerVerificationForSession(): Promise<
     data: {
       profile,
       credentials,
-      canSubmit:
-        (profile.verificationStatus === "PENDING" ||
-          profile.verificationStatus === "REJECTED") &&
-        !hasPending,
+      canSubmit: canSubmitCredentials(profile) && !hasPending,
     },
   };
 }
@@ -188,12 +231,27 @@ export type AdminCredentialQueueItem = {
   lawyerEmail: string | null;
   lawyerName: string | null;
   documentUrl: string;
+  practiceAreas: PracticeArea[];
+};
+
+export type AdminLawyerDirectoryItem = {
+  lawyer: LawyerProfile;
+  lawyerEmail: string | null;
+  lawyerName: string | null;
+  practiceAreas: PracticeArea[];
+  latestCredential: LawyerCredential | null;
+  documentUrl: string | null;
+  hasActiveOffering: boolean;
 };
 
 export async function getAdminLawyerVerificationQueue(): Promise<
   | { status: "unauthenticated" }
   | { status: "forbidden" }
-  | { status: "ok"; items: AdminCredentialQueueItem[] }
+  | {
+      status: "ok";
+      items: AdminCredentialQueueItem[];
+      directory: AdminLawyerDirectoryItem[];
+    }
 > {
   const session = await getSessionUser();
   if (!session?.user?.id) {
@@ -206,6 +264,16 @@ export async function getAdminLawyerVerificationQueue(): Promise<
   const { items: pending } =
     await lawyerCredentialRepository.findPendingReview();
   const { userRepository } = await import("@/infrastructure/repositories");
+
+  const allPracticeAreas = await practiceAreaRepository.findAllActive();
+  const practiceById = new Map(allPracticeAreas.map((area) => [area.id, area]));
+
+  async function practiceAreasFor(profileId: string): Promise<PracticeArea[]> {
+    const links = await lawyerTaxonomyRepository.getPracticeAreas(profileId);
+    return links
+      .map((link) => practiceById.get(link.practiceAreaId))
+      .filter((area): area is PracticeArea => Boolean(area));
+  }
 
   const items = (
     await Promise.all(
@@ -221,10 +289,42 @@ export async function getAdminLawyerVerificationQueue(): Promise<
           lawyerEmail: user?.email ?? null,
           lawyerName: user?.name ?? null,
           documentUrl: buildAppFilePath(credential.documentUrl),
+          practiceAreas: await practiceAreasFor(lawyer.id),
         } satisfies AdminCredentialQueueItem;
       }),
     )
   ).filter((item): item is AdminCredentialQueueItem => item != null);
 
-  return { status: "ok", items };
+  const lawyerUsers = await userRepository.findByRole(UserRole.LAWYER);
+  const directory = (
+    await Promise.all(
+      lawyerUsers.map(async (user): Promise<AdminLawyerDirectoryItem | null> => {
+        const lawyer = await lawyerProfileRepository.findByUserId(user.id);
+        if (!lawyer) return null;
+        const credentials =
+          await lawyerCredentialRepository.findByLawyerProfileId(lawyer.id);
+        const latestCredential = credentials[0] ?? null;
+        const approvedCredential =
+          credentials.find(
+            (credential) =>
+              credential.status === CredentialReviewStatus.APPROVED,
+          ) ?? latestCredential;
+        return {
+          lawyer,
+          lawyerEmail: user.email ?? null,
+          lawyerName: user.name ?? null,
+          practiceAreas: await practiceAreasFor(lawyer.id),
+          latestCredential: approvedCredential,
+          documentUrl: approvedCredential
+            ? buildAppFilePath(approvedCredential.documentUrl)
+            : null,
+          hasActiveOffering: await lawyerProfileRepository.hasActiveOffering(
+            lawyer.id,
+          ),
+        };
+      }),
+    )
+  ).filter((item): item is AdminLawyerDirectoryItem => item != null);
+
+  return { status: "ok", items, directory };
 }

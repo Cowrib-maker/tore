@@ -1,4 +1,8 @@
-import type { User, CreateUserInput } from "@/domain/entities/user";
+import type {
+  User,
+  CreateUserInput,
+  UpdateUserProfileInput,
+} from "@/domain/entities/user";
 import type { UserRole } from "@/domain/enums";
 
 export interface UserRepository {
@@ -14,4 +18,5 @@ export interface UserRepository {
   findByRole(role: UserRole): Promise<User[]>;
   markEmailVerified(userId: string, verifiedAt?: Date): Promise<User>;
   updatePasswordHash(userId: string, passwordHash: string): Promise<User>;
+  updateProfile(userId: string, input: UpdateUserProfileInput): Promise<User>;
 }

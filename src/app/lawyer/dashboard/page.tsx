@@ -122,7 +122,7 @@ export default async function LawyerDashboardPage() {
           </CardHeader>
           <CardFooter>
             <Link
-              href="/lawyer/verification"
+              href="/lawyer/profile#verification"
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
             >
               {ld.manageVerification}

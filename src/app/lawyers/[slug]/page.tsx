@@ -29,6 +29,7 @@ import {
   lawyerTaxonomyRepository,
   practiceAreaRepository,
   userRepository,
+  lawyerCredentialRepository,
 } from "@/infrastructure/repositories";
 import { formatDateTimeUtc, formatModality } from "@/lib/format-labels";
 import {
@@ -39,6 +40,7 @@ import { cn } from "@/lib/utils";
 
 const discoveryDeps = {
   lawyerProfileRepository,
+  lawyerCredentialRepository,
   consultationOfferingRepository,
   availabilityRepository,
   bookingRepository,
@@ -99,14 +101,24 @@ export default async function PublicLawyerProfilePage({
         <div className="space-y-6">
           <Surface as="section" padded>
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h1 className="ds-title">{view.displayName}</h1>
-                <p className="mt-1 text-brand-muted">
-                  {view.profile.headline ?? m.common.legalCounsel}
-                </p>
-                {view.profile.city && (
-                  <p className="mt-2 text-sm text-brand-muted">{view.profile.city}</p>
-                )}
+              <div className="flex items-start gap-4">
+                {view.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={view.imageUrl}
+                    alt=""
+                    className="size-16 rounded-full object-cover"
+                  />
+                ) : null}
+                <div>
+                  <h1 className="ds-title">{view.displayName}</h1>
+                  <p className="mt-1 text-brand-muted">
+                    {view.profile.headline ?? m.common.legalCounsel}
+                  </p>
+                  {view.profile.city && (
+                    <p className="mt-2 text-sm text-brand-muted">{view.profile.city}</p>
+                  )}
+                </div>
               </div>
               <Badge>{m.common.verified}</Badge>
             </div>
@@ -116,6 +128,16 @@ export default async function PublicLawyerProfilePage({
                   "{n}",
                   String(view.profile.yearsOfExperience),
                 )}
+              </p>
+            )}
+            {view.phone && (
+              <p className="mt-2 text-sm text-ink/80">
+                {p.phone}: {view.phone}
+              </p>
+            )}
+            {view.licenseNumber && (
+              <p className="mt-2 text-sm text-ink/80">
+                {p.license}: {view.licenseNumber}
               </p>
             )}
             {view.profile.bio && (

@@ -20,6 +20,7 @@ function makeLawyerProfile(
     yearsOfExperience: null,
     city: null,
     education: null,
+    phone: null,
     verificationStatus: LawyerVerificationStatus.PENDING,
     verifiedAt: null,
     isListed: false,

@@ -1,14 +1,16 @@
 import type { ConsultationOffering } from "@/domain/entities/consultation-offering";
-import type { LawyerProfile } from "@/domain/entities/profile";
+import type { LawyerCredential, LawyerProfile } from "@/domain/entities/profile";
 import type { Language, PracticeArea } from "@/domain/entities/taxonomy";
 import type { InstantSlot } from "@/domain/value-objects/time-slot";
 import type { AvailabilityRepository } from "@/domain/repositories/availability-repository";
 import type { BookingRepository } from "@/domain/repositories/booking-repository";
 import type { ConsultationOfferingRepository } from "@/domain/repositories/consultation-offering-repository";
 import type {
+  LawyerCredentialRepository,
   LawyerDiscoveryFilters,
   LawyerProfileRepository,
 } from "@/domain/repositories/profile-repository";
+import { CredentialReviewStatus } from "@/domain/enums";
 import type {
   LanguageRepository,
   LawyerTaxonomyRepository,
@@ -26,6 +28,9 @@ import { localizedTaxonomyName } from "@/lib/localized-content";
 export type DirectoryLawyerCard = {
   profile: LawyerProfile;
   displayName: string;
+  imageUrl: string | null;
+  phone: string | null;
+  licenseNumber: string | null;
   minPriceMnt: number | null;
   practiceAreaNames: string[];
   languageCodes: string[];
@@ -34,6 +39,9 @@ export type DirectoryLawyerCard = {
 export type PublicLawyerProfileView = {
   profile: LawyerProfile;
   displayName: string;
+  imageUrl: string | null;
+  phone: string | null;
+  licenseNumber: string | null;
   offerings: ConsultationOffering[];
   practiceAreas: PracticeArea[];
   languages: Language[];
@@ -42,6 +50,7 @@ export type PublicLawyerProfileView = {
 
 export type DiscoveryDeps = {
   lawyerProfileRepository: LawyerProfileRepository;
+  lawyerCredentialRepository: LawyerCredentialRepository;
   consultationOfferingRepository: ConsultationOfferingRepository;
   availabilityRepository: AvailabilityRepository;
   bookingRepository: BookingRepository;
@@ -80,6 +89,15 @@ export async function searchListedLawyers(
     deps.languageRepository.findAllActive(),
   ]);
 
+  const credentialsByProfile = new Map<string, LawyerCredential[]>();
+  await Promise.all(
+    profileIds.map(async (profileId) => {
+      const credentials =
+        await deps.lawyerCredentialRepository.findByLawyerProfileId(profileId);
+      credentialsByProfile.set(profileId, credentials);
+    }),
+  );
+
   const userById = new Map(users.map((u) => [u.id, u]));
   const offeringsByProfile = new Map<string, ConsultationOffering[]>();
   for (const offering of offerings) {
@@ -116,6 +134,9 @@ export async function searchListedLawyers(
     return {
       profile,
       displayName: user?.name ?? profile.slug,
+      imageUrl: user?.image ?? null,
+      phone: profile.phone,
+      licenseNumber: publicLicenseNumber(credentialsByProfile.get(profile.id) ?? []),
       minPriceMnt:
         profileOfferings.length > 0
           ? Math.min(...profileOfferings.map((o) => o.priceMnt))
@@ -150,6 +171,7 @@ export async function getPublicLawyerProfile(
     rules,
     allPracticeAreas,
     allLanguages,
+    credentials,
   ] = await Promise.all([
     deps.userRepository.findById(profile.userId),
     deps.consultationOfferingRepository.findActiveByLawyerProfileId(
@@ -160,6 +182,7 @@ export async function getPublicLawyerProfile(
     deps.availabilityRepository.findActiveRulesByLawyerProfileId(profile.id),
     deps.practiceAreaRepository.findAllActive(),
     deps.languageRepository.findAllActive(),
+    deps.lawyerCredentialRepository.findByLawyerProfileId(profile.id),
   ]);
 
   const duration = offerings[0]?.durationMinutes ?? 60;
@@ -203,9 +226,20 @@ export async function getPublicLawyerProfile(
   return {
     profile,
     displayName: user?.name ?? profile.slug,
+    imageUrl: user?.image ?? null,
+    phone: profile.phone,
+    licenseNumber: publicLicenseNumber(credentials),
     offerings,
     practiceAreas,
     languages,
     slots,
   };
+}
+
+function publicLicenseNumber(credentials: LawyerCredential[]): string | null {
+  return (
+    credentials.find(
+      (credential) => credential.status === CredentialReviewStatus.APPROVED,
+    )?.licenseNumber ?? null
+  );
 }

@@ -12,6 +12,7 @@ const lawyerProfile = {
   yearsOfExperience: 10,
   city: "Ulaanbaatar",
   education: null,
+  phone: null,
   timezone: "Asia/Ulaanbaatar",
   verificationStatus: "APPROVED" as const,
   verifiedAt: new Date(),

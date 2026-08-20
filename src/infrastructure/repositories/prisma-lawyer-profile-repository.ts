@@ -105,6 +105,7 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
       yearsOfExperience?: number | null;
       city?: string | null;
       education?: string | null;
+      phone?: string | null;
       timezone?: string;
       isListed?: boolean;
     } = {};
@@ -115,6 +116,7 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
     }
     if (input.city !== undefined) data.city = input.city;
     if (input.education !== undefined) data.education = input.education;
+    if (input.phone !== undefined) data.phone = input.phone;
     if (input.timezone !== undefined) data.timezone = input.timezone;
     if (input.isListed !== undefined) data.isListed = input.isListed;
 
