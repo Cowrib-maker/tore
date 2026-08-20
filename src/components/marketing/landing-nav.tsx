@@ -40,7 +40,7 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
         <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_LANDING} />
 
         <nav
-          className="hidden items-center gap-5 xl:flex"
+          className="hidden items-center gap-1.5 xl:flex"
           aria-label="Primary"
         >
           {links.map((item) => (
@@ -63,7 +63,7 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
               <form action={logoutAction} className="hidden sm:block">
                 <button
                   type="submit"
-                  className="h-9 cursor-pointer rounded-lg px-3 text-[13px] font-medium text-[#5C6570] transition-colors hover:bg-[#0B1F3A]/5 hover:text-[#0B1F3A]"
+                  className="h-9 cursor-pointer rounded-full px-4 text-[13px] font-medium text-[#5C6570] transition-colors hover:bg-[#0B1F3A]/5 hover:text-[#0B1F3A]"
                 >
                   {dict.common.signOut}
                 </button>
@@ -73,7 +73,7 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
             <>
               <Link
                 href="/login"
-                className="hidden h-9 items-center rounded-lg px-3 text-[13px] font-medium text-[#5C6570] transition-colors hover:bg-[#0B1F3A]/5 hover:text-[#0B1F3A] sm:inline-flex"
+                className="hidden h-9 items-center rounded-full px-4 text-[13px] font-medium text-[#5C6570] transition-colors hover:bg-[#0B1F3A]/5 hover:text-[#0B1F3A] sm:inline-flex"
               >
                 {dict.common.signIn}
               </Link>
@@ -81,7 +81,7 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
                 href="/register/client"
                 className={cn(
                   buttonVariants({ size: "sm" }),
-                  "hidden h-9 rounded-lg bg-[#0B1F3A] px-3.5 text-[13px] font-semibold text-white hover:bg-[#0B1F3A]/92 sm:inline-flex",
+                  "hidden h-9 rounded-full bg-[#0B1F3A] px-4 text-[13px] font-semibold text-white hover:bg-[#0B1F3A]/92 sm:inline-flex",
                 )}
               >
                 {dict.landing.ctaStart}
@@ -90,7 +90,7 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
           )}
           <button
             type="button"
-            className="inline-flex size-9 items-center justify-center rounded-lg border border-[#0B1F3A]/12 text-[#0B1F3A] xl:hidden"
+            className="inline-flex size-9 items-center justify-center rounded-full border border-[#0B1F3A]/12 text-[#0B1F3A] xl:hidden"
             aria-expanded={open}
             aria-controls="landing-mobile-nav"
             onClick={() => setOpen((value) => !value)}
@@ -112,7 +112,7 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
               <a
                 key={`${item.href}-${item.label}`}
                 href={item.href}
-                className="rounded-lg px-2 py-2 text-sm font-medium text-[#0A0F14] hover:bg-[#F4F6F8]"
+                className="rounded-full px-4 py-2 text-sm font-medium text-[#0A0F14] hover:bg-[#F4F6F8]"
                 onClick={() => setOpen(false)}
               >
                 {item.label}
@@ -147,7 +147,7 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
                 </Link>
                 <Link
                   href="/register/client"
-                  className="mt-2 inline-flex h-10 items-center justify-center rounded-lg bg-[#0B1F3A] px-4 text-sm font-semibold text-white"
+                  className="mt-2 inline-flex h-10 items-center justify-center rounded-full bg-[#0B1F3A] px-4 text-sm font-semibold text-white"
                   onClick={() => setOpen(false)}
                 >
                   {dict.landing.ctaStart}

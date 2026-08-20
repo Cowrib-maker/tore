@@ -1,5 +1,3 @@
-import { Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google";
-
 import { LandingEnterprise } from "@/components/marketing/landing-enterprise";
 import { LandingExperiences } from "@/components/marketing/landing-experiences";
 import { LandingFaq } from "@/components/marketing/landing-faq";
@@ -23,19 +21,6 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/types";
 import { cn } from "@/lib/utils";
 
-const display = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-landing-display",
-  display: "swap",
-});
-
-const sans = Plus_Jakarta_Sans({
-  subsets: ["latin", "latin-ext"],
-  variable: "--font-landing-sans",
-  display: "swap",
-});
-
 type LandingPageProps = {
   dict: Dictionary;
   locale: Locale;
@@ -56,10 +41,7 @@ export function LandingPage({
   return (
     <div
       className={cn(
-        display.variable,
-        sans.variable,
         "landing-page min-h-screen bg-white text-[#0A0F14] antialiased",
-        "font-[family-name:var(--font-landing-sans)]",
       )}
     >
       <LandingNav dict={dict} locale={locale} authUser={authUser} />

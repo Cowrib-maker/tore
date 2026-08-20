@@ -1,18 +1,16 @@
 "use client";
 
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MessageCircle, Send, X } from "lucide-react";
 
 import { ToreLogo } from "@/components/brand/tore-logo";
-import { OPEN_LEGAL_AI_WIDGET_EVENT } from "@/components/legal-ai/legal-ai-widget-events";
-import { loginHrefForLegalAi } from "@/domain/services/rbac";
-
-type Message = {
-  role: "USER" | "ASSISTANT";
-  content: string;
-};
+import {
+  OPEN_LEGAL_AI_WIDGET_EVENT,
+  type OpenLegalAiWidgetDetail,
+} from "@/components/legal-ai/legal-ai-widget-events";
+import { useLegalAiChatSession } from "@/components/legal-ai/use-legal-ai-chat-session";
 
 const HIDDEN_PATH_PREFIX = "/legal-ai";
 
@@ -20,14 +18,18 @@ export function FloatingLegalAiWidget() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [conversationId, setConversationId] = useState<string>();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const { messages, conversationId, loading, error, sendMessage } =
+    useLegalAiChatSession();
+  const sendMessageRef = useRef(sendMessage);
+  sendMessageRef.current = sendMessage;
 
   useEffect(() => {
-    function handleOpenRequest() {
+    function handleOpenRequest(event: Event) {
       setOpen(true);
+      const detail = (event as CustomEvent<OpenLegalAiWidgetDetail>).detail;
+      if (detail?.message) {
+        void sendMessageRef.current(detail.message);
+      }
     }
     window.addEventListener(OPEN_LEGAL_AI_WIDGET_EVENT, handleOpenRequest);
     return () =>
@@ -36,55 +38,6 @@ export function FloatingLegalAiWidget() {
 
   if (pathname?.startsWith(HIDDEN_PATH_PREFIX)) {
     return null;
-  }
-
-  async function sendMessage(text: string) {
-    setError("");
-    setMessages((current) => [...current, { role: "USER", content: text }]);
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/ai/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: text,
-          conversationId,
-          mode: "CITIZEN",
-        }),
-      });
-
-      const data = (await response.json()) as {
-        error?: string;
-        conversationId?: string;
-        message?: { content?: string };
-      };
-
-      if (response.status === 401) {
-        window.location.assign(loginHrefForLegalAi(text));
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error(
-          data.error ?? "AI үйлчилгээтэй холбогдоход алдаа гарлаа.",
-        );
-      }
-
-      setConversationId(data.conversationId);
-      setMessages((current) => [
-        ...current,
-        { role: "ASSISTANT", content: data.message?.content ?? "" },
-      ]);
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "AI үйлчилгээтэй холбогдоход алдаа гарлаа.",
-      );
-    } finally {
-      setLoading(false);
-    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
