@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
+  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -77,6 +78,22 @@ export default async function LawyerDashboardPage() {
   const hasActiveOffering = data.hasActiveOffering;
   const listed = data.profile.isListed;
   const ld = m.lawyerDashboard;
+  const pf = m.lawyerProfileForm;
+
+  const profileSummary = [
+    { label: pf.headline, value: data.profile.headline },
+    { label: pf.city, value: data.profile.city },
+    {
+      label: pf.years,
+      value:
+        data.profile.yearsOfExperience !== null
+          ? String(data.profile.yearsOfExperience)
+          : null,
+    },
+    { label: pf.phone, value: data.profile.phone },
+  ].filter((item): item is { label: string; value: string } =>
+    Boolean(item.value),
+  );
 
   return (
     <>
@@ -99,6 +116,25 @@ export default async function LawyerDashboardPage() {
                 : ld.addHeadline}
             </CardDescription>
           </CardHeader>
+          {profileSummary.length > 0 || data.profile.bio ? (
+            <CardContent>
+              <dl className="space-y-1.5 text-sm">
+                {profileSummary.map((item) => (
+                  <div key={item.label} className="flex gap-2">
+                    <dt className="shrink-0 text-muted-foreground">
+                      {item.label}:
+                    </dt>
+                    <dd className="truncate font-medium">{item.value}</dd>
+                  </div>
+                ))}
+              </dl>
+              {data.profile.bio ? (
+                <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                  {data.profile.bio}
+                </p>
+              ) : null}
+            </CardContent>
+          ) : null}
           <CardFooter>
             <Link
               href="/lawyer/profile"
