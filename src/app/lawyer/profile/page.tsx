@@ -19,7 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { SimpleTabs } from "@/components/ui/simple-tabs";
+import { WorkspaceTabs } from "@/components/ui/workspace-tabs";
 import { UserRole } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
@@ -118,7 +118,7 @@ export default async function LawyerProfilePage() {
           </Link>
         ) : null}
       </div>
-      <SimpleTabs
+      <WorkspaceTabs
         defaultValue="profile"
         items={[
           {

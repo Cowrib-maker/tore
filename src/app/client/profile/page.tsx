@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { SimpleTabs } from "@/components/ui/simple-tabs";
+import { WorkspaceTabs } from "@/components/ui/workspace-tabs";
 import { UserRole } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
 
@@ -59,7 +59,7 @@ export default async function ClientProfilePage() {
   return (
     <>
       <DashboardPageHeading>{cp.title}</DashboardPageHeading>
-      <SimpleTabs
+      <WorkspaceTabs
         defaultValue="profile"
         items={[
           {
