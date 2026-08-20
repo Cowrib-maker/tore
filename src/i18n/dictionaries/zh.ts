@@ -262,6 +262,8 @@ export const zh: Dictionary = {
     navVerification: "资质核验",
     navOfferings: "咨询服务",
     navAvailability: "可预约时段",
+    navWorkspace: "工作台",
+    navLegalChat: "法律聊天",
     navLawyerReview: "资质审核",
     navAdminDev: "Dev tools",
     navOrganizations: "组织",

@@ -193,6 +193,7 @@ export const marketplaceEn: MarketplaceDictionary = {
     tabProfile: "Profile",
     tabPractice: "Practice areas",
     tabVerification: "Verification",
+    tabSchedule: "Availability",
     tabSecurity: "Login details",
     emailTitle: "Email address",
     emailDescription:

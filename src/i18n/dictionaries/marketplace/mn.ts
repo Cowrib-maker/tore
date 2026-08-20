@@ -199,6 +199,7 @@ export const marketplaceMn: MarketplaceDictionary = {
     tabProfile: "Танилцуулга",
     tabPractice: "Чиглэл",
     tabVerification: "Баталгаажуулалт",
+    tabSchedule: "Цагийн хуваарь",
     tabSecurity: "Нэвтрэх мэдээлэл",
     emailTitle: "И-мэйл хаяг",
     emailDescription:

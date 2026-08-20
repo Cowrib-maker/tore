@@ -319,6 +319,8 @@ export const en: Dictionary = {
     navVerification: "Verification",
     navOfferings: "Offerings",
     navAvailability: "Availability",
+    navWorkspace: "Workspace",
+    navLegalChat: "Legal chat",
     navLawyerReview: "Credential review",
     navAdminDev: "Dev tools",
     navOrganizations: "Organizations",

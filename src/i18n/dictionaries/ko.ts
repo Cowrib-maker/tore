@@ -263,6 +263,8 @@ export const ko: Dictionary = {
     navVerification: "자격 검증",
     navOfferings: "상담 서비스",
     navAvailability: "가능 시간",
+    navWorkspace: "업무 공간",
+    navLegalChat: "법률 채팅",
     navLawyerReview: "자격 심사",
     navAdminDev: "Dev tools",
     navOrganizations: "조직",

@@ -165,6 +165,7 @@ export type MarketplaceDictionary = {
     tabProfile: string;
     tabPractice: string;
     tabVerification: string;
+    tabSchedule: string;
     tabSecurity: string;
     emailTitle: string;
     emailDescription: string;

@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { revalidatePath } from "next/cache";
 
@@ -194,7 +194,7 @@ export async function createAvailabilityRuleAction(
       availabilityDeps,
       await getClientIp(),
     );
-    revalidatePath("/lawyer/availability");
+    revalidatePath("/lawyer/profile");
     return { success: true };
   } catch (error) {
     return mapActionError(error);
@@ -218,7 +218,7 @@ export async function deleteAvailabilityRuleAction(
       availabilityDeps,
       await getClientIp(),
     );
-    revalidatePath("/lawyer/availability");
+    revalidatePath("/lawyer/profile");
     return { success: true };
   } catch (error) {
     return mapActionError(error);
@@ -256,7 +256,7 @@ export async function createAvailabilityExceptionAction(
       availabilityDeps,
       await getClientIp(),
     );
-    revalidatePath("/lawyer/availability");
+    revalidatePath("/lawyer/profile");
     return { success: true };
   } catch (error) {
     return mapActionError(error);
@@ -280,7 +280,7 @@ export async function deleteAvailabilityExceptionAction(
       availabilityDeps,
       await getClientIp(),
     );
-    revalidatePath("/lawyer/availability");
+    revalidatePath("/lawyer/profile");
     return { success: true };
   } catch (error) {
     return mapActionError(error);

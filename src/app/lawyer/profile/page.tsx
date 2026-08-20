@@ -5,6 +5,12 @@ import { getSessionUser } from "@/application/common/session";
 import { getLawyerProfileForSession } from "@/application/actions/profile.actions";
 import { getLawyerVerificationForSession } from "@/application/actions/verification.actions";
 import { LawyerTaxonomyForm } from "@/components/marketplace/lawyer-taxonomy-form";
+import {
+  AvailabilityExceptionList,
+  AvailabilityRuleList,
+  CreateAvailabilityExceptionForm,
+  CreateAvailabilityRuleForm,
+} from "@/components/marketplace/availability-forms";
 import { ChangeEmailForm } from "@/components/profiles/change-email-form";
 import { ChangePasswordForm } from "@/components/profiles/change-password-form";
 import { LawyerProfileForm } from "@/components/profiles/lawyer-profile-form";
@@ -25,6 +31,7 @@ import { getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 import { buildAppFilePath } from "@/infrastructure/storage/file-access";
 import {
+  availabilityRepository,
   languageRepository,
   lawyerTaxonomyRepository,
   practiceAreaRepository,
@@ -69,13 +76,31 @@ export default async function LawyerProfilePage() {
     );
   }
 
-  const [practiceAreas, languages, selectedPractice, selectedLanguages] =
-    await Promise.all([
-      practiceAreaRepository.findAllActive(),
-      languageRepository.findAllActive(),
-      lawyerTaxonomyRepository.getPracticeAreas(data.profile.id),
-      lawyerTaxonomyRepository.getLanguages(data.profile.id),
-    ]);
+  const rangeStart = new Date();
+  const today = rangeStart.toISOString().slice(0, 10);
+  const rangeEnd = new Date(rangeStart);
+  rangeEnd.setUTCDate(rangeEnd.getUTCDate() + 60);
+  const horizon = rangeEnd.toISOString().slice(0, 10);
+
+  const [
+    practiceAreas,
+    languages,
+    selectedPractice,
+    selectedLanguages,
+    availabilityRules,
+    availabilityExceptions,
+  ] = await Promise.all([
+    practiceAreaRepository.findAllActive(),
+    languageRepository.findAllActive(),
+    lawyerTaxonomyRepository.getPracticeAreas(data.profile.id),
+    lawyerTaxonomyRepository.getLanguages(data.profile.id),
+    availabilityRepository.findRulesByLawyerProfileId(data.profile.id),
+    availabilityRepository.findExceptionsByLawyerProfileId(
+      data.profile.id,
+      today,
+      horizon,
+    ),
+  ]);
 
   const formCopy = {
     ...m.lawyerProfileForm,
@@ -83,6 +108,10 @@ export default async function LawyerProfilePage() {
   };
   const taxonomyCopy = {
     ...m.taxonomyForm,
+    saving: m.common.saving,
+  };
+  const availabilityCopy = {
+    ...m.availabilityForm,
     saving: m.common.saving,
   };
   const names = splitDisplayName(data.user.name);
@@ -200,6 +229,48 @@ export default async function LawyerProfilePage() {
                   locale={locale}
                 />
               ) : null,
+          },
+          {
+            value: "schedule",
+            label: m.account.tabSchedule,
+            content: (
+              <div className="grid gap-6 lg:grid-cols-2">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{m.availability.weeklyTitle}</CardTitle>
+                    <CardDescription>
+                      {m.availability.weeklyHelp}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <AvailabilityRuleList
+                      rules={availabilityRules}
+                      copy={availabilityCopy}
+                      locale={locale}
+                    />
+                    <CreateAvailabilityRuleForm
+                      copy={availabilityCopy}
+                      locale={locale}
+                    />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{m.availability.exceptionsTitle}</CardTitle>
+                    <CardDescription>
+                      {m.availability.exceptionsHelp}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <AvailabilityExceptionList
+                      exceptions={availabilityExceptions}
+                      copy={availabilityCopy}
+                    />
+                    <CreateAvailabilityExceptionForm copy={availabilityCopy} />
+                  </CardContent>
+                </Card>
+              </div>
+            ),
           },
           {
             value: "security",

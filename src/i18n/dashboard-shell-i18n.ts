@@ -27,10 +27,11 @@ export const getShellI18n = cache(async (role: "client" | "lawyer" | "admin") =>
       : role === "lawyer"
         ? [
             { href: "/lawyer/dashboard", label: d.navDashboard },
-            { href: "/lawyer/availability", label: d.navAvailability },
+            { href: "/lawyer/workspace", label: d.navWorkspace },
             { href: "/lawyer/offerings", label: d.navOfferings },
             { href: "/lawyer/bookings", label: d.navBookings },
             { href: "/lawyer/notifications", label: d.navNotifications },
+            { href: "/legal-ai", label: d.navLegalChat },
             ...orgNav,
           ]
         : role === "admin"

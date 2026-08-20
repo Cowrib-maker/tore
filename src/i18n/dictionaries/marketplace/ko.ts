@@ -189,6 +189,7 @@ export const marketplaceKo: MarketplaceDictionary = {
     tabProfile: "프로필",
     tabPractice: "전문 분야",
     tabVerification: "인증",
+    tabSchedule: "가능 시간",
     tabSecurity: "로그인 정보",
     emailTitle: "이메일 주소",
     emailDescription: "이메일을 변경하면 새 주소를 다시 인증해야 합니다.",

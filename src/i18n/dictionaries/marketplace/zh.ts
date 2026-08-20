@@ -188,6 +188,7 @@ export const marketplaceZh: MarketplaceDictionary = {
     tabProfile: "简介",
     tabPractice: "执业领域",
     tabVerification: "认证",
+    tabSchedule: "可预约时段",
     tabSecurity: "登录信息",
     emailTitle: "邮箱地址",
     emailDescription: "更改邮箱后需要重新验证新地址。",
