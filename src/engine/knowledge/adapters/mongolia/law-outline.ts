@@ -197,7 +197,7 @@ function classifyLine(line: string): ClassifiedLine {
     return {
       kind: "section",
       display: line,
-      number: chapterOrdinalToNumber(ordinal) ?? ordinal,
+      number: mongolianOrdinalToNumber(ordinal) ?? ordinal,
       heading: emptyToNull(subsection[2]),
       original: line,
     };
@@ -210,7 +210,7 @@ function classifyLine(line: string): ClassifiedLine {
     return {
       kind: "chapter",
       display: line,
-      number: numeric?.[1] ?? chapterOrdinalToNumber(ordinal) ?? ordinal,
+      number: numeric?.[1] ?? mongolianOrdinalToNumber(ordinal) ?? ordinal,
       heading: emptyToNull(chapterOrdinal[2]),
       original: line,
     };
@@ -229,18 +229,33 @@ function classifyLine(line: string): ClassifiedLine {
     };
   }
 
-  const article = line.match(
+  const articleNumeric = line.match(
     /^(\d+)\s*(?:дүгээр|дугаар)\s+зүйл\s*\.?\s*(.*)$/i,
   );
-  if (article) {
-    const number = article[1] ?? "1";
+  if (articleNumeric) {
+    const number = articleNumeric[1] ?? "1";
     return {
       kind: "article",
       display: line,
       number,
-      heading: emptyToNull(article[2]),
+      heading: emptyToNull(articleNumeric[2]),
       original: line,
     };
+  }
+
+  // Constitution-style headings: "Нэгдүгээр зүйл." / "Арван хоёрдугаар зүйл."
+  const articleOrdinal = line.match(/^(.+?)\s+зүйл\s*\.?\s*(.*)$/iu);
+  if (articleOrdinal) {
+    const number = mongolianOrdinalToNumber(articleOrdinal[1] ?? "");
+    if (number) {
+      return {
+        kind: "article",
+        display: line,
+        number,
+        heading: emptyToNull(articleOrdinal[2]),
+        original: line,
+      };
+    }
   }
 
   const numbered = line.match(/^(\d+(?:\.\d+){1,3})\.(.*)$/);
@@ -336,39 +351,79 @@ function romanToInt(roman: string): number {
   return total || 1;
 }
 
-const CHAPTER_BASE_ORDINALS: [string, number][] = [
-  ["АРВАН ЕС", 19],
-  ["АРВАН НАЙМ", 18],
-  ["АРВАН ДОЛОО", 17],
-  ["АРВАН ДОЛ", 17],
-  ["АРВАН ЗУРГАА", 16],
-  ["АРВАН ТАВ", 15],
-  ["АРВАН ДӨРӨВ", 14],
-  ["АРВАН ГУРАВ", 13],
-  ["АРВАН ХОЁР", 12],
-  ["АРВАН НЭГ", 11],
-  ["АРАВ", 10],
-  ["ЕС", 9],
-  ["НАЙМ", 8],
-  ["ДОЛОО", 7],
-  ["ДОЛ", 7],
-  ["ЗУРГАА", 6],
-  ["ТАВ", 5],
-  ["ДӨРӨВ", 4],
-  ["ГУРАВ", 3],
-  ["ХОЁР", 2],
-  ["НЭГ", 1],
+const ONES: Record<string, number> = {
+  НЭГ: 1,
+  ХОЁР: 2,
+  ГУРАВ: 3,
+  ДӨРӨВ: 4,
+  ТАВ: 5,
+  ЗУРГАА: 6,
+  ЗУРГА: 6,
+  ДОЛОО: 7,
+  ДОЛ: 7,
+  НАЙМ: 8,
+  ЕС: 9,
+};
+
+const TENS_STANDALONE: Record<string, number> = {
+  АРАВ: 10,
+  ХОРЬ: 20,
+  ГУЧ: 30,
+  ДӨЧ: 40,
+  ТАВЬ: 50,
+  ЖАР: 60,
+  ДАЛ: 70,
+  НАЯ: 80,
+  ЕР: 90,
+};
+
+const TENS_PREFIX: [string, number][] = [
+  ["АРВАН", 10],
+  ["ХОРИН", 20],
+  ["ГУЧИН", 30],
+  ["ДӨЧИН", 40],
+  ["ТАВИН", 50],
+  ["ЖАРАН", 60],
+  ["ДАЛАН", 70],
+  ["НАЯН", 80],
+  ["ЕРЭН", 90],
 ];
 
-function chapterOrdinalToNumber(raw: string): string | null {
-  const compact = raw
+/**
+ * Mongolian word ordinals used in chapter/article headings
+ * ("Нэгдүгээр", "Арван хоёрдугаар", "Хорьдугаар", …).
+ */
+function mongolianOrdinalToNumber(raw: string): string | null {
+  let compact = raw
     .toUpperCase()
     .replace(/\s+/g, " ")
-    .replace(/\s*(?:ДҮГЭЭР|ДУГААР)\s*$/u, "")
     .trim();
-  for (const [token, value] of CHAPTER_BASE_ORDINALS) {
-    if (compact === token) {
-      return String(value);
+  // LegalInfo occasionally emits noise like "Арван ес 1 дүгээр".
+  compact = compact.replace(/\s+\d+(?:\s*(?:ДҮГЭЭР|ДУГААР))?$/u, "").trim();
+  compact = compact.replace(/\s*(?:ДҮГЭЭР|ДУГААР)\s*$/u, "").trim();
+  if (!compact) {
+    return null;
+  }
+
+  const tensAlone = TENS_STANDALONE[compact];
+  if (tensAlone != null) {
+    return String(tensAlone);
+  }
+  const oneAlone = ONES[compact];
+  if (oneAlone != null) {
+    return String(oneAlone);
+  }
+
+  for (const [prefix, tens] of TENS_PREFIX) {
+    if (compact === prefix) {
+      return String(tens);
+    }
+    if (compact.startsWith(`${prefix} `)) {
+      const rest = compact.slice(prefix.length + 1).trim();
+      const one = ONES[rest];
+      if (one != null) {
+        return String(tens + one);
+      }
     }
   }
   return null;

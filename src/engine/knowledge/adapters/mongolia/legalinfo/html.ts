@@ -59,7 +59,12 @@ export function legalInfoHtmlToLines(html: string): string[] {
   const withoutNoise = html
     .replace(/<script\b[\s\S]*?<\/script>/gi, "")
     .replace(/<style\b[\s\S]*?<\/style>/gi, "")
-    .replace(/<!--[\s\S]*?-->/g, "");
+    .replace(/<!--[\s\S]*?-->/g, "")
+    // LegalInfo UI chrome glued beside article text (print / listen / share).
+    .replace(
+      /<(?:span|a|button)\b[^>]*(?:print-zuil|listen|media-link|text-share)[^>]*>[\s\S]*?<\/(?:span|a|button)>/gi,
+      "",
+    );
   const content = extractLawBody(withoutNoise);
   const withBreaks = content
     .replace(/<(br|hr)\s*\/?>/gi, "\n")
@@ -70,19 +75,105 @@ export function legalInfoHtmlToLines(html: string): string[] {
   const text = decodeEntities(withBreaks.replace(/<[^>]+>/g, " "));
   return text
     .split(/\r?\n/)
-    .map((line) => line.replace(/\u00a0/g, " ").replace(/[ \t]+/g, " ").trim())
+    .map((line) =>
+      line
+        .replace(/\u00a0/g, " ")
+        .replace(/[ \t]+/g, " ")
+        .replace(/^Хэвлэх\s+/i, "")
+        .trim(),
+    )
     .filter((line) => line.length > 0);
 }
 
+/**
+ * Prefer the best depth-balanced law-body container.
+ *
+ * LegalInfo wraps statute text in nested `div.law_content` / `maincontenter`
+ * trees. A non-greedy `[\s\S]*?</div>` match stops at the first nested close
+ * tag (toolbar only) and yields zero articles — balanced extraction is required.
+ *
+ * Some laws ship a longer unofficial English translation pane alongside the
+ * Mongolian statute. Prefer the pane with Mongolian article markers, not merely
+ * the longest HTML fragment.
+ */
 function extractLawBody(html: string): string {
-  const named = html.match(
-    /<(?:div|section|article)[^>]*(?:id|class)=["'][^"']*(?:law[-_ ]?(?:content|body|text)|ck-content|detail[-_]?content)[^"']*["'][^>]*>([\s\S]*?)<\/(?:div|section|article)>/i,
-  );
-  if (named?.[1]) {
-    return named[1];
+  const openRe =
+    /<(div|section|article)\b([^>]*(?:id|class)=["'][^"']*(?:law[-_ ]?(?:content|body|text)|ck-content|detail[-_]?content|main-huuliin-content|maincontenter)[^"']*["'][^>]*)>/gi;
+
+  let best: string | null = null;
+  let bestScore = Number.NEGATIVE_INFINITY;
+  let match: RegExpExecArray | null;
+  while ((match = openRe.exec(html))) {
+    const inner = extractBalancedElementInner(html, match);
+    if (inner == null || inner.trim().length === 0) {
+      continue;
+    }
+    const score = scoreLawBodyCandidate(inner);
+    if (
+      best == null ||
+      score > bestScore ||
+      (score === bestScore && inner.length > best.length)
+    ) {
+      best = inner;
+      bestScore = score;
+    }
   }
-  const body = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-  return body?.[1] ?? html;
+  if (best != null) {
+    return best;
+  }
+
+  const bodyOpen = /<body\b[^>]*>/i.exec(html);
+  if (bodyOpen && bodyOpen.index != null) {
+    const close = html.toLowerCase().lastIndexOf("</body>");
+    if (close > bodyOpen.index) {
+      return html.slice(bodyOpen.index + bodyOpen[0].length, close);
+    }
+  }
+  return html;
+}
+
+function scoreLawBodyCandidate(inner: string): number {
+  const mongolianNumeric = (
+    inner.match(/\d+\s*(?:дүгээр|дугаар)\s+зүйл/gi) ?? []
+  ).length;
+  const mongolianWord = (inner.match(/[А-ЯӨҮЁа-яөүё]+\s+зүйл\s*\./g) ?? [])
+    .length;
+  const englishArticle = (inner.match(/\bArticle\s+\d+/gi) ?? []).length;
+  // Weight Mongolian statute markers far above raw length; penalize English panes.
+  return mongolianNumeric * 10 + mongolianWord * 10 - englishArticle * 5;
+}
+
+function extractBalancedElementInner(
+  html: string,
+  openMatch: RegExpExecArray,
+): string | null {
+  const tag = (openMatch[1] ?? "div").toLowerCase();
+  const start = openMatch.index + openMatch[0].length;
+  let depth = 1;
+  let cursor = start;
+  const openTag = new RegExp(`<${tag}\\b`, "gi");
+  const closeTag = new RegExp(`</${tag}\\s*>`, "gi");
+
+  while (cursor < html.length && depth > 0) {
+    openTag.lastIndex = cursor;
+    closeTag.lastIndex = cursor;
+    const nextOpen = openTag.exec(html);
+    const nextClose = closeTag.exec(html);
+    if (!nextClose) {
+      return null;
+    }
+    if (nextOpen && nextOpen.index < nextClose.index) {
+      depth += 1;
+      cursor = nextOpen.index + nextOpen[0].length;
+      continue;
+    }
+    depth -= 1;
+    if (depth === 0) {
+      return html.slice(start, nextClose.index);
+    }
+    cursor = nextClose.index + nextClose[0].length;
+  }
+  return null;
 }
 
 function isGenericHeader(title: string | null): boolean {

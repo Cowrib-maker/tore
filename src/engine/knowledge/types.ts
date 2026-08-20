@@ -91,6 +91,21 @@ export type StoredKnowledgeDocument = {
   articles: KnowledgeArticle[];
   chunks: KnowledgeChunk[];
   ingestedAt: Date;
+  /**
+   * Link to the immutable archive snapshot. Required for durable PostgreSQL
+   * persistence; optional for in-memory / offline verification scripts.
+   */
+  provenance?: KnowledgeArchiveProvenance;
+};
+
+/**
+ * Provenance: legal document → archive snapshot → official source URL.
+ */
+export type KnowledgeArchiveProvenance = {
+  archiveId: string;
+  sha256: string;
+  originalUrl: string;
+  lawId?: string | null;
 };
 
 /** Portable snapshot produced by {@link IKnowledgeExporter}. */
@@ -108,7 +123,10 @@ export type KnowledgeIngestionResult = {
   failed: Array<{ sourceUrl: string; reason: string }>;
 };
 
-/** Port: fetch official source documents. Replace with a LegalInfo crawler later. */
+/**
+ * Port: fetch official source documents.
+ * Production: {@link HttpKnowledgeCrawler}. Tests/seed: {@link InMemoryKnowledgeCrawler}.
+ */
 export interface IKnowledgeCrawler {
   crawl(job: KnowledgeCrawlJob): Promise<RawKnowledgeDocument[]>;
 }

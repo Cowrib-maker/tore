@@ -898,3 +898,100 @@ model AIUsage {
   @@index([provider, model, createdAt])
   @@map("ai_usage")
 }
+
+/**
+ * Immutable metadata for an official-source archive snapshot.
+ * Blob bytes live in object storage (local FS or S3); never store raw HTML here.
+ */
+model LegalSourceArchive {
+  id               String   @id @map("id")
+  connectorId      String   @map("connector_id")
+  source           String
+  sourceId         String   @map("source_id")
+  lawId            String?  @map("law_id")
+  jurisdiction     String
+  authority        String
+  sourceType       String   @map("source_type")
+  originalUrl      String   @map("original_url")
+  fetchedAt        DateTime @map("fetched_at")
+  sha256           String   @unique
+  checksumVerified Boolean  @map("checksum_verified")
+  mimeType         String   @map("mime_type")
+  byteSize         Int      @map("byte_size")
+  archiveVersion   Int      @map("archive_version")
+  storageKey       String   @map("storage_key")
+  originalFileName String   @map("original_file_name")
+  encoding         String?
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  documents LegalKnowledgeDocument[]
+
+  @@unique([connectorId, originalUrl, archiveVersion])
+  @@index([originalUrl])
+  @@index([lawId])
+  @@index([sourceId, lawId])
+  @@map("legal_source_archives")
+}
+
+/**
+ * Structured legal knowledge document linked to a verified archive snapshot.
+ * A row must never exist without a verifiable LegalSourceArchive.
+ */
+model LegalKnowledgeDocument {
+  id            String   @id
+  sourceId      String   @map("source_id")
+  sourceUrl     String   @map("source_url")
+  lawId         String?  @map("law_id")
+  title         String
+  kind          String
+  language      String
+  jurisdiction  String
+  documentType  String?  @map("document_type")
+  articleCount  Int      @map("article_count")
+  chunkCount    Int      @map("chunk_count")
+  contentSha256 String   @map("content_sha256")
+  archiveId     String   @map("archive_id")
+  version       Int      @default(1)
+  ingestedAt    DateTime @map("ingested_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  archive  LegalSourceArchive      @relation(fields: [archiveId], references: [id], onDelete: Restrict)
+  articles LegalKnowledgeArticle[]
+  chunks   LegalKnowledgeChunk[]
+
+  @@unique([sourceUrl, contentSha256])
+  @@index([sourceUrl])
+  @@index([lawId])
+  @@index([archiveId])
+  @@map("legal_knowledge_documents")
+}
+
+model LegalKnowledgeArticle {
+  id            String  @id @default(cuid())
+  documentId    String  @map("document_id")
+  articleNumber String? @map("article_number")
+  title         String?
+  text          String  @db.Text
+  order         Int
+
+  document LegalKnowledgeDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, order])
+  @@map("legal_knowledge_articles")
+}
+
+model LegalKnowledgeChunk {
+  id            String  @id
+  documentId    String  @map("document_id")
+  articleNumber String? @map("article_number")
+  order         Int
+  text          String  @db.Text
+  tokenEstimate Int     @map("token_estimate")
+
+  document LegalKnowledgeDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, order])
+  @@map("legal_knowledge_chunks")
+}
+

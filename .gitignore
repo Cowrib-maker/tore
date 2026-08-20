@@ -44,3 +44,5 @@ next-env.d.ts
 
 # local file storage (FILE_STORAGE=local)
 .data/
+
+tmp/

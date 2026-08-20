@@ -8,9 +8,8 @@ import {
 /**
  * In-memory crawler for tests and local seeding.
  *
- * Production LegalInfo crawling should implement {@link IKnowledgeCrawler}
- * and be injected via {@link createKnowledgeEngine}. This class never
- * performs HTTP.
+ * Production LegalInfo crawling uses {@link HttpKnowledgeCrawler}, injected
+ * via {@link createKnowledgeEngine}. This class never performs HTTP.
  */
 export class InMemoryKnowledgeCrawler implements IKnowledgeCrawler {
   constructor(private readonly documents: readonly RawKnowledgeDocument[] = []) {}

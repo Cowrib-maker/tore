@@ -56,6 +56,7 @@ export type {
   ParsedKnowledgeDocument,
   RawKnowledgeDocument,
   StoredKnowledgeDocument,
+  KnowledgeArchiveProvenance,
 } from "./types";
 export type {
   CommentaryAuthor,
@@ -82,10 +83,64 @@ export type {
 } from "./schema";
 
 export {
+  HttpKnowledgeCrawler,
   InMemoryKnowledgeCrawler,
+  KnowledgeCrawlError,
+  LEGALINFO_CONSTITUTION_CATEGORY_ID,
+  LEGALINFO_CONSTITUTION_LAW_ID,
+  LEGALINFO_DEFAULT_LOCALE,
+  LEGALINFO_HOST,
+  LEGALINFO_STATUTE_CATEGORY_ID,
+  LEGALINFO_VERIFY_LAW_IDS,
+  LEGALINFO_VERIFY_50_LAW_IDS,
+  assertHttpsLegalInfoUrl,
+  isLegalInfoHostname,
+  legalInfoAjaxListUrl,
+  legalInfoCategoryUrl,
+  legalInfoDetailUrl,
+  lawIdFromLegalInfoUrl,
   rawTextDocument,
 } from "./crawler";
+export type {
+  FetchLike,
+  HttpKnowledgeCrawlerOptions,
+  KnowledgeCrawlErrorCode,
+} from "./crawler";
 export {
+  FileLegalInfoManifestStore,
+  InMemoryLegalInfoManifestStore,
+  LegalInfoDiscoverer,
+  LegalInfoDocumentStatus,
+  LegalInfoIngestionQueue,
+  LegalInfoListClient,
+  LEGALINFO_INGESTION_CONCURRENCY,
+  LEGALINFO_INGESTION_DEFAULT_REQUEST_DELAY_MS,
+  LEGALINFO_INGESTION_DEFAULT_TIMEOUT_MS,
+  LEGALINFO_MANIFEST_VERSION,
+  createEmptyManifest,
+  parseLegalInfoListHtml,
+  planLegalInfoIngestionDryRun,
+  plannedActionForStatus,
+  selectQueue,
+} from "./discovery";
+export type {
+  DryRunPlanItem,
+  ILegalInfoManifestStore,
+  LegalInfoDiscovererOptions,
+  LegalInfoDiscoveryResult,
+  LegalInfoIngestionDryRunPlan,
+  LegalInfoIngestionQueueOptions,
+  LegalInfoIngestionQueueResult,
+  LegalInfoListClientOptions,
+  LegalInfoListItem,
+  LegalInfoListPage,
+  LegalInfoManifest,
+  LegalInfoManifestDocument,
+  LegalInfoSourceType,
+  PlannedIngestionAction,
+} from "./discovery";
+export {
+  LegalInfoKnowledgeParser,
   LegalInfoLawParser,
   StructuralKnowledgeParser,
 } from "./parser";
@@ -96,7 +151,10 @@ export { LawParser } from "./parsers";
 export { UnicodeKnowledgeNormalizer } from "./normalizer";
 export { RuleBasedKnowledgeMetadataExtractor } from "./metadata";
 export { ParagraphKnowledgeChunker } from "./chunker";
-export { InMemoryKnowledgeRepository } from "./repository";
+export {
+  ArchiveVerifiedKnowledgeRepository,
+  InMemoryKnowledgeRepository,
+} from "./repository";
 export { JsonKnowledgeExporter } from "./exporter";
 export {
   KnowledgeEngine,
@@ -108,8 +166,10 @@ export {
 /**
  * Composition root for the default (in-memory) wiring.
  *
- * Inject a LegalInfo crawler, article parser, or Prisma repository through
- * `overrides` without changing {@link KnowledgeEngine.ingest}.
+ * Default crawler remains {@link InMemoryKnowledgeCrawler} so tests and
+ * local seeding stay offline. Inject {@link HttpKnowledgeCrawler} (or any
+ * other {@link IKnowledgeCrawler}) through `overrides` for production LegalInfo
+ * fetches without changing {@link KnowledgeEngine.ingest}.
  */
 export function createKnowledgeEngine(
   overrides: Partial<KnowledgeEngineDependencies> = {},

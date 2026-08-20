@@ -16,18 +16,30 @@ export const ArchiveArtifactFormat = {
 export type ArchiveArtifactFormat =
   (typeof ArchiveArtifactFormat)[keyof typeof ArchiveArtifactFormat];
 
+/**
+ * Durable metadata for one immutable source snapshot.
+ * Blobs live in {@link IArchiveStorage}; this record is insert-only.
+ */
 export type ArchiveRecord = {
   archiveId: string;
+  /** Connector / pipeline id (e.g. mn.legalinfo). */
   connectorId: string;
+  /** Human / registry source name (e.g. legalinfo.mn). */
+  source: string;
+  /** Stable source catalog id (e.g. legalinfo). */
+  sourceId: string;
+  /** Document identity within the source (e.g. LegalInfo lawId). */
+  lawId: string | null;
   jurisdiction: string;
   authority: string;
   sourceType: string;
   originalUrl: string;
-  downloadedAt: string;
+  /** ISO-8601 fetch time. */
+  fetchedAt: string;
   sha256: string;
   checksumVerified: boolean;
   mimeType: string;
-  fileSize: number;
+  byteSize: number;
   archiveVersion: number;
   storageKey: string;
   originalFileName: string;
@@ -37,6 +49,9 @@ export type ArchiveRecord = {
 export type ArchiveStoreInput = {
   bytes: Uint8Array;
   connectorId: string;
+  source: string;
+  sourceId: string;
+  lawId?: string | null;
   jurisdiction: string;
   authority: string;
   sourceType: string;
@@ -44,6 +59,8 @@ export type ArchiveStoreInput = {
   originalFileName: string;
   mimeType?: string;
   encoding?: string;
+  fetchedAt?: string;
+  /** @deprecated Prefer fetchedAt */
   downloadedAt?: string;
 };
 
@@ -66,12 +83,18 @@ export interface IArchiveStorage {
   health(): Promise<ArchiveHealth>;
 }
 
+/**
+ * Insert-only archive metadata. Implementations may be in-memory or PostgreSQL.
+ */
 export interface IArchiveRepository {
-  save(record: ArchiveRecord): void;
-  findByHash(sha256: string): ArchiveRecord | null;
-  findByArchiveId(archiveId: string): ArchiveRecord | null;
-  findVersions(connectorId: string, originalUrl: string): ArchiveRecord[];
-  exists(sha256: string): boolean;
+  save(record: ArchiveRecord): Promise<void>;
+  findByHash(sha256: string): Promise<ArchiveRecord | null>;
+  findByArchiveId(archiveId: string): Promise<ArchiveRecord | null>;
+  findVersions(
+    connectorId: string,
+    originalUrl: string,
+  ): Promise<ArchiveRecord[]>;
+  exists(sha256: string): Promise<boolean>;
 }
 
 export type ArchiveServiceDependencies = {

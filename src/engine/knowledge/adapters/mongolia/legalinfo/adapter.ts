@@ -28,7 +28,7 @@ export class LegalInfoSourceAdapter implements ISourceAdapter {
   readonly jurisdiction = "MN";
 
   adapt(input: SourceAdapterInput): CanonicalSourceDocument {
-    if (!input.html) {
+    if (typeof input.html !== "string") {
       throw new Error("LegalInfo adapter requires html");
     }
 
