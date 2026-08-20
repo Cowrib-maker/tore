@@ -102,7 +102,7 @@ export default async function LawyerDashboardPage() {
       <p className="mb-5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
         {ld.intro}
       </p>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="space-y-4">
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between gap-2">
@@ -207,8 +207,6 @@ export default async function LawyerDashboardPage() {
             </ul>
           </CardFooter>
         </Card>
-      </div>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle>{ld.offerings}</CardTitle>

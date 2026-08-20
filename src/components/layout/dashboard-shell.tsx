@@ -68,7 +68,7 @@ export function DashboardShell({
             {nav && nav.length > 0 && (
               <>
                 <nav
-                  className="hidden items-center gap-4 sm:flex"
+                  className="hidden items-center gap-1.5 sm:flex"
                   aria-label={navAriaLabel}
                 >
                   <DashboardNavLinks items={nav} />
