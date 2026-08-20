@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/application/common/session";
 import { getLawyerProfileForSession } from "@/application/actions/profile.actions";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
+import { DashboardLegalAiPanel } from "@/components/legal-ai/dashboard-legal-ai-panel";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { PillTopTabs } from "@/components/ui/pill-top-tabs";
 import { UserRole } from "@/domain/enums";
 import { isLawyerVerified } from "@/domain/services/lawyer-eligibility";
 import { getDashboardPath } from "@/domain/services/rbac";
@@ -95,9 +97,8 @@ export default async function LawyerDashboardPage() {
     Boolean(item.value),
   );
 
-  return (
-    <>
-      <DashboardPageHeading>{i18n.title}</DashboardPageHeading>
+  const overviewContent = (
+    <div className="p-4 sm:p-5">
       <p className="mb-5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
         {ld.intro}
       </p>
@@ -251,6 +252,23 @@ export default async function LawyerDashboardPage() {
           </CardFooter>
         </Card>
       </div>
+    </div>
+  );
+
+  return (
+    <>
+      <DashboardPageHeading>{i18n.title}</DashboardPageHeading>
+      <PillTopTabs
+        defaultValue="overview"
+        items={[
+          { value: "overview", label: "Тойм", content: overviewContent },
+          {
+            value: "ai",
+            label: "AI туслах",
+            content: <DashboardLegalAiPanel mode="PROFESSIONAL" />,
+          },
+        ]}
+      />
     </>
   );
 }
