@@ -5,6 +5,8 @@ import { getSessionUser } from "@/application/common/session";
 import { getLawyerProfileForSession } from "@/application/actions/profile.actions";
 import { getLawyerVerificationForSession } from "@/application/actions/verification.actions";
 import { LawyerTaxonomyForm } from "@/components/marketplace/lawyer-taxonomy-form";
+import { ChangeEmailForm } from "@/components/profiles/change-email-form";
+import { ChangePasswordForm } from "@/components/profiles/change-password-form";
 import { LawyerProfileForm } from "@/components/profiles/lawyer-profile-form";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { LawyerVerificationSection } from "@/components/verification/lawyer-verification-section";
@@ -17,6 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { SimpleTabs } from "@/components/ui/simple-tabs";
 import { UserRole } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
@@ -115,65 +118,126 @@ export default async function LawyerProfilePage() {
           </Link>
         ) : null}
       </div>
-      <div className="grid gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>{lp.title}</CardTitle>
-            <CardDescription>
-              {lp.description}{" "}
-              <Link
-                href="/lawyer/dashboard"
-                className="text-primary underline-offset-4 hover:underline"
-              >
-                {m.common.returnOverview}
-              </Link>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <LawyerProfileForm
-              key={data.profile.updatedAt.toISOString()}
-              lastName={names.lastName}
-              firstName={names.firstName}
-              phone={data.profile.phone ?? ""}
-              headline={data.profile.headline ?? ""}
-              bio={data.profile.bio ?? ""}
-              yearsOfExperience={data.profile.yearsOfExperience}
-              city={data.profile.city ?? ""}
-              education={data.profile.education ?? ""}
-              timezone={data.profile.timezone ?? "Asia/Ulaanbaatar"}
-              copy={formCopy}
-            />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>{lp.taxonomyTitle}</CardTitle>
-            <CardDescription>{lp.taxonomyDescription}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <LawyerTaxonomyForm
-              practiceAreas={practiceAreas}
-              languages={languages}
-              selectedPracticeAreaIds={selectedPractice.map(
-                (p) => p.practiceAreaId,
-              )}
-              selectedLanguageIds={selectedLanguages.map((l) => l.languageId)}
-              copy={taxonomyCopy}
-              locale={locale}
-            />
-          </CardContent>
-        </Card>
-        {verification.status === "ok" ? (
-          <LawyerVerificationSection
-            profile={verification.data.profile}
-            credentials={credentials}
-            canSubmit={verification.data.canSubmit}
-            copy={{ ...m.verification, yes: m.common.yes, no: m.common.no }}
-            submitCopy={m.submitCredential}
-            locale={locale}
-          />
-        ) : null}
-      </div>
+      <SimpleTabs
+        defaultValue="profile"
+        items={[
+          {
+            value: "profile",
+            label: m.account.tabProfile,
+            content: (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{lp.title}</CardTitle>
+                  <CardDescription>
+                    {lp.description}{" "}
+                    <Link
+                      href="/lawyer/dashboard"
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      {m.common.returnOverview}
+                    </Link>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <LawyerProfileForm
+                    key={data.profile.updatedAt.toISOString()}
+                    lastName={names.lastName}
+                    firstName={names.firstName}
+                    phone={data.profile.phone ?? ""}
+                    headline={data.profile.headline ?? ""}
+                    bio={data.profile.bio ?? ""}
+                    yearsOfExperience={data.profile.yearsOfExperience}
+                    city={data.profile.city ?? ""}
+                    education={data.profile.education ?? ""}
+                    timezone={data.profile.timezone ?? "Asia/Ulaanbaatar"}
+                    copy={formCopy}
+                  />
+                </CardContent>
+              </Card>
+            ),
+          },
+          {
+            value: "practice",
+            label: m.account.tabPractice,
+            content: (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{lp.taxonomyTitle}</CardTitle>
+                  <CardDescription>{lp.taxonomyDescription}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <LawyerTaxonomyForm
+                    practiceAreas={practiceAreas}
+                    languages={languages}
+                    selectedPracticeAreaIds={selectedPractice.map(
+                      (p) => p.practiceAreaId,
+                    )}
+                    selectedLanguageIds={selectedLanguages.map(
+                      (l) => l.languageId,
+                    )}
+                    copy={taxonomyCopy}
+                    locale={locale}
+                  />
+                </CardContent>
+              </Card>
+            ),
+          },
+          {
+            value: "verification",
+            label: m.account.tabVerification,
+            content:
+              verification.status === "ok" ? (
+                <LawyerVerificationSection
+                  profile={verification.data.profile}
+                  credentials={credentials}
+                  canSubmit={verification.data.canSubmit}
+                  copy={{
+                    ...m.verification,
+                    yes: m.common.yes,
+                    no: m.common.no,
+                  }}
+                  submitCopy={m.submitCredential}
+                  locale={locale}
+                />
+              ) : null,
+          },
+          {
+            value: "security",
+            label: m.account.tabSecurity,
+            content: (
+              <div className="grid gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{m.account.emailTitle}</CardTitle>
+                    <CardDescription>
+                      {m.account.emailDescription}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ChangeEmailForm
+                      currentEmail={data.user.email}
+                      copy={{ ...m.account, saving: m.common.saving }}
+                    />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{m.account.passwordTitle}</CardTitle>
+                    <CardDescription>
+                      {m.account.passwordDescription}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ChangePasswordForm
+                      copy={{ ...m.account, saving: m.common.saving }}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            ),
+          },
+        ]}
+      />
     </>
   );
 }

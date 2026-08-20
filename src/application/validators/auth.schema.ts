@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const emailSchema = z
+export const emailSchema = z
   .string()
   .trim()
   .email("Invalid email address")
@@ -13,7 +13,7 @@ export const loginSchema = z.object({
 
 export type LoginInput = z.infer<typeof loginSchema>;
 
-const passwordSchema = z
+export const passwordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters")
   .regex(/[A-Z]/, "Password must contain an uppercase letter")

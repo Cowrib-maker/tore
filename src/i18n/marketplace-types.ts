@@ -161,6 +161,26 @@ export type MarketplaceDictionary = {
     title: string;
     description: string;
   };
+  account: {
+    tabProfile: string;
+    tabPractice: string;
+    tabVerification: string;
+    tabSecurity: string;
+    emailTitle: string;
+    emailDescription: string;
+    currentEmail: string;
+    newEmail: string;
+    newEmailPh: string;
+    changeEmailButton: string;
+    emailSavedToast: string;
+    passwordTitle: string;
+    passwordDescription: string;
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+    changePasswordButton: string;
+    passwordSavedToast: string;
+  };
   lawyerProfileForm: {
     savedToast: string;
     lastName: string;

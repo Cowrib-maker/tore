@@ -147,6 +147,19 @@ export class PrismaUserRepository implements UserRepository {
     });
     return mapUser(record);
   }
+
+  async updateEmail(userId: string, email: string): Promise<User> {
+    try {
+      const record = await this.db.user.update({
+        where: { id: userId },
+        data: { email, emailVerified: null },
+        select: userSelect,
+      });
+      return mapUser(record);
+    } catch (error) {
+      mapUniqueViolation(error, "An account with this email already exists");
+    }
+  }
 }
 
 export const userRepository = new PrismaUserRepository();

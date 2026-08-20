@@ -195,6 +195,27 @@ export const marketplaceMn: MarketplaceDictionary = {
     description:
       "Захиалга болон бүртгэлийн харилцаанд ашиглагдах холбоо барих мэдээлэл.",
   },
+  account: {
+    tabProfile: "Танилцуулга",
+    tabPractice: "Чиглэл",
+    tabVerification: "Баталгаажуулалт",
+    tabSecurity: "Нэвтрэх мэдээлэл",
+    emailTitle: "И-мэйл хаяг",
+    emailDescription:
+      "И-мэйлээ солиход шинэ хаягаа дахин баталгаажуулах шаардлагатай.",
+    currentEmail: "Одоогийн и-мэйл",
+    newEmail: "Шинэ и-мэйл",
+    newEmailPh: "name@example.com",
+    changeEmailButton: "И-мэйл солих",
+    emailSavedToast: "И-мэйл шинэчлэгдлээ. Шинэ хаягаа баталгаажуулна уу.",
+    passwordTitle: "Нууц үг",
+    passwordDescription: "Аюулгүй байдлын үүднээс тогтмол шинэчилнэ үү.",
+    currentPassword: "Одоогийн нууц үг",
+    newPassword: "Шинэ нууц үг",
+    confirmPassword: "Шинэ нууц үг давтах",
+    changePasswordButton: "Нууц үг солих",
+    passwordSavedToast: "Нууц үг амжилттай солигдлоо",
+  },
   lawyerProfileForm: {
     savedToast: "Танилцуулга амжилттай хадгалагдлаа",
     lastName: "Овог",

@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
 import { getClientProfileForSession } from "@/application/actions/profile.actions";
+import { ChangeEmailForm } from "@/components/profiles/change-email-form";
+import { ChangePasswordForm } from "@/components/profiles/change-password-form";
 import { ClientProfileForm } from "@/components/profiles/client-profile-form";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
@@ -13,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { SimpleTabs } from "@/components/ui/simple-tabs";
 import { UserRole } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
 
@@ -56,28 +59,74 @@ export default async function ClientProfilePage() {
   return (
     <>
       <DashboardPageHeading>{cp.title}</DashboardPageHeading>
-      <Card>
-        <CardHeader>
-          <CardTitle>{cp.title}</CardTitle>
-          <CardDescription>
-            {cp.description}{" "}
-            <Link
-              href="/client/dashboard"
-              className="text-primary underline-offset-4 hover:underline"
-            >
-              {m.common.returnOverview}
-            </Link>
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ClientProfileForm
-            key={data.profile.updatedAt.toISOString()}
-            phone={data.profile.phone ?? ""}
-            companyName={data.profile.companyName ?? ""}
-            copy={{ ...m.clientProfileForm, saving: m.common.saving }}
-          />
-        </CardContent>
-      </Card>
+      <SimpleTabs
+        defaultValue="profile"
+        items={[
+          {
+            value: "profile",
+            label: m.account.tabProfile,
+            content: (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{cp.title}</CardTitle>
+                  <CardDescription>
+                    {cp.description}{" "}
+                    <Link
+                      href="/client/dashboard"
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      {m.common.returnOverview}
+                    </Link>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ClientProfileForm
+                    key={data.profile.updatedAt.toISOString()}
+                    phone={data.profile.phone ?? ""}
+                    companyName={data.profile.companyName ?? ""}
+                    copy={{ ...m.clientProfileForm, saving: m.common.saving }}
+                  />
+                </CardContent>
+              </Card>
+            ),
+          },
+          {
+            value: "security",
+            label: m.account.tabSecurity,
+            content: (
+              <div className="grid gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{m.account.emailTitle}</CardTitle>
+                    <CardDescription>
+                      {m.account.emailDescription}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ChangeEmailForm
+                      currentEmail={data.user.email}
+                      copy={{ ...m.account, saving: m.common.saving }}
+                    />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{m.account.passwordTitle}</CardTitle>
+                    <CardDescription>
+                      {m.account.passwordDescription}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ChangePasswordForm
+                      copy={{ ...m.account, saving: m.common.saving }}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            ),
+          },
+        ]}
+      />
     </>
   );
 }

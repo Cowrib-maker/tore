@@ -19,4 +19,6 @@ export interface UserRepository {
   markEmailVerified(userId: string, verifiedAt?: Date): Promise<User>;
   updatePasswordHash(userId: string, passwordHash: string): Promise<User>;
   updateProfile(userId: string, input: UpdateUserProfileInput): Promise<User>;
+  /** Sets a new email and resets verification (the new address is unverified). */
+  updateEmail(userId: string, email: string): Promise<User>;
 }
