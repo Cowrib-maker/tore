@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/application/common/session";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { UserRole } from "@/domain/enums";
-import { getDashboardPath } from "@/domain/services/rbac";
+import { getDashboardPath, getProfilePath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 
 export default async function ClientLayout({
@@ -25,6 +25,7 @@ export default async function ClientLayout({
     <DashboardShell
       user={session.user}
       nav={i18n.nav}
+      profileHref={getProfilePath(session.user.role as UserRole)}
       {...i18n.shellProps}
     >
       {children}

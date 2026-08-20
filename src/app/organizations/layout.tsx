@@ -6,7 +6,7 @@ import { getSessionUser } from "@/application/common/session";
 import { ActiveContextSwitcher } from "@/components/organizations/active-context-switcher";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { ActiveContextType } from "@/domain/enums";
-import { getDashboardPath } from "@/domain/services/rbac";
+import { getDashboardPath, getProfilePath } from "@/domain/services/rbac";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 import { isFoundationOrgsV1Enabled } from "@/lib/feature-flags";
@@ -47,6 +47,7 @@ export default async function OrganizationsLayout({
         email: session?.user?.email,
       }}
       nav={nav}
+      profileHref={getProfilePath(actor.role)}
       locale={locale}
       languageLabel={dict.common.language}
       signOutLabel={dict.dashboard.signOut}

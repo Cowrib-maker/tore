@@ -19,6 +19,16 @@ export function getDashboardPath(role: UserRole): string {
   return DASHBOARD_PATH[role];
 }
 
+/** Self-service profile page, where one exists for the role. */
+export const PROFILE_PATH: Partial<Record<UserRole, string>> = {
+  [UserRole.CLIENT]: "/client/profile",
+  [UserRole.LAWYER]: "/lawyer/profile",
+};
+
+export function getProfilePath(role: UserRole): string | null {
+  return PROFILE_PATH[role] ?? null;
+}
+
 /** Canonical client Legal AI workspace. */
 export const LEGAL_AI_PATH = "/legal-ai";
 

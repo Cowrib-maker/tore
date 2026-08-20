@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { logoutAction } from "@/application/actions/auth.actions";
 import { BRAND_LOGO_SHELL, BRAND_NAME } from "@/components/brand/tokens";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
@@ -28,6 +30,8 @@ interface DashboardShellProps {
   brand?: string;
   navAriaLabel?: string;
   mobileNavLabel?: string;
+  /** Self-service profile page. When set, the header name links there. */
+  profileHref?: string | null;
 }
 
 export function DashboardPageHeading({
@@ -53,6 +57,7 @@ export function DashboardShell({
   brand = BRAND_NAME,
   navAriaLabel = "Main navigation",
   mobileNavLabel = "Navigate",
+  profileHref,
 }: DashboardShellProps) {
   return (
     <div className="min-h-svh flex flex-col">
@@ -74,9 +79,18 @@ export function DashboardShell({
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <LanguageSwitcher locale={locale} label={languageLabel} />
-            <span className="hidden max-w-[10rem] truncate text-sm text-muted-foreground md:inline">
-              {user.name ?? user.email}
-            </span>
+            {profileHref ? (
+              <Link
+                href={profileHref}
+                className="hidden max-w-[10rem] truncate text-sm text-muted-foreground hover:text-foreground hover:underline md:inline"
+              >
+                {user.name ?? user.email}
+              </Link>
+            ) : (
+              <span className="hidden max-w-[10rem] truncate text-sm text-muted-foreground md:inline">
+                {user.name ?? user.email}
+              </span>
+            )}
             <form action={logoutAction}>
               <button
                 type="submit"
