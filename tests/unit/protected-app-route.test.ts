@@ -32,5 +32,11 @@ describe("protected app route boundaries", () => {
     expect(canAccessRoute(UserRole.ADMIN, "/organizations/org_1")).toBe(true);
 
     expect(canAccessRoute(UserRole.CLIENT, "/lawyer/dashboard")).toBe(false);
+    expect(
+      canAccessRoute(UserRole.CLIENT, "/lawyer/workspace/case-review"),
+    ).toBe(false);
+    expect(
+      canAccessRoute(UserRole.LAWYER, "/lawyer/workspace/cases"),
+    ).toBe(true);
   });
 });

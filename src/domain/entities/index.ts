@@ -1,4 +1,21 @@
 export type { User, CreateUserInput } from "./user";
+export type {
+  CaseFile,
+  CaseFilePatch,
+  CreateCaseFileInput,
+  ManualMappingLogEntry,
+  CaseFact,
+  CaseEvidenceRecord,
+  CaseFactEvidenceLink,
+} from "./case-file";
+export {
+  CaseFileAnalysisStatus,
+  CaseFactSourceType,
+  CaseEvidenceType,
+  FACT_TEXT_MAX,
+  EVIDENCE_TITLE_MAX,
+  EVIDENCE_DESCRIPTION_MAX,
+} from "./case-file";
 export type { Professional } from "./professional";
 export type {
   Organization,

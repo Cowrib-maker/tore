@@ -207,6 +207,7 @@ export type Dictionary = {
     navOfferings: string;
     navAvailability: string;
     navWorkspace: string;
+    navCases: string;
     navLegalChat: string;
     navLawyerReview: string;
     navUsers: string;

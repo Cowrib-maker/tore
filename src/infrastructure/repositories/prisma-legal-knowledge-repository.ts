@@ -1,17 +1,31 @@
 /**
  * PostgreSQL persistence for structured legal knowledge.
  * Always verifies the linked archive blob before insert.
+ *
+ * Article search filters in SQL — does not load the full corpus into memory.
  */
 
 import type { ArchiveService } from "@/engine/data/archive";
+import {
+  domainFilterHints,
+  extractArticleNumberFromText,
+  isPositiveLawDocumentType,
+  normalizeArticleNumber,
+  rankDocumentsToHits,
+  tokenizeSearchTerms,
+} from "@/engine/knowledge/repository/article-search";
 import type {
   IKnowledgeRepository,
   KnowledgeArticle,
+  KnowledgeArticleHit,
+  KnowledgeArticleSearchQuery,
   KnowledgeChunk,
   KnowledgeDocumentKind,
   StoredKnowledgeDocument,
 } from "@/engine/knowledge/types";
 import type { PrismaDbClient } from "@/infrastructure/database/prisma-client";
+
+type PrismaWhere = Record<string, unknown>;
 
 export class PrismaKnowledgeRepository implements IKnowledgeRepository {
   constructor(
@@ -67,9 +81,14 @@ export class PrismaKnowledgeRepository implements IKnowledgeRepository {
         contentSha256: provenance.sha256,
         archiveId: record.archiveId,
         version: priorVersions + 1,
+        validFrom: document.metadata.validFrom ?? null,
+        validTo: document.metadata.validTo ?? null,
+        sourceVersion:
+          document.metadata.sourceVersion ?? `v${priorVersions + 1}`,
         ingestedAt: document.ingestedAt,
         articles: {
           create: document.articles.map((article) => ({
+            ...(article.id ? { id: article.id } : {}),
             articleNumber: article.articleNumber,
             title: article.title,
             text: article.text,
@@ -130,6 +149,305 @@ export class PrismaKnowledgeRepository implements IKnowledgeRepository {
     });
     return rows.map(fromRow);
   }
+
+  /**
+   * SQL-scoped article/chunk search. Fetches a bounded candidate set of the
+   * smallest useful unit, then ranks with the shared deterministic scorer —
+   * never a full-corpus Node scan and never the entire sibling-article HTML.
+   */
+  async searchArticles(
+    query: KnowledgeArticleSearchQuery,
+  ): Promise<KnowledgeArticleHit[]> {
+    const limit = Math.min(Math.max(query.limit ?? 20, 1), 50);
+    const candidateLimit = Math.min(limit * 5, 100);
+    const documentWhere = buildDocumentWhere(query);
+    const wantedArticle =
+      normalizeArticleNumber(query.articleNumber) ??
+      extractArticleNumberFromText(query.text ?? "");
+
+    const articleRows = await this.db.legalKnowledgeArticle.findMany({
+      where: buildArticleWhere(documentWhere, query.text ?? "", wantedArticle),
+      take: candidateLimit,
+      orderBy: { order: "asc" },
+      include: {
+        document: {
+          include: {
+            chunks: {
+              ...(wantedArticle
+                ? {
+                    where: {
+                      OR: [
+                        { articleNumber: wantedArticle },
+                        {
+                          articleNumber: {
+                            contains: wantedArticle,
+                            mode: "insensitive" as const,
+                          },
+                        },
+                      ],
+                    },
+                  }
+                : {}),
+              orderBy: { order: "asc" as const },
+              take: 4,
+            },
+          },
+        },
+      },
+    });
+
+    const chunkRows =
+      wantedArticle || !(query.text ?? "").trim()
+        ? []
+        : await this.db.legalKnowledgeChunk.findMany({
+            where: {
+              AND: [
+                { document: documentWhere },
+                buildChunkTextWhere(query.text ?? ""),
+              ],
+            },
+            take: candidateLimit,
+            orderBy: { order: "asc" },
+            include: {
+              document: {
+                include: {
+                  articles: {
+                    orderBy: { order: "asc" as const },
+                    take: 8,
+                  },
+                },
+              },
+            },
+          });
+
+    const miniDocs = assembleCandidateDocuments(articleRows, chunkRows);
+    return rankDocumentsToHits(miniDocs, { ...query, limit });
+  }
+}
+
+function buildDocumentWhere(query: KnowledgeArticleSearchQuery): PrismaWhere {
+  const and: PrismaWhere[] = [];
+
+  if (query.jurisdiction) {
+    and.push({ jurisdiction: query.jurisdiction });
+  }
+  if (query.sourceUrl) {
+    and.push({ sourceUrl: query.sourceUrl });
+  }
+  if (query.sourceId) {
+    and.push({ sourceId: query.sourceId });
+  }
+  if (query.documentType) {
+    and.push({ documentType: query.documentType });
+  }
+
+  and.push({
+    NOT: {
+      OR: [
+        { documentType: { contains: "COURT", mode: "insensitive" } },
+        { documentType: { contains: "DECISION", mode: "insensitive" } },
+        { documentType: { contains: "JUDGMENT", mode: "insensitive" } },
+        { documentType: { contains: "COMMENTARY", mode: "insensitive" } },
+        { documentType: { contains: "DOCTRINE", mode: "insensitive" } },
+        { documentType: { contains: "REGULATION", mode: "insensitive" } },
+        { documentType: { contains: "AI", mode: "insensitive" } },
+        { documentType: { contains: "LLM", mode: "insensitive" } },
+      ],
+    },
+  });
+
+  const hints = domainFilterHints(query.domain);
+  const or: PrismaWhere[] = [];
+  for (const type of hints.documentTypes) {
+    or.push({ documentType: type });
+  }
+  for (const hint of hints.titleTerms) {
+    or.push({ title: { contains: hint, mode: "insensitive" } });
+    or.push({ documentType: { contains: hint, mode: "insensitive" } });
+  }
+  if (or.length > 0) {
+    and.push({ OR: or });
+  }
+
+  if (query.applicableAt) {
+    and.push({
+      OR: [{ validFrom: null }, { validFrom: { lte: query.applicableAt } }],
+    });
+    and.push({
+      OR: [{ validTo: null }, { validTo: { gte: query.applicableAt } }],
+    });
+  }
+
+  return and.length > 0 ? { AND: and } : {};
+}
+
+function buildArticleWhere(
+  documentWhere: PrismaWhere,
+  text: string,
+  wantedArticle: string | null,
+): PrismaWhere {
+  if (wantedArticle) {
+    return {
+      AND: [
+        { document: documentWhere },
+        {
+          OR: [
+            { articleNumber: wantedArticle },
+            {
+              articleNumber: {
+                equals: wantedArticle,
+                mode: "insensitive" as const,
+              },
+            },
+            {
+              articleNumber: {
+                contains: wantedArticle,
+                mode: "insensitive" as const,
+              },
+            },
+          ],
+        },
+      ],
+    };
+  }
+
+  return {
+    AND: [{ document: documentWhere }, buildTextContainsWhere(text)],
+  };
+}
+
+function buildTextContainsWhere(text: string): PrismaWhere {
+  const tokens = tokenizeSearchTerms(text, 6);
+  if (tokens.length === 0) {
+    return {};
+  }
+  return {
+    OR: tokens.flatMap((token) => [
+      { articleNumber: { contains: token, mode: "insensitive" as const } },
+      { title: { contains: token, mode: "insensitive" as const } },
+      { text: { contains: token, mode: "insensitive" as const } },
+    ]),
+  };
+}
+
+function buildChunkTextWhere(text: string): PrismaWhere {
+  const tokens = tokenizeSearchTerms(text, 6);
+  if (tokens.length === 0) {
+    return {};
+  }
+  return {
+    OR: tokens.flatMap((token) => [
+      { articleNumber: { contains: token, mode: "insensitive" as const } },
+      { text: { contains: token, mode: "insensitive" as const } },
+    ]),
+  };
+}
+
+type ArticleSearchRow = {
+  id: string;
+  documentId: string;
+  articleNumber: string | null;
+  title: string | null;
+  text: string;
+  order: number;
+  document: KnowledgeRow;
+};
+
+type ChunkSearchRow = {
+  id: string;
+  documentId: string;
+  articleNumber: string | null;
+  order: number;
+  text: string;
+  tokenEstimate: number;
+  document: KnowledgeRow;
+};
+
+function assembleCandidateDocuments(
+  articleRows: ArticleSearchRow[],
+  chunkRows: ChunkSearchRow[],
+): StoredKnowledgeDocument[] {
+  const byId = new Map<string, StoredKnowledgeDocument>();
+
+  for (const row of articleRows) {
+    if (!isPositiveLawDocumentType(row.document.documentType)) continue;
+    const mini = fromRow({
+      ...row.document,
+      articles: [
+        {
+          id: row.id,
+          articleNumber: row.articleNumber,
+          title: row.title,
+          text: row.text,
+          order: row.order,
+        },
+      ],
+      chunks: row.document.chunks ?? [],
+    });
+    mergeMiniDocument(byId, mini);
+  }
+
+  for (const row of chunkRows) {
+    if (!isPositiveLawDocumentType(row.document.documentType)) continue;
+    const matchingArticles = (row.document.articles ?? []).filter(
+      (article) =>
+        normalizeArticleNumber(article.articleNumber) ===
+        normalizeArticleNumber(row.articleNumber),
+    );
+    const articles =
+      matchingArticles.length > 0
+        ? matchingArticles
+        : [
+            {
+              id: row.id,
+              articleNumber: row.articleNumber,
+              title: null,
+              text: row.text,
+              order: row.order,
+            },
+          ];
+    const mini = fromRow({
+      ...row.document,
+      articles,
+      chunks: [
+        {
+          id: row.id,
+          documentId: row.documentId,
+          articleNumber: row.articleNumber,
+          order: row.order,
+          text: row.text,
+          tokenEstimate: row.tokenEstimate,
+        },
+      ],
+    });
+    mergeMiniDocument(byId, mini);
+  }
+
+  return [...byId.values()];
+}
+
+function mergeMiniDocument(
+  byId: Map<string, StoredKnowledgeDocument>,
+  incoming: StoredKnowledgeDocument,
+): void {
+  const existing = byId.get(incoming.id);
+  if (!existing) {
+    byId.set(incoming.id, incoming);
+    return;
+  }
+  const articles = [...existing.articles];
+  for (const article of incoming.articles) {
+    if (!articles.some((a) => a.id === article.id)) {
+      articles.push(article);
+    }
+  }
+  const chunks = [...existing.chunks];
+  for (const chunk of incoming.chunks) {
+    if (!chunks.some((c) => c.id === chunk.id)) {
+      chunks.push(chunk);
+    }
+  }
+  byId.set(incoming.id, { ...existing, articles, chunks });
 }
 
 type KnowledgeRow = {
@@ -146,14 +464,19 @@ type KnowledgeRow = {
   chunkCount: number;
   contentSha256: string;
   archiveId: string;
+  version?: number;
+  validFrom?: string | null;
+  validTo?: string | null;
+  sourceVersion?: string | null;
   ingestedAt: Date;
-  articles: Array<{
+  articles?: Array<{
+    id?: string;
     articleNumber: string | null;
     title: string | null;
     text: string;
     order: number;
   }>;
-  chunks: Array<{
+  chunks?: Array<{
     id: string;
     documentId: string;
     articleNumber: string | null;
@@ -164,13 +487,16 @@ type KnowledgeRow = {
 };
 
 function fromRow(row: KnowledgeRow): StoredKnowledgeDocument {
-  const articles: KnowledgeArticle[] = row.articles.map((article) => ({
-    articleNumber: article.articleNumber,
-    title: article.title,
-    text: article.text,
-    order: article.order,
-  }));
-  const chunks: KnowledgeChunk[] = row.chunks.map((chunk) => ({
+  const articles: KnowledgeArticle[] = (row.articles ?? []).map(
+    (article, index) => ({
+      id: article.id ?? `${row.id}:article:${article.order ?? index}`,
+      articleNumber: article.articleNumber,
+      title: article.title,
+      text: article.text,
+      order: article.order,
+    }),
+  );
+  const chunks: KnowledgeChunk[] = (row.chunks ?? []).map((chunk) => ({
     id: chunk.id,
     documentId: chunk.documentId,
     articleNumber: chunk.articleNumber,
@@ -191,10 +517,16 @@ function fromRow(row: KnowledgeRow): StoredKnowledgeDocument {
       documentType: row.documentType,
       sourceUrl: row.sourceUrl,
       articleCount: row.articleCount,
+      validFrom: row.validFrom ?? null,
+      validTo: row.validTo ?? null,
+      sourceVersion:
+        row.sourceVersion ??
+        (row.version != null ? `v${row.version}` : null),
     },
     articles,
     chunks,
     ingestedAt: row.ingestedAt,
+    version: row.version,
     provenance: {
       archiveId: row.archiveId,
       sha256: row.contentSha256,

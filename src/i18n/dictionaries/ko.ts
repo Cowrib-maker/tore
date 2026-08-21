@@ -264,6 +264,7 @@ export const ko: Dictionary = {
     navOfferings: "상담 서비스",
     navAvailability: "가능 시간",
     navWorkspace: "업무 공간",
+    navCases: "사건",
     navLegalChat: "법률 채팅",
     navLawyerReview: "자격 심사",
     navUsers: "사용자",

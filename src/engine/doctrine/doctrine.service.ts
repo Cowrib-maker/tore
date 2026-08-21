@@ -1,14 +1,26 @@
 /**
  * Legal Doctrine engine facade.
  *
- * Provides classification + empty frameworks + source-backed reasoning pipeline.
- * Does not scrape, invent Mongolian doctrine, or call LLMs.
+ * Provides classification + empty frameworks + source-backed reasoning pipeline
+ * + case-analysis orchestration.
+ * Does not scrape, invent Mongolian doctrine, or call LLMs as legal authority.
  */
 
+import type { IKnowledgeRepository } from "@/engine/knowledge/types";
 import {
   RuleBasedLegalDomainClassifier,
   type LegalDomainClassificationContract,
 } from "./classification";
+import {
+  createCaseAnalysisOrchestrator,
+  EmptyRuleRetriever,
+  KnowledgeRuleRetriever,
+  RuleBasedIssueSpotter,
+  type CaseAnalysisOrchestrator,
+  type CaseAnalysisRequest,
+  type CaseAnalysisResult,
+  type IRuleRetriever,
+} from "./case-analysis";
 import {
   EmptyAdministrativeDoctrineFramework,
   EmptyCivilDoctrineFramework,
@@ -33,18 +45,36 @@ import {
   type LegalDomain as LegalDomainType,
 } from "./types";
 
+export type DoctrineEngineDependenciesWithCaseAnalysis =
+  DoctrineEngineDependencies & {
+    ruleRetriever?: IRuleRetriever;
+    caseAnalysis?: CaseAnalysisOrchestrator;
+    /**
+     * When provided (and ruleRetriever is not), wires
+     * {@link KnowledgeRuleRetriever} over the knowledge repository.
+     * Default remains EmptyRuleRetriever — no corpus load at engine create.
+     */
+    knowledgeRepository?: IKnowledgeRepository;
+  };
+
 export class DoctrineService {
   private readonly repository: IDoctrineRepository;
   private readonly pipeline: ILegalReasoningPipeline;
   private readonly classifier: LegalDomainClassificationContract;
+  private readonly caseAnalysis: CaseAnalysisOrchestrator;
   readonly criminalFramework: DoctrineEngineDependencies["criminalFramework"];
   readonly civilFramework: DoctrineEngineDependencies["civilFramework"];
   readonly administrativeFramework: DoctrineEngineDependencies["administrativeFramework"];
 
-  constructor(dependencies: DoctrineEngineDependencies) {
+  constructor(
+    dependencies: DoctrineEngineDependencies & {
+      caseAnalysis: CaseAnalysisOrchestrator;
+    },
+  ) {
     this.repository = dependencies.repository;
     this.pipeline = dependencies.pipeline;
     this.classifier = dependencies.classifier;
+    this.caseAnalysis = dependencies.caseAnalysis;
     this.criminalFramework = dependencies.criminalFramework;
     this.civilFramework = dependencies.civilFramework;
     this.administrativeFramework = dependencies.administrativeFramework;
@@ -82,22 +112,54 @@ export class DoctrineService {
   reason(request: LegalReasoningRequest): LegalReasoningResult {
     return this.pipeline.run(request);
   }
+
+  /**
+   * Full case-analysis orchestration (facts → issues → doctrine → rules →
+   * subsumption → conclusion). Never invents doctrine or citations.
+   */
+  analyzeCase(request: CaseAnalysisRequest): Promise<CaseAnalysisResult> {
+    return this.caseAnalysis.analyze(request);
+  }
 }
 
 export function createDoctrineEngine(
-  overrides: Partial<DoctrineEngineDependencies> = {},
+  overrides: Partial<DoctrineEngineDependenciesWithCaseAnalysis> = {},
 ): DoctrineService {
+  const classifier =
+    overrides.classifier ?? new RuleBasedLegalDomainClassifier();
+  const criminalFramework =
+    overrides.criminalFramework ?? new EmptyCriminalDoctrineFramework();
+  const civilFramework =
+    overrides.civilFramework ?? new EmptyCivilDoctrineFramework();
+  const administrativeFramework =
+    overrides.administrativeFramework ??
+    new EmptyAdministrativeDoctrineFramework();
+
+  const ruleRetriever =
+    overrides.ruleRetriever ??
+    (overrides.knowledgeRepository
+      ? new KnowledgeRuleRetriever(overrides.knowledgeRepository)
+      : new EmptyRuleRetriever());
+
+  const caseAnalysis =
+    overrides.caseAnalysis ??
+    createCaseAnalysisOrchestrator({
+      issueSpotter: new RuleBasedIssueSpotter(classifier),
+      ruleRetriever,
+      classifier,
+      criminalFramework,
+      civilFramework,
+      administrativeFramework,
+    });
+
   return new DoctrineService({
     repository: overrides.repository ?? new InMemoryDoctrineRepository(),
     pipeline: overrides.pipeline ?? createLegalReasoningPipeline(),
-    classifier: overrides.classifier ?? new RuleBasedLegalDomainClassifier(),
-    criminalFramework:
-      overrides.criminalFramework ?? new EmptyCriminalDoctrineFramework(),
-    civilFramework:
-      overrides.civilFramework ?? new EmptyCivilDoctrineFramework(),
-    administrativeFramework:
-      overrides.administrativeFramework ??
-      new EmptyAdministrativeDoctrineFramework(),
+    classifier,
+    criminalFramework,
+    civilFramework,
+    administrativeFramework,
+    caseAnalysis,
   });
 }
 

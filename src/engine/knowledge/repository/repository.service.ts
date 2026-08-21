@@ -1,7 +1,13 @@
 import type {
   IKnowledgeRepository,
+  KnowledgeArticleHit,
+  KnowledgeArticleSearchQuery,
   StoredKnowledgeDocument,
 } from "../types";
+import {
+  filterDocumentsForSearch,
+  rankDocumentsToHits,
+} from "./article-search";
 
 /**
  * In-memory knowledge store.
@@ -14,10 +20,14 @@ export class InMemoryKnowledgeRepository implements IKnowledgeRepository {
   private readonly documents = new Map<string, StoredKnowledgeDocument>();
 
   async save(document: StoredKnowledgeDocument): Promise<StoredKnowledgeDocument> {
-    const stored = {
+    const stored: StoredKnowledgeDocument = {
       ...document,
-      articles: [...document.articles],
+      articles: document.articles.map((article, index) => ({
+        ...article,
+        id: article.id ?? `${document.id}:article:${article.order ?? index}`,
+      })),
       chunks: [...document.chunks],
+      metadata: { ...document.metadata },
     };
     this.documents.set(stored.id, stored);
     return stored;
@@ -38,5 +48,15 @@ export class InMemoryKnowledgeRepository implements IKnowledgeRepository {
 
   async list(): Promise<StoredKnowledgeDocument[]> {
     return [...this.documents.values()];
+  }
+
+  async searchArticles(
+    query: KnowledgeArticleSearchQuery,
+  ): Promise<KnowledgeArticleHit[]> {
+    const scoped = filterDocumentsForSearch(
+      [...this.documents.values()],
+      query,
+    );
+    return rankDocumentsToHits(scoped, query);
   }
 }

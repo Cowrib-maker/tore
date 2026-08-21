@@ -216,6 +216,7 @@ model User {
   organizationMemberships  OrganizationMembership[]
   aiConversations AIConversation[]
   aiUsage        AIUsage[]
+  caseFiles      CaseFile[] @relation("LawyerCaseFiles")
 
   @@index([role, status])
   @@index([email])
@@ -952,6 +953,11 @@ model LegalKnowledgeDocument {
   contentSha256 String   @map("content_sha256")
   archiveId     String   @map("archive_id")
   version       Int      @default(1)
+  /** ISO date — instrument validity start when known from catalog. */
+  validFrom     String?  @map("valid_from")
+  /** ISO date — exclusive/end bound when known; null = still in force / unknown. */
+  validTo       String?  @map("valid_to")
+  sourceVersion String?  @map("source_version")
   ingestedAt    DateTime @map("ingested_at")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
@@ -964,6 +970,8 @@ model LegalKnowledgeDocument {
   @@index([sourceUrl])
   @@index([lawId])
   @@index([archiveId])
+  @@index([sourceId])
+  @@index([jurisdiction, documentType])
   @@map("legal_knowledge_documents")
 }
 
@@ -978,7 +986,97 @@ model LegalKnowledgeArticle {
   document LegalKnowledgeDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@index([documentId, order])
+  @@index([articleNumber])
+  @@index([documentId, articleNumber])
   @@map("legal_knowledge_articles")
+}
+
+/**
+ * Lawyer-owned case file. Container for facts/request/review snapshots.
+ * Legal authority remains in LegalInfo knowledge; reasoning remains in the engine.
+ * Does not store a legal conclusion as an independent source of truth.
+ */
+model CaseFile {
+  id                String    @id @default(cuid())
+  ownerLawyerId     String    @map("owner_lawyer_id")
+  title             String
+  description       String?   @db.Text
+  legalDomain       String    @map("legal_domain")
+  version           Int       @default(1)
+  applicableAt      String    @map("applicable_at")
+  /// Serializable CaseAnalysisRequest (facts, evidence, mappings, applicableAt).
+  requestJson       Json      @map("request_json")
+  /// Last successful CaseAnalysisReview. Null until the engine has run.
+  reviewJson        Json?     @map("review_json")
+  /// Append-only MANUAL mapping audit log. Historical rows are never rewritten.
+  mappingLogJson    Json      @map("mapping_log_json")
+  /// Dev/sample InMemory retriever entries only — never a LegalInfo corpus copy.
+  fixtureRulesJson  Json?     @map("fixture_rules_json")
+  analysisStatus    String    @default("NOT_ANALYZED") @map("analysis_status")
+  lastAnalyzedAt    DateTime? @map("last_analyzed_at")
+  lastAnalysisError String?   @map("last_analysis_error") @db.Text
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  owner User @relation("LawyerCaseFiles", fields: [ownerLawyerId], references: [id], onDelete: Restrict)
+  facts    CaseFact[]
+  evidence CaseEvidence[]
+
+  @@index([ownerLawyerId, updatedAt(sort: Desc)])
+  @@map("case_files")
+}
+
+model CaseFact {
+  id              String   @id @default(cuid())
+  caseFileId      String   @map("case_file_id")
+  text            String   @db.Text
+  sourceType      String   @map("source_type")
+  sourceReference String?  @map("source_reference")
+  createdByUserId String   @map("created_by_user_id")
+  updatedByUserId String   @map("updated_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  caseFile CaseFile           @relation(fields: [caseFileId], references: [id], onDelete: Cascade)
+  links    CaseFactEvidence[]
+
+  @@index([caseFileId, createdAt])
+  @@map("case_facts")
+}
+
+model CaseEvidence {
+  id              String   @id @default(cuid())
+  caseFileId      String   @map("case_file_id")
+  title           String
+  description     String?  @db.Text
+  evidenceType    String   @map("evidence_type")
+  /// Nullable until the document-upload milestone. Not an archive/R2 key in this slice.
+  fileReference   String?  @map("file_reference")
+  sourceReference String?  @map("source_reference")
+  createdByUserId String   @map("created_by_user_id")
+  updatedByUserId String   @map("updated_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  caseFile CaseFile           @relation(fields: [caseFileId], references: [id], onDelete: Cascade)
+  links    CaseFactEvidence[]
+
+  @@index([caseFileId, createdAt])
+  @@map("case_evidence")
+}
+
+model CaseFactEvidence {
+  caseFactId      String   @map("case_fact_id")
+  caseEvidenceId  String   @map("case_evidence_id")
+  createdByUserId String   @map("created_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  fact     CaseFact     @relation(fields: [caseFactId], references: [id], onDelete: Cascade)
+  evidence CaseEvidence @relation(fields: [caseEvidenceId], references: [id], onDelete: Cascade)
+
+  @@id([caseFactId, caseEvidenceId])
+  @@index([caseEvidenceId])
+  @@map("case_fact_evidence")
 }
 
 model LegalKnowledgeChunk {
@@ -992,6 +1090,7 @@ model LegalKnowledgeChunk {
   document LegalKnowledgeDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@index([documentId, order])
+  @@index([documentId, articleNumber])
   @@map("legal_knowledge_chunks")
 }
 

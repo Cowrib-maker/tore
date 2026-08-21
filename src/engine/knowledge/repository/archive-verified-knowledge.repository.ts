@@ -6,6 +6,8 @@
 import type { ArchiveService } from "@/engine/data/archive";
 import type {
   IKnowledgeRepository,
+  KnowledgeArticleHit,
+  KnowledgeArticleSearchQuery,
   StoredKnowledgeDocument,
 } from "../types";
 
@@ -72,5 +74,11 @@ export class ArchiveVerifiedKnowledgeRepository
 
   list() {
     return this.inner.list();
+  }
+
+  searchArticles(
+    query: KnowledgeArticleSearchQuery,
+  ): Promise<KnowledgeArticleHit[]> {
+    return this.inner.searchArticles(query);
   }
 }

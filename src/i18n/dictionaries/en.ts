@@ -320,6 +320,7 @@ export const en: Dictionary = {
     navOfferings: "Offerings",
     navAvailability: "Availability",
     navWorkspace: "Workspace",
+    navCases: "Cases",
     navLegalChat: "Legal chat",
     navLawyerReview: "Credential review",
     navUsers: "Users",

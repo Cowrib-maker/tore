@@ -263,6 +263,7 @@ export const zh: Dictionary = {
     navOfferings: "咨询服务",
     navAvailability: "可预约时段",
     navWorkspace: "工作台",
+    navCases: "案件",
     navLegalChat: "法律聊天",
     navLawyerReview: "资质审核",
     navUsers: "用户",

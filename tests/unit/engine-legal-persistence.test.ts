@@ -89,6 +89,9 @@ function createFakePrisma() {
       archiveId: string;
       version: number;
       ingestedAt: Date;
+      validFrom?: string | null;
+      validTo?: string | null;
+      sourceVersion?: string | null;
       articles: Array<{
         articleNumber: string | null;
         title: string | null;
@@ -209,6 +212,9 @@ function createFakePrisma() {
           archiveId: string;
           version: number;
           ingestedAt: Date;
+          validFrom?: string | null;
+          validTo?: string | null;
+          sourceVersion?: string | null;
           articles: {
             create: Array<{
               articleNumber: string | null;
@@ -244,6 +250,9 @@ function createFakePrisma() {
           archiveId: data.archiveId,
           version: data.version,
           ingestedAt: data.ingestedAt,
+          validFrom: data.validFrom ?? null,
+          validTo: data.validTo ?? null,
+          sourceVersion: data.sourceVersion ?? null,
           articles: data.articles.create,
           chunks: data.chunks.create.map((chunk) => ({
             ...chunk,

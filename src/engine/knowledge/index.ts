@@ -46,6 +46,8 @@ export type {
   IKnowledgeParser,
   IKnowledgeRepository,
   KnowledgeArticle,
+  KnowledgeArticleHit,
+  KnowledgeArticleSearchQuery,
   KnowledgeChunk,
   KnowledgeCrawlJob,
   KnowledgeEngineDependencies,
@@ -58,6 +60,8 @@ export type {
   StoredKnowledgeDocument,
   KnowledgeArchiveProvenance,
 } from "./types";
+export type { KnowledgeMatchKind } from "./types";
+export { KnowledgeMatchKind as KnowledgeMatchKinds } from "./types";
 export type {
   CommentaryAuthor,
   GovernmentRegulationBody,
@@ -154,6 +158,14 @@ export { ParagraphKnowledgeChunker } from "./chunker";
 export {
   ArchiveVerifiedKnowledgeRepository,
   InMemoryKnowledgeRepository,
+  documentMatchesDomain,
+  domainFilterHints,
+  extractArticleNumberFromText,
+  isKnowledgeApplicableAt,
+  isPositiveLawDocumentType,
+  normalizeArticleNumber,
+  rankDocumentsToHits,
+  tokenizeSearchTerms,
 } from "./repository";
 export { JsonKnowledgeExporter } from "./exporter";
 export {

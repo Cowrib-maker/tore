@@ -40,6 +40,8 @@ export type RawKnowledgeDocument = {
 
 /** One structural unit of a legal text. Not a RAG embedding. */
 export type KnowledgeArticle = {
+  /** Stable id when persisted (Prisma cuid or `${documentId}:article:${order}`). */
+  id?: string;
   articleNumber: string | null;
   title: string | null;
   text: string;
@@ -68,6 +70,12 @@ export type KnowledgeMetadata = {
   documentType: string | null;
   sourceUrl: string;
   articleCount: number;
+  /** ISO date — when known from source catalog; null if unknown. */
+  validFrom?: string | null;
+  /** ISO date — exclusive end when known; null = still in force / unknown. */
+  validTo?: string | null;
+  /** Source / archive version label when known. */
+  sourceVersion?: string | null;
 };
 
 /** Retrieval-sized slice of an article. No vector is attached here. */
@@ -91,11 +99,72 @@ export type StoredKnowledgeDocument = {
   articles: KnowledgeArticle[];
   chunks: KnowledgeChunk[];
   ingestedAt: Date;
+  /** Monotonic version per sourceUrl when persisted via Prisma. */
+  version?: number;
   /**
    * Link to the immutable archive snapshot. Required for durable PostgreSQL
    * persistence; optional for in-memory / offline verification scripts.
    */
   provenance?: KnowledgeArchiveProvenance;
+};
+
+/**
+ * Deterministic article-level search for positive-law rule retrieval.
+ * Repository implementations must filter in-store — not load the full corpus.
+ */
+export type KnowledgeArticleSearchQuery = {
+  /** Free-text / legal concept / issue statement. */
+  text?: string;
+  /** Exact or normalized article number (e.g. "15", "Зүйл 15"). */
+  articleNumber?: string | null;
+  /** CRIMINAL | CIVIL | ADMINISTRATIVE — filters via document metadata/title. */
+  domain?: string | null;
+  issueKind?: string | null;
+  jurisdiction?: string | null;
+  sourceUrl?: string | null;
+  sourceId?: string | null;
+  documentType?: string | null;
+  /** When set, callers should discard hits outside validity; repo may pre-filter. */
+  applicableAt?: string | null;
+  limit?: number;
+};
+
+export const KnowledgeMatchKind = {
+  ARTICLE_NUMBER: "ARTICLE_NUMBER",
+  CONCEPT: "CONCEPT",
+  ISSUE_KIND: "ISSUE_KIND",
+  TITLE: "TITLE",
+  CHUNK: "CHUNK",
+} as const;
+
+export type KnowledgeMatchKind =
+  (typeof KnowledgeMatchKind)[keyof typeof KnowledgeMatchKind];
+
+/**
+ * Smallest useful positive-law unit returned by {@link IKnowledgeRepository.searchArticles}.
+ */
+export type KnowledgeArticleHit = {
+  documentId: string;
+  sourceId: string;
+  sourceUrl: string;
+  officialUrl: string;
+  documentTitle: string;
+  documentType: string | null;
+  jurisdiction: string;
+  lawId: string | null;
+  contentSha256: string | null;
+  version: number | null;
+  articleId: string;
+  articleNumber: string | null;
+  articleTitle: string | null;
+  articleText: string;
+  chunkId: string | null;
+  chunkText: string | null;
+  matchKind: KnowledgeMatchKind;
+  score: number;
+  validFrom: string | null;
+  validTo: string | null;
+  sourceVersion: string | null;
 };
 
 /**
@@ -160,6 +229,13 @@ export interface IKnowledgeRepository {
   findById(id: string): Promise<StoredKnowledgeDocument | null>;
   findBySourceUrl(sourceUrl: string): Promise<StoredKnowledgeDocument | null>;
   list(): Promise<StoredKnowledgeDocument[]>;
+  /**
+   * Article-level search for rule retrieval. Must not invent content.
+   * Prisma path filters in SQL; in-memory path scans its local map only.
+   */
+  searchArticles(
+    query: KnowledgeArticleSearchQuery,
+  ): Promise<KnowledgeArticleHit[]>;
 }
 
 /** Port: serialize the knowledge base for backup or downstream pipelines. */

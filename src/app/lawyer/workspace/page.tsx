@@ -24,6 +24,17 @@ export default async function LawyerWorkspacePage() {
   return (
     <>
       <DashboardPageHeading>{dict.dashboard.navWorkspace}</DashboardPageHeading>
+      <p className="mb-4 text-sm text-muted-foreground">
+        <a
+          href="/lawyer/workspace/cases"
+          className="font-medium underline underline-offset-4"
+        >
+          Case files
+        </a>
+        {" — "}
+        persist facts, MANUAL mappings, and the last engine review. This
+        workspace does not generate legal conclusions.
+      </p>
       <PillTopTabs
         defaultValue="research"
         items={[

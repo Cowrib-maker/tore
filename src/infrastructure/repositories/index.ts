@@ -17,4 +17,5 @@ export {
   lawyerTaxonomyRepository,
 } from "./prisma-taxonomy-repository";
 export { emailVerificationTokenRepository } from "./prisma-email-verification-token-repository";
+export { caseFileRepository } from "./prisma-case-file-repository";
 export { unitOfWork } from "@/infrastructure/database/prisma-unit-of-work";

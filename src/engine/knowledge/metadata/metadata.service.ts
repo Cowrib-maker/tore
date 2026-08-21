@@ -25,6 +25,9 @@ export class RuleBasedKnowledgeMetadataExtractor
       documentType: inferDocumentType(sample),
       sourceUrl: document.sourceUrl,
       articleCount: document.articles.length,
+      validFrom: null,
+      validTo: null,
+      sourceVersion: null,
     };
   }
 }

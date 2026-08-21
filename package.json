@@ -25,6 +25,7 @@
     "ingest:legalinfo:dry-run": "tsx scripts/ingest-legalinfo-dry-run.ts",
     "ingest:legalinfo:batch-10": "tsx scripts/ingest-legalinfo-batch-10.ts",
     "ingest:legalinfo:canary-10": "tsx scripts/ingest-legalinfo-cloud-canary-10.ts",
+    "ingest:legalinfo:cloud": "tsx scripts/ingest-legalinfo-cloud.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {

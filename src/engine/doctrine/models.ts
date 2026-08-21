@@ -10,6 +10,8 @@ import type { DoctrineProvenance } from "./provenance";
 import type {
   LegalDomain,
   TemporalApplicability,
+  FactElementRelation,
+  MappingMethod,
 } from "./types";
 
 /** Abstract legal concept used inside doctrine (e.g. an element label). */
@@ -67,7 +69,8 @@ export type LegalElement = {
 export type LegalTest = {
   id: string;
   name: string;
-  doctrineId: string;
+  /** Null when the test is extracted from positive law, not a doctrine corpus. */
+  doctrineId: string | null;
   ruleId: string | null;
   elements: LegalElement[];
   temporal: TemporalApplicability;
@@ -101,7 +104,13 @@ export type LegalFact = {
   id: string;
   statement: string;
   elementId: string | null;
+  /** Extra element ids when one fact is assigned to multiple elements. */
+  elementIds?: string[];
   disputed: boolean;
+  /** Caller-assigned relation; default SUPPORTS when an element id is set. */
+  mappingRelation?: FactElementRelation;
+  /** EXPLICIT (default) or MANUAL when the caller assigned element ids. */
+  mappingMethod?: MappingMethod;
 };
 
 /** Evidence offered to support a fact. */

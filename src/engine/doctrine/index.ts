@@ -6,14 +6,21 @@
  * Doctrine remains distinct from positive law, court decisions,
  * administrative regulations, and AI inference.
  *
- * Does not populate a doctrine corpus, scrape sources, call LLMs,
+ * Does not populate a doctrine corpus, scrape sources, call LLMs as authority,
  * or alter LegalInfo ingestion / UI.
  */
 
 export {
+  CaseAnalysisStage,
+  ConclusionDisposition,
+  ElementExtractionKind,
+  FactElementRelation,
+  MappingConfidence,
+  MappingMethod,
   LegalAuthorityKind,
   LegalConflictKind,
   LegalDomain,
+  LegalIssueKind,
   LegalReasoningStepKind,
   LegalReasoningStepStatus,
   ReasoningSupportStatus,
@@ -21,7 +28,16 @@ export {
   SubsumptionMatchStatus,
   emptyTemporal,
 } from "./types";
-export type { TemporalApplicability } from "./types";
+export type {
+  CaseAnalysisStage as CaseAnalysisStageType,
+  ConclusionDisposition as ConclusionDispositionType,
+  ElementExtractionKind as ElementExtractionKindType,
+  FactElementRelation as FactElementRelationType,
+  MappingConfidence as MappingConfidenceType,
+  MappingMethod as MappingMethodType,
+  LegalIssueKind as LegalIssueKindType,
+  TemporalApplicability,
+} from "./types";
 
 export type {
   DoctrineProvenance,
@@ -32,6 +48,8 @@ export {
   evaluateSourceBackedSupport,
   isNonAiProvenance,
 } from "./provenance";
+
+export { filterApplicableAt, isApplicableAt } from "./temporal";
 
 export type {
   LegalDomainClassificationContract,
@@ -68,9 +86,13 @@ export type {
   ICriminalDoctrineFramework,
 } from "./frameworks";
 export {
+  ADMINISTRATIVE_ISSUE_KINDS,
+  CIVIL_ISSUE_KINDS,
+  CRIMINAL_ISSUE_KINDS,
   EmptyAdministrativeDoctrineFramework,
   EmptyCivilDoctrineFramework,
   EmptyCriminalDoctrineFramework,
+  issueKindsForDomain,
 } from "./frameworks";
 
 export type {
@@ -97,10 +119,68 @@ export {
 } from "./reasoning";
 
 export type {
+  CaseAnalysisConclusion,
+  CaseAnalysisOrchestratorDependencies,
+  CaseAnalysisRequest,
+  CaseAnalysisResult,
+  CaseAnalysisReview,
+  CaseReviewWorkspacePayload,
+  CaseIntakeFactView,
+  CaseIntakeEvidenceView,
+  CaseAnalysisTrace,
+  CaseAnalysisTraceStep,
+  CaseCounterargument,
+  CandidateLegalIssue,
+  ElementApplication,
+  ElementApplicationResult,
+  IIssueSpotter,
+  ILegalReasoningModel,
+  IRuleRetriever,
+  ISubsumptionEngine,
+  IssueSpottingResult,
+  LegalArgumentDraft,
+  RetrievedLegalRule,
+  RuleRetrievalQuery,
+  ExtractedLegalTest,
+  ILegalTestExtractor,
+  LegalTestExtractionQuery,
+  ExplicitFactMappingInput,
+  FactElementMapping,
+  IFactElementMapper,
+  SubsumptionEngineResult,
+} from "./case-analysis";
+export {
+  CaseAnalysisOrchestrator,
+  DefaultSubsumptionEngine,
+  DeterministicFactElementMapper,
+  EmptyLegalTestExtractor,
+  EmptyRuleRetriever,
+  InMemoryRuleRetriever,
+  KNOWLEDGE_AUTHORITATIVE_MIN_SCORE,
+  KnowledgeRuleRetriever,
+  NullLegalReasoningModel,
+  RuleBasedIssueSpotter,
+  SourceGroundedLegalTestExtractor,
+  assertRuleSupported,
+  bindFactsToElements,
+  buildCaseAnalysisReview,
+  createCaseAnalysisOrchestrator,
+  createFactElementMapper,
+  createLegalTestExtractor,
+  evaluateElementMappings,
+  mappingIsAdequate,
+  resolveKnowledgeDomain,
+} from "./case-analysis";
+
+export type {
   DoctrineEngineDependencies,
   DoctrineIssueDraft,
   IDoctrineRepository,
 } from "./interfaces";
 export { InMemoryDoctrineRepository } from "./interfaces";
 
-export { DoctrineService, createDoctrineEngine } from "./doctrine.service";
+export {
+  DoctrineService,
+  createDoctrineEngine,
+} from "./doctrine.service";
+export type { DoctrineEngineDependenciesWithCaseAnalysis } from "./doctrine.service";

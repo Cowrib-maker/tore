@@ -18,6 +18,7 @@ export type {
 export type { ConsultationOfferingRepository } from "./consultation-offering-repository";
 export type { AvailabilityRepository } from "./availability-repository";
 export type { BookingRepository } from "./booking-repository";
+export type { CaseFileRepository } from "./case-file-repository";
 export type {
   PaymentRepository,
   PayoutRepository,
