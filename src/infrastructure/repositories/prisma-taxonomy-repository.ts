@@ -1,10 +1,14 @@
 import type {
+  CreateLanguageInput,
+  CreatePracticeAreaInput,
   Language,
   LawyerLanguageLink,
   LawyerPracticeAreaLink,
   PracticeArea,
   SetLawyerLanguagesInput,
   SetLawyerPracticeAreasInput,
+  UpdateLanguageInput,
+  UpdatePracticeAreaInput,
 } from "@/domain/entities/taxonomy";
 import type { LanguageProficiency } from "@/domain/enums";
 import type {
@@ -92,6 +96,55 @@ export class PrismaPracticeAreaRepository implements PracticeAreaRepository {
     });
     return records.map(mapPracticeArea);
   }
+
+  async findAll(): Promise<PracticeArea[]> {
+    const records = await this.db.practiceArea.findMany({
+      where: { deletedAt: null },
+      orderBy: { sortOrder: "asc" },
+      select: practiceAreaSelect,
+    });
+    return records.map(mapPracticeArea);
+  }
+
+  async create(input: CreatePracticeAreaInput): Promise<PracticeArea> {
+    const record = await this.db.practiceArea.create({
+      data: {
+        slug: input.slug,
+        nameMn: input.nameMn,
+        nameEn: input.nameEn,
+        descriptionMn: input.descriptionMn ?? null,
+        descriptionEn: input.descriptionEn ?? null,
+        sortOrder: input.sortOrder ?? 0,
+      },
+      select: practiceAreaSelect,
+    });
+    return mapPracticeArea(record);
+  }
+
+  async update(
+    id: string,
+    input: UpdatePracticeAreaInput,
+  ): Promise<PracticeArea> {
+    const record = await this.db.practiceArea.update({
+      where: { id },
+      data: {
+        ...(input.nameMn !== undefined ? { nameMn: input.nameMn } : {}),
+        ...(input.nameEn !== undefined ? { nameEn: input.nameEn } : {}),
+        ...(input.descriptionMn !== undefined
+          ? { descriptionMn: input.descriptionMn }
+          : {}),
+        ...(input.descriptionEn !== undefined
+          ? { descriptionEn: input.descriptionEn }
+          : {}),
+        ...(input.sortOrder !== undefined
+          ? { sortOrder: input.sortOrder }
+          : {}),
+        ...(input.isActive !== undefined ? { isActive: input.isActive } : {}),
+      },
+      select: practiceAreaSelect,
+    });
+    return mapPracticeArea(record);
+  }
 }
 
 export class PrismaLanguageRepository implements LanguageRepository {
@@ -120,6 +173,39 @@ export class PrismaLanguageRepository implements LanguageRepository {
       select: languageSelect,
     });
     return records.map(mapLanguage);
+  }
+
+  async findAll(): Promise<Language[]> {
+    const records = await this.db.language.findMany({
+      orderBy: { code: "asc" },
+      select: languageSelect,
+    });
+    return records.map(mapLanguage);
+  }
+
+  async create(input: CreateLanguageInput): Promise<Language> {
+    const record = await this.db.language.create({
+      data: {
+        code: input.code,
+        nameMn: input.nameMn,
+        nameEn: input.nameEn,
+      },
+      select: languageSelect,
+    });
+    return mapLanguage(record);
+  }
+
+  async update(id: string, input: UpdateLanguageInput): Promise<Language> {
+    const record = await this.db.language.update({
+      where: { id },
+      data: {
+        ...(input.nameMn !== undefined ? { nameMn: input.nameMn } : {}),
+        ...(input.nameEn !== undefined ? { nameEn: input.nameEn } : {}),
+        ...(input.isActive !== undefined ? { isActive: input.isActive } : {}),
+      },
+      select: languageSelect,
+    });
+    return mapLanguage(record);
   }
 }
 

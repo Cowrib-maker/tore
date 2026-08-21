@@ -209,6 +209,9 @@ export type Dictionary = {
     navWorkspace: string;
     navLegalChat: string;
     navLawyerReview: string;
+    navUsers: string;
+    navTaxonomy: string;
+    navSettings: string;
     navAdminDev: string;
     navOrganizations: string;
     pageOfferings: string;

@@ -1,5 +1,9 @@
 import type { User } from "@/domain/entities/user";
-import type { UserRepository } from "@/domain/repositories/user-repository";
+import type {
+  ListUsersInput,
+  ListUsersResult,
+  UserRepository,
+} from "@/domain/repositories/user-repository";
 import type {
   CreateUserInput,
   UpdateUserProfileInput,
@@ -143,6 +147,44 @@ export class PrismaUserRepository implements UserRepository {
       data: {
         ...(input.name !== undefined ? { name: input.name } : {}),
       },
+      select: userSelect,
+    });
+    return mapUser(record);
+  }
+
+  async listUsers(input: ListUsersInput): Promise<ListUsersResult> {
+    const where = {
+      deletedAt: null,
+      ...(input.role ? { role: input.role } : {}),
+      ...(input.status ? { status: input.status } : {}),
+      ...(input.search
+        ? {
+            OR: [
+              { email: { contains: input.search, mode: "insensitive" as const } },
+              { name: { contains: input.search, mode: "insensitive" as const } },
+            ],
+          }
+        : {}),
+    };
+
+    const [records, total] = await Promise.all([
+      this.db.user.findMany({
+        where,
+        select: userSelect,
+        orderBy: { createdAt: "desc" },
+        take: input.limit,
+        skip: input.offset,
+      }),
+      this.db.user.count({ where }),
+    ]);
+
+    return { items: records.map(mapUser), total };
+  }
+
+  async updateStatus(userId: string, status: UserStatus): Promise<User> {
+    const record = await this.db.user.update({
+      where: { id: userId },
+      data: { status },
       select: userSelect,
     });
     return mapUser(record);

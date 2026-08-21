@@ -15,6 +15,28 @@ export class PrismaPlatformSettingRepository implements PlatformSettingRepositor
     });
     return records.map(mapPlatformSetting);
   }
+
+  async findAll(): Promise<PlatformSetting[]> {
+    const records = await prisma.platformSetting.findMany({
+      orderBy: { key: "asc" },
+    });
+    return records.map(mapPlatformSetting);
+  }
+
+  async updateValue(
+    key: string,
+    value: string,
+    updatedByUserId?: string,
+  ): Promise<PlatformSetting> {
+    const record = await prisma.platformSetting.update({
+      where: { key },
+      data: {
+        value,
+        ...(updatedByUserId ? { updatedByUserId } : {}),
+      },
+    });
+    return mapPlatformSetting(record);
+  }
 }
 
 export const platformSettingRepository = new PrismaPlatformSettingRepository();

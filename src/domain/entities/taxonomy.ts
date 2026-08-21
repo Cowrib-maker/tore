@@ -35,6 +35,36 @@ export interface LawyerLanguageLink {
   createdAt: Date;
 }
 
+export interface CreatePracticeAreaInput {
+  slug: string;
+  nameMn: string;
+  nameEn: string;
+  descriptionMn?: string | null;
+  descriptionEn?: string | null;
+  sortOrder?: number;
+}
+
+export interface UpdatePracticeAreaInput {
+  nameMn?: string;
+  nameEn?: string;
+  descriptionMn?: string | null;
+  descriptionEn?: string | null;
+  sortOrder?: number;
+  isActive?: boolean;
+}
+
+export interface CreateLanguageInput {
+  code: string;
+  nameMn: string;
+  nameEn: string;
+}
+
+export interface UpdateLanguageInput {
+  nameMn?: string;
+  nameEn?: string;
+  isActive?: boolean;
+}
+
 export interface SetLawyerPracticeAreasInput {
   lawyerProfileId: string;
   practiceAreaIds: string[];

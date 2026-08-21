@@ -3,7 +3,20 @@ import type {
   CreateUserInput,
   UpdateUserProfileInput,
 } from "@/domain/entities/user";
-import type { UserRole } from "@/domain/enums";
+import type { UserRole, UserStatus } from "@/domain/enums";
+
+export type ListUsersInput = {
+  search?: string;
+  role?: UserRole;
+  status?: UserStatus;
+  limit: number;
+  offset: number;
+};
+
+export type ListUsersResult = {
+  items: User[];
+  total: number;
+};
 
 export interface UserRepository {
   findById(id: string): Promise<User | null>;
@@ -21,4 +34,6 @@ export interface UserRepository {
   updateProfile(userId: string, input: UpdateUserProfileInput): Promise<User>;
   /** Sets a new email and resets verification (the new address is unverified). */
   updateEmail(userId: string, email: string): Promise<User>;
+  listUsers(input: ListUsersInput): Promise<ListUsersResult>;
+  updateStatus(userId: string, status: UserStatus): Promise<User>;
 }
