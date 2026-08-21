@@ -42,6 +42,7 @@ export const getShellI18n = cache(async (role: "client" | "lawyer" | "admin") =>
               { href: "/admin/users", label: d.navUsers },
               { href: "/admin/taxonomy", label: d.navTaxonomy },
               { href: "/admin/settings", label: d.navSettings },
+              { href: "/admin/homepage", label: d.navHomepage },
               ...(process.env.NODE_ENV !== "production"
                 ? [{ href: "/admin/dev", label: d.navAdminDev }]
                 : []),

@@ -42,3 +42,18 @@ export function buildAppFilePath(key: string, appUrl?: string): string {
 export function assertKnownFilePurpose(purpose: string): purpose is FilePurpose {
   return (FILE_PURPOSES as readonly string[]).includes(purpose);
 }
+
+/**
+ * Public, unauthenticated path for homepage marketing images — served by a
+ * dedicated route that never touches session auth, unlike /api/files.
+ */
+export function buildPublicHomepageImagePath(key: string, appUrl?: string): string {
+  assertSafeStorageKey(key);
+  const encoded = key
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+  const path = `/api/homepage-images/${encoded}`;
+  if (!appUrl) return path;
+  return `${appUrl.replace(/\/$/, "")}${path}`;
+}

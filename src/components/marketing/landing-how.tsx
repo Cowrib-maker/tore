@@ -6,9 +6,15 @@ import {
 } from "@/components/marketing/landing-section";
 import type { Dictionary } from "@/i18n/types";
 
-export function LandingHow({ t }: { t: Dictionary["landing"] }) {
+export function LandingHow({
+  t,
+  imageUrl,
+}: {
+  t: Dictionary["landing"];
+  imageUrl?: string | null;
+}) {
   return (
-    <LandingSection id="how">
+    <LandingSection id="how" imageUrl={imageUrl}>
       <LandingReveal className="max-w-2xl">
         <LandingEyebrow>{t.howEyebrow}</LandingEyebrow>
         <LandingHeading>{t.howTitle}</LandingHeading>

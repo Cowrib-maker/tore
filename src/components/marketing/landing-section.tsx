@@ -7,11 +7,13 @@ export function LandingSection({
   children,
   className,
   muted = false,
+  imageUrl,
 }: {
   id?: string;
   children: ReactNode;
   className?: string;
   muted?: boolean;
+  imageUrl?: string | null;
 }) {
   return (
     <section
@@ -22,7 +24,17 @@ export function LandingSection({
         className,
       )}
     >
-      <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-16 lg:py-18">{children}</div>
+      <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-16 lg:py-18">
+        {imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={imageUrl}
+            alt=""
+            className="mb-10 max-h-96 w-full rounded-2xl border border-[#0B1F3A]/10 object-cover"
+          />
+        ) : null}
+        {children}
+      </div>
     </section>
   );
 }

@@ -5,9 +5,15 @@ import { LandingReveal } from "@/components/marketing/landing-reveal";
 import { LandingSection } from "@/components/marketing/landing-section";
 import type { Dictionary } from "@/i18n/types";
 
-export function LandingEnterprise({ t }: { t: Dictionary["landing"] }) {
+export function LandingEnterprise({
+  t,
+  imageUrl,
+}: {
+  t: Dictionary["landing"];
+  imageUrl?: string | null;
+}) {
   return (
-    <LandingSection id="enterprise">
+    <LandingSection id="enterprise" imageUrl={imageUrl}>
       <div className="overflow-hidden rounded-2xl border border-[#0B1F3A]/20 bg-[#0B1F3A] text-white">
         <div className="grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <LandingReveal className="p-6 sm:p-8 lg:p-10">

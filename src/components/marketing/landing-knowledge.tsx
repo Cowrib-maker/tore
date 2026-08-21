@@ -7,9 +7,15 @@ import {
 } from "@/components/marketing/landing-section";
 import type { Dictionary } from "@/i18n/types";
 
-export function LandingKnowledge({ t }: { t: Dictionary["landing"] }) {
+export function LandingKnowledge({
+  t,
+  imageUrl,
+}: {
+  t: Dictionary["landing"];
+  imageUrl?: string | null;
+}) {
   return (
-    <LandingSection id="knowledge" muted>
+    <LandingSection id="knowledge" muted imageUrl={imageUrl}>
       <div className="grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-14">
         <LandingReveal>
           <LandingEyebrow>{t.knowledgeEyebrow}</LandingEyebrow>

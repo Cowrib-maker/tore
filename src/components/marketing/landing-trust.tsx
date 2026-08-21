@@ -7,9 +7,15 @@ import {
 } from "@/components/marketing/landing-section";
 import type { Dictionary } from "@/i18n/types";
 
-export function LandingTrust({ t }: { t: Dictionary["landing"] }) {
+export function LandingTrust({
+  t,
+  imageUrl,
+}: {
+  t: Dictionary["landing"];
+  imageUrl?: string | null;
+}) {
   return (
-    <LandingSection id="trust" muted>
+    <LandingSection id="trust" muted imageUrl={imageUrl}>
       <LandingReveal className="max-w-2xl">
         <LandingEyebrow>{t.trustEyebrow}</LandingEyebrow>
         <LandingHeading>{t.trustTitle}</LandingHeading>

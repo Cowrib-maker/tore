@@ -269,6 +269,7 @@ export const zh: Dictionary = {
     navUsers: "用户",
     navTaxonomy: "分类",
     navSettings: "设置",
+    navHomepage: "主页",
     navAdminDev: "Dev tools",
     navOrganizations: "组织",
     pageOfferings: "咨询服务",

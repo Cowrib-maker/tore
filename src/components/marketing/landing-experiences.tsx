@@ -19,9 +19,15 @@ const HREFS = [
 
 const ANCHORS = ["citizens", "businesses", "lawyers", "government"] as const;
 
-export function LandingExperiences({ t }: { t: Dictionary["landing"] }) {
+export function LandingExperiences({
+  t,
+  imageUrl,
+}: {
+  t: Dictionary["landing"];
+  imageUrl?: string | null;
+}) {
   return (
-    <LandingSection id="platform">
+    <LandingSection id="platform" imageUrl={imageUrl}>
       <LandingReveal className="max-w-2xl">
         <LandingEyebrow>{t.experiencesEyebrow}</LandingEyebrow>
         <LandingHeading>{t.experiencesTitle}</LandingHeading>

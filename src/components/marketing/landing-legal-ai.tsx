@@ -13,12 +13,14 @@ import { cn } from "@/lib/utils";
 export function LandingLegalAi({
   t,
   exploreHref,
+  imageUrl,
 }: {
   t: Dictionary["landing"];
   exploreHref: string;
+  imageUrl?: string | null;
 }) {
   return (
-    <LandingSection id="ai">
+    <LandingSection id="ai" imageUrl={imageUrl}>
       <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-14">
         <LandingReveal>
           <LandingEyebrow>{t.aiEyebrow}</LandingEyebrow>

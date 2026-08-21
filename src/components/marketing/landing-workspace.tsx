@@ -8,13 +8,19 @@ import {
 import type { Dictionary } from "@/i18n/types";
 import { cn } from "@/lib/utils";
 
-export function LandingWorkspace({ t }: { t: Dictionary["landing"] }) {
+export function LandingWorkspace({
+  t,
+  imageUrl,
+}: {
+  t: Dictionary["landing"];
+  imageUrl?: string | null;
+}) {
   const modules = t.workspaceModules;
   const nav = modules.slice(0, 5);
   const active = nav[0] ?? modules[0];
 
   return (
-    <LandingSection id="workspace">
+    <LandingSection id="workspace" imageUrl={imageUrl}>
       <div className="grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center lg:gap-14">
         <LandingReveal>
           <LandingEyebrow>{t.workspaceEyebrow}</LandingEyebrow>

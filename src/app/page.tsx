@@ -1,4 +1,5 @@
 import { getSessionUser } from "@/application/common/session";
+import { getHomepageSectionImages } from "@/application/actions/homepage.actions";
 import { LandingPage } from "@/components/marketing/landing-page";
 import { UserRole } from "@/domain/enums";
 import {
@@ -9,10 +10,11 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 
 export default async function HomePage() {
-  const [dict, locale, session] = await Promise.all([
+  const [dict, locale, session, sectionImages] = await Promise.all([
     getDictionary(),
     getLocale(),
     getSessionUser(),
+    getHomepageSectionImages(),
   ]);
 
   const role = session?.user?.role as UserRole | undefined;
@@ -40,6 +42,7 @@ export default async function HomePage() {
       authUser={authUser}
       composerMode={composerMode}
       exploreHref={exploreHref}
+      sectionImages={sectionImages}
     />
   );
 }

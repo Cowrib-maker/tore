@@ -10,10 +10,12 @@ export function LandingHero({
   t,
   exploreHref,
   composerMode,
+  imageUrl,
 }: {
   t: Dictionary["landing"];
   exploreHref: string;
   composerMode: "guest" | "client" | "other";
+  imageUrl?: string | null;
 }) {
   return (
     <section className="relative overflow-hidden border-b border-[#0B1F3A]/8 bg-white">
@@ -24,6 +26,14 @@ export function LandingHero({
 
       <div className="relative mx-auto max-w-3xl px-5 pt-16 pb-16 text-center sm:px-8 sm:pt-20 sm:pb-20 lg:pt-24 lg:pb-24">
         <LandingReveal>
+          {imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imageUrl}
+              alt=""
+              className="mx-auto mb-8 max-h-80 w-full max-w-2xl rounded-2xl border border-[#0B1F3A]/10 object-cover"
+            />
+          ) : null}
           <p className="text-[11px] font-semibold tracking-[0.18em] text-[#5C6570] uppercase">
             {t.osEyebrow}
           </p>

@@ -10,9 +10,15 @@ import {
 } from "@/components/marketing/landing-section";
 import type { Dictionary } from "@/i18n/types";
 
-export function LandingMarketplace({ t }: { t: Dictionary["landing"] }) {
+export function LandingMarketplace({
+  t,
+  imageUrl,
+}: {
+  t: Dictionary["landing"];
+  imageUrl?: string | null;
+}) {
   return (
-    <LandingSection id="marketplace" muted>
+    <LandingSection id="marketplace" muted imageUrl={imageUrl}>
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <LandingReveal className="max-w-2xl">
           <LandingEyebrow>{t.marketEyebrow}</LandingEyebrow>

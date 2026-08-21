@@ -17,6 +17,7 @@ import {
 } from "@/components/marketing/landing-section";
 import { LandingTrust } from "@/components/marketing/landing-trust";
 import { LandingWorkspace } from "@/components/marketing/landing-workspace";
+import type { HomepageSectionKey } from "@/domain/entities/homepage-section";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/types";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,7 @@ type LandingPageProps = {
   authUser?: LandingAuthUser | null;
   composerMode: "guest" | "client" | "other";
   exploreHref: string;
+  sectionImages?: Partial<Record<HomepageSectionKey, string | null>>;
 };
 
 export function LandingPage({
@@ -35,8 +37,10 @@ export function LandingPage({
   authUser,
   composerMode,
   exploreHref,
+  sectionImages,
 }: LandingPageProps) {
   const t = dict.landing;
+  const images = sectionImages ?? {};
 
   return (
     <div
@@ -50,16 +54,17 @@ export function LandingPage({
           t={t}
           exploreHref={exploreHref}
           composerMode={composerMode}
+          imageUrl={images.hero}
         />
-        <LandingExperiences t={t} />
-        <LandingLegalAi t={t} exploreHref={exploreHref} />
-        <LandingKnowledge t={t} />
-        <LandingWorkspace t={t} />
-        <LandingMarketplace t={t} />
-        <LandingEnterprise t={t} />
-        <LandingTrust t={t} />
-        <LandingHow t={t} />
-        <LandingSection id="resources">
+        <LandingExperiences t={t} imageUrl={images.experiences} />
+        <LandingLegalAi t={t} exploreHref={exploreHref} imageUrl={images["legal-ai"]} />
+        <LandingKnowledge t={t} imageUrl={images.knowledge} />
+        <LandingWorkspace t={t} imageUrl={images.workspace} />
+        <LandingMarketplace t={t} imageUrl={images.marketplace} />
+        <LandingEnterprise t={t} imageUrl={images.enterprise} />
+        <LandingTrust t={t} imageUrl={images.trust} />
+        <LandingHow t={t} imageUrl={images.how} />
+        <LandingSection id="resources" imageUrl={images.faq}>
           <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-12">
             <LandingReveal>
               <LandingEyebrow>{t.faqEyebrow}</LandingEyebrow>

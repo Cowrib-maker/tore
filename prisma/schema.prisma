@@ -250,6 +250,7 @@ model User {
   disputesRaised           Dispute[]              @relation("DisputeRaiser")
   disputesResolved         Dispute[]              @relation("DisputeResolver")
   platformSettingsUpdated  PlatformSetting[]      @relation("PlatformSettingUpdater")
+  homepageSectionsUpdated  HomepageSection[]      @relation("HomepageSectionUpdater")
   reviewsModerated         Review[]               @relation("ReviewModerator")
   organizationMemberships  OrganizationMembership[]
   aiConversations AIConversation[]
@@ -865,6 +866,17 @@ model PlatformSetting {
   updatedBy User? @relation("PlatformSettingUpdater", fields: [updatedByUserId], references: [id], onDelete: SetNull)
 
   @@map("platform_settings")
+}
+
+model HomepageSection {
+  key             String   @id
+  imageKey        String?  @map("image_key")
+  updatedByUserId String?  @map("updated_by_user_id")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  updatedBy User? @relation("HomepageSectionUpdater", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+
+  @@map("homepage_sections")
 }
 // ─── TORE Legal AI ────────────────────────────────────────────────────────────
 

@@ -12,6 +12,7 @@ export const FILE_PURPOSES = [
   "contract",
   "evidence",
   "message-attachment",
+  "homepage-image",
 ] as const;
 
 export type FilePurpose = (typeof FILE_PURPOSES)[number];

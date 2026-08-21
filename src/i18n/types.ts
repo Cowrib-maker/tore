@@ -213,6 +213,7 @@ export type Dictionary = {
     navUsers: string;
     navTaxonomy: string;
     navSettings: string;
+    navHomepage: string;
     navAdminDev: string;
     navOrganizations: string;
     pageOfferings: string;

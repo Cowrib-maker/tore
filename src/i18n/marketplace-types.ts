@@ -493,4 +493,26 @@ export type MarketplaceDictionary = {
     saved: string;
     updatedAt: string;
   };
+  adminHomepage: {
+    pageTitle: string;
+    pageHelp: string;
+    noImage: string;
+    upload: string;
+    change: string;
+    remove: string;
+    uploaded: string;
+    removed: string;
+    sectionLabels: {
+      hero: string;
+      experiences: string;
+      "legal-ai": string;
+      knowledge: string;
+      workspace: string;
+      marketplace: string;
+      enterprise: string;
+      trust: string;
+      how: string;
+      faq: string;
+    };
+  };
 };
