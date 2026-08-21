@@ -28,6 +28,18 @@ export function assertProductionEnvGuards(env: Env): void {
     }
   }
 
+  if (env.ARCHIVE_STORAGE === "s3") {
+    const bucket = env.ARCHIVE_S3_BUCKET || env.S3_BUCKET;
+    const missing: string[] = [];
+    if (!bucket) missing.push("ARCHIVE_S3_BUCKET or S3_BUCKET");
+    if (!env.S3_REGION) missing.push("S3_REGION");
+    if (!env.S3_ACCESS_KEY_ID) missing.push("S3_ACCESS_KEY_ID");
+    if (!env.S3_SECRET_ACCESS_KEY) missing.push("S3_SECRET_ACCESS_KEY");
+    if (missing.length > 0) {
+      throw new Error(`ARCHIVE_STORAGE=s3 requires: ${missing.join(", ")}`);
+    }
+  }
+
   if (
     env.NODE_ENV === "production" &&
     env.FILE_STORAGE !== "s3" &&
@@ -35,6 +47,17 @@ export function assertProductionEnvGuards(env: Env): void {
   ) {
     throw new Error(
       "Production requires FILE_STORAGE=s3 (set TORE_ALLOW_LOCAL_STORAGE=1 only for exceptional deploys)",
+    );
+  }
+
+  if (
+    env.NODE_ENV === "production" &&
+    env.ARCHIVE_STORAGE !== "s3" &&
+    !allowFlag("TORE_ALLOW_LOCAL_STORAGE") &&
+    !allowFlag("TORE_ALLOW_LOCAL_ARCHIVE")
+  ) {
+    throw new Error(
+      "Production requires ARCHIVE_STORAGE=s3 (set TORE_ALLOW_LOCAL_ARCHIVE=1 or TORE_ALLOW_LOCAL_STORAGE=1 only for exceptional deploys)",
     );
   }
 

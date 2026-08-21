@@ -13,6 +13,9 @@ function prodEnv(overrides: Partial<Env> = {}): Env {
     NODE_ENV: "production",
     FILE_STORAGE: "s3",
     FILE_STORAGE_LOCAL_ROOT: ".data/uploads",
+    ARCHIVE_STORAGE: "s3",
+    ARCHIVE_LOCAL_ROOT: ".data/legal-archive",
+    ARCHIVE_S3_PREFIX: "legal-archive",
     S3_BUCKET: "tore",
     S3_REGION: "ap-southeast-1",
     S3_ACCESS_KEY_ID: "key",
@@ -30,6 +33,7 @@ function prodEnv(overrides: Partial<Env> = {}): Env {
 
 const FLAG_KEYS = [
   "TORE_ALLOW_LOCAL_STORAGE",
+  "TORE_ALLOW_LOCAL_ARCHIVE",
   "TORE_ALLOW_NO_REDIS",
   "TORE_ALLOW_NO_EMAIL",
   "TORE_ALLOW_INSECURE_URLS",
@@ -55,6 +59,17 @@ describe("assertProductionEnvGuards", () => {
     process.env.TORE_ALLOW_LOCAL_STORAGE = "1";
     expect(() =>
       assertProductionEnvGuards(prodEnv({ FILE_STORAGE: "local" })),
+    ).not.toThrow();
+  });
+
+  it("requires ARCHIVE_STORAGE=s3 in production unless allow flag", () => {
+    expect(() =>
+      assertProductionEnvGuards(prodEnv({ ARCHIVE_STORAGE: "local" })),
+    ).toThrow(/ARCHIVE_STORAGE=s3/);
+
+    process.env.TORE_ALLOW_LOCAL_ARCHIVE = "1";
+    expect(() =>
+      assertProductionEnvGuards(prodEnv({ ARCHIVE_STORAGE: "local" })),
     ).not.toThrow();
   });
 

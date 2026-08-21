@@ -11,7 +11,7 @@ export class InMemoryArchiveRepository implements IArchiveRepository {
   private readonly byId = new Map<string, ArchiveRecord>();
   private readonly byHash = new Map<string, string>();
 
-  save(record: ArchiveRecord): void {
+  async save(record: ArchiveRecord): Promise<void> {
     if (this.byId.has(record.archiveId)) {
       throw new Error(`Archive record is immutable: ${record.archiveId}`);
     }
@@ -23,7 +23,7 @@ export class InMemoryArchiveRepository implements IArchiveRepository {
     this.byHash.set(frozen.sha256, frozen.archiveId);
   }
 
-  findByHash(sha256: string): ArchiveRecord | null {
+  async findByHash(sha256: string): Promise<ArchiveRecord | null> {
     const id = this.byHash.get(sha256.toLowerCase());
     if (!id) {
       return null;
@@ -31,11 +31,14 @@ export class InMemoryArchiveRepository implements IArchiveRepository {
     return this.byId.get(id) ?? null;
   }
 
-  findByArchiveId(archiveId: string): ArchiveRecord | null {
+  async findByArchiveId(archiveId: string): Promise<ArchiveRecord | null> {
     return this.byId.get(archiveId) ?? null;
   }
 
-  findVersions(connectorId: string, originalUrl: string): ArchiveRecord[] {
+  async findVersions(
+    connectorId: string,
+    originalUrl: string,
+  ): Promise<ArchiveRecord[]> {
     return [...this.byId.values()]
       .filter(
         (record) =>
@@ -45,7 +48,7 @@ export class InMemoryArchiveRepository implements IArchiveRepository {
       .sort((left, right) => left.archiveVersion - right.archiveVersion);
   }
 
-  exists(sha256: string): boolean {
+  async exists(sha256: string): Promise<boolean> {
     return this.byHash.has(sha256.toLowerCase());
   }
 }

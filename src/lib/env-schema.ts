@@ -21,6 +21,16 @@ export const envSchema = z.object({
   FILE_STORAGE: z.enum(["local", "s3"]).default("local"),
   /** Absolute or process-relative root for local object storage. Never hardcode in app code. */
   FILE_STORAGE_LOCAL_ROOT: z.string().min(1).default(".data/uploads"),
+  /**
+   * Legal-source archive object storage (HttpKnowledgeCrawler / ArchiveService).
+   * Distinct purpose from FILE_STORAGE (marketplace uploads).
+   */
+  ARCHIVE_STORAGE: z.enum(["local", "s3"]).default("local"),
+  ARCHIVE_LOCAL_ROOT: z.string().min(1).default(".data/legal-archive"),
+  /** Optional key prefix inside the archive bucket (no leading slash). */
+  ARCHIVE_S3_PREFIX: z.string().min(1).default("legal-archive"),
+  /** Optional dedicated archive bucket; falls back to S3_BUCKET. */
+  ARCHIVE_S3_BUCKET: z.string().optional(),
   S3_BUCKET: z.string().optional(),
   S3_REGION: z.string().optional(),
   S3_ACCESS_KEY_ID: z.string().optional(),
