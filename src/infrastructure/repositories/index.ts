@@ -18,4 +18,9 @@ export {
 } from "./prisma-taxonomy-repository";
 export { emailVerificationTokenRepository } from "./prisma-email-verification-token-repository";
 export { caseFileRepository } from "./prisma-case-file-repository";
+export { subscriptionRepository } from "./prisma-subscription-repository";
+export { deviceSessionRepository } from "./prisma-device-session-repository";
+export { entitlementUsageRepository } from "./prisma-entitlement-usage-repository";
+export { invoiceRepository } from "./prisma-invoice-repository";
+export { paymentTransactionRepository } from "./prisma-payment-transaction-repository";
 export { unitOfWork } from "@/infrastructure/database/prisma-unit-of-work";

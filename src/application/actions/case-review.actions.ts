@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import type { ActionState } from "@/application/common/action-state";
 import { mapActionError } from "@/application/common/map-action-error";
+import { guardLawyerAiHttp, recordLawyerFeatureUsage } from "@/application/common/guard-lawyer-ai-http";
 import { requireActor } from "@/application/common/require-actor";
 import {
   createCaseEvidenceForLawyer,
@@ -22,7 +23,7 @@ import {
   updateCaseFactForLawyer,
 } from "@/application/use-cases/case-review";
 import { parseEvidenceIds } from "@/application/use-cases/case-review/view-model";
-import { UserRole } from "@/domain/enums";
+import { EntitlementFeature, UserRole } from "@/domain/enums";
 import { ValidationError } from "@/domain/errors/domain-error";
 import type { CaseReviewWorkspacePayload } from "@/engine/doctrine";
 
@@ -57,8 +58,13 @@ export async function createCaseFileAction(
 
 export async function openSampleCaseAction(formData: FormData): Promise<void> {
   const actor = await requireActor(UserRole.LAWYER);
+  const guard = await guardLawyerAiHttp(
+    actor,
+    EntitlementFeature.CASE_ANALYSIS,
+  );
   const variant = String(formData.get("variant") ?? "");
   const payload = await openSampleCaseForLawyer(actor, variant);
+  await recordLawyerFeatureUsage(guard.usageId, EntitlementFeature.CASE_ANALYSIS);
   revalidatePath(CASES_PATH);
   redirect(`${REVIEW_PATH}?caseId=${encodeURIComponent(payload.caseId)}`);
 }
@@ -91,10 +97,20 @@ export async function rerunCaseAnalysisAction(
 ): Promise<CaseReviewActionState> {
   try {
     const actor = await requireActor(UserRole.LAWYER);
+    const guard = await guardLawyerAiHttp(
+      actor,
+      EntitlementFeature.CASE_ANALYSIS,
+    );
     const payload = await rerunCaseAnalysisForLawyer(actor, {
       caseId: String(formData.get("caseId") ?? ""),
       expectedVersion: Number(formData.get("expectedVersion") ?? NaN),
     });
+    if (!payload.lastAnalysisError) {
+      await recordLawyerFeatureUsage(
+        guard.usageId,
+        EntitlementFeature.CASE_ANALYSIS,
+      );
+    }
     revalidatePath(REVIEW_PATH);
     revalidatePath(CASES_PATH);
     return { success: true, payload, caseId: payload.caseId };

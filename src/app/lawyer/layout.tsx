@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { AccountSharingBanner } from "@/components/account/account-sharing-banner";
+import { DeviceSessionBeacon } from "@/components/account/device-session-beacon";
 import { UserRole } from "@/domain/enums";
 import { getDashboardPath, getProfilePath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
@@ -28,6 +30,8 @@ export default async function LawyerLayout({
       profileHref={getProfilePath(session.user.role as UserRole)}
       {...i18n.shellProps}
     >
+      <DeviceSessionBeacon />
+      <AccountSharingBanner copy={i18n.dict.marketplace.account} />
       {children}
     </DashboardShell>
   );

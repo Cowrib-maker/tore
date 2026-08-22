@@ -75,6 +75,16 @@ export const envSchema = z.object({
   /** Shared secret for Authorization: Bearer. Never expose to the browser. */
   ENGINE_SERVICE_TOKEN: z.string().min(8).optional(),
   ENGINE_TIMEOUT_MS: z.coerce.number().int().min(1000).max(30_000).default(8000),
+  /**
+   * QPay Merchant V2. Server-only. Sandbox vs production is selected by BASE_URL.
+   * Optional until a lawyer starts checkout; then all four plus invoice code are required.
+   */
+  QPAY_BASE_URL: z.string().url().optional(),
+  QPAY_CLIENT_ID: z.string().min(1).optional(),
+  QPAY_CLIENT_SECRET: z.string().min(1).optional(),
+  QPAY_CALLBACK_URL: z.string().url().optional(),
+  /** Merchant invoice_code assigned by QPay. Required to create invoices. */
+  QPAY_INVOICE_CODE: z.string().min(1).optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

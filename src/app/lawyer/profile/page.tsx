@@ -13,6 +13,7 @@ import {
 } from "@/components/marketplace/availability-forms";
 import { ChangeEmailForm } from "@/components/profiles/change-email-form";
 import { ChangePasswordForm } from "@/components/profiles/change-password-form";
+import { BillingAndSessionsPanel } from "@/components/account/billing-and-sessions-panel";
 import { LawyerProfileForm } from "@/components/profiles/lawyer-profile-form";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { LawyerVerificationSection } from "@/components/verification/lawyer-verification-section";
@@ -305,6 +306,17 @@ export default async function LawyerProfilePage() {
                   </CardContent>
                 </Card>
               </div>
+            ),
+          },
+          {
+            value: "billing",
+            label: m.account.tabBilling,
+            content: (
+              <BillingAndSessionsPanel
+                copy={m.account}
+                locale={locale}
+                supportEmail="support@tore.mn"
+              />
             ),
           },
         ]}

@@ -169,6 +169,44 @@ enum OrganizationMembershipStatus {
   SUSPENDED
 }
 
+enum SubscriptionPlanCode {
+  SOLO
+  TEAM
+}
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+}
+
+enum BillingInvoiceStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+  CANCELLED
+}
+
+enum BillingPaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+enum SeatStatus {
+  ACTIVE
+  REVOKED
+}
+
+enum DeviceSessionStatus {
+  ACTIVE
+  REVOKED
+}
+
 // ─── Identity & Authentication (Auth.js) ─────────────────────────────────────
 
 model User {
@@ -217,6 +255,12 @@ model User {
   aiConversations AIConversation[]
   aiUsage        AIUsage[]
   caseFiles      CaseFile[] @relation("LawyerCaseFiles")
+  ownedSubscriptions Subscription[] @relation("SubscriptionOwner")
+  subscriptionSeats  SubscriptionSeat[]
+  deviceSessions     DeviceSession[]
+  entitlementUsages  EntitlementUsage[]
+  billingInvoices    Invoice[]
+
 
   @@index([role, status])
   @@index([email])
@@ -898,6 +942,152 @@ model AIUsage {
   @@index([userId, createdAt])
   @@index([provider, model, createdAt])
   @@map("ai_usage")
+}
+
+// ─── Subscriptions, seats, device sessions (entitlement / anti-sharing) ───────
+
+/**
+ * Paid (or catalog-default) subscription. QPay remains the payment adapter;
+ * entitlements are calculated from this record, never from the client.
+ */
+model Subscription {
+  id                 String             @id @default(cuid())
+  ownerUserId        String             @map("owner_user_id")
+  planCode           SubscriptionPlanCode @map("plan_code")
+  status             SubscriptionStatus
+  seatLimit          Int                @map("seat_limit")
+  currentPeriodStart DateTime           @map("current_period_start")
+  currentPeriodEnd   DateTime           @map("current_period_end")
+  /// Payment-provider invoice id when billed. Not an entitlement input.
+  providerInvoiceId  String?            @map("provider_invoice_id")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+
+  owner          User               @relation("SubscriptionOwner", fields: [ownerUserId], references: [id], onDelete: Restrict)
+  seats          SubscriptionSeat[]
+  deviceSessions DeviceSession[]
+  usages         EntitlementUsage[]
+  invoices       Invoice[]
+
+  @@index([ownerUserId, status])
+  @@index([status, currentPeriodEnd])
+  @@map("subscriptions")
+}
+
+/// One human user assigned to a subscription. Sessions are not seats.
+model SubscriptionSeat {
+  id             String     @id @default(cuid())
+  subscriptionId String     @map("subscription_id")
+  userId         String     @map("user_id")
+  status         SeatStatus @default(ACTIVE)
+  assignedAt     DateTime   @default(now()) @map("assigned_at")
+  revokedAt      DateTime?  @map("revoked_at")
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([subscriptionId, userId])
+  @@index([userId, status])
+  @@index([subscriptionId, status])
+  @@map("subscription_seats")
+}
+
+/**
+ * Server-side device/session tracking. A session is not a seat.
+ * Stores IP hash only (never raw IP). No hardware fingerprints.
+ */
+model DeviceSession {
+  id                      String              @id @default(cuid())
+  userId                  String              @map("user_id")
+  subscriptionId          String?             @map("subscription_id")
+  userAgent               String?             @map("user_agent") @db.VarChar(256)
+  ipHash                  String?             @map("ip_hash")
+  firstSeenAt             DateTime            @map("first_seen_at")
+  lastSeenAt              DateTime            @map("last_seen_at")
+  revokedAt               DateTime?           @map("revoked_at")
+  status                  DeviceSessionStatus @default(ACTIVE)
+  requestCountWindowStart DateTime?           @map("request_count_window_start")
+  requestCountInWindow    Int                 @default(0) @map("request_count_in_window")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, status])
+  @@index([subscriptionId, status])
+  @@index([status, lastSeenAt])
+  @@index([userId, lastSeenAt])
+  @@map("device_sessions")
+}
+
+/// Monthly feature-quota ledger. Token columns are backend-only.
+model EntitlementUsage {
+  id                     String   @id @default(cuid())
+  userId                 String   @map("user_id")
+  subscriptionId         String?  @map("subscription_id")
+  periodStart            DateTime @map("period_start") @db.Date
+  caseAnalysisCount      Int      @default(0) @map("case_analysis_count")
+  documentAnalysisCount  Int      @default(0) @map("document_analysis_count")
+  legalAiQueryCount      Int      @default(0) @map("legal_ai_query_count")
+  inputTokens            Int      @default(0) @map("input_tokens")
+  outputTokens           Int      @default(0) @map("output_tokens")
+  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, periodStart])
+  @@index([subscriptionId, periodStart])
+  @@map("entitlement_usages")
+}
+
+/**
+ * Local billing invoice. QPay invoice_id is stored as providerInvoiceId.
+ * Subscription is linked only after verified payment (or reused on renewal).
+ */
+model Invoice {
+  id                String               @id @default(cuid())
+  userId            String               @map("user_id")
+  subscriptionId    String?              @map("subscription_id")
+  planCode          SubscriptionPlanCode @map("plan_code")
+  amountMnt         Int                  @map("amount_mnt")
+  currency          String               @default("MNT")
+  provider          String
+  providerInvoiceId String?              @unique @map("provider_invoice_id")
+  status            BillingInvoiceStatus
+  expiresAt         DateTime             @map("expires_at")
+  qrText            String?              @map("qr_text") @db.Text
+  qrImage           String?              @map("qr_image") @db.Text
+  shortUrl          String?              @map("short_url")
+  deeplinksJson     Json?                @map("deeplinks_json")
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
+
+  user         User                  @relation(fields: [userId], references: [id], onDelete: Restrict)
+  subscription Subscription?         @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  payments     PaymentTransaction[]
+
+  @@index([userId, status])
+  @@index([status, expiresAt])
+  @@map("invoices")
+}
+
+model PaymentTransaction {
+  id                 String               @id @default(cuid())
+  invoiceId          String               @unique @map("invoice_id")
+  provider           String
+  providerPaymentId  String               @unique @map("provider_payment_id")
+  amountMnt          Int                  @map("amount_mnt")
+  currency           String               @default("MNT")
+  status             BillingPaymentStatus
+  paidAt             DateTime?            @map("paid_at")
+  metadataJson       Json?                @map("metadata_json")
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+
+  @@index([status])
+  @@map("payment_transactions")
 }
 
 /**

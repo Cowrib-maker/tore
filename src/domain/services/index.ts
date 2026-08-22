@@ -67,6 +67,31 @@ export {
   filterAvailableSlots,
 } from "./generate-slots";
 export {
+  evaluateAccountSharingRisk,
+  shouldRestrictExpensiveOps,
+  RISK_SIGNAL_FAMILIES,
+} from "./account-sharing-risk";
+export type {
+  AccountSharingRiskInput,
+  AccountSharingRiskResult,
+  RiskSignalFamily,
+  RiskSignalId,
+} from "./account-sharing-risk";
+export {
+  resolveLawyerEntitlement,
+  evaluateFeatureQuota,
+  isSubscriptionActive,
+  toPublicUsageSnapshot,
+  utcMonthStart,
+  utcMonthEnd,
+  emptyUsageCounts,
+} from "./entitlement";
+export type {
+  LawyerEntitlement,
+  PublicUsageSnapshot,
+  QuotaDecision,
+} from "./entitlement";
+export {
   isLawyerVerified,
   isLawyerPubliclyListed,
   canClientBookLawyer,
@@ -76,3 +101,4 @@ export {
   isUserActive,
   canRegisterAs,
 } from "./lawyer-eligibility";
+export { summarizeUserAgent, truncateUserAgent } from "./user-agent";

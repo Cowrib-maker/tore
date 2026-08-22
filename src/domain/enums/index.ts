@@ -174,3 +174,55 @@ export enum ActiveContextType {
   PERSONAL = "PERSONAL",
   ORGANIZATION = "ORGANIZATION",
 }
+
+export enum SubscriptionPlanCode {
+  SOLO = "SOLO",
+  TEAM = "TEAM",
+}
+
+export enum SubscriptionStatus {
+  PENDING = "PENDING",
+  ACTIVE = "ACTIVE",
+  PAST_DUE = "PAST_DUE",
+  CANCELED = "CANCELED",
+  EXPIRED = "EXPIRED",
+}
+
+export enum InvoiceStatus {
+  PENDING = "PENDING",
+  PAID = "PAID",
+  FAILED = "FAILED",
+  EXPIRED = "EXPIRED",
+  CANCELLED = "CANCELLED",
+}
+
+export enum PaymentTransactionStatus {
+  PENDING = "PENDING",
+  PAID = "PAID",
+  FAILED = "FAILED",
+  CANCELLED = "CANCELLED",
+}
+
+export const BILLING_PROVIDER_QPAY = "QPAY";
+
+export enum SeatStatus {
+  ACTIVE = "ACTIVE",
+  REVOKED = "REVOKED",
+}
+
+export enum DeviceSessionStatus {
+  ACTIVE = "ACTIVE",
+  REVOKED = "REVOKED",
+}
+
+export enum AccountSharingRiskState {
+  NORMAL = "NORMAL",
+  SUSPICIOUS = "SUSPICIOUS",
+  HIGH_RISK = "HIGH_RISK",
+}
+
+export enum EntitlementFeature {
+  CASE_ANALYSIS = "CASE_ANALYSIS",
+  DOCUMENT_ANALYSIS = "DOCUMENT_ANALYSIS",
+  LEGAL_AI_QUERY = "LEGAL_AI_QUERY",
+}

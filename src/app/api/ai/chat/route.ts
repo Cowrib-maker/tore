@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 
 import { LegalAiError } from "@/application/ai/legal-ai.errors";
 import { getLegalAiService } from "@/application/ai/create-legal-ai-service";
-import { auth } from "@/lib/auth";
+import { guardLawyerAiHttp, recordLawyerFeatureUsage } from "@/application/common/guard-lawyer-ai-http";
+import { requireActor } from "@/application/common/require-actor";
+import { DomainError } from "@/domain/errors/domain-error";
+import { EntitlementFeature, UserRole } from "@/domain/enums";
 
 type ChatRequest = {
   message?: string;
@@ -12,25 +15,34 @@ type ChatRequest = {
 
 export async function POST(request: Request) {
   try {
-    const session = await auth();
+    const actor = await requireActor();
+    let usageId: string | undefined;
 
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Нэвтэрч орно уу." },
-        { status: 401 },
+    if (actor.role === UserRole.LAWYER) {
+      const guard = await guardLawyerAiHttp(
+        actor,
+        EntitlementFeature.LEGAL_AI_QUERY,
       );
+      usageId = guard.usageId;
     }
 
     const body = (await request.json()) as ChatRequest;
-   const result = await getLegalAiService().createTurn({
-  userId: session.user.id,
-  message: body.message ?? "",
-  conversationId: body.conversationId,
-  userContext: {
-    role: session.user.role,
-  },
-  mode: body.mode,
-});
+    const result = await getLegalAiService().createTurn({
+      userId: actor.userId,
+      message: body.message ?? "",
+      conversationId: body.conversationId,
+      userContext: {
+        role: actor.role,
+      },
+      mode: body.mode,
+    });
+
+    if (usageId) {
+      await recordLawyerFeatureUsage(usageId, EntitlementFeature.LEGAL_AI_QUERY, {
+        inputTokens: result.usage.inputTokens,
+        outputTokens: result.usage.outputTokens,
+      });
+    }
 
     return NextResponse.json({
       conversationId: result.conversationId,
@@ -39,7 +51,6 @@ export async function POST(request: Request) {
         role: result.message.role,
         content: result.message.content,
       },
-      usage: result.usage,
     });
   } catch (error) {
     if (error instanceof LegalAiError) {
@@ -47,6 +58,11 @@ export async function POST(request: Request) {
         { error: error.message },
         { status: error.statusCode },
       );
+    }
+    if (error instanceof DomainError) {
+      const status =
+        error.code === "VALIDATION_ERROR" ? 400 : error.statusCode;
+      return NextResponse.json({ error: error.message }, { status });
     }
 
     console.error("TORE Legal AI error:", error);

@@ -137,6 +137,17 @@ const PLATFORM_SETTINGS = [
     value: "2026-08-01",
     description: "Current marketplace disclaimer version identifier (TORE is not a law firm).",
   },
+  {
+    key: "session_protection_policy",
+    value: JSON.stringify({
+      maxNormalConcurrentSessions: 2,
+      warningThreshold: 3,
+      suspiciousThreshold: 4,
+      restrictExpensiveOpsOnHighRisk: true,
+    }),
+    description:
+      "JSON overlay for lawyer session/anti-sharing thresholds. Missing keys use code defaults.",
+  },
 ] as const;
 
 async function main() {

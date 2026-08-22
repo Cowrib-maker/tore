@@ -6,6 +6,7 @@ export const PLATFORM_SETTING_KEYS = {
   PLATFORM_FEE_PERCENT: "platform_fee_percent",
   BOOKING_NUMBER_PREFIX: "booking_number_prefix",
   SUPPORT_EMAIL: "support_email",
+  SESSION_PROTECTION_POLICY: "session_protection_policy",
 } as const;
 
 export type PlatformSettingKey =

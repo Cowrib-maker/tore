@@ -95,3 +95,16 @@ export type {
   Notification,
   CreateNotificationInput,
 } from "./trust";
+export type { Invoice, PaymentTransaction } from "./invoice";
+export type {
+  Subscription,
+  SubscriptionSeat,
+  DeviceSession,
+  EntitlementUsage,
+  CreateSubscriptionInput,
+  CreateSeatInput,
+  CreateDeviceSessionInput,
+  TouchDeviceSessionInput,
+  CreateEntitlementUsageInput,
+  EntitlementUsageIncrement,
+} from "./subscription";

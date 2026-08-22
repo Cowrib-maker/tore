@@ -33,3 +33,10 @@ export type {
   ReviewRepository,
   NotificationRepository,
 } from "./trust-repository";
+export type { SubscriptionRepository } from "./subscription-repository";
+export type { DeviceSessionRepository } from "./device-session-repository";
+export type { EntitlementUsageRepository } from "./entitlement-usage-repository";
+export type {
+  InvoiceRepository,
+  PaymentTransactionRepository,
+} from "./invoice-repository";
