@@ -1,5 +1,6 @@
 import { getSessionUser } from "@/application/common/session";
 import { getHomepageSectionImages } from "@/application/actions/homepage.actions";
+import { getHomepageContentOverride } from "@/application/actions/homepage-content.actions";
 import { LandingPage } from "@/components/marketing/landing-page";
 import { UserRole } from "@/domain/enums";
 import {
@@ -10,12 +11,18 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 
 export default async function HomePage() {
-  const [dict, locale, session, sectionImages] = await Promise.all([
-    getDictionary(),
-    getLocale(),
+  const locale = await getLocale();
+
+  const [dict, session, sectionImages, contentOverride] = await Promise.all([
+    getDictionary(locale),
     getSessionUser(),
     getHomepageSectionImages(),
+    getHomepageContentOverride(locale),
   ]);
+
+  const effectiveDict = contentOverride
+    ? { ...dict, landing: contentOverride }
+    : dict;
 
   const role = session?.user?.role as UserRole | undefined;
   const dashboardHref =
@@ -25,7 +32,7 @@ export default async function HomePage() {
         displayName:
           session.user.name?.trim() ||
           session.user.email ||
-          dict.common.brand,
+          effectiveDict.common.brand,
         dashboardHref,
       }
     : null;
@@ -37,7 +44,7 @@ export default async function HomePage() {
 
   return (
     <LandingPage
-      dict={dict}
+      dict={effectiveDict}
       locale={locale}
       authUser={authUser}
       composerMode={composerMode}

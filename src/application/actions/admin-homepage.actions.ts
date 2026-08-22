@@ -32,6 +32,10 @@ const deps = {
   fileStorage: getFileStorage(),
 };
 
+export type HomepageImageActionState = ActionState & {
+  imageUrl?: string | null;
+};
+
 export async function getAdminHomepageSections(): Promise<
   | { status: "unauthorized" }
   | { status: "ok"; sections: (HomepageSection & { imageUrl: string | null })[] }
@@ -54,9 +58,9 @@ export async function getAdminHomepageSections(): Promise<
 }
 
 export async function adminSetHomepageSectionImageAction(
-  _prev: ActionState,
+  _prev: HomepageImageActionState,
   formData: FormData,
-): Promise<ActionState> {
+): Promise<HomepageImageActionState> {
   try {
     const actor = await requireActor(UserRole.ADMIN);
     const parsed = setHomepageSectionImageSchema.safeParse({
@@ -83,7 +87,7 @@ export async function adminSetHomepageSectionImageAction(
 
     const buffer = new Uint8Array(await file.arrayBuffer());
     const ipAddress = await getClientIp();
-    await setHomepageSectionImageUseCase(
+    const section = await setHomepageSectionImageUseCase(
       actor,
       parsed.data,
       { fileName: file.name || "image.jpg", contentType: file.type, body: buffer },
@@ -93,16 +97,21 @@ export async function adminSetHomepageSectionImageAction(
 
     revalidatePath("/admin/homepage");
     revalidatePath("/");
-    return { success: true };
+    return {
+      success: true,
+      imageUrl: section.imageKey
+        ? buildPublicHomepageImagePath(section.imageKey)
+        : null,
+    };
   } catch (error) {
     return mapActionError(error);
   }
 }
 
 export async function adminClearHomepageSectionImageAction(
-  _prev: ActionState,
+  _prev: HomepageImageActionState,
   formData: FormData,
-): Promise<ActionState> {
+): Promise<HomepageImageActionState> {
   try {
     const actor = await requireActor(UserRole.ADMIN);
     const parsed = clearHomepageSectionImageSchema.safeParse({
@@ -117,7 +126,7 @@ export async function adminClearHomepageSectionImageAction(
 
     revalidatePath("/admin/homepage");
     revalidatePath("/");
-    return { success: true };
+    return { success: true, imageUrl: null };
   } catch (error) {
     return mapActionError(error);
   }

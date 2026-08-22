@@ -5,6 +5,7 @@ export { auditLogRepository } from "./prisma-audit-log-repository";
 export { termsAcceptanceRepository } from "./prisma-terms-acceptance-repository";
 export { platformSettingRepository } from "./prisma-platform-setting-repository";
 export { homepageSectionRepository } from "./prisma-homepage-section-repository";
+export { homepageContentRepository } from "./prisma-homepage-content-repository";
 export { clientProfileRepository } from "./prisma-client-profile-repository";
 export { lawyerProfileRepository } from "./prisma-lawyer-profile-repository";
 export { lawyerCredentialRepository } from "./prisma-lawyer-credential-repository";

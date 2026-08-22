@@ -251,6 +251,7 @@ model User {
   disputesResolved         Dispute[]              @relation("DisputeResolver")
   platformSettingsUpdated  PlatformSetting[]      @relation("PlatformSettingUpdater")
   homepageSectionsUpdated  HomepageSection[]      @relation("HomepageSectionUpdater")
+  homepageContentsUpdated  HomepageContent[]      @relation("HomepageContentUpdater")
   reviewsModerated         Review[]               @relation("ReviewModerator")
   organizationMemberships  OrganizationMembership[]
   aiConversations AIConversation[]
@@ -877,6 +878,17 @@ model HomepageSection {
   updatedBy User? @relation("HomepageSectionUpdater", fields: [updatedByUserId], references: [id], onDelete: SetNull)
 
   @@map("homepage_sections")
+}
+
+model HomepageContent {
+  locale          String   @id
+  contentJson     Json     @map("content_json")
+  updatedByUserId String?  @map("updated_by_user_id")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  updatedBy User? @relation("HomepageContentUpdater", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+
+  @@map("homepage_contents")
 }
 // ─── TORE Legal AI ────────────────────────────────────────────────────────────
 
