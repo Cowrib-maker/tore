@@ -136,11 +136,20 @@ function scoreLawBodyCandidate(inner: string): number {
   const mongolianNumeric = (
     inner.match(/\d+\s*(?:дүгээр|дугаар)\s+зүйл/gi) ?? []
   ).length;
+  const mongolianDotted = (
+    inner.match(/\d+\.\d+\s*(?:дүгээр|дугаар)\s+зүйл/gi) ?? []
+  ).length;
   const mongolianWord = (inner.match(/[А-ЯӨҮЁа-яөүё]+\s+зүйл\s*\./g) ?? [])
     .length;
   const englishArticle = (inner.match(/\bArticle\s+\d+/gi) ?? []).length;
   // Weight Mongolian statute markers far above raw length; penalize English panes.
-  return mongolianNumeric * 10 + mongolianWord * 10 - englishArticle * 5;
+  // Dotted headings (`17.1 дүгээр зүйл`) are first-class articles.
+  return (
+    mongolianNumeric * 10 +
+    mongolianDotted * 10 +
+    mongolianWord * 10 -
+    englishArticle * 5
+  );
 }
 
 function extractBalancedElementInner(

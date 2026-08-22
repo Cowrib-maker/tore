@@ -31,6 +31,13 @@ export class PrismaArchiveRepository implements IArchiveRepository {
     return row ? fromRow(row) : null;
   }
 
+  async findByContentHash(contentSha256: string): Promise<ArchiveRecord | null> {
+    const row = await this.db.legalSourceArchive.findUnique({
+      where: { contentSha256: contentSha256.toLowerCase() },
+    });
+    return row ? fromRow(row) : null;
+  }
+
   async findByArchiveId(archiveId: string): Promise<ArchiveRecord | null> {
     const row = await this.db.legalSourceArchive.findUnique({
       where: { id: archiveId },
@@ -70,6 +77,7 @@ type ArchiveRow = {
   originalUrl: string;
   fetchedAt: Date;
   sha256: string;
+  contentSha256: string;
   checksumVerified: boolean;
   mimeType: string;
   byteSize: number;
@@ -92,6 +100,7 @@ function toRow(record: ArchiveRecord) {
     originalUrl: record.originalUrl,
     fetchedAt: new Date(record.fetchedAt),
     sha256: record.sha256.toLowerCase(),
+    contentSha256: record.contentSha256.toLowerCase(),
     checksumVerified: record.checksumVerified,
     mimeType: record.mimeType,
     byteSize: record.byteSize,
@@ -115,6 +124,7 @@ function fromRow(row: ArchiveRow): ArchiveRecord {
     originalUrl: row.originalUrl,
     fetchedAt: row.fetchedAt.toISOString(),
     sha256: row.sha256,
+    contentSha256: row.contentSha256,
     checksumVerified: row.checksumVerified,
     mimeType: row.mimeType,
     byteSize: row.byteSize,

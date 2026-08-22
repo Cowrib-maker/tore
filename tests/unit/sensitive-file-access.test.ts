@@ -23,8 +23,12 @@ describe("sensitive file access", () => {
   it("marks credential keys as sensitive and builds app paths", () => {
     expect(isSensitiveStorageKey(key)).toBe(true);
     expect(isSensitiveStorageKey("profile-photo/u1/a.jpg")).toBe(false);
+    expect(isSensitiveStorageKey("legal-ai-document/u1/uuid-a.pdf")).toBe(true);
     expect(buildAppFilePath(key)).toBe(
       "/api/files/lawyer-credential/lp1/doc.pdf",
+    );
+    expect(buildAppFilePath("legal-ai-document/u1/uuid-a.pdf")).toBe(
+      "/api/files/legal-ai-document/u1/uuid-a.pdf",
     );
   });
 

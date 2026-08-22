@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { requireActor } from "@/application/common/require-actor";
+import { assertEmailVerified } from "@/application/common/require-verified-email";
 import { guardLawyerAiHttp, recordLawyerFeatureUsage } from "@/application/common/guard-lawyer-ai-http";
 import { rerunCaseAnalysisForLawyer } from "@/application/use-cases/case-review";
 import { caseFileErrorResponse } from "@/application/use-cases/case-review/http-error";
@@ -9,6 +10,7 @@ import { EntitlementFeature, UserRole } from "@/domain/enums";
 export async function POST(request: Request) {
   try {
     const actor = await requireActor(UserRole.LAWYER);
+    await assertEmailVerified(actor.userId);
     const guard = await guardLawyerAiHttp(
       actor,
       EntitlementFeature.CASE_ANALYSIS,

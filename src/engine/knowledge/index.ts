@@ -126,6 +126,8 @@ export {
   planLegalInfoIngestionDryRun,
   plannedActionForStatus,
   selectQueue,
+  classifyCriminalCodeTitle,
+  identifyCriminalCodeFromDocuments,
 } from "./discovery";
 export type {
   DryRunPlanItem,
@@ -142,6 +144,11 @@ export type {
   LegalInfoManifestDocument,
   LegalInfoSourceType,
   PlannedIngestionAction,
+  CriminalCodeDiscoveryDocument,
+  CriminalCodeDiscoveryMatch,
+  CriminalCodeDiscoverySkip,
+  CriminalCodeTitleClass,
+  IdentifyCriminalCodeResult,
 } from "./discovery";
 export {
   LegalInfoKnowledgeParser,
@@ -167,6 +174,45 @@ export {
   rankDocumentsToHits,
   tokenizeSearchTerms,
 } from "./repository";
+export {
+  LegalTemporalEvaluationStatus,
+  LegalTemporalRelationType,
+  LegalTemporalStatusBasis,
+  resolveLegalTemporalStatus,
+} from "./temporal/resolve-legal-temporal-status";
+export {
+  LegalTemporalQueryKind,
+  LegalTemporalQueryPrecision,
+  parseLegalTemporalQueryIntent,
+  stripLegalTemporalQueryPhrases,
+} from "./temporal/parse-legal-temporal-query-intent";
+export { evaluateVersionForTemporalQuery } from "./temporal/evaluate-version-for-temporal-query";
+export {
+  LegalInfoCrossReferenceKind,
+  extractLegalInfoCrossReferences,
+} from "./evidence";
+export type {
+  ExtractLegalInfoCrossReferencesInput,
+  LegalInfoCrossReference,
+} from "./evidence";
+export {
+  KnowledgeVersionDiffRejectReason,
+  LegalChangeType,
+  diffKnowledgeDocuments,
+  normalizeComparableKnowledgeText,
+} from "./diff";
+export type {
+  DiffKnowledgeDocumentsResult,
+  LegalVersionDiff,
+} from "./diff";
+export type {
+  LegalTemporalExplicitRelation,
+  LegalTemporalSourceStatus,
+  LegalTemporalStatusInput,
+  LegalTemporalStatusResult,
+} from "./temporal/resolve-legal-temporal-status";
+export type { LegalTemporalQueryIntent } from "./temporal/parse-legal-temporal-query-intent";
+export type { LegalTemporalVersionFacts } from "./temporal/evaluate-version-for-temporal-query";
 export { JsonKnowledgeExporter } from "./exporter";
 export {
   KnowledgeEngine,

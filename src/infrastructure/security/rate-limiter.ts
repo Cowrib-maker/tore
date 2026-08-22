@@ -167,3 +167,23 @@ export const NOTIFICATION_WRITE_RATE_LIMIT = {
   limit: 60,
   windowMs: 15 * 60 * 1000,
 };
+
+/** Legal AI chat: 30 requests / 15 minutes / user */
+export const LEGAL_AI_CHAT_RATE_LIMIT = {
+  limit: 30,
+  windowMs: 15 * 60 * 1000,
+};
+
+export function legalAiChatRateLimitKey(userId: string): string {
+  return `ai-chat:${userId}`;
+}
+
+/** Legal AI document upload: 10 / 15 minutes / user */
+export const LEGAL_AI_DOCUMENT_RATE_LIMIT = {
+  limit: 10,
+  windowMs: 15 * 60 * 1000,
+};
+
+export function legalAiDocumentRateLimitKey(userId: string): string {
+  return `ai-document:${userId}`;
+}

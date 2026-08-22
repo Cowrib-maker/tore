@@ -1,4 +1,10 @@
+import type {
+  LegalAiCitationPersistInput,
+  LegalAiSafeCitation,
+} from "@/application/ai/legal-ai-citation";
 import type { PromptTurnKind, UserTypeContext } from "@/engine/gateway";
+
+export type { LegalAiSafeCitation } from "@/application/ai/legal-ai-citation";
 
 export type LegalAiMessageRole = "USER" | "ASSISTANT" | "SYSTEM";
 
@@ -15,6 +21,7 @@ export type LegalAiAssistantMessage = {
   id: string;
   role: "ASSISTANT";
   content: string;
+  citations?: LegalAiSafeCitation[];
 };
 
 export type LegalAiMode = "CITIZEN" | "PROFESSIONAL";
@@ -35,6 +42,20 @@ export type LegalAiCreateTurnResult = {
     outputTokens: number;
   };
   turnKind: PromptTurnKind;
+};
+
+export type LegalAiConversationDocumentExtract = {
+  fileName: string;
+  extractedText: string;
+};
+
+export type LegalAiConversationDocumentMeta = {
+  id: string;
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+  extractStatus: "OK" | "EMPTY" | "FAILED";
+  pageCount: number | null;
 };
 
 export type LegalAiStore = {
@@ -71,14 +92,33 @@ export type LegalAiStore = {
   }): Promise<void>;
   createCitations(input: {
     messageId: string;
-    citations: Array<{
-      title: string;
-      sourceType: string;
-      sourceUrl?: string | null;
-      reference?: string | null;
-      excerpt?: string | null;
-    }>;
-  }): Promise<void>;
+    citations: LegalAiCitationPersistInput[];
+  }): Promise<LegalAiSafeCitation[]>;
+  findOwnedDocumentExtract(
+    conversationId: string,
+    userId: string,
+  ): Promise<LegalAiConversationDocumentExtract | null>;
+  findOwnedDocumentMeta(
+    conversationId: string,
+    userId: string,
+  ): Promise<LegalAiConversationDocumentMeta | null>;
+  findDocumentByStorageKey(
+    storageKey: string,
+  ): Promise<{ userId: string } | null>;
+  findDocumentIdByConversationId(
+    conversationId: string,
+  ): Promise<string | null>;
+  createConversationDocument(input: {
+    conversationId: string;
+    userId: string;
+    storageKey: string;
+    fileName: string;
+    mimeType: string;
+    sizeBytes: number;
+    extractedText: string;
+    pageCount: number | null;
+    extractStatus: "OK";
+  }): Promise<LegalAiConversationDocumentMeta>;
 };
 
 export type LegalAiCompletionResult = {

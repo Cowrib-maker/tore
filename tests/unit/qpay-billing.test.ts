@@ -20,6 +20,10 @@ import {
 } from "@/domain/enums";
 import { ForbiddenError } from "@/domain/errors/domain-error";
 import { envSchema } from "@/lib/env-schema";
+import {
+  isQpayConfigured,
+  readQpayConfig,
+} from "@/infrastructure/billing/qpay-config";
 import type {
   QpayCheckedPayment,
   QpayCreateInvoiceInput,
@@ -489,8 +493,10 @@ describe("QPay-activated SOLO subscriptions", () => {
   it("keeps QPay secrets off the public env schema prefix", () => {
     const keys = Object.keys(envSchema.shape);
     expect(keys.some((key) => key.startsWith("NEXT_PUBLIC_QPAY"))).toBe(false);
+    expect(keys.some((key) => key.startsWith("NEXT_PUBLIC_OPENAI"))).toBe(false);
     expect(keys).toEqual(
       expect.arrayContaining([
+        "OPENAI_API_KEY",
         "QPAY_BASE_URL",
         "QPAY_CLIENT_ID",
         "QPAY_CLIENT_SECRET",
@@ -498,5 +504,46 @@ describe("QPay-activated SOLO subscriptions", () => {
         "QPAY_INVOICE_CODE",
       ]),
     );
+  });
+
+  it("refuses checkout/config construction without real QPay credentials", () => {
+    const unset = {
+      QPAY_BASE_URL: "https://merchant-sandbox.qpay.mn",
+      QPAY_CLIENT_ID: undefined,
+      QPAY_CLIENT_SECRET: undefined,
+      QPAY_CALLBACK_URL: undefined,
+      QPAY_INVOICE_CODE: undefined,
+    };
+    expect(isQpayConfigured(unset)).toBe(false);
+    expect(() => readQpayConfig(unset)).toThrow(
+      expect.objectContaining({
+        code: "BILLING_PROVIDER_NOT_CONFIGURED",
+        statusCode: 503,
+      }),
+    );
+  });
+
+  it("is configured only when all QPay credentials and URLs are present", () => {
+    const complete = {
+      QPAY_BASE_URL: "https://merchant-sandbox.qpay.mn",
+      QPAY_CLIENT_ID: "sandbox-client",
+      QPAY_CLIENT_SECRET: "sandbox-secret",
+      QPAY_CALLBACK_URL: "https://tore.test/api/billing/qpay/callback",
+      QPAY_INVOICE_CODE: "SOLO_INVOICE",
+    };
+    expect(isQpayConfigured(complete)).toBe(true);
+    expect(readQpayConfig(complete)).toEqual({
+      baseUrl: "https://merchant-sandbox.qpay.mn",
+      clientId: "sandbox-client",
+      clientSecret: "sandbox-secret",
+      callbackUrl: "https://tore.test/api/billing/qpay/callback",
+      invoiceCode: "SOLO_INVOICE",
+    });
+    expect(
+      isQpayConfigured({
+        ...complete,
+        QPAY_CALLBACK_URL: "not-a-url",
+      }),
+    ).toBe(false);
   });
 });

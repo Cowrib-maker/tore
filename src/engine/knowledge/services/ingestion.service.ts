@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 
+import { contentSha256Hex } from "@/engine/data/archive";
 import type {
   IKnowledgeChunker,
   IKnowledgeCrawler,
@@ -52,7 +53,8 @@ export class KnowledgeIngestionService {
         const parsed = await this.parser.parse(raw);
         const normalized = this.normalizer.normalize(parsed);
         const metadata = this.metadata.extract(normalized);
-        const id = knowledgeDocumentId(raw.sourceUrl);
+        const contentSha256 = contentSha256Hex(raw.bytes);
+        const id = knowledgeDocumentId(raw.sourceUrl, contentSha256);
         const chunks = this.chunker.chunk(normalized, id);
         const stored = await this.repository.save({
           id,
@@ -137,7 +139,21 @@ export class KnowledgeEngine {
   }
 }
 
-/** Stable content-addressed id derived from the official source URL. */
-export function knowledgeDocumentId(sourceUrl: string): string {
-  return createHash("sha256").update(sourceUrl).digest("hex").slice(0, 32);
+/**
+ * Stable knowledge identity: official URL + canonical legal content.
+ * Same URL + same canonical hash → same id. A real legal-text change
+ * (different canonical hash) becomes a new retrievable version.
+ */
+export function knowledgeDocumentId(
+  sourceUrl: string,
+  contentSha256: string,
+): string {
+  const canonical = contentSha256.trim().toLowerCase();
+  if (!canonical) {
+    throw new Error("contentSha256 is required for knowledge document identity");
+  }
+  return createHash("sha256")
+    .update(`${sourceUrl.trim()}\n${canonical}`)
+    .digest("hex")
+    .slice(0, 32);
 }

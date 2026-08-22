@@ -36,18 +36,21 @@ export class ArchiveVerifiedKnowledgeRepository
 
     const existing = await this.inner.findBySourceUrl(document.sourceUrl);
     if (
-      existing?.provenance?.sha256 === provenance.sha256 &&
-      existing.id === document.id
+      existing &&
+      existing.id === document.id &&
+      (existing.provenance?.sha256 === provenance.sha256 ||
+        existing.provenance?.contentSha256 === record.contentSha256)
     ) {
       return existing;
     }
 
-    // Idempotent when same content hash already stored under this URL.
+    // Idempotent when same canonical legal content already stored under this URL.
     const all = await this.inner.list();
     const duplicate = all.find(
       (doc) =>
-        doc.sourceUrl === document.sourceUrl &&
-        doc.provenance?.sha256 === provenance.sha256,
+        doc.provenance?.contentSha256 === record.contentSha256 ||
+        (doc.sourceUrl === document.sourceUrl &&
+          doc.provenance?.sha256 === provenance.sha256),
     );
     if (duplicate) {
       return duplicate;
@@ -58,6 +61,7 @@ export class ArchiveVerifiedKnowledgeRepository
       provenance: {
         archiveId: record.archiveId,
         sha256: record.sha256,
+        contentSha256: record.contentSha256,
         originalUrl: record.originalUrl,
         lawId: provenance.lawId ?? record.lawId,
       },
@@ -70,6 +74,10 @@ export class ArchiveVerifiedKnowledgeRepository
 
   findBySourceUrl(sourceUrl: string) {
     return this.inner.findBySourceUrl(sourceUrl);
+  }
+
+  listBySourceUrl(sourceUrl: string) {
+    return this.inner.listBySourceUrl(sourceUrl);
   }
 
   list() {

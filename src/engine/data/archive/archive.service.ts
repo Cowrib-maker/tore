@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 
+import { contentSha256Hex } from "./canonicalize";
 import { sha256Hex, storageKeyForHash } from "./hash";
 import { mimeTypeForFileName } from "./mime";
 import type {
@@ -14,8 +15,9 @@ import type {
 
 /**
  * Immutable archive facade.
- * Deduplicates by SHA-256; new bytes under the same source URL become a new version.
- * Metadata is written only after blob storage verifies the checksum.
+ * Deduplicates by raw SHA-256, then by canonical legal content SHA-256
+ * (captcha nonce ignored). New legal bytes become a new version.
+ * Metadata is written only after blob storage verifies the raw checksum.
  */
 export class ArchiveService {
   private readonly repository: IArchiveRepository;
@@ -28,9 +30,16 @@ export class ArchiveService {
 
   async store(input: ArchiveStoreInput): Promise<ArchiveStoreResult> {
     const sha256 = sha256Hex(input.bytes);
-    const existing = await this.repository.findByHash(sha256);
-    if (existing) {
-      return { record: existing, created: false };
+    const contentSha256 = contentSha256Hex(input.bytes);
+    const existingRaw = await this.repository.findByHash(sha256);
+    if (existingRaw) {
+      return { record: existingRaw, created: false };
+    }
+    const existingContent = await this.repository.findByContentHash(contentSha256);
+    if (existingContent) {
+      // Same legal source, different non-legal noise (captcha nonce). Keep the
+      // first stored blob; do not write a second raw variant.
+      return { record: existingContent, created: false };
     }
 
     const storageKey = storageKeyForHash(sha256);
@@ -72,6 +81,7 @@ export class ArchiveService {
       originalUrl: input.originalUrl,
       fetchedAt,
       sha256,
+      contentSha256,
       checksumVerified: true,
       mimeType: mimeTypeForFileName(input.originalFileName, input.mimeType),
       byteSize: input.bytes.byteLength,
@@ -86,6 +96,10 @@ export class ArchiveService {
 
   async findByHash(sha256: string): Promise<ArchiveRecord | null> {
     return this.repository.findByHash(sha256);
+  }
+
+  async findByContentHash(contentSha256: string): Promise<ArchiveRecord | null> {
+    return this.repository.findByContentHash(contentSha256);
   }
 
   async findByArchiveId(archiveId: string): Promise<ArchiveRecord | null> {

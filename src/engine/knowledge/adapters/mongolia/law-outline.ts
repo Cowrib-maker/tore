@@ -229,6 +229,21 @@ function classifyLine(line: string): ClassifiedLine {
     };
   }
 
+  // Dotted article headings (`17.1 дүгээр зүйл`) must not collapse to `17`.
+  const articleDotted = line.match(
+    /^(\d+)\.(\d+)\s*(?:дүгээр|дугаар)\s+зүйл\s*\.?\s*(.*)$/i,
+  );
+  if (articleDotted) {
+    const number = `${articleDotted[1]}.${articleDotted[2]}`;
+    return {
+      kind: "article",
+      display: line,
+      number,
+      heading: emptyToNull(articleDotted[3]),
+      original: line,
+    };
+  }
+
   const articleNumeric = line.match(
     /^(\d+)\s*(?:дүгээр|дугаар)\s+зүйл\s*\.?\s*(.*)$/i,
   );

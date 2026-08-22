@@ -55,6 +55,18 @@ export type ParsedKnowledgeDocument = {
   title: string;
   kind: KnowledgeDocumentKind;
   articles: KnowledgeArticle[];
+  /**
+   * ISO date from the source catalog (LegalInfo `enforcementdate`).
+   * Null when the source did not publish a date — never invented.
+   */
+  validFrom?: string | null;
+  /** ISO date from the source catalog when known; null if missing. */
+  validTo?: string | null;
+  /**
+   * Authoritative publisher version label only.
+   * Null when the source has none — never a local `vN` ingest counter.
+   */
+  sourceVersion?: string | null;
 };
 
 /** Parser output after Unicode/whitespace normalization. */
@@ -76,6 +88,12 @@ export type KnowledgeMetadata = {
   validTo?: string | null;
   /** Source / archive version label when known. */
   sourceVersion?: string | null;
+  /**
+   * Explicit publisher/catalog force status when the source supplied one.
+   * Never inferred from isactive, recodification subtitles, or latest scrape.
+   * Not a Prisma column — in-memory / caller-supplied only in v0.2.
+   */
+  sourceStatus?: "IN_FORCE" | "EXPIRED" | "REPEALED" | null;
 };
 
 /** Retrieval-sized slice of an article. No vector is attached here. */
@@ -172,7 +190,10 @@ export type KnowledgeArticleHit = {
  */
 export type KnowledgeArchiveProvenance = {
   archiveId: string;
+  /** SHA-256 of the stored archive blob (raw HTTP bytes). */
   sha256: string;
+  /** SHA-256 of canonical legal source bytes when known. */
+  contentSha256?: string;
   originalUrl: string;
   lawId?: string | null;
 };
@@ -228,6 +249,11 @@ export interface IKnowledgeRepository {
   save(document: StoredKnowledgeDocument): Promise<StoredKnowledgeDocument>;
   findById(id: string): Promise<StoredKnowledgeDocument | null>;
   findBySourceUrl(sourceUrl: string): Promise<StoredKnowledgeDocument | null>;
+  /**
+   * Every stored snapshot for an official URL.
+   * Ordered by ingest time then id — storage metadata only, not legal force.
+   */
+  listBySourceUrl(sourceUrl: string): Promise<StoredKnowledgeDocument[]>;
   list(): Promise<StoredKnowledgeDocument[]>;
   /**
    * Article-level search for rule retrieval. Must not invent content.

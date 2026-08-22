@@ -61,7 +61,9 @@ describe("LegalInfoLawParser", () => {
     expect(document.publication.publicationSeries).toBe("2017 оны 24 дүгээр");
     expect(document.publication.issuedOn).toBe("2017-05-25");
     expect(document.temporal.effectiveOn).toBe("2017-07-01");
-    expect(document.temporal.status).toBe(LegalDocumentStatus.IN_FORCE);
+    expect(document.temporal.validFrom).toBe("2017-07-01");
+    expect(document.temporal.validTo).toBeNull();
+    expect(document.temporal.status).toBe(LegalDocumentStatus.UNKNOWN);
     expect(document.identity.identifiers).toEqual(
       expect.arrayContaining([
         {

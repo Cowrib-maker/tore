@@ -72,6 +72,42 @@ describe("legalinfo batch verify helpers", () => {
     expect(evaluated.failureReason).toMatch(/article count is 0/i);
   });
 
+  it("accepts matching canonical hashes when raw SHA differs", () => {
+    const evaluated = evaluateIngestedLaw({
+      stored: {
+        id: "x",
+        sourceId: "legalinfo",
+        sourceUrl: "https://legalinfo.mn/mn/detail?lawId=1",
+        title: "ТУРШИЛТЫН ХУУЛЬ ТУХАЙ",
+        kind: KnowledgeDocumentKind.HTML,
+        metadata: {
+          title: "ТУРШИЛТЫН ХУУЛЬ ТУХАЙ",
+          language: "mn",
+          jurisdiction: "MN",
+          documentType: "law",
+          sourceUrl: "https://legalinfo.mn/mn/detail?lawId=1",
+          articleCount: 1,
+        },
+        articles: [{ articleNumber: "1", title: null, text: "x", order: 0 }],
+        chunks: [
+          {
+            id: "c1",
+            documentId: "x",
+            articleNumber: "1",
+            order: 0,
+            text: "x",
+            tokenEstimate: 1,
+          },
+        ],
+        ingestedAt: new Date(),
+      },
+      archiveSha256: "raw-nonce-a",
+      contentSha256: "canonical-legal",
+      archiveContentSha256: "canonical-legal",
+    });
+    expect(evaluated.ingestionStatus).toBe("SUCCESS");
+  });
+
   it("detects duplicate SHA-256 without rewriting the first SUCCESS", () => {
     const reports = applyDuplicateDetection([
       baseReport({ lawId: "10", sha256: "same-hash" }),

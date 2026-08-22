@@ -1,12 +1,19 @@
 /**
- * Production full-corpus LegalInfo cloud ingestion.
+ * PRODUCTION full remaining-corpus LegalInfo cloud ingestion.
  *
- * Stack (same as cloud canary):
+ * Command role: production cloud ingest.
+ * Do not run until the LegalInfo production foundation is verified.
+ * Do not invoke from tests.
+ *
+ * Stack (same persistence as staging canary):
  *   HttpKnowledgeCrawler
  *   → ArchiveService (R2/S3)
  *   → Prisma archive metadata
  *   → LegalInfoKnowledgeParser → normalize/metadata/chunk
  *   → PrismaKnowledgeRepository
+ *
+ * Local parser test: `npm run ingest:legalinfo:batch-10`
+ * Staging canary: `npm run ingest:legalinfo:canary-10`
  *
  * Resumes from tmp/legalinfo-discovery-manifest.json.
  * Does NOT start automatically on build/deploy — run explicitly.

@@ -15,6 +15,7 @@ import {
   createArchiveService,
   InMemoryArchiveRepository,
   LocalFilesystemArchiveStorage,
+  contentSha256Hex,
   sha256Hex,
   type ArchiveService,
 } from "../../src/engine/data/archive";
@@ -100,11 +101,12 @@ export function evaluateIngestedLaw(input: {
   stored: StoredKnowledgeDocument | undefined;
   archiveSha256: string | null;
   contentSha256: string;
+  archiveContentSha256?: string | null;
 }): Pick<
   LawVerificationReport,
   "title" | "articleCount" | "chunkCount" | "ingestionStatus" | "failureReason"
 > {
-  const { stored, archiveSha256, contentSha256 } = input;
+  const { stored, archiveSha256, contentSha256, archiveContentSha256 } = input;
   if (!stored) {
     return {
       title: null,
@@ -128,7 +130,17 @@ export function evaluateIngestedLaw(input: {
       failureReason: "missing archive checksum",
     };
   }
-  if (archiveSha256 !== contentSha256) {
+  if (archiveContentSha256) {
+    if (archiveContentSha256 !== contentSha256) {
+      return {
+        title,
+        articleCount,
+        chunkCount,
+        ingestionStatus: "FAILURE",
+        failureReason: "archive checksum mismatch",
+      };
+    }
+  } else if (archiveSha256 !== contentSha256) {
     return {
       title,
       articleCount,
@@ -383,8 +395,11 @@ export async function runLegalInfoBatchVerify(
       continue;
     }
 
-    const contentHash = sha256Hex(raw.bytes);
-    const archiveRecord = await archive.findByHash(contentHash);
+    const rawHash = sha256Hex(raw.bytes);
+    const canonicalHash = contentSha256Hex(raw.bytes);
+    const archiveRecord =
+      (await archive.findByHash(rawHash)) ??
+      (await archive.findByContentHash(canonicalHash));
     const archiveSha256 = archiveRecord?.sha256 ?? null;
 
     const ingestError = ingestFailByUrl.get(url);
@@ -398,7 +413,7 @@ export async function runLegalInfoBatchVerify(
         title: null,
         articleCount: null,
         chunkCount: null,
-        sha256: contentHash,
+        sha256: canonicalHash,
         ingestionStatus: "FAILURE",
         failureReason: ingestError,
         duplicateOfLawId: null,
@@ -409,7 +424,8 @@ export async function runLegalInfoBatchVerify(
     const evaluated = evaluateIngestedLaw({
       stored: storedByUrl.get(url),
       archiveSha256,
-      contentSha256: contentHash,
+      contentSha256: canonicalHash,
+      archiveContentSha256: archiveRecord?.contentSha256 ?? null,
     });
 
     reports.push({
@@ -418,7 +434,7 @@ export async function runLegalInfoBatchVerify(
       httpStatus: 200,
       httpSuccess: true,
       byteSize: raw.bytes.byteLength,
-      sha256: contentHash,
+      sha256: canonicalHash,
       duplicateOfLawId: null,
       ...evaluated,
     });

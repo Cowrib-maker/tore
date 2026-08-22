@@ -3,12 +3,15 @@ import { NextResponse } from "next/server";
 import { requireActor } from "@/application/common/require-actor";
 import { assertCanAccessStoredFile } from "@/application/services/assert-can-access-stored-file";
 import { DomainError } from "@/domain/errors/domain-error";
+import { PrismaLegalAiStore } from "@/infrastructure/ai/prisma-legal-ai-store";
 import {
   lawyerCredentialRepository,
   lawyerProfileRepository,
 } from "@/infrastructure/repositories";
 import { getFileStorage } from "@/infrastructure/storage";
 import { isSensitiveStorageKey } from "@/infrastructure/storage/file-access";
+
+const legalAiStore = new PrismaLegalAiStore();
 
 type RouteContext = {
   params: Promise<{ key: string[] }>;
@@ -24,6 +27,8 @@ export async function GET(_request: Request, context: RouteContext) {
     await assertCanAccessStoredFile(actor, key, {
       lawyerProfileRepository,
       lawyerCredentialRepository,
+      findLegalAiDocumentByStorageKey: (storageKey) =>
+        legalAiStore.findDocumentByStorageKey(storageKey),
     });
 
     const object = await getFileStorage().getObject(key);

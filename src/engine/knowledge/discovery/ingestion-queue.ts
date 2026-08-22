@@ -6,6 +6,7 @@ import {
   createArchiveService,
   InMemoryArchiveRepository,
   LocalFilesystemArchiveStorage,
+  contentSha256Hex,
   sha256Hex,
   type ArchiveService,
 } from "@/engine/data/archive";
@@ -48,8 +49,9 @@ export type LegalInfoIngestionQueueOptions = {
   archiveRootDir?: string;
   /**
    * Optional durable knowledge repository (e.g. Prisma + archive verification).
-   * When omitted, structured knowledge is only held in the per-document
-   * in-memory engine used for validation (existing script behavior).
+   * Staging canary / production cloud ingest inject PrismaKnowledgeRepository.
+   * When omitted (local `ingest:legalinfo:batch-10`), structured knowledge is
+   * only held in the per-document in-memory engine used for parser validation.
    */
   knowledgeRepository?: IKnowledgeRepository;
   requestDelayMs?: number;
@@ -80,7 +82,7 @@ export type LegalInfoIngestionQueueResult = {
  *
  * - SUCCESS documents are not downloaded again
  * - FAILED documents are retried when retryFailed is true
- * - SKIPPED_DUPLICATE is set when SHA-256 matches an earlier SUCCESS
+ * - SKIPPED_DUPLICATE is set when canonical content SHA-256 matches an earlier SUCCESS
  * - One failure does not abort the remaining queue
  * - Progress is checkpointed after each document
  *
@@ -338,17 +340,23 @@ export class LegalInfoIngestionQueue {
     }
 
     const raw = rawDocuments[0]!;
-    const contentHash = sha256Hex(raw.bytes);
-    const archiveRecord = await archive.findByHash(contentHash);
+    const rawHash = sha256Hex(raw.bytes);
+    const canonicalHash = contentSha256Hex(raw.bytes);
+    const archiveRecord =
+      (await archive.findByHash(rawHash)) ??
+      (await archive.findByContentHash(canonicalHash));
     if (!archiveRecord) {
       return { ok: false, reason: "missing archive checksum" };
     }
-    if (archiveRecord.sha256 !== contentHash) {
+    if (
+      archiveRecord.sha256 !== rawHash &&
+      archiveRecord.contentSha256 !== canonicalHash
+    ) {
       return { ok: false, reason: "archive checksum mismatch" };
     }
 
     try {
-      await archive.verifyArchiveIntegrity(contentHash);
+      await archive.verifyArchiveIntegrity(archiveRecord.sha256);
     } catch (error) {
       return {
         ok: false,
@@ -408,7 +416,8 @@ export class LegalInfoIngestionQueue {
           ...stored,
           provenance: {
             archiveId: archiveRecord.archiveId,
-            sha256: contentHash,
+            sha256: archiveRecord.sha256,
+            contentSha256: archiveRecord.contentSha256,
             originalUrl: archiveRecord.originalUrl,
             lawId: doc.lawId,
           },
@@ -425,7 +434,7 @@ export class LegalInfoIngestionQueue {
 
     return {
       ok: true,
-      sha256: contentHash,
+      sha256: archiveRecord.contentSha256,
       title,
       articleCount: stored.articles.length,
       chunkCount: stored.chunks.length,

@@ -14,6 +14,8 @@ export function mapActionError(error: unknown): ActionState {
         return { error: "Please sign in to continue." };
       case "FORBIDDEN":
         return { error: "You do not have permission to perform this action." };
+      case "EMAIL_NOT_VERIFIED":
+        return { error: error.message };
       default:
         // Validation / conflict messages are intentionally user-facing.
         return { error: error.message };

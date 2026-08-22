@@ -1,8 +1,13 @@
 /**
- * LIVE LegalInfo bulk ingestion — first 10 PENDING documents only.
+ * LOCAL parser/archive test — first 10 PENDING LegalInfo documents only.
  *
- * Uses the validated resumable queue + HttpKnowledgeCrawler + ArchiveService
- * + LegalInfoKnowledgeParser pipeline. Does NOT start the remaining corpus.
+ * Command role: local parser test.
+ * Persistence: local filesystem archive bytes + in-memory archive metadata.
+ * Does NOT write Prisma knowledge or archive rows.
+ * Does NOT use S3/R2.
+ *
+ * Staging / production-like persistence is `npm run ingest:legalinfo:canary-10`.
+ * Full remaining corpus is `npm run ingest:legalinfo:cloud` (do not run yet).
  *
  * Usage:
  *   npm run ingest:legalinfo:batch-10

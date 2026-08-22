@@ -36,7 +36,16 @@ export type ArchiveRecord = {
   originalUrl: string;
   /** ISO-8601 fetch time. */
   fetchedAt: string;
+  /**
+   * SHA-256 of the exact stored blob bytes (raw HTTP body).
+   * Integrity checks hash the blob against this value.
+   */
   sha256: string;
+  /**
+   * SHA-256 of canonical legal source bytes (captcha nonce removed).
+   * Knowledge deduplication uses this, not the raw SHA.
+   */
+  contentSha256: string;
   checksumVerified: boolean;
   mimeType: string;
   byteSize: number;
@@ -89,6 +98,7 @@ export interface IArchiveStorage {
 export interface IArchiveRepository {
   save(record: ArchiveRecord): Promise<void>;
   findByHash(sha256: string): Promise<ArchiveRecord | null>;
+  findByContentHash(contentSha256: string): Promise<ArchiveRecord | null>;
   findByArchiveId(archiveId: string): Promise<ArchiveRecord | null>;
   findVersions(
     connectorId: string,

@@ -157,3 +157,101 @@ describe("assertProductionEnvGuards", () => {
     ).not.toThrow();
   });
 });
+
+describe("QPay env is optional at boot", () => {
+  it("parses without QPay credentials and defaults the sandbox base URL", async () => {
+    const { envSchema } = await import("@/lib/env-schema");
+    const parsed = envSchema.safeParse({
+      DATABASE_URL: "postgresql://localhost/tore",
+      AUTH_SECRET: "test-auth-secret-minimum-32-characters",
+      NODE_ENV: "test",
+    });
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(parsed.data.QPAY_BASE_URL).toBe("https://merchant-sandbox.qpay.mn");
+    expect(parsed.data.QPAY_CLIENT_ID).toBeUndefined();
+    expect(parsed.data.QPAY_CLIENT_SECRET).toBeUndefined();
+    expect(parsed.data.QPAY_CALLBACK_URL).toBeUndefined();
+    expect(parsed.data.QPAY_INVOICE_CODE).toBeUndefined();
+  });
+
+  it("treats empty QPay dotenv values as unset instead of failing boot", async () => {
+    const { envSchema } = await import("@/lib/env-schema");
+    const parsed = envSchema.safeParse({
+      DATABASE_URL: "postgresql://localhost/tore",
+      AUTH_SECRET: "test-auth-secret-minimum-32-characters",
+      NODE_ENV: "test",
+      QPAY_BASE_URL: "",
+      QPAY_CLIENT_ID: "   ",
+      QPAY_CLIENT_SECRET: "",
+      QPAY_CALLBACK_URL: "",
+      QPAY_INVOICE_CODE: "",
+    });
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(parsed.data.QPAY_CLIENT_ID).toBeUndefined();
+    expect(parsed.data.QPAY_CLIENT_SECRET).toBeUndefined();
+    expect(parsed.data.QPAY_CALLBACK_URL).toBeUndefined();
+    expect(parsed.data.QPAY_INVOICE_CODE).toBeUndefined();
+    expect(parsed.data.QPAY_BASE_URL).toBe("https://merchant-sandbox.qpay.mn");
+  });
+
+  it("does not fail boot when QPay callback is a non-URL placeholder", async () => {
+    const { envSchema } = await import("@/lib/env-schema");
+    const parsed = envSchema.safeParse({
+      DATABASE_URL: "postgresql://localhost/tore",
+      AUTH_SECRET: "test-auth-secret-minimum-32-characters",
+      NODE_ENV: "test",
+      QPAY_CLIENT_ID: "",
+      QPAY_CLIENT_SECRET: "",
+      QPAY_CALLBACK_URL: "not-a-url",
+      QPAY_INVOICE_CODE: "",
+    });
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(parsed.data.QPAY_CALLBACK_URL).toBe("not-a-url");
+  });
+});
+
+describe("OpenAI env is optional at boot", () => {
+  it("parses without OPENAI_API_KEY", async () => {
+    const { envSchema } = await import("@/lib/env-schema");
+    const parsed = envSchema.safeParse({
+      DATABASE_URL: "postgresql://localhost/tore",
+      AUTH_SECRET: "test-auth-secret-minimum-32-characters",
+      NODE_ENV: "test",
+    });
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(parsed.data.OPENAI_API_KEY).toBeUndefined();
+  });
+
+  it("treats empty and whitespace OpenAI dotenv values as unset", async () => {
+    const { envSchema } = await import("@/lib/env-schema");
+    const parsed = envSchema.safeParse({
+      DATABASE_URL: "postgresql://localhost/tore",
+      AUTH_SECRET: "test-auth-secret-minimum-32-characters",
+      NODE_ENV: "test",
+      OPENAI_API_KEY: "   ",
+    });
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(parsed.data.OPENAI_API_KEY).toBeUndefined();
+  });
+
+  it("trims a present OpenAI key and never uses a NEXT_PUBLIC_ prefix", async () => {
+    const { envSchema } = await import("@/lib/env-schema");
+    const parsed = envSchema.safeParse({
+      DATABASE_URL: "postgresql://localhost/tore",
+      AUTH_SECRET: "test-auth-secret-minimum-32-characters",
+      NODE_ENV: "test",
+      OPENAI_API_KEY: " sk-test-key ",
+    });
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(parsed.data.OPENAI_API_KEY).toBe("sk-test-key");
+    expect(Object.keys(envSchema.shape).some((key) => key.startsWith("NEXT_PUBLIC_OPENAI"))).toBe(
+      false,
+    );
+  });
+});

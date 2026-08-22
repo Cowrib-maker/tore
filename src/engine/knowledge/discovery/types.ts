@@ -23,7 +23,7 @@ export type LegalInfoManifestDocument = {
   status: LegalInfoDocumentStatus;
   /** Set when status is FAILED. */
   failureReason: string | null;
-  /** Content SHA-256 after successful archive/ingest. */
+  /** Content SHA-256 after successful archive/ingest (canonical legal source). */
   sha256: string | null;
   /** When SKIPPED_DUPLICATE, points at the first SUCCESS lawId. */
   duplicateOfLawId: string | null;

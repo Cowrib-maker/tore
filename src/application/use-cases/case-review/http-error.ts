@@ -16,7 +16,7 @@ export function caseFileErrorResponse(error: unknown): NextResponse {
             : error.code === "CONFLICT"
               ? "Case file was updated in another session."
               : error.message;
-    return NextResponse.json({ error: message }, { status });
+    return NextResponse.json({ error: message, code: error.code }, { status });
   }
   console.error(error);
   return NextResponse.json({ error: "Unexpected error" }, { status: 500 });

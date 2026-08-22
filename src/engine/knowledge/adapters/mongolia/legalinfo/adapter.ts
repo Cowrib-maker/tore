@@ -65,9 +65,8 @@ export class LegalInfoSourceAdapter implements ISourceAdapter {
         publicationSeries: meta.publicationSeries,
       },
       temporal: {
-        status: meta.effectiveOn
-          ? LegalDocumentStatus.IN_FORCE
-          : LegalDocumentStatus.UNKNOWN,
+        // LegalInfo enforcementdate is a start date, not current-force proof.
+        status: LegalDocumentStatus.UNKNOWN,
         effectiveOn: meta.effectiveOn,
         validFrom: meta.effectiveOn,
         validTo: null,

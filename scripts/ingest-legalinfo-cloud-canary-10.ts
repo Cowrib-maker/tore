@@ -1,13 +1,19 @@
 /**
- * LIVE cloud-persistence canary: next 10 PENDING LegalInfo documents.
+ * STAGING canary — next 10 PENDING LegalInfo documents with production-like
+ * persistence. Does NOT start the remaining corpus.
  *
- * Stack:
- *   ARCHIVE_STORAGE=s3
- *   PostgreSQL archive metadata + knowledge (Prisma)
- *   HttpKnowledgeCrawler + ArchiveService + LegalInfo parser pipeline
- *   resumable manifest/checkpoint
+ * Command role: staging canary.
+ * Persistence:
+ *   Prisma archive metadata
+ *   PrismaKnowledgeRepository
+ *   S3/R2 blob storage (ARCHIVE_STORAGE=s3)
  *
- * Does NOT start the remaining corpus after these 10.
+ * Point DATABASE_URL and ARCHIVE_S3_PREFIX at a staging database and prefix.
+ * Never use production credentials in tests.
+ *
+ * Local parser-only test (no Prisma): `npm run ingest:legalinfo:batch-10`.
+ * Production remaining-corpus ingest: `npm run ingest:legalinfo:cloud`
+ * (do not run until the LegalInfo production foundation is verified).
  *
  * Usage:
  *   npm run ingest:legalinfo:canary-10
@@ -35,8 +41,20 @@ import { env } from "../src/lib/env";
 const BATCH_SIZE = 10;
 const BATCH_ID = "legalinfo-cloud-canary-10";
 
+function redactDatabaseHost(databaseUrl: string): string {
+  try {
+    const parsed = new URL(databaseUrl);
+    return parsed.host || "(unknown host)";
+  } catch {
+    return "(unparseable DATABASE_URL)";
+  }
+}
+
 async function main() {
-  console.log("This is a LIVE cloud-persistence canary of 10 documents.");
+  console.log("This is a STAGING canary of 10 documents (Prisma + S3/R2).");
+  console.log(
+    "Use a staging DATABASE_URL and ARCHIVE_S3_PREFIX. Never use production credentials in tests.",
+  );
 
   if (env.ARCHIVE_STORAGE !== "s3") {
     console.error(
@@ -47,6 +65,15 @@ async function main() {
     );
     process.exit(1);
   }
+
+  if (env.ARCHIVE_S3_PREFIX === "legal-archive") {
+    console.warn(
+      'ARCHIVE_S3_PREFIX is the default "legal-archive". Staging should use a separate prefix from production.',
+    );
+  }
+
+  console.log(`DATABASE_URL host: ${redactDatabaseHost(env.DATABASE_URL)}`);
+  console.log(`ARCHIVE_S3_PREFIX: ${env.ARCHIVE_S3_PREFIX}`);
 
   const root = process.cwd();
   const manifestPath = join(root, "tmp", "legalinfo-discovery-manifest.json");

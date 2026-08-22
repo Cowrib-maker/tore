@@ -37,6 +37,6 @@ export async function requireActor(role?: UserRole): Promise<ActorContext> {
   return { userId: record.id, role: record.role };
 }
 
-const loadActorUser = cache(async (userId: string) => {
+export const loadActorUser = cache(async (userId: string) => {
   return userRepository.findById(userId);
 });

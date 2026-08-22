@@ -1,3 +1,5 @@
+import type { LegalTemporalExplicitRelation } from "@/engine/knowledge";
+
 export const CitationVerificationStatus = {
   VALID: "VALID",
   UNRESOLVED: "UNRESOLVED",
@@ -20,6 +22,12 @@ export type LegalCorpusAuthority = {
   archiveRecordId: string;
   effectiveFrom: string | null;
   effectiveTo: string | null;
+  /** Official source URL when known. Never invent a missing URL. */
+  sourceUrl?: string | null;
+  sourceVersion?: string | null;
+  article?: string | null;
+  paragraph?: string | null;
+  sourceType?: string;
 };
 
 export type LegalCorpusUnavailableReason =
@@ -28,7 +36,8 @@ export type LegalCorpusUnavailableReason =
   | "server_error"
   | "network"
   | "not_configured"
-  | "invalid_response";
+  | "invalid_response"
+  | "not_found";
 
 export type LegalCorpusRetrieveResult =
   | {
@@ -66,13 +75,18 @@ export type LegalCorpusRetrieveInput = {
   question: string;
   query: string;
   locator: string | null;
+  /** Caller-supplied relations only. Never inferred from titles. */
+  explicitRelations?: readonly LegalTemporalExplicitRelation[];
 };
 
 export type LegalCorpusVerifyInput = {
   query: string;
+  /** Full user message when available; required to preserve as-of intent. */
+  question?: string;
   nodeId?: string | null;
   documentId?: string | null;
   locator?: string | null;
+  explicitRelations?: readonly LegalTemporalExplicitRelation[];
 };
 
 /**

@@ -144,13 +144,113 @@ function containsPhrase(haystack: string, phrase: string): boolean {
   }
 
   if (needle.includes(" ")) {
-    return haystack.includes(needle);
+    return (
+      haystack.includes(needle) ||
+      containsInflectedCyrillicPhrase(haystack, needle)
+    );
   }
 
-  const tokens = haystack.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  const tokens = tokenizeCyrillic(haystack);
   return tokens.some(
     (token) => token === needle || token.startsWith(needle),
   );
+}
+
+function tokenizeCyrillic(value: string): string[] {
+  return value.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+}
+
+/**
+ * Multi-word Mongolian legal phrases inflect on the last word
+ * (`гэмт хэрэг` → `гэмт хэргийн`). First words stay exact; the last
+ * token may take a case ending or drop the unstable stem vowel.
+ */
+function containsInflectedCyrillicPhrase(
+  haystack: string,
+  needle: string,
+): boolean {
+  const needleTokens = needle.split(" ").filter(Boolean);
+  const hayTokens = tokenizeCyrillic(haystack);
+  if (needleTokens.length < 2 || hayTokens.length < needleTokens.length) {
+    return false;
+  }
+
+  const lastNeedle = needleTokens[needleTokens.length - 1]!;
+  const prefixLength = needleTokens.length - 1;
+
+  for (let index = 0; index <= hayTokens.length - needleTokens.length; index += 1) {
+    let prefixOk = true;
+    for (let offset = 0; offset < prefixLength; offset += 1) {
+      if (hayTokens[index + offset] !== needleTokens[offset]) {
+        prefixOk = false;
+        break;
+      }
+    }
+    if (!prefixOk) {
+      continue;
+    }
+    const lastHay = hayTokens[index + prefixLength]!;
+    if (tokenMatchesInflectedStem(lastHay, lastNeedle)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function tokenMatchesInflectedStem(token: string, stem: string): boolean {
+  if (token === stem || token.startsWith(stem)) {
+    return true;
+  }
+  const stripped = stripMongolianCaseSuffix(token);
+  if (stripped === stem || stripped === dropUnstableStemVowel(stem)) {
+    return true;
+  }
+  return false;
+}
+
+/** Longest-first case endings. Single-letter cases are covered by startsWith. */
+const MONGOLIAN_CASE_SUFFIXES = [
+  "ийн",
+  "ыйн",
+  "ийг",
+  "ыг",
+  "ээс",
+  "аас",
+  "оос",
+  "өөс",
+  "ээр",
+  "аар",
+  "оор",
+  "өөр",
+  "руу",
+  "рүү",
+  "тай",
+  "тэй",
+  "той",
+  "төй",
+] as const;
+
+function stripMongolianCaseSuffix(token: string): string {
+  for (const suffix of MONGOLIAN_CASE_SUFFIXES) {
+    if (token.length - suffix.length >= 3 && token.endsWith(suffix)) {
+      return token.slice(0, -suffix.length);
+    }
+  }
+  return token;
+}
+
+/**
+ * Mongolian CVCVC stems often drop the last inner vowel when inflected
+ * (`хэрэг` → `хэрг` + `ийн`).
+ */
+function dropUnstableStemVowel(stem: string): string {
+  const match = stem.match(
+    /^(.*)[аэиоөуүеёы]([бвгджзклмнпрстфхцчшщ])$/u,
+  );
+  if (!match?.[1] || !match[2] || match[1].length < 2) {
+    return stem;
+  }
+  return `${match[1]}${match[2]}`;
 }
 
 function isAsciiPhrase(value: string): boolean {

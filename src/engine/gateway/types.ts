@@ -124,6 +124,9 @@ export type PromptBuildInput = {
   corpusAvailable?: boolean;
   verifiedAuthorities?: readonly VerifiedLegalAuthority[];
   mode?: "CITIZEN" | "PROFESSIONAL";
+  /** Native-text extract from the conversation's attached PDF, if any. */
+  documentExtract?: string;
+  documentFileName?: string;
 };
 
 /** A retrieved statute excerpt that may be cited. */
@@ -136,6 +139,11 @@ export type VerifiedLegalAuthority = {
   nodeId: string;
   effectiveFrom: string | null;
   effectiveTo: string | null;
+  sourceUrl?: string | null;
+  sourceVersion?: string | null;
+  article?: string | null;
+  paragraph?: string | null;
+  sourceType?: string;
 };
 
 /** Prompt payload a future completion adapter can send to a model. */

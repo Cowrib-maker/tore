@@ -2,6 +2,17 @@ import { z } from "zod";
 
 const nodeEnv = process.env.NODE_ENV ?? "development";
 
+export const DEFAULT_QPAY_BASE_URL = "https://merchant-sandbox.qpay.mn";
+
+/** Dotenv often sets KEY= which Zod would reject on .url() / .min(1). */
+function emptyToUndefined<T extends z.ZodTypeAny>(schema: T) {
+  return z.preprocess((value) => {
+    if (typeof value !== "string") return value;
+    const trimmed = value.trim();
+    return trimmed === "" ? undefined : trimmed;
+  }, schema);
+}
+
 export const envSchema = z.object({
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   AUTH_SECRET:
@@ -27,7 +38,7 @@ export const envSchema = z.object({
    */
   ARCHIVE_STORAGE: z.enum(["local", "s3"]).default("local"),
   ARCHIVE_LOCAL_ROOT: z.string().min(1).default(".data/legal-archive"),
-  /** Optional key prefix inside the archive bucket (no leading slash). */
+  /** Optional key prefix inside the archive bucket (no leading slash). Staging canary must not share the production prefix. */
   ARCHIVE_S3_PREFIX: z.string().min(1).default("legal-archive"),
   /** Optional dedicated archive bucket; falls back to S3_BUCKET. */
   ARCHIVE_S3_BUCKET: z.string().optional(),
@@ -76,15 +87,24 @@ export const envSchema = z.object({
   ENGINE_SERVICE_TOKEN: z.string().min(8).optional(),
   ENGINE_TIMEOUT_MS: z.coerce.number().int().min(1000).max(30_000).default(8000),
   /**
-   * QPay Merchant V2. Server-only. Sandbox vs production is selected by BASE_URL.
-   * Optional until a lawyer starts checkout; then all four plus invoice code are required.
+   * OpenAI. Server-only. Optional at boot — required when a legal AI completion
+   * runs. Never prefix with NEXT_PUBLIC_.
    */
-  QPAY_BASE_URL: z.string().url().optional(),
-  QPAY_CLIENT_ID: z.string().min(1).optional(),
-  QPAY_CLIENT_SECRET: z.string().min(1).optional(),
-  QPAY_CALLBACK_URL: z.string().url().optional(),
+  OPENAI_API_KEY: emptyToUndefined(z.string().optional()),
+  /**
+   * QPay Merchant V2. Server-only. Sandbox vs production is selected by BASE_URL.
+   * Credentials are optional at boot — empty or placeholder values must not fail
+   * process start. Call-time helpers (isQpayConfigured / readQpayConfig) enforce
+   * completeness before checkout or payment/check.
+   */
+  QPAY_BASE_URL: emptyToUndefined(
+    z.string().default(DEFAULT_QPAY_BASE_URL),
+  ),
+  QPAY_CLIENT_ID: emptyToUndefined(z.string().optional()),
+  QPAY_CLIENT_SECRET: emptyToUndefined(z.string().optional()),
+  QPAY_CALLBACK_URL: emptyToUndefined(z.string().optional()),
   /** Merchant invoice_code assigned by QPay. Required to create invoices. */
-  QPAY_INVOICE_CODE: z.string().min(1).optional(),
+  QPAY_INVOICE_CODE: emptyToUndefined(z.string().optional()),
 });
 
 export type Env = z.infer<typeof envSchema>;

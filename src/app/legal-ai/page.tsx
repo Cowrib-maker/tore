@@ -29,6 +29,14 @@ export default async function LegalAiPage({
       : null;
 
   let initialMessages: { role: "USER" | "ASSISTANT"; content: string }[] = [];
+  let initialAttachedDocument: {
+    id: string;
+    fileName: string;
+    mimeType: string;
+    sizeBytes: number;
+    extractStatus: "OK" | "EMPTY" | "FAILED";
+    pageCount: number | null;
+  } | null = null;
   if (conversationId && session?.user?.id) {
     try {
       const history = await getLegalAiService().getConversationMessages(
@@ -41,6 +49,11 @@ export default async function LegalAiPage({
           role: item.role as "USER" | "ASSISTANT",
           content: item.content,
         }));
+      initialAttachedDocument =
+        await getLegalAiService().getConversationDocumentMeta(
+          session.user.id,
+          conversationId,
+        );
     } catch {
       // Conversation missing or not owned by this user — fall back to empty state.
     }
@@ -49,8 +62,14 @@ export default async function LegalAiPage({
   return (
     <LegalAiChat
       initialQuestion={initialQuestion}
-      initialConversationId={initialMessages.length ? conversationId : undefined}
+      initialConversationId={
+        initialMessages.length || initialAttachedDocument
+          ? conversationId
+          : undefined
+      }
       initialMessages={initialMessages}
+      initialAttachedDocument={initialAttachedDocument}
+      documentUploadEnabled={session?.user?.role === UserRole.LAWYER}
       dashboardHref={dashboardHref}
       displayName={session?.user?.name?.trim() || session?.user?.email}
       signInLabel={dict.common.signIn}

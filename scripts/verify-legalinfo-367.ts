@@ -20,6 +20,7 @@ import {
   createArchiveService,
   InMemoryArchiveRepository,
   LocalFilesystemArchiveStorage,
+  contentSha256Hex,
   sha256Hex,
 } from "../src/engine/data/archive";
 import {
@@ -68,15 +69,21 @@ async function main() {
     }
 
     const raw = rawDocuments[0]!;
-    const contentHash = sha256Hex(raw.bytes);
-    const archiveRecord = await archive.findByHash(contentHash);
+    const rawHash = sha256Hex(raw.bytes);
+    const canonicalHash = contentSha256Hex(raw.bytes);
+    const archiveRecord =
+      (await archive.findByHash(rawHash)) ??
+      (await archive.findByContentHash(canonicalHash));
 
     console.log(`fetched byte size: ${raw.bytes.byteLength}`);
     console.log(`content type: ${raw.contentType ?? "(none)"}`);
     console.log(
       `archive ID: ${archiveRecord?.archiveId ?? "(not archived)"}`,
     );
-    console.log(`archive hash: ${archiveRecord?.sha256 ?? contentHash}`);
+    console.log(`raw SHA-256: ${archiveRecord?.sha256 ?? rawHash}`);
+    console.log(
+      `content SHA-256: ${archiveRecord?.contentSha256 ?? canonicalHash}`,
+    );
 
     const repository = new InMemoryKnowledgeRepository();
     const engine = createKnowledgeEngine({

@@ -27,6 +27,12 @@ import type { PrismaDbClient } from "@/infrastructure/database/prisma-client";
 
 type PrismaWhere = Record<string, unknown>;
 
+const DOCUMENT_INCLUDE = {
+  articles: { orderBy: { order: "asc" as const } },
+  chunks: { orderBy: { order: "asc" as const } },
+  archive: true,
+} as const;
+
 export class PrismaKnowledgeRepository implements IKnowledgeRepository {
   constructor(
     private readonly archive: ArchiveService,
@@ -48,14 +54,24 @@ export class PrismaKnowledgeRepository implements IKnowledgeRepository {
       );
     }
 
+    const contentSha256 = record.contentSha256;
+    const byHash = await this.db.legalKnowledgeDocument.findUnique({
+      where: { contentSha256 },
+      include: DOCUMENT_INCLUDE,
+    });
+    if (byHash) {
+      // Same canonical legal content, any URL: keep the first ingested row.
+      return fromRow(byHash);
+    }
+
     const existing = await this.db.legalKnowledgeDocument.findUnique({
       where: {
         sourceUrl_contentSha256: {
           sourceUrl: document.sourceUrl,
-          contentSha256: provenance.sha256,
+          contentSha256,
         },
       },
-      include: { articles: { orderBy: { order: "asc" } }, chunks: { orderBy: { order: "asc" } } },
+      include: DOCUMENT_INCLUDE,
     });
     if (existing) {
       return fromRow(existing);
@@ -65,62 +81,79 @@ export class PrismaKnowledgeRepository implements IKnowledgeRepository {
       where: { sourceUrl: document.sourceUrl },
     });
 
-    const created = await this.db.legalKnowledgeDocument.create({
-      data: {
-        id: document.id,
-        sourceId: document.sourceId,
-        sourceUrl: document.sourceUrl,
-        lawId: provenance.lawId ?? record.lawId,
-        title: document.title,
-        kind: document.kind,
-        language: document.metadata.language,
-        jurisdiction: document.metadata.jurisdiction,
-        documentType: document.metadata.documentType,
-        articleCount: document.articles.length,
-        chunkCount: document.chunks.length,
-        contentSha256: provenance.sha256,
-        archiveId: record.archiveId,
-        version: priorVersions + 1,
-        validFrom: document.metadata.validFrom ?? null,
-        validTo: document.metadata.validTo ?? null,
-        sourceVersion:
-          document.metadata.sourceVersion ?? `v${priorVersions + 1}`,
-        ingestedAt: document.ingestedAt,
-        articles: {
-          create: document.articles.map((article) => ({
-            ...(article.id ? { id: article.id } : {}),
-            articleNumber: article.articleNumber,
-            title: article.title,
-            text: article.text,
-            order: article.order,
-          })),
+    try {
+      const created = await this.db.legalKnowledgeDocument.create({
+        data: {
+          id: document.id,
+          sourceId: document.sourceId,
+          sourceUrl: document.sourceUrl,
+          lawId: provenance.lawId ?? record.lawId,
+          title: document.title,
+          kind: document.kind,
+          language: document.metadata.language,
+          jurisdiction: document.metadata.jurisdiction,
+          documentType: document.metadata.documentType,
+          articleCount: document.articles.length,
+          chunkCount: document.chunks.length,
+          contentSha256,
+          archiveId: record.archiveId,
+          version: priorVersions + 1,
+          validFrom: document.metadata.validFrom ?? null,
+          validTo: document.metadata.validTo ?? null,
+          sourceVersion: document.metadata.sourceVersion ?? null,
+          ingestedAt: document.ingestedAt,
+          articles: {
+            create: document.articles.map((article) => ({
+              ...(article.id ? { id: article.id } : {}),
+              articleNumber: article.articleNumber,
+              title: article.title,
+              text: article.text,
+              order: article.order,
+            })),
+          },
+          chunks: {
+            create: document.chunks.map((chunk) => ({
+              id: chunk.id,
+              articleNumber: chunk.articleNumber,
+              order: chunk.order,
+              text: chunk.text,
+              tokenEstimate: chunk.tokenEstimate,
+            })),
+          },
         },
-        chunks: {
-          create: document.chunks.map((chunk) => ({
-            id: chunk.id,
-            articleNumber: chunk.articleNumber,
-            order: chunk.order,
-            text: chunk.text,
-            tokenEstimate: chunk.tokenEstimate,
-          })),
-        },
-      },
-      include: {
-        articles: { orderBy: { order: "asc" } },
-        chunks: { orderBy: { order: "asc" } },
-      },
-    });
+        include: DOCUMENT_INCLUDE,
+      });
 
-    return fromRow(created);
+      return fromRow(created);
+    } catch (error) {
+      if (!isUniqueViolation(error)) {
+        throw error;
+      }
+      const raced =
+        (await this.db.legalKnowledgeDocument.findUnique({
+          where: { contentSha256 },
+          include: DOCUMENT_INCLUDE,
+        })) ??
+        (await this.db.legalKnowledgeDocument.findUnique({
+          where: {
+            sourceUrl_contentSha256: {
+              sourceUrl: document.sourceUrl,
+              contentSha256,
+            },
+          },
+          include: DOCUMENT_INCLUDE,
+        }));
+      if (raced) {
+        return fromRow(raced);
+      }
+      throw error;
+    }
   }
 
   async findById(id: string): Promise<StoredKnowledgeDocument | null> {
     const row = await this.db.legalKnowledgeDocument.findUnique({
       where: { id },
-      include: {
-        articles: { orderBy: { order: "asc" } },
-        chunks: { orderBy: { order: "asc" } },
-      },
+      include: DOCUMENT_INCLUDE,
     });
     return row ? fromRow(row) : null;
   }
@@ -131,21 +164,24 @@ export class PrismaKnowledgeRepository implements IKnowledgeRepository {
     const row = await this.db.legalKnowledgeDocument.findFirst({
       where: { sourceUrl },
       orderBy: { version: "desc" },
-      include: {
-        articles: { orderBy: { order: "asc" } },
-        chunks: { orderBy: { order: "asc" } },
-      },
+      include: DOCUMENT_INCLUDE,
     });
     return row ? fromRow(row) : null;
+  }
+
+  async listBySourceUrl(sourceUrl: string): Promise<StoredKnowledgeDocument[]> {
+    const rows = await this.db.legalKnowledgeDocument.findMany({
+      where: { sourceUrl },
+      orderBy: [{ ingestedAt: "asc" }, { id: "asc" }],
+      include: DOCUMENT_INCLUDE,
+    });
+    return rows.map(fromRow);
   }
 
   async list(): Promise<StoredKnowledgeDocument[]> {
     const rows = await this.db.legalKnowledgeDocument.findMany({
       orderBy: { ingestedAt: "asc" },
-      include: {
-        articles: { orderBy: { order: "asc" } },
-        chunks: { orderBy: { order: "asc" } },
-      },
+      include: DOCUMENT_INCLUDE,
     });
     return rows.map(fromRow);
   }
@@ -172,6 +208,7 @@ export class PrismaKnowledgeRepository implements IKnowledgeRepository {
       include: {
         document: {
           include: {
+            archive: true,
             chunks: {
               ...(wantedArticle
                 ? {
@@ -211,6 +248,7 @@ export class PrismaKnowledgeRepository implements IKnowledgeRepository {
             include: {
               document: {
                 include: {
+                  archive: true,
                   articles: {
                     orderBy: { order: "asc" as const },
                     take: 8,
@@ -464,6 +502,10 @@ type KnowledgeRow = {
   chunkCount: number;
   contentSha256: string;
   archiveId: string;
+  archive?: {
+    sha256: string;
+    contentSha256: string;
+  } | null;
   version?: number;
   validFrom?: string | null;
   validTo?: string | null;
@@ -519,9 +561,7 @@ function fromRow(row: KnowledgeRow): StoredKnowledgeDocument {
       articleCount: row.articleCount,
       validFrom: row.validFrom ?? null,
       validTo: row.validTo ?? null,
-      sourceVersion:
-        row.sourceVersion ??
-        (row.version != null ? `v${row.version}` : null),
+      sourceVersion: row.sourceVersion ?? null,
     },
     articles,
     chunks,
@@ -529,9 +569,19 @@ function fromRow(row: KnowledgeRow): StoredKnowledgeDocument {
     version: row.version,
     provenance: {
       archiveId: row.archiveId,
-      sha256: row.contentSha256,
+      sha256: row.archive?.sha256 ?? row.contentSha256,
+      contentSha256: row.contentSha256,
       originalUrl: row.sourceUrl,
       lawId: row.lawId,
     },
   };
+}
+
+function isUniqueViolation(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error != null &&
+    "code" in error &&
+    (error as { code?: string }).code === "P2002"
+  );
 }

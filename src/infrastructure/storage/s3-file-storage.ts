@@ -14,6 +14,7 @@ import type {
   StoredObjectBody,
   UploadFileInput,
 } from "@/domain/ports/file-storage";
+import { isSensitiveFilePurpose } from "@/infrastructure/storage/file-access";
 import {
   assertSafeStorageKey,
   buildObjectKey,
@@ -118,7 +119,7 @@ export class S3FileStorage implements FileStorage {
 
     // Sensitive objects never use a permanent public/CDN base URL.
     // Callers should prefer /api/files for session-authorized access.
-    if (purpose === "lawyer-credential" || purpose === "contract" || purpose === "evidence" || purpose === "message-attachment") {
+    if (isSensitiveFilePurpose(purpose)) {
       const expiresIn = Math.min(options?.expiresInSeconds ?? 60, 120);
       return getSignedUrl(
         this.client,

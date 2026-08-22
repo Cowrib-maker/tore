@@ -98,6 +98,7 @@ describe("ArchiveService", () => {
       /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
     );
     expect(result.record.sha256).toBe(sha256Hex(payload));
+    expect(result.record.contentSha256).toBe(result.record.sha256);
     expect(result.record.checksumVerified).toBe(true);
     expect(result.record.byteSize).toBe(payload.byteLength);
     expect(result.record.mimeType).toBe("text/html");

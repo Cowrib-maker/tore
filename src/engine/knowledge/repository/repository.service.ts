@@ -13,8 +13,9 @@ import {
  * In-memory knowledge store.
  *
  * Replace with a Prisma/SQL adapter implementing the same
- * {@link IKnowledgeRepository} port. Saves are keyed by `id`; a second
- * save with the same id replaces the record (source-of-truth upsert).
+ * {@link IKnowledgeRepository} port. Saves are keyed by `id`. The same
+ * canonical version (same id) may refresh in place; a different
+ * contentSha256 must use a different id so prior versions stay listed.
  */
 export class InMemoryKnowledgeRepository implements IKnowledgeRepository {
   private readonly documents = new Map<string, StoredKnowledgeDocument>();
@@ -44,6 +45,18 @@ export class InMemoryKnowledgeRepository implements IKnowledgeRepository {
       }
     }
     return null;
+  }
+
+  async listBySourceUrl(sourceUrl: string): Promise<StoredKnowledgeDocument[]> {
+    return [...this.documents.values()]
+      .filter((document) => document.sourceUrl === sourceUrl)
+      .sort((left, right) => {
+        const byTime = left.ingestedAt.getTime() - right.ingestedAt.getTime();
+        if (byTime !== 0) {
+          return byTime;
+        }
+        return left.id.localeCompare(right.id);
+      });
   }
 
   async list(): Promise<StoredKnowledgeDocument[]> {

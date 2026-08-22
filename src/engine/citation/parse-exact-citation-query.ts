@@ -1,3 +1,5 @@
+import { stripLegalTemporalQueryPhrases } from "@/engine/knowledge/temporal/parse-legal-temporal-query-intent";
+
 import { parseDottedPinpoint } from "./pinpoint";
 
 export type DetectedExactCitation = {
@@ -20,7 +22,9 @@ export type DetectedExactCitation = {
 export function detectExactCitation(
   message: string,
 ): DetectedExactCitation | null {
-  const normalized = message.replace(/\s+/g, " ").trim();
+  const normalized = stripLegalTemporalQueryPhrases(
+    message.replace(/\s+/g, " ").trim(),
+  );
   if (!normalized) {
     return null;
   }

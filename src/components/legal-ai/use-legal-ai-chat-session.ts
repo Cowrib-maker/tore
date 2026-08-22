@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 
+import { parseSafeCitationsFromUnknown } from "@/application/ai/legal-ai-citation";
+import type { LegalAiSafeCitation } from "@/application/ai/legal-ai-citation";
 import { loginHrefForLegalAi } from "@/domain/services/rbac";
 
 export type ChatMessage = {
   role: "USER" | "ASSISTANT";
   content: string;
+  citations?: LegalAiSafeCitation[];
 };
 
 export function useLegalAiChatSession(initial?: {
@@ -40,7 +43,7 @@ export function useLegalAiChatSession(initial?: {
       const data = (await response.json()) as {
         error?: string;
         conversationId?: string;
-        message?: { content?: string };
+        message?: { content?: string; citations?: unknown };
       };
 
       if (response.status === 401) {
@@ -57,7 +60,11 @@ export function useLegalAiChatSession(initial?: {
       setConversationId(data.conversationId);
       setMessages((current) => [
         ...current,
-        { role: "ASSISTANT", content: data.message?.content ?? "" },
+        {
+          role: "ASSISTANT",
+          content: data.message?.content ?? "",
+          citations: parseSafeCitationsFromUnknown(data.message?.citations),
+        },
       ]);
     } catch (err) {
       setError(

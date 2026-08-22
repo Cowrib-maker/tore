@@ -42,6 +42,10 @@ const DOMAIN_DOCUMENT_TYPES: Record<string, readonly string[]> = {
  * Document types that must never become an authoritative legal-rule hit.
  * Court reasoning, commentary, doctrine notes, regulations, and AI output
  * are distinct from positive law.
+ *
+ * REGULATION exclusion is an existing product policy, isolated here.
+ * Historical retrieval v0.2 does not change it; review separately before
+ * grounding regulations, orders, or resolutions as positive law.
  */
 const NON_POSITIVE_LAW =
   /\b(court|decision|judgment|commentary|doctrine|opinion|regulation|ai|llm)\b/i;
@@ -61,18 +65,24 @@ const ISSUE_KIND_TERMS: Record<string, RegExp> = {
   evidence_or_admissibility: /\b(evidence|admissib|witness|proof)\b/i,
 };
 
+const ARTICLE_NUMBER_TOKEN = "([0-9]+(?:\\.[0-9]+)*[a-zA-Zа-яА-ЯёЁ]?)";
+
 export function normalizeArticleNumber(value: string | null | undefined): string | null {
   if (!value) return null;
   const trimmed = value.trim();
   if (!trimmed) return null;
   const match =
-    trimmed.match(/(?:art(?:icle)?|зүйл)\.?\s*([0-9]+[a-zA-Zа-яА-ЯёЁ]?)/i) ??
-    trimmed.match(/^([0-9]+[a-zA-Zа-яА-ЯёЁ]?)$/);
+    trimmed.match(new RegExp(`(?:art(?:icle)?|зүйл)\\.?\\s*${ARTICLE_NUMBER_TOKEN}`, "i")) ??
+    trimmed.match(new RegExp(`^${ARTICLE_NUMBER_TOKEN}$`));
   return match?.[1]?.toLowerCase() ?? trimmed.toLowerCase();
 }
 
 export function extractArticleNumberFromText(text: string): string | null {
-  const match = text.match(/(?:art(?:icle)?|зүйл)\.?\s*([0-9]+[a-zA-Zа-яА-ЯёЁ]?)/i);
+  const match =
+    text.match(new RegExp(`(?:art(?:icle)?|зүйл)\\.?\\s*${ARTICLE_NUMBER_TOKEN}`, "i")) ??
+    text.match(
+      /([0-9]+(?:\.[0-9]+)*)\s*(?:дүгээр|дугаар|дэх)?\s*зүйл/i,
+    );
   return match?.[1]?.toLowerCase() ?? null;
 }
 
@@ -304,7 +314,10 @@ export function rankDocumentsToHits(
         documentType: document.metadata.documentType,
         jurisdiction: document.metadata.jurisdiction,
         lawId: document.provenance?.lawId ?? null,
-        contentSha256: document.provenance?.sha256 ?? null,
+        contentSha256:
+          document.provenance?.contentSha256 ??
+          document.provenance?.sha256 ??
+          null,
         version: document.version ?? null,
         articleId: articleIdFor(document, article),
         articleNumber: article.articleNumber,
@@ -316,9 +329,7 @@ export function rankDocumentsToHits(
         score: scored.score,
         validFrom: document.metadata.validFrom ?? null,
         validTo: document.metadata.validTo ?? null,
-        sourceVersion:
-          document.metadata.sourceVersion ??
-          (document.version != null ? `v${document.version}` : null),
+        sourceVersion: document.metadata.sourceVersion ?? null,
       });
     }
   }

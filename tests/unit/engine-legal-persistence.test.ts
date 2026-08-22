@@ -59,6 +59,7 @@ type ArchiveRow = {
   originalUrl: string;
   fetchedAt: Date;
   sha256: string;
+  contentSha256: string;
   checksumVerified: boolean;
   mimeType: string;
   byteSize: number;
@@ -71,6 +72,8 @@ type ArchiveRow = {
 function createFakePrisma() {
   const archives = new Map<string, ArchiveRow>();
   const byHash = new Map<string, string>();
+  const byContentHash = new Map<string, string>();
+  const documentsByHash = new Map<string, string>();
   const documents = new Map<
     string,
     {
@@ -112,21 +115,26 @@ function createFakePrisma() {
   return {
     legalSourceArchive: {
       async create({ data }: { data: ArchiveRow }) {
-        if (byHash.has(data.sha256)) {
+        if (byHash.has(data.sha256) || byContentHash.has(data.contentSha256)) {
           const err = Object.assign(new Error("unique"), { code: "P2002" });
           throw err;
         }
         archives.set(data.id, data);
         byHash.set(data.sha256, data.id);
+        byContentHash.set(data.contentSha256, data.id);
         return data;
       },
       async findUnique({
         where,
       }: {
-        where: { sha256?: string; id?: string };
+        where: { sha256?: string; contentSha256?: string; id?: string };
       }) {
         if (where.sha256) {
           const id = byHash.get(where.sha256);
+          return id ? archives.get(id) ?? null : null;
+        }
+        if (where.contentSha256) {
+          const id = byContentHash.get(where.contentSha256);
           return id ? archives.get(id) ?? null : null;
         }
         if (where.id) {
@@ -157,11 +165,29 @@ function createFakePrisma() {
             sourceUrl: string;
             contentSha256: string;
           };
+          contentSha256?: string;
           id?: string;
         };
       }) {
+        const attach = (doc: (typeof documents extends Map<string, infer T> ? T : never) | undefined | null) => {
+          if (!doc) return null;
+          const archive = archives.get(doc.archiveId);
+          return {
+            ...doc,
+            archive: archive
+              ? {
+                  sha256: archive.sha256,
+                  contentSha256: archive.contentSha256,
+                }
+              : null,
+          };
+        };
         if (where.id) {
-          return documents.get(where.id) ?? null;
+          return attach(documents.get(where.id));
+        }
+        if (where.contentSha256) {
+          const id = documentsByHash.get(where.contentSha256);
+          return attach(id ? documents.get(id) : null);
         }
         const key = where.sourceUrl_contentSha256;
         if (!key) return null;
@@ -170,7 +196,7 @@ function createFakePrisma() {
             doc.sourceUrl === key.sourceUrl &&
             doc.contentSha256 === key.contentSha256
           ) {
-            return doc;
+            return attach(doc);
           }
         }
         return null;
@@ -183,10 +209,29 @@ function createFakePrisma() {
         const matches = [...documents.values()]
           .filter((doc) => doc.sourceUrl === where.sourceUrl)
           .sort((a, b) => b.version - a.version);
-        return matches[0] ?? null;
+        const doc = matches[0];
+        if (!doc) return null;
+        const archive = archives.get(doc.archiveId);
+        return {
+          ...doc,
+          archive: archive
+            ? { sha256: archive.sha256, contentSha256: archive.contentSha256 }
+            : null,
+        };
       },
       async findMany() {
-        return [...documents.values()];
+        return [...documents.values()].map((doc) => {
+          const archive = archives.get(doc.archiveId);
+          return {
+            ...doc,
+            archive: archive
+              ? {
+                  sha256: archive.sha256,
+                  contentSha256: archive.contentSha256,
+                }
+              : null,
+          };
+        });
       },
       async count({ where }: { where: { sourceUrl: string } }) {
         return [...documents.values()].filter(
@@ -234,6 +279,19 @@ function createFakePrisma() {
           };
         };
       }) {
+        if (documentsByHash.has(data.contentSha256)) {
+          const err = Object.assign(new Error("unique"), { code: "P2002" });
+          throw err;
+        }
+        for (const existing of documents.values()) {
+          if (
+            existing.sourceUrl === data.sourceUrl &&
+            existing.contentSha256 === data.contentSha256
+          ) {
+            const err = Object.assign(new Error("unique"), { code: "P2002" });
+            throw err;
+          }
+        }
         const row = {
           id: data.id,
           sourceId: data.sourceId,
@@ -260,7 +318,14 @@ function createFakePrisma() {
           })),
         };
         documents.set(row.id, row);
-        return row;
+        documentsByHash.set(row.contentSha256, row.id);
+        const archive = archives.get(row.archiveId);
+        return {
+          ...row,
+          archive: archive
+            ? { sha256: archive.sha256, contentSha256: archive.contentSha256 }
+            : null,
+        };
       },
     },
   };
@@ -282,6 +347,7 @@ describe("PrismaArchiveRepository (fake Prisma)", () => {
       originalUrl: "https://legalinfo.mn/mn/detail?lawId=367",
       fetchedAt: "2026-08-21T00:00:00.000Z",
       sha256: "abc123",
+      contentSha256: "abc123",
       checksumVerified: true,
       mimeType: "text/html",
       byteSize: 10,
@@ -294,6 +360,10 @@ describe("PrismaArchiveRepository (fake Prisma)", () => {
     expect(await repo.findByHash("abc123")).toMatchObject({
       lawId: "367",
       source: "legalinfo.mn",
+      contentSha256: "abc123",
+    });
+    expect(await repo.findByContentHash("abc123")).toMatchObject({
+      archiveId: "arch-1",
     });
     expect(await repo.exists("abc123")).toBe(true);
   });
@@ -397,6 +467,7 @@ describe("PrismaKnowledgeRepository (fake Prisma)", () => {
         originalUrl: stored.record.originalUrl,
         fetchedAt: new Date(stored.record.fetchedAt),
         sha256: stored.record.sha256,
+        contentSha256: stored.record.contentSha256,
         checksumVerified: true,
         mimeType: stored.record.mimeType,
         byteSize: stored.record.byteSize,
@@ -445,7 +516,220 @@ describe("PrismaKnowledgeRepository (fake Prisma)", () => {
     const first = await knowledge.save(doc);
     const second = await knowledge.save(doc);
     expect(first.provenance?.sha256).toBe(sha256Hex(payload));
+    expect(first.provenance?.contentSha256).toBe(stored.record.contentSha256);
+    expect(second.id).toBe(first.id);
+    expect(await knowledge.list()).toHaveLength(1);
+    expect(first.metadata.sourceVersion).toBeNull();
+  });
+
+  it("does not invent sourceVersion when the catalog has none", async () => {
+    const { knowledge, stored } = await seedArchivedKnowledge();
+    const saved = await knowledge.save(
+      knowledgeDoc({
+        id: "doc-version",
+        sourceUrl: stored.record.originalUrl,
+        provenance: {
+          archiveId: stored.record.archiveId,
+          sha256: stored.record.sha256,
+          originalUrl: stored.record.originalUrl,
+          lawId: "1",
+        },
+        metadata: {
+          title: "Law",
+          language: "mn",
+          jurisdiction: "MN",
+          documentType: "LAW",
+          sourceUrl: stored.record.originalUrl,
+          articleCount: 1,
+          validFrom: "2017-07-01",
+          validTo: null,
+          sourceVersion: null,
+        },
+      }),
+    );
+    expect(saved.metadata.validFrom).toBe("2017-07-01");
+    expect(saved.metadata.validTo).toBeNull();
+    expect(saved.metadata.sourceVersion).toBeNull();
+  });
+
+  it("reuses one knowledge row when SHA-256 matches a different URL", async () => {
+    const { knowledge, stored } = await seedArchivedKnowledge();
+    const firstUrl = stored.record.originalUrl;
+    const secondUrl = "https://legalinfo.mn/mn/detail?lawId=99";
+    const provenance = {
+      archiveId: stored.record.archiveId,
+      sha256: stored.record.sha256,
+      originalUrl: firstUrl,
+      lawId: "1",
+    };
+
+    const first = await knowledge.save(
+      knowledgeDoc({
+        id: "doc-url-a",
+        sourceUrl: firstUrl,
+        provenance,
+      }),
+    );
+    const second = await knowledge.save(
+      knowledgeDoc({
+        id: "doc-url-b",
+        sourceUrl: secondUrl,
+        provenance: { ...provenance, originalUrl: secondUrl, lawId: "99" },
+      }),
+    );
+
+    expect(second.id).toBe(first.id);
+    expect(second.sourceUrl).toBe(firstUrl);
+    expect(second.provenance?.lawId).toBe("1");
+    expect(await knowledge.list()).toHaveLength(1);
+  });
+
+  it("is idempotent for the same URL and SHA-256", async () => {
+    const { knowledge, stored } = await seedArchivedKnowledge();
+    const doc = knowledgeDoc({
+      id: "doc-same-url",
+      sourceUrl: stored.record.originalUrl,
+      provenance: {
+        archiveId: stored.record.archiveId,
+        sha256: stored.record.sha256,
+        originalUrl: stored.record.originalUrl,
+        lawId: "1",
+      },
+    });
+    const first = await knowledge.save(doc);
+    const second = await knowledge.save(doc);
     expect(second.id).toBe(first.id);
     expect(await knowledge.list()).toHaveLength(1);
   });
+
+  it("returns the first row when concurrent saves race on the same SHA", async () => {
+    const { knowledge, stored } = await seedArchivedKnowledge();
+    const provenance = {
+      archiveId: stored.record.archiveId,
+      sha256: stored.record.sha256,
+      originalUrl: stored.record.originalUrl,
+      lawId: "1",
+    };
+    const [a, b] = await Promise.all([
+      knowledge.save(
+        knowledgeDoc({
+          id: "doc-race-a",
+          sourceUrl: stored.record.originalUrl,
+          provenance,
+        }),
+      ),
+      knowledge.save(
+        knowledgeDoc({
+          id: "doc-race-b",
+          sourceUrl: "https://legalinfo.mn/mn/detail?lawId=88",
+          provenance: {
+            ...provenance,
+            originalUrl: "https://legalinfo.mn/mn/detail?lawId=88",
+            lawId: "88",
+          },
+        }),
+      ),
+    ]);
+    expect(a.id).toBe(b.id);
+    expect(await knowledge.list()).toHaveLength(1);
+  });
 });
+
+async function seedArchivedKnowledge() {
+  const storage = new MemoryStorage();
+  const archive = createArchiveService({
+    repository: new InMemoryArchiveRepository(),
+    storage,
+  });
+  const stored = await archive.store({
+    bytes: bytes("<html>shared-bytes</html>"),
+    connectorId: "mn.legalinfo",
+    source: "legalinfo.mn",
+    sourceId: "legalinfo",
+    lawId: "1",
+    jurisdiction: "MN",
+    authority: "LEGALINFO",
+    sourceType: "law",
+    originalUrl: "https://legalinfo.mn/mn/detail?lawId=1",
+    originalFileName: "a.html",
+  });
+  const db = createFakePrisma();
+  await db.legalSourceArchive.create({
+    data: {
+      id: stored.record.archiveId,
+      connectorId: stored.record.connectorId,
+      source: stored.record.source,
+      sourceId: stored.record.sourceId,
+      lawId: stored.record.lawId,
+      jurisdiction: stored.record.jurisdiction,
+      authority: stored.record.authority,
+      sourceType: stored.record.sourceType,
+      originalUrl: stored.record.originalUrl,
+      fetchedAt: new Date(stored.record.fetchedAt),
+      sha256: stored.record.sha256,
+      contentSha256: stored.record.contentSha256,
+      checksumVerified: true,
+      mimeType: stored.record.mimeType,
+      byteSize: stored.record.byteSize,
+      archiveVersion: stored.record.archiveVersion,
+      storageKey: stored.record.storageKey,
+      originalFileName: stored.record.originalFileName,
+      encoding: stored.record.encoding ?? null,
+    },
+  });
+  return {
+    knowledge: new PrismaKnowledgeRepository(archive, db as never),
+    stored,
+  };
+}
+
+function knowledgeDoc(input: {
+  id: string;
+  sourceUrl: string;
+  provenance: {
+    archiveId: string;
+    sha256: string;
+    originalUrl: string;
+    lawId: string;
+  };
+  metadata?: {
+    title: string;
+    language: string;
+    jurisdiction: string;
+    documentType: string;
+    sourceUrl: string;
+    articleCount: number;
+    validFrom?: string | null;
+    validTo?: string | null;
+    sourceVersion?: string | null;
+  };
+}) {
+  return {
+    id: input.id,
+    sourceId: "legalinfo",
+    sourceUrl: input.sourceUrl,
+    title: "Law",
+    kind: KnowledgeDocumentKind.HTML,
+    metadata: input.metadata ?? {
+      title: "Law",
+      language: "mn",
+      jurisdiction: "MN",
+      documentType: "LAW",
+      sourceUrl: input.sourceUrl,
+      articleCount: 1,
+    },
+    articles: [{ articleNumber: "1", title: null, text: "x", order: 0 }],
+    chunks: [
+      {
+        id: `${input.id}-c1`,
+        documentId: input.id,
+        articleNumber: "1",
+        order: 0,
+        text: "x",
+        tokenEstimate: 1,
+      },
+    ],
+    ingestedAt: new Date(),
+    provenance: input.provenance,
+  };
+}

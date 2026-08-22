@@ -2,23 +2,26 @@ import { describe, expect, it } from "vitest";
 
 import {
   InMemoryKnowledgeCrawler,
+  InMemoryKnowledgeRepository,
   KnowledgeDocumentKind,
   createKnowledgeEngine,
   knowledgeDocumentId,
   rawTextDocument,
 } from "@/engine/knowledge";
+import { contentSha256Hex } from "@/engine/data/archive";
 
 describe("KnowledgeEngine", () => {
   it("ingests a seeded document through parse → normalize → chunk → store", async () => {
     const sourceUrl = "https://legalinfo.mn/mn/detail?lawId=1";
+    const html = `<h1>Хөдөлмөрийн тухай хууль</h1>
+<p>Зүйл 1. Зорилго</p>
+<p>${"ажилтан ".repeat(120)}</p>`;
     const engine = createKnowledgeEngine({
       crawler: new InMemoryKnowledgeCrawler([
         rawTextDocument({
           sourceUrl,
           kind: KnowledgeDocumentKind.HTML,
-          text: `<h1>Хөдөлмөрийн тухай хууль</h1>
-<p>Зүйл 1. Зорилго</p>
-<p>${"ажилтан ".repeat(120)}</p>`,
+          text: html,
         }),
       ]),
     });
@@ -28,7 +31,12 @@ describe("KnowledgeEngine", () => {
     expect(result.ingested).toHaveLength(1);
 
     const stored = result.ingested[0];
-    expect(stored?.id).toBe(knowledgeDocumentId(sourceUrl));
+    expect(stored?.id).toBe(
+      knowledgeDocumentId(
+        sourceUrl,
+        contentSha256Hex(new TextEncoder().encode(html)),
+      ),
+    );
     expect(stored?.metadata.language).toBe("mn");
     expect(stored?.metadata.jurisdiction).toBe("MN");
     expect(stored?.articles.length).toBeGreaterThan(0);
@@ -79,5 +87,27 @@ describe("KnowledgeEngine", () => {
     const second = await engine.ingest({ sourceId: "legalinfo" });
     expect(first.ingested[0]?.id).toBe(second.ingested[0]?.id);
     expect(await engine.exportSnapshot()).toMatchObject({ documentCount: 1 });
+  });
+
+  it("keeps two retrievable versions when canonical content changes", async () => {
+    const sourceUrl = "https://legalinfo.mn/mn/detail?lawId=42";
+    const repository = new InMemoryKnowledgeRepository();
+    const first = await createKnowledgeEngine({
+      crawler: new InMemoryKnowledgeCrawler([
+        rawTextDocument({ sourceUrl, text: "Гэрээний хуучин эх" }),
+      ]),
+      repository,
+    }).ingest({ sourceId: "legalinfo" });
+    const second = await createKnowledgeEngine({
+      crawler: new InMemoryKnowledgeCrawler([
+        rawTextDocument({ sourceUrl, text: "Гэрээний шинэ эх" }),
+      ]),
+      repository,
+    }).ingest({ sourceId: "legalinfo" });
+
+    expect(first.ingested[0]?.id).not.toBe(second.ingested[0]?.id);
+    expect(await repository.list()).toHaveLength(2);
+    expect(await repository.findById(first.ingested[0]!.id)).not.toBeNull();
+    expect(await repository.findById(second.ingested[0]!.id)).not.toBeNull();
   });
 });

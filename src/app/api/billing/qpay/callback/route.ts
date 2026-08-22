@@ -27,10 +27,13 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     if (error instanceof PaymentVerificationError) {
-      const retry = error.code === "QPAY_UNAVAILABLE";
+      const serviceUnavailable =
+        error.code === "QPAY_UNAVAILABLE" ||
+        error.code === "BILLING_PROVIDER_NOT_CONFIGURED" ||
+        error.code === "QPAY_NOT_CONFIGURED";
       return NextResponse.json(
         { ok: false, code: error.code },
-        { status: retry ? 503 : 200 },
+        { status: serviceUnavailable ? 503 : 200 },
       );
     }
     console.error(error);

@@ -25,5 +25,8 @@ function validateEnv(): Env {
   return env;
 }
 
-/** Validated env — import from boot paths so validation always runs. */
+/**
+ * Validated env — import from boot paths so validation always runs.
+ * QPay credentials are optional here; checkout/callback use isQpayConfigured().
+ */
 export const env = validateEnv();

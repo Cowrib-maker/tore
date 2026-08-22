@@ -40,4 +40,29 @@ describe("detectExactCitation", () => {
     ).toBeNull();
     expect(detectExactCitation("17.1 дүгээр зүйл")).toBeNull();
   });
+
+  it("keeps 17 and 17.1 as distinct printed locators", () => {
+    expect(detectExactCitation("Эрүүгийн хуулийн 17 дугаар зүйл")).toMatchObject({
+      article: "17",
+      paragraph: null,
+      locator: "art-17",
+    });
+    expect(detectExactCitation("Эрүүгийн хуулийн 17.1 дүгээр зүйл")).toMatchObject({
+      article: "17",
+      paragraph: "1",
+      locator: "art-17/p-1",
+    });
+  });
+
+  it("still detects a citation after a historical date prefix", () => {
+    expect(
+      detectExactCitation(
+        "2021 оны 5 сарын 10-нд Эрүүгийн хуулийн 17.1 дүгээр зүйл юу гэж заасан бэ?",
+      ),
+    ).toMatchObject({
+      titleHint: "Эрүүгийн",
+      article: "17",
+      paragraph: "1",
+    });
+  });
 });

@@ -37,3 +37,12 @@ export {
   type LegalInfoManifestDocument,
   type LegalInfoSourceType,
 } from "./types";
+export {
+  classifyCriminalCodeTitle,
+  identifyCriminalCodeFromDocuments,
+  type CriminalCodeDiscoveryDocument,
+  type CriminalCodeDiscoveryMatch,
+  type CriminalCodeDiscoverySkip,
+  type CriminalCodeTitleClass,
+  type IdentifyCriminalCodeResult,
+} from "./identify-criminal-code";

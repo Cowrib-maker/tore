@@ -255,6 +255,7 @@ model User {
   reviewsModerated         Review[]               @relation("ReviewModerator")
   organizationMemberships  OrganizationMembership[]
   aiConversations AIConversation[]
+  aiConversationDocuments AIConversationDocument[]
   aiUsage        AIUsage[]
   caseFiles      CaseFile[] @relation("LawyerCaseFiles")
   ownedSubscriptions Subscription[] @relation("SubscriptionOwner")
@@ -903,6 +904,12 @@ enum AIMessageRole {
   SYSTEM
 }
 
+enum AIDocumentExtractStatus {
+  OK
+  EMPTY
+  FAILED
+}
+
 model AIConversation {
   id        String   @id @default(cuid())
   userId    String   @map("user_id")
@@ -910,11 +917,35 @@ model AIConversation {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages AIMessage[]
+  document AIConversationDocument?
 
   @@index([userId, updatedAt(sort: Desc)])
   @@map("ai_conversations")
+}
+
+/// One native-text PDF attached to a Legal AI conversation (v0.1).
+/// Raw PDF bytes live in FileStorage; only extracted text is persisted here.
+model AIConversationDocument {
+  id             String                   @id @default(cuid())
+  conversationId String                   @unique @map("conversation_id")
+  userId         String                   @map("user_id")
+  storageKey     String                   @unique @map("storage_key")
+  fileName       String                   @map("file_name")
+  mimeType       String                   @map("mime_type")
+  sizeBytes      Int                      @map("size_bytes")
+  extractedText  String                   @map("extracted_text") @db.Text
+  pageCount      Int?                     @map("page_count")
+  extractStatus  AIDocumentExtractStatus  @map("extract_status")
+  createdAt      DateTime                 @default(now()) @map("created_at")
+  updatedAt      DateTime                 @updatedAt @map("updated_at")
+
+  conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("ai_conversation_documents")
 }
 
 model AIMessage {
@@ -1129,7 +1160,10 @@ model LegalSourceArchive {
   sourceType       String   @map("source_type")
   originalUrl      String   @map("original_url")
   fetchedAt        DateTime @map("fetched_at")
+  /** SHA-256 of the exact stored HTTP bytes. Integrity checks use this. */
   sha256           String   @unique
+  /** SHA-256 of canonical legal source bytes (captcha nonce removed). */
+  contentSha256    String   @unique @map("content_sha256")
   checksumVerified Boolean  @map("checksum_verified")
   mimeType         String   @map("mime_type")
   byteSize         Int      @map("byte_size")
@@ -1151,6 +1185,15 @@ model LegalSourceArchive {
 /**
  * Structured legal knowledge document linked to a verified archive snapshot.
  * A row must never exist without a verifiable LegalSourceArchive.
+ *
+ * Uniqueness:
+ * - (sourceUrl, contentSha256): same official URL + same canonical legal
+ *   content is idempotent.
+ * - contentSha256: identical canonical legal content creates one knowledge
+ *   row even when sourceUrl or raw HTTP bytes (captcha nonce) differ.
+ *   The first ingested URL and archive provenance are preserved.
+ * Historical rows are never overwritten when legal text actually changes;
+ * a new contentSha256 inserts a new versioned row.
  */
 model LegalKnowledgeDocument {
   id            String   @id
@@ -1169,7 +1212,7 @@ model LegalKnowledgeDocument {
   version       Int      @default(1)
   /** ISO date — instrument validity start when known from catalog. */
   validFrom     String?  @map("valid_from")
-  /** ISO date — exclusive/end bound when known; null = still in force / unknown. */
+  /** ISO date — end bound when the source supplied one. Null means missing, not in force. */
   validTo       String?  @map("valid_to")
   sourceVersion String?  @map("source_version")
   ingestedAt    DateTime @map("ingested_at")
@@ -1181,6 +1224,7 @@ model LegalKnowledgeDocument {
   chunks   LegalKnowledgeChunk[]
 
   @@unique([sourceUrl, contentSha256])
+  @@unique([contentSha256])
   @@index([sourceUrl])
   @@index([lawId])
   @@index([archiveId])

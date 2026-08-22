@@ -22,7 +22,6 @@ import {
   Shield,
   SquarePen,
   Users,
-  X,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -36,6 +35,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { LEGAL_AI_DOCUMENT_MAX_BYTES } from "@/application/ai/legal-ai-document.constants";
+import {
+  parseSafeCitationsFromUnknown,
+  type LegalAiSafeCitation,
+} from "@/application/ai/legal-ai-citation";
+import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-list";
 import {
   LEGAL_AI_PATH,
   loginHrefForLegalAi,
@@ -46,18 +51,24 @@ import { cn } from "@/lib/utils";
 type Message = {
   role: "USER" | "ASSISTANT";
   content: string;
+  citations?: LegalAiSafeCitation[];
 };
 
-type PendingFile = {
+type AttachedDocument = {
   id: string;
-  name: string;
-  kind: "image" | "document";
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+  extractStatus: "OK" | "EMPTY" | "FAILED";
+  pageCount: number | null;
 };
 
 type LegalAiChatProps = {
   initialQuestion?: string;
   initialConversationId?: string;
   initialMessages?: Message[];
+  initialAttachedDocument?: AttachedDocument | null;
+  documentUploadEnabled?: boolean;
   dashboardHref: string | null;
   displayName?: string | null;
   signInLabel: string;
@@ -85,7 +96,7 @@ const QUICK_ACTIONS = [
     label: "Баримт бичиг шалгуулах",
     icon: FileText,
     prompt:
-      "Баримт бичгээ шалгуулахыг хүсэж байна. Одоогоор файлын шинжилгээ идэвхжээгүй тул агуулгыг текстээр тайлбарлая: ",
+      "Баримт бичгээ шалгуулахыг хүсэж байна. PDF хавсаргаад агуулгыг асууя: ",
   },
   {
     id: "lawyer",
@@ -96,14 +107,12 @@ const QUICK_ACTIONS = [
   },
 ] as const;
 
-function nextFileId() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
 export function LegalAiChat({
   initialQuestion = "",
   initialConversationId,
   initialMessages = [],
+  initialAttachedDocument = null,
+  documentUploadEnabled = false,
   dashboardHref,
   displayName,
   signInLabel,
@@ -117,12 +126,14 @@ export function LegalAiChat({
     initialConversationId,
   );
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
-  const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
+  const [attachedDocument, setAttachedDocument] = useState<AttachedDocument | null>(
+    initialAttachedDocument,
+  );
   const [listening, setListening] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  const imageInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<{ stop: () => void } | null>(null);
@@ -145,32 +156,107 @@ export function LegalAiChat({
     setMessages([]);
     setConversationId(undefined);
     setError("");
-    setPendingFiles([]);
+    setAttachedDocument(null);
     setMessage("");
     setListening(false);
     setMobileNavOpen(false);
   }, []);
 
-  function addFiles(files: FileList | null, kind: PendingFile["kind"]) {
-    if (!files?.length) {
+  function handleUnsupportedImage() {
+    setError(
+      "Зураг болон OCR одоогоор дэмжигдэхгүй. Native-text PDF хавсаргана уу.",
+    );
+    toast.message("Зураг одоогоор дэмжигдэхгүй.");
+  }
+
+  async function handleDocumentChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) {
       return;
     }
-    const next = Array.from(files).map((file) => ({
-      id: nextFileId(),
-      name: file.name,
-      kind,
-    }));
-    setPendingFiles((current) => [...current, ...next].slice(0, 6));
+    await uploadPdf(file);
   }
 
-  function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
-    addFiles(event.target.files, "image");
-    event.target.value = "";
-  }
+  async function uploadPdf(file: File) {
+    if (!documentUploadEnabled) {
+      setError("PDF хавсаргах нь хуульчийн эрхтэй хэрэглэгчид зориулагдсан.");
+      return;
+    }
+    if (attachedDocument) {
+      setError("Энэ ярианд аль хэдийн нэг PDF хавсаргасан байна.");
+      return;
+    }
+    if (!isNativePdfFile(file)) {
+      setError(
+        "Одоогоор зөвхөн PDF файлыг шинжилнэ. DOCX, DOC, зураг, скан хийсэн PDF-ийг дэмжихгүй.",
+      );
+      return;
+    }
+    if (file.size > LEGAL_AI_DOCUMENT_MAX_BYTES) {
+      setError("Файл 10MB-аас ихгүй байх ёстой.");
+      return;
+    }
 
-  function handleDocumentChange(event: ChangeEvent<HTMLInputElement>) {
-    addFiles(event.target.files, "document");
-    event.target.value = "";
+    setError("");
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      if (conversationId) {
+        formData.append("conversationId", conversationId);
+      }
+
+      const response = await fetch("/api/lawyer/ai/documents", {
+        method: "POST",
+        body: formData,
+      });
+      const data = (await response.json()) as {
+        error?: string;
+        id?: string;
+        conversationId?: string;
+        fileName?: string;
+        mimeType?: string;
+        sizeBytes?: number;
+        extractStatus?: AttachedDocument["extractStatus"];
+        pageCount?: number | null;
+        storageKey?: string;
+        key?: string;
+      };
+
+      if (response.status === 401) {
+        window.location.assign(loginHrefForLegalAi());
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Баримт хавсаргахад алдаа гарлаа.");
+      }
+
+      if (data.storageKey || data.key) {
+        throw new Error("Баримт хавсаргахад алдаа гарлаа.");
+      }
+
+      if (!data.id || !data.fileName || !data.conversationId) {
+        throw new Error("Баримт хавсаргахад алдаа гарлаа.");
+      }
+
+      setConversationId(data.conversationId);
+      setAttachedDocument({
+        id: data.id,
+        fileName: data.fileName,
+        mimeType: data.mimeType ?? "application/pdf",
+        sizeBytes: data.sizeBytes ?? file.size,
+        extractStatus: data.extractStatus ?? "OK",
+        pageCount: data.pageCount ?? null,
+      });
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Баримт хавсаргахад алдаа гарлаа.",
+      );
+    } finally {
+      setUploading(false);
+    }
   }
 
   function toggleMicrophone() {
@@ -223,7 +309,6 @@ export function LegalAiChat({
 
     setError("");
     setMessage("");
-    setPendingFiles([]);
     setMessages((current) => [...current, { role: "USER", content: text }]);
     setLoading(true);
 
@@ -243,7 +328,7 @@ export function LegalAiChat({
       const data = (await response.json()) as {
         error?: string;
         conversationId?: string;
-        message?: { content?: string };
+        message?: { content?: string; citations?: unknown };
       };
 
       if (response.status === 401) {
@@ -263,6 +348,7 @@ export function LegalAiChat({
         {
           role: "ASSISTANT",
           content: data.message?.content ?? "",
+          citations: parseSafeCitationsFromUnknown(data.message?.citations),
         },
       ]);
     } catch (err) {
@@ -280,11 +366,6 @@ export function LegalAiChat({
     event.preventDefault();
     const text = message.trim();
     if (!text) {
-      if (pendingFiles.length > 0) {
-        setError(
-          "Хавсаргасан файлыг одоогоор шинжлэхгүй. Асуудлаа текстээр бичнэ үү.",
-        );
-      }
       return;
     }
     await sendMessage(text);
@@ -309,33 +390,19 @@ export function LegalAiChat({
       )}
     >
       <div className={cn(isEmpty ? "w-full" : "mx-auto w-full max-w-3xl")}>
-        {pendingFiles.length > 0 ? (
+        {attachedDocument || uploading ? (
           <ul className="mb-2 flex flex-wrap gap-2">
-            {pendingFiles.map((file) => (
-              <li
-                key={file.id}
-                className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-[#F8FAFC] py-1 pr-1 pl-2.5 text-xs text-[#3F4852]"
-              >
-                {file.kind === "image" ? (
-                  <ImagePlus className="size-3.5 shrink-0" />
-                ) : (
-                  <Paperclip className="size-3.5 shrink-0" />
-                )}
-                <span className="truncate">{file.name}</span>
-                <button
-                  type="button"
-                  className="rounded-full p-1 hover:bg-[#0B1F3A]/8"
-                  aria-label={`${file.name} хасах`}
-                  onClick={() =>
-                    setPendingFiles((current) =>
-                      current.filter((item) => item.id !== file.id),
-                    )
-                  }
-                >
-                  <X className="size-3" />
-                </button>
+            {attachedDocument ? (
+              <li className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-[#F8FAFC] py-1 pr-2.5 pl-2.5 text-xs text-[#3F4852]">
+                <Paperclip className="size-3.5 shrink-0" />
+                <span className="truncate">{attachedDocument.fileName}</span>
               </li>
-            ))}
+            ) : (
+              <li className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-[#F8FAFC] py-1 pr-2.5 pl-2.5 text-xs text-[#3F4852]">
+                <Paperclip className="size-3.5 shrink-0" />
+                <span>PDF хавсаргаж байна...</span>
+              </li>
+            )}
           </ul>
         ) : null}
 
@@ -352,35 +419,30 @@ export function LegalAiChat({
             placeholder="Хууль зүйн асуудлаа бичих эсвэл файл хавсаргах..."
             rows={2}
             className="min-h-12 w-full resize-none bg-transparent px-3 py-2 text-sm leading-6 text-[#0A0F14] outline-none placeholder:text-[#9AA3AD]"
-            disabled={loading}
+            disabled={loading || uploading}
           />
           <div className="flex items-center justify-between gap-2 px-1 pb-1">
             <div className="flex items-center gap-0.5">
               <input
-                ref={imageInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                multiple
-                className="sr-only"
-                onChange={handleImageChange}
-              />
-              <input
                 ref={documentInputRef}
                 type="file"
-                accept="application/pdf,.pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                multiple
+                accept="application/pdf,.pdf"
                 className="sr-only"
                 onChange={handleDocumentChange}
               />
               <ComposerIconButton
                 label="Зураг хавсаргах"
-                onClick={() => imageInputRef.current?.click()}
+                onClick={handleUnsupportedImage}
               >
                 <ImagePlus className="size-4" />
               </ComposerIconButton>
               <ComposerIconButton
-                label="PDF, баримт хавсаргах"
-                onClick={() => documentInputRef.current?.click()}
+                label="PDF хавсаргах"
+                onClick={() => {
+                  if (!uploading && !attachedDocument) {
+                    documentInputRef.current?.click();
+                  }
+                }}
               >
                 <Paperclip className="size-4" />
               </ComposerIconButton>
@@ -395,7 +457,7 @@ export function LegalAiChat({
             <Button
               type="submit"
               size="sm"
-              disabled={!message.trim() || loading}
+              disabled={!message.trim() || loading || uploading}
               className="gap-1.5 bg-[#0B1F3A] text-white hover:bg-[#173A66]"
             >
               <Send className="size-3.5" />
@@ -405,8 +467,9 @@ export function LegalAiChat({
         </div>
         <p className="mt-2 px-1 text-[11px] leading-4 text-[#8A939D]">
           TORE Legal AI нь ерөнхий хууль зүйн мэдээлэл, урьдчилсан чиглэл
-          өгнө. Мэргэжлийн зөвлөгөө, төлөөлөл биш. Хавсаргасан файлыг
-          одоогоор шинжлэхгүй.
+          өгнө. Мэргэжлийн зөвлөгөө, төлөөлөл биш. Native-text PDF-ийн
+          уншигдсан текстийг шинжилнэ. DOCX, зураг, скан хийсэн PDF одоогоор
+          боломжгүй.
         </p>
       </div>
     </form>
@@ -725,6 +788,7 @@ function MessageBubble({ message }: { message: Message }) {
       <WorkspaceMark />
       <div className="max-w-[85%] rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-white px-4 py-4 text-sm leading-6 whitespace-pre-wrap text-[#3F4852] shadow-[0_10px_28px_-20px_rgba(11,31,58,0.4)]">
         {message.content}
+        <LegalAiCitationList citations={message.citations} />
       </div>
     </div>
   );
@@ -782,6 +846,18 @@ type SpeechRecognitionLike = {
 };
 
 type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
+
+function isNativePdfFile(file: File): boolean {
+  const name = file.name.toLowerCase();
+  const type = file.type.toLowerCase();
+  if (name.endsWith(".doc") || name.endsWith(".docx")) {
+    return false;
+  }
+  if (type.startsWith("image/")) {
+    return false;
+  }
+  return type === "application/pdf" || name.endsWith(".pdf");
+}
 
 function getSpeechRecognitionCtor(): SpeechRecognitionCtor | undefined {
   if (typeof window === "undefined") {

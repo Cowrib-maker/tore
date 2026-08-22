@@ -23,11 +23,49 @@ describe("RuleBasedDomainFilter", () => {
     );
   });
 
+  it("classifies inflected Mongolian legal phrases as LEGAL", () => {
+    expect(
+      filter.classify(
+        "Хулгайлах гэмт хэргийн бүрэлдэхүүнд ямар шинжүүд хамаарах вэ?",
+      ).domain,
+    ).toBe(DomainLabel.LEGAL);
+    expect(
+      filter.classify("Эрүүгийн хуулийн 17.1 дүгээр зүйл юу гэж заасан бэ?")
+        .domain,
+    ).toBe(DomainLabel.LEGAL);
+    expect(
+      filter.classify(
+        "Гэмт хэрэг үйлдсэн этгээдэд эрүүгийн хариуцлага хэзээ хүлээлгэх вэ?",
+      ).domain,
+    ).toBe(DomainLabel.LEGAL);
+    expect(
+      filter.classify("Энэ асуудлыг хуулийн дагуу хэрхэн шийдэх вэ?").domain,
+    ).toBe(DomainLabel.LEGAL);
+    expect(filter.classify("гэмт хэргийг хэрхэн тодорхойлох вэ?").domain).toBe(
+      DomainLabel.LEGAL,
+    );
+    expect(filter.classify("гэмт хэрэгт холбогдсон уу?").domain).toBe(
+      DomainLabel.LEGAL,
+    );
+    expect(filter.classify("гэмт хэргээс хэрхэн урьдчилан сэргийлэх вэ?").domain).toBe(
+      DomainLabel.LEGAL,
+    );
+  });
+
   it("classifies off-topic messages as NON_LEGAL", () => {
     expect(filter.classify("What's the weather in Ulaanbaatar?").domain).toBe(
       DomainLabel.NON_LEGAL,
     );
     expect(filter.classify("Хоолны жор өгөөч").domain).toBe(DomainLabel.NON_LEGAL);
+    expect(filter.classify("Өнөөдөр цаг агаар ямар байна?").domain).toBe(
+      DomainLabel.NON_LEGAL,
+    );
+    expect(filter.classify("Надад төрсөн өдрийн мэндчилгээ бичиж өг.").domain).toBe(
+      DomainLabel.NON_LEGAL,
+    );
+    expect(filter.classify("Энэ өгүүлбэрийг англи хэл рүү орчуул.").domain).toBe(
+      DomainLabel.NON_LEGAL,
+    );
   });
 
   it("accepts additional rules without mutating the original filter", () => {

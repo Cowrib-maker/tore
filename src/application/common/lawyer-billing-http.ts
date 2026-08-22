@@ -3,8 +3,10 @@ import type { QpayGateway } from "@/domain/ports/qpay-gateway";
 import type { InvoiceRepository } from "@/domain/repositories/invoice-repository";
 import type { PaymentTransactionRepository } from "@/domain/repositories/invoice-repository";
 import type { SubscriptionRepository } from "@/domain/repositories/subscription-repository";
+import { PaymentVerificationError } from "@/domain/errors/payment-verification-error";
 import {
   createQpayGateway,
+  isQpayConfigured,
   qpayCallbackUrl,
 } from "@/infrastructure/billing/create-qpay-gateway";
 import { billingUnitOfWork } from "@/infrastructure/database/prisma-billing-unit-of-work";
@@ -22,6 +24,13 @@ export type LawyerBillingDeps = {
 };
 
 export function lawyerBillingDeps(): LawyerBillingDeps {
+  if (!isQpayConfigured()) {
+    throw new PaymentVerificationError(
+      "QPay is not configured",
+      "BILLING_PROVIDER_NOT_CONFIGURED",
+      503,
+    );
+  }
   return {
     invoiceRepository,
     paymentTransactionRepository,

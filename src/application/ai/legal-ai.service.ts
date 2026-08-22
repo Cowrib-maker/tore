@@ -1,3 +1,9 @@
+import { MAX_DOCUMENT_EXTRACT_CHARS } from "@/application/ai/legal-ai-document.constants";
+import {
+  citationPinpointFromLocator,
+  nullIfBlank,
+  type LegalAiSafeCitation,
+} from "@/application/ai/legal-ai-citation";
 import { LegalAiError } from "@/application/ai/legal-ai.errors";
 import type {
   LegalCitationVerdict,
@@ -13,6 +19,7 @@ import type {
   LegalAiCompletionPort,
   LegalAiCreateTurnInput,
   LegalAiCreateTurnResult,
+  LegalAiConversationDocumentMeta,
   LegalAiStore,
   LegalAiStoredMessage,
 } from "@/application/ai/legal-ai.types";
@@ -81,7 +88,11 @@ export class LegalAiService {
 
     if (!isNonLegal && !this.dependencies.completion.isConfigured()) {
       console.error("OPENAI_API_KEY is not configured.");
-      throw new LegalAiError("AI үйлчилгээний тохиргоо хийгдээгүй байна.", 500);
+      throw new LegalAiError(
+        "AI үйлчилгээний тохиргоо хийгдээгүй байна.",
+        503,
+        "AI_NOT_CONFIGURED",
+      );
     }
 
     const conversation = await this.resolveConversation(
@@ -137,21 +148,30 @@ export class LegalAiService {
         : undefined;
 
     const reasoningPlan = this.prepareReasoningPlan(message, intent);
+    const document = await this.dependencies.store.findOwnedDocumentExtract(
+      conversation.id,
+      input.userId,
+    );
 
     const prompt = this.dependencies.promptBuilder.build({
-  message,
-  userType,
-  domain: domainResult.domain,
-  turnKind,
-  mode: input.mode ?? "CITIZEN",
-  intentType: intent.intent,
-  intentConfidence: intent.confidence,
-  missingInformation: verifiedAuthorities?.length
-    ? undefined
-    : reasoningPlan?.missingInformation,
-  corpusAvailable: Boolean(verifiedAuthorities?.length),
-  verifiedAuthorities,
-});
+      message,
+      userType,
+      domain: domainResult.domain,
+      turnKind,
+      mode: input.mode ?? "CITIZEN",
+      intentType: intent.intent,
+      intentConfidence: intent.confidence,
+      missingInformation: verifiedAuthorities?.length
+        ? undefined
+        : reasoningPlan?.missingInformation,
+      corpusAvailable: Boolean(verifiedAuthorities?.length),
+      verifiedAuthorities,
+      documentExtract: document?.extractedText.slice(
+        0,
+        MAX_DOCUMENT_EXTRACT_CHARS,
+      ),
+      documentFileName: document?.fileName,
+    });
 
     const completion = await this.dependencies.completion.complete({
       systemPrompt: prompt.systemPrompt,
@@ -177,27 +197,39 @@ export class LegalAiService {
       outputTokens: completion.outputTokens,
     });
 
+    let citations: LegalAiSafeCitation[] = [];
     if (verifiedAuthorities?.length) {
-      await this.dependencies.store.createCitations({
+      citations = await this.dependencies.store.createCitations({
         messageId: assistantMessage.id,
-        citations: verifiedAuthorities.map((authority) => ({
-          title: authority.title,
-          sourceType: VERIFIED_SOURCE_TYPE,
-          sourceUrl: null,
-          reference: [
-            authority.locator,
-            authority.documentId,
-            authority.documentVersionId,
-            authority.nodeId,
-          ].join(" | "),
-          excerpt: authority.excerpt,
-        })),
+        citations: verifiedAuthorities.map((authority) => {
+          const pinpoint = citationPinpointFromLocator(authority.locator);
+          return {
+            title: authority.title,
+            sourceType: authority.sourceType ?? VERIFIED_SOURCE_TYPE,
+            sourceUrl: nullIfBlank(authority.sourceUrl),
+            reference: [
+              authority.locator,
+              authority.documentId,
+              authority.documentVersionId,
+              authority.nodeId,
+            ].join(" | "),
+            excerpt: authority.excerpt,
+            article: nullIfBlank(authority.article) ?? pinpoint.article,
+            paragraph: nullIfBlank(authority.paragraph) ?? pinpoint.paragraph,
+            sourceVersion: nullIfBlank(authority.sourceVersion),
+            validFrom: nullIfBlank(authority.effectiveFrom),
+            validTo: nullIfBlank(authority.effectiveTo),
+          };
+        }),
       });
     }
 
     return {
       conversationId: conversation.id,
-      message: assistantMessage,
+      message: {
+        ...assistantMessage,
+        citations,
+      },
       usage: {
         inputTokens: completion.inputTokens,
         outputTokens: completion.outputTokens,
@@ -222,6 +254,11 @@ export class LegalAiService {
           nodeId: string;
           effectiveFrom: string | null;
           effectiveTo: string | null;
+          sourceUrl: string | null;
+          sourceVersion: string | null;
+          article: string | null;
+          paragraph: string | null;
+          sourceType: string;
         }>;
       }
     | { kind: "refused"; message: string }
@@ -244,6 +281,7 @@ export class LegalAiService {
     }
 
     const verification = await this.dependencies.corpusRetriever.verifyCitation({
+      question: input.question,
       query: input.query,
       ...verifyHintFromRetrieved(retrieved.authorities),
     });
@@ -267,16 +305,24 @@ export class LegalAiService {
 
     return {
       kind: "verified",
-      authorities: verified.map((authority) => ({
-        title: authority.title,
-        locator: authority.locator,
-        excerpt: authority.excerpt,
-        documentId: authority.documentId,
-        documentVersionId: authority.documentVersionId,
-        nodeId: authority.nodeId,
-        effectiveFrom: authority.effectiveFrom,
-        effectiveTo: authority.effectiveTo,
-      })),
+      authorities: verified.map((authority) => {
+        const pinpoint = citationPinpointFromLocator(authority.locator);
+        return {
+          title: authority.title,
+          locator: authority.locator,
+          excerpt: authority.excerpt,
+          documentId: authority.documentId,
+          documentVersionId: authority.documentVersionId,
+          nodeId: authority.nodeId,
+          effectiveFrom: authority.effectiveFrom,
+          effectiveTo: authority.effectiveTo,
+          sourceUrl: nullIfBlank(authority.sourceUrl),
+          sourceVersion: nullIfBlank(authority.sourceVersion),
+          article: nullIfBlank(authority.article) ?? pinpoint.article,
+          paragraph: nullIfBlank(authority.paragraph) ?? pinpoint.paragraph,
+          sourceType: authority.sourceType ?? VERIFIED_SOURCE_TYPE,
+        };
+      }),
     };
   }
 
@@ -294,6 +340,23 @@ export class LegalAiService {
     return this.dependencies.store.listMessages(conversationId, HISTORY_LIMIT);
   }
 
+  async getConversationDocumentMeta(
+    userId: string,
+    conversationId: string,
+  ): Promise<LegalAiConversationDocumentMeta | null> {
+    const conversation = await this.dependencies.store.findOwnedConversation(
+      conversationId,
+      userId,
+    );
+    if (!conversation) {
+      throw new LegalAiError("Яриа олдсонгүй.", 404);
+    }
+    return this.dependencies.store.findOwnedDocumentMeta(
+      conversationId,
+      userId,
+    );
+  }
+
   private async persistSafeReply(input: {
     conversationId: string;
     content: string;
@@ -307,7 +370,10 @@ export class LegalAiService {
 
     return {
       conversationId: input.conversationId,
-      message: assistantMessage,
+      message: {
+        ...assistantMessage,
+        citations: [],
+      },
       usage: {
         inputTokens: 0,
         outputTokens: 0,

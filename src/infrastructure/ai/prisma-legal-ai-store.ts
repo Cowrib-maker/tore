@@ -2,9 +2,16 @@ import { prisma } from "@/infrastructure/database/prisma";
 import type {
   LegalAiAssistantMessage,
   LegalAiConversation,
+  LegalAiConversationDocumentExtract,
+  LegalAiConversationDocumentMeta,
   LegalAiStore,
   LegalAiStoredMessage,
 } from "@/application/ai/legal-ai.types";
+import {
+  toSafeLegalAiCitation,
+  type LegalAiCitationPersistInput,
+  type LegalAiSafeCitation,
+} from "@/application/ai/legal-ai-citation";
 
 export class PrismaLegalAiStore implements LegalAiStore {
   async findOwnedConversation(
@@ -104,26 +111,114 @@ export class PrismaLegalAiStore implements LegalAiStore {
 
   async createCitations(input: {
     messageId: string;
-    citations: Array<{
-      title: string;
-      sourceType: string;
-      sourceUrl?: string | null;
-      reference?: string | null;
-      excerpt?: string | null;
-    }>;
-  }): Promise<void> {
+    citations: LegalAiCitationPersistInput[];
+  }): Promise<LegalAiSafeCitation[]> {
     if (input.citations.length === 0) {
-      return;
+      return [];
     }
-    await prisma.aICitation.createMany({
-      data: input.citations.map((citation) => ({
-        messageId: input.messageId,
-        title: citation.title,
-        sourceType: citation.sourceType,
-        sourceUrl: citation.sourceUrl ?? null,
-        reference: citation.reference ?? null,
-        excerpt: citation.excerpt ?? null,
-      })),
+    const created: LegalAiSafeCitation[] = [];
+    for (const citation of input.citations) {
+      const row = await prisma.aICitation.create({
+        data: {
+          messageId: input.messageId,
+          title: citation.title,
+          sourceType: citation.sourceType,
+          sourceUrl: citation.sourceUrl ?? null,
+          reference: citation.reference ?? null,
+          excerpt: citation.excerpt ?? null,
+        },
+        select: {
+          id: true,
+          title: true,
+          sourceType: true,
+          sourceUrl: true,
+        },
+      });
+      created.push(toSafeLegalAiCitation(row.id, citation));
+    }
+    return created;
+  }
+
+  async findOwnedDocumentExtract(
+    conversationId: string,
+    userId: string,
+  ): Promise<LegalAiConversationDocumentExtract | null> {
+    const row = await prisma.aIConversationDocument.findFirst({
+      where: { conversationId, userId, extractStatus: "OK" },
+      select: { fileName: true, extractedText: true },
     });
+    return row;
+  }
+
+  async findOwnedDocumentMeta(
+    conversationId: string,
+    userId: string,
+  ): Promise<LegalAiConversationDocumentMeta | null> {
+    const row = await prisma.aIConversationDocument.findFirst({
+      where: { conversationId, userId },
+      select: {
+        id: true,
+        fileName: true,
+        mimeType: true,
+        sizeBytes: true,
+        extractStatus: true,
+        pageCount: true,
+      },
+    });
+    return row;
+  }
+
+  async findDocumentByStorageKey(
+    storageKey: string,
+  ): Promise<{ userId: string } | null> {
+    return prisma.aIConversationDocument.findFirst({
+      where: { storageKey },
+      select: { userId: true },
+    });
+  }
+
+  async findDocumentIdByConversationId(
+    conversationId: string,
+  ): Promise<string | null> {
+    const row = await prisma.aIConversationDocument.findFirst({
+      where: { conversationId },
+      select: { id: true },
+    });
+    return row?.id ?? null;
+  }
+
+  async createConversationDocument(input: {
+    conversationId: string;
+    userId: string;
+    storageKey: string;
+    fileName: string;
+    mimeType: string;
+    sizeBytes: number;
+    extractedText: string;
+    pageCount: number | null;
+    extractStatus: "OK";
+  }): Promise<LegalAiConversationDocumentMeta> {
+    const row = await prisma.aIConversationDocument.create({
+      data: {
+        conversationId: input.conversationId,
+        userId: input.userId,
+        storageKey: input.storageKey,
+        fileName: input.fileName,
+        mimeType: input.mimeType,
+        sizeBytes: input.sizeBytes,
+        extractedText: input.extractedText,
+        pageCount: input.pageCount,
+        extractStatus: input.extractStatus,
+      },
+      select: {
+        id: true,
+        fileName: true,
+        mimeType: true,
+        sizeBytes: true,
+        extractStatus: true,
+        pageCount: true,
+      },
+    });
+    return row;
   }
 }

@@ -7,6 +7,7 @@ import type { ActionState } from "@/application/common/action-state";
 import { mapActionError } from "@/application/common/map-action-error";
 import { guardLawyerAiHttp, recordLawyerFeatureUsage } from "@/application/common/guard-lawyer-ai-http";
 import { requireActor } from "@/application/common/require-actor";
+import { assertEmailVerified } from "@/application/common/require-verified-email";
 import {
   createCaseEvidenceForLawyer,
   createCaseFactForLawyer,
@@ -97,6 +98,7 @@ export async function rerunCaseAnalysisAction(
 ): Promise<CaseReviewActionState> {
   try {
     const actor = await requireActor(UserRole.LAWYER);
+    await assertEmailVerified(actor.userId);
     const guard = await guardLawyerAiHttp(
       actor,
       EntitlementFeature.CASE_ANALYSIS,

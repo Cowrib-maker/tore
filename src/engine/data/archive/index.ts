@@ -18,6 +18,13 @@ export type {
 export { ArchiveArtifactFormat as ArchiveFormat } from "./types";
 
 export { sha256Hex, storageKeyForHash } from "./hash";
+export {
+  canonicalizeLegalSourceBytes,
+  contentSha256Hex,
+  rawSha256Hex,
+  LEGALINFO_CAPTCHA_NONCE_PATTERN,
+  LEGALINFO_CAPTCHA_STABLE,
+} from "./canonicalize";
 export { mimeTypeForFileName, SUPPORTED_MIME_TYPES } from "./mime";
 export { InMemoryArchiveRepository } from "./in-memory-archive.repository";
 export { LocalFilesystemArchiveStorage } from "./local-filesystem.storage";
