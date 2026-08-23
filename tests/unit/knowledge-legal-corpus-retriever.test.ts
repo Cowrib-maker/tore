@@ -5,6 +5,8 @@ import {
   CitationVerificationStatus,
   type LegalCorpusAuthority,
   type LegalCorpusRetriever,
+  type LegalCorpusRetrieveInput,
+  type LegalCorpusRetrieveResult,
 } from "@/application/ai/legal-corpus";
 import { KnowledgeDocumentKind, LegalTemporalRelationType } from "@/engine/knowledge";
 import { InMemoryKnowledgeRepository } from "@/engine/knowledge/repository";
@@ -98,12 +100,23 @@ function createRemote(
   }),
 ): LegalCorpusRetriever & {
   retrieveExactCitation: ReturnType<typeof vi.fn>;
+  retrieveLegalQuestion: ReturnType<typeof vi.fn>;
   verifyCitation: ReturnType<typeof vi.fn>;
 } {
   return {
-    retrieveExactCitation: vi.fn(retrieve),
-    verifyCitation: vi.fn(verify),
-  };
+  retrieveExactCitation: vi.fn(retrieve),
+  retrieveLegalQuestion: vi.fn(
+    async (
+      _input: LegalCorpusRetrieveInput,
+    ): Promise<LegalCorpusRetrieveResult> => ({
+      kind: "unavailable",
+      reason: "not_configured",
+      authorities: [],
+      retrievedAt: null,
+    }),
+  ),
+  verifyCitation: vi.fn(verify),
+};
 }
 
 describe("KnowledgeLegalCorpusRetriever", () => {

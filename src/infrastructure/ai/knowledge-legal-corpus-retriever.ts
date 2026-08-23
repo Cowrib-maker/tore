@@ -155,7 +155,86 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
       retrievedAt: new Date().toISOString(),
     };
   }
+  async retrieveLegalQuestion(
+    input: LegalCorpusRetrieveInput,
+  ): Promise<LegalCorpusRetrieveResult> {
+    const temporalText = [input.question, input.query]
+      .filter((part) => part?.trim())
+      .join(" ");
 
+    const intent = parseLegalTemporalQueryIntent(temporalText);
+    const nowIsoDate = isoDateFromClock(
+      this.options.now?.() ?? new Date(),
+    );
+
+    const hits = await this.knowledge.searchArticles({
+      text: input.question || input.query,
+      jurisdiction: "MN",
+      limit: 8,
+    });
+
+    const uniqueHits = uniqueByArticleId(hits);
+
+    const verified: LegalCorpusAuthority[] = [];
+
+    for (const hit of uniqueHits) {
+      const document = await this.knowledge.findById(hit.documentId);
+
+      if (!hasVerifiedProvenance(document)) {
+        continue;
+      }
+
+      if (
+        !versionIsProven(
+          document,
+          intent,
+          nowIsoDate,
+          input.explicitRelations ?? [],
+        )
+      ) {
+        continue;
+      }
+
+      verified.push(
+        toLocalAuthority(
+          hit,
+          document,
+          {
+            article: articleNumberOf(hit),
+            paragraph: null,
+            locator: articleNumberOf(hit),
+            titleHint: hit.documentTitle,
+          } as DetectedExactCitation,
+        ),
+      );
+    }
+
+    if (verified.length === 0) {
+      const requiresProof =
+        intent.kind === "HISTORICAL" || intent.kind === "CURRENT";
+
+      if (requiresProof && uniqueHits.length > 0) {
+        const documents = await Promise.all(
+          uniqueHits.map((hit) => this.knowledge.findById(hit.documentId)),
+        );
+
+        if (
+          documents.some((document) => hasVerifiedProvenance(document))
+        ) {
+          return asOfUnavailable();
+        }
+      }
+
+      return unavailableNotFound();
+    }
+
+    return {
+      kind: "retrieved",
+      status: "ok",
+      authorities: verified,
+      retrievedAt: new Date().toISOString(),
+    };
+  }
   async verifyCitation(
     input: LegalCorpusVerifyInput,
   ): Promise<LegalCitationVerifyResult> {

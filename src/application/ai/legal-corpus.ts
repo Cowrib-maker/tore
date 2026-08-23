@@ -97,11 +97,15 @@ export interface LegalCorpusRetriever {
   retrieveExactCitation(
     input: LegalCorpusRetrieveInput,
   ): Promise<LegalCorpusRetrieveResult>;
+
+  retrieveLegalQuestion(
+    input: LegalCorpusRetrieveInput,
+  ): Promise<LegalCorpusRetrieveResult>;
+
   verifyCitation(
     input: LegalCorpusVerifyInput,
   ): Promise<LegalCitationVerifyResult>;
 }
-
 /**
  * Maps retrieve HTTP shape only. Never declares a citation VALID.
  * Official validity comes from POST /v1/citations/verify.

@@ -46,7 +46,21 @@ export class FallbackLegalCorpusRetriever implements LegalCorpusRetriever {
     }
     return this.remote.retrieveExactCitation(input);
   }
+  async retrieveLegalQuestion(
+    input: LegalCorpusRetrieveInput,
+  ): Promise<LegalCorpusRetrieveResult> {
+    const local = await this.local.retrieveLegalQuestion(input);
 
+    if (local.kind === "as_of_unavailable") {
+      return local;
+    }
+
+    if (hasRetrievedAuthorities(local)) {
+      return local;
+    }
+
+    return this.remote.retrieveLegalQuestion(input);
+  }
   async verifyCitation(
     input: LegalCorpusVerifyInput,
   ): Promise<LegalCitationVerifyResult> {

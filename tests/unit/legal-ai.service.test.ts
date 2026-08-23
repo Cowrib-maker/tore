@@ -6,8 +6,12 @@ import {
   LegalAiService,
   resolveTurnKind,
 } from "@/application/ai/legal-ai.service";
-import type { LegalCorpusRetriever } from "@/application/ai/legal-corpus";
-import { CitationVerificationStatus } from "@/application/ai/legal-corpus";
+import {
+  CitationVerificationStatus,
+  type LegalCorpusRetriever,
+  type LegalCorpusRetrieveInput,
+  type LegalCorpusRetrieveResult,
+} from "@/application/ai/legal-corpus";
 import type {
   LegalAiCompletionPort,
   LegalAiStore,
@@ -187,13 +191,30 @@ function createRetriever(
   }),
 ): LegalCorpusRetriever & {
   retrieveExactCitation: ReturnType<typeof vi.fn>;
+  retrieveLegalQuestion: ReturnType<typeof vi.fn>;
   verifyCitation: ReturnType<typeof vi.fn>;
 } {
   const retrieveExactCitation = vi.fn(retrieve);
-  const verifyCitation = vi.fn(verify);
-  return { retrieveExactCitation, verifyCitation };
-}
 
+  const retrieveLegalQuestion = vi.fn(
+    async (
+      _input: LegalCorpusRetrieveInput,
+    ): Promise<LegalCorpusRetrieveResult> => ({
+      kind: "unavailable",
+      reason: "not_configured",
+      authorities: [],
+      retrievedAt: null,
+    }),
+  );
+
+  const verifyCitation = vi.fn(verify);
+
+  return {
+    retrieveExactCitation,
+    retrieveLegalQuestion,
+    verifyCitation,
+  };
+}
 function sampleVerdict(
   status: (typeof CitationVerificationStatus)[keyof typeof CitationVerificationStatus] = CitationVerificationStatus.VALID,
 ) {

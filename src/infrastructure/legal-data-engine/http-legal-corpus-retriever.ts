@@ -30,7 +30,24 @@ export class HttpLegalCorpusRetriever implements LegalCorpusRetriever {
       retrievedAt: result.data.retrievedAt,
     });
   }
+  async retrieveLegalQuestion(
+    input: LegalCorpusRetrieveInput,
+  ): Promise<LegalCorpusRetrieveResult> {
+    const result = await this.client.retrieve({
+      question: input.question || input.query,
+      asOf: null,
+    });
 
+    if (!result.ok) {
+      return unavailable(result.kind);
+    }
+
+    return inspectRetrieveShape({
+      status: result.data.status,
+      authorities: result.data.authorities,
+      retrievedAt: result.data.retrievedAt,
+    });
+  }
   async verifyCitation(
     input: LegalCorpusVerifyInput,
   ): Promise<LegalCitationVerifyResult> {
@@ -66,7 +83,9 @@ export class UnavailableLegalCorpusRetriever implements LegalCorpusRetriever {
   async retrieveExactCitation(): Promise<LegalCorpusRetrieveResult> {
     return unavailable(this.reason);
   }
-
+  async retrieveLegalQuestion(): Promise<LegalCorpusRetrieveResult> {
+    return unavailable(this.reason);
+  }
   async verifyCitation(): Promise<LegalCitationVerifyResult> {
     return { ok: false, reason: this.reason };
   }
