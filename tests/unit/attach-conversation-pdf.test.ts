@@ -23,13 +23,18 @@ function createStore(): LegalAiStore & {
   const documents = new Map<string, { userId: string; storageKey: string }>();
 
   return {
-    documents,
-    uploaded: [],
-    async findOwnedConversation(id, userId) {
-      const row = conversations.get(id);
-      if (!row || row.userId !== userId) return null;
-      return { id: row.id };
-    },
+  documents,
+  uploaded: [],
+
+  async countUserLegalAiQuestions(_userId) {
+    return 0;
+  },
+
+  async findOwnedConversation(id, userId) {
+    const row = conversations.get(id);
+    if (!row || row.userId !== userId) return null;
+    return { id: row.id };
+  },
     async createConversation(input) {
       const id = `conv-${input.userId}-new`;
       conversations.set(id, { id, userId: input.userId });

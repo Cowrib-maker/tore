@@ -14,7 +14,18 @@ import {
 } from "@/application/ai/legal-ai-citation";
 
 export class PrismaLegalAiStore implements LegalAiStore {
-  async findOwnedConversation(
+  async countUserLegalAiQuestions(userId: string): Promise<number> {
+    return prisma.aIMessage.count({
+      where: {
+        role: "USER",
+        conversation: {
+          userId,
+        },
+      },
+    });
+  }
+
+    async findOwnedConversation(
     id: string,
     userId: string,
   ): Promise<LegalAiConversation | null> {
@@ -25,7 +36,7 @@ export class PrismaLegalAiStore implements LegalAiStore {
     return conversation;
   }
 
-  async createConversation(input: {
+   async createConversation(input: {
     userId: string;
     title: string;
   }): Promise<LegalAiConversation> {

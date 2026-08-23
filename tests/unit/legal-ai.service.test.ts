@@ -52,13 +52,18 @@ function createStore(): LegalAiStore & {
   let seq = 0;
 
   return {
-    conversations,
-    userMessages: [],
-    assistantMessages: [],
-    usageCount: 0,
-    citations: [],
-    documentExtracts,
-    async findOwnedConversation(id, userId) {
+  conversations,
+  userMessages: [],
+  assistantMessages: [],
+  usageCount: 0,
+  citations: [],
+  documentExtracts,
+
+  async countUserLegalAiQuestions() {
+    return this.userMessages.length;
+  },
+
+      async findOwnedConversation(id, userId) {
       const row = conversations.get(id);
       if (!row || row.userId !== userId) {
         return null;

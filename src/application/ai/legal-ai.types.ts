@@ -59,6 +59,9 @@ export type LegalAiConversationDocumentMeta = {
 };
 
 export type LegalAiStore = {
+  countUserLegalAiQuestions(
+    userId: string,
+  ): Promise<number>;
   findOwnedConversation(
     id: string,
     userId: string,
