@@ -41,6 +41,10 @@ import {
   type LegalAiSafeCitation,
 } from "@/application/ai/legal-ai-citation";
 import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-list";
+import { interpretLegalAiChatAccess } from "@/components/legal-ai/interpret-legal-ai-chat-access";
+import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
+import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
+import { requestCitizenCheckout } from "@/components/legal-ai/request-citizen-checkout";
 import {
   LEGAL_AI_PATH,
   loginHrefForLegalAi,
@@ -78,32 +82,34 @@ type LegalAiChatProps = {
 
 const QUICK_ACTIONS = [
   {
-    id: "identify",
-    label: "Хууль зүйн асуудлаа тодорхойлох",
+    id: "fired",
+    label: "Намайг ажлаас халсан.",
     icon: Scale,
-    prompt:
-      "Миний нөхцөл байдал ямар эрх зүйн харилцаанд хамаарахыг тодорхойлоход тусална уу. ",
+    prompt: "Намайг ажлаас халсан.",
   },
   {
-    id: "rights",
-    label: "Эрх, үүргээ мэдэх",
+    id: "unpaid",
+    label: "Мөнгө өгөхгүй байна.",
     icon: Shield,
-    prompt:
-      "Миний нөхцөл байдалд холбогдох ерөнхий эрх, үүргийг ойлгомжтой тайлбарлана уу. ",
+    prompt: "Мөнгө өгөхгүй байна.",
   },
   {
-    id: "document",
-    label: "Баримт бичиг шалгуулах",
+    id: "accident",
+    label: "Зам тээврийн осолд орсон.",
     icon: FileText,
-    prompt:
-      "Баримт бичгээ шалгуулахыг хүсэж байна. PDF хавсаргаад агуулгыг асууя: ",
+    prompt: "Зам тээврийн осолд орсон.",
   },
   {
-    id: "lawyer",
-    label: "Хуульч, өмгөөлөгч санал болгох",
+    id: "contract",
+    label: "Гэрээтэй холбоотой асуудалтай.",
     icon: Users,
-    prompt:
-      "Миний асуудалд ямар чиглэлийн хуульч, өмгөөлөгч тохирохыг тайлбарлана уу. Тодорхой хүнийг зохиож санал болгохгүй байхыг хүсье. ",
+    prompt: "Гэрээтэй холбоотой асуудалтай.",
+  },
+  {
+    id: "police",
+    label: "Цагдаад дуудсан.",
+    icon: Scale,
+    prompt: "Цагдаад дуудсан.",
   },
 ] as const;
 
@@ -133,6 +139,18 @@ export function LegalAiChat({
   );
   const [listening, setListening] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [accessGate, setAccessGate] = useState<null | {
+    kind: "auth" | "billing";
+    question: string;
+    message: string;
+    checkout?: {
+      qrImage: string | null;
+      shortUrl: string | null;
+      amountMnt: number;
+      planCode: string;
+    } | null;
+    checkoutError?: string;
+  }>(null);
 
   const documentInputRef = useRef<HTMLInputElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
@@ -156,6 +174,7 @@ export function LegalAiChat({
     setMessages([]);
     setConversationId(undefined);
     setError("");
+    setAccessGate(null);
     setAttachedDocument(null);
     setMessage("");
     setListening(false);
@@ -167,6 +186,18 @@ export function LegalAiChat({
       "Зураг болон OCR одоогоор дэмжигдэхгүй. Native-text PDF хавсаргана уу.",
     );
     toast.message("Зураг одоогоор дэмжигдэхгүй.");
+  }
+
+  async function startCitizenCheckout(): Promise<{
+    view: {
+      qrImage: string | null;
+      shortUrl: string | null;
+      amountMnt: number;
+      planCode: string;
+    } | null;
+    error?: string;
+  }> {
+    return requestCitizenCheckout({ enabled: Boolean(dashboardHref) });
   }
 
   async function handleDocumentChange(event: ChangeEvent<HTMLInputElement>) {
@@ -308,6 +339,7 @@ export function LegalAiChat({
     }
 
     setError("");
+    setAccessGate(null);
     setMessage("");
     setMessages((current) => [...current, { role: "USER", content: text }]);
     setLoading(true);
@@ -315,31 +347,49 @@ export function LegalAiChat({
     try {
       const response = await fetch("/api/ai/chat", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
-     body: JSON.stringify({
-  message: text,
-  conversationId,
-  mode,
-}),
+        body: JSON.stringify({
+          message: text,
+          conversationId,
+          mode,
+        }),
       });
 
       const data = (await response.json()) as {
         error?: string;
+        code?: string;
         conversationId?: string;
         message?: { content?: string; citations?: unknown };
       };
 
-      if (response.status === 401) {
-        window.location.assign(loginHrefForLegalAi(text));
+      const interpreted = interpretLegalAiChatAccess({
+        status: response.status,
+        body: data,
+        question: text,
+      });
+
+      if (interpreted.type === "auth") {
+        setAccessGate(interpreted.gate);
+        setMessage(text);
         return;
       }
 
-      if (!response.ok) {
-        throw new Error(
-          data.error ?? "AI үйлчилгээтэй холбогдоход алдаа гарлаа.",
-        );
+      if (interpreted.type === "billing") {
+        const checkout = await startCitizenCheckout();
+        setAccessGate({
+          ...interpreted.gate,
+          checkout: checkout.view,
+          checkoutError: checkout.error,
+        });
+        setMessage(text);
+        return;
+      }
+
+      if (interpreted.type === "error") {
+        throw new Error(interpreted.message);
       }
 
       setConversationId(data.conversationId);
@@ -416,7 +466,7 @@ export function LegalAiChat({
                 event.currentTarget.form?.requestSubmit();
               }
             }}
-            placeholder="Хууль зүйн асуудлаа бичих эсвэл файл хавсаргах..."
+            placeholder="Асуудлаа өөрийнхөөрөө бичээрэй. Хуулийн нэр томъёо мэдэх шаардлагагүй."
             rows={2}
             className="min-h-12 w-full resize-none bg-transparent px-3 py-2 text-sm leading-6 text-[#0A0F14] outline-none placeholder:text-[#9AA3AD]"
             disabled={loading || uploading}
@@ -603,6 +653,12 @@ export function LegalAiChat({
                   setError("");
                 }}
               />
+              <LegalAiEntitlementBanner />
+              {initialQuestion.trim() && !accessGate ? (
+                <p className="mt-4 text-sm text-[#5C6570]">
+                  Асуултаа илгээхийн тулд Илгээх дарна уу. Автоматаар илгээгдэхгүй.
+                </p>
+              ) : null}
               {error ? (
                 <div
                   role="alert"
@@ -611,6 +667,7 @@ export function LegalAiChat({
                   {error}
                 </div>
               ) : null}
+              {accessGate ? <LegalAiAccessGateCard gate={accessGate} /> : null}
               {composer}
             </div>
           </div>
@@ -640,6 +697,8 @@ export function LegalAiChat({
                     {error}
                   </div>
                 ) : null}
+                <LegalAiEntitlementBanner />
+                {accessGate ? <LegalAiAccessGateCard gate={accessGate} /> : null}
               </div>
             </div>
             {composer}
@@ -747,11 +806,10 @@ function EmptyWorkspace({
           TORE LEGAL AI
         </p>
         <h1 className="mt-2 text-[1.75rem] font-semibold leading-[1.2] tracking-[-0.03em] text-[#0A0F14] sm:text-[2rem]">
-          Хууль зүйн асуудлаа бичнэ үү
+          Танд юу тохиолдсон бэ?
         </h1>
         <p className="mx-auto mt-3 max-w-lg text-[15px] leading-[1.6] text-[#5C6570]">
-          Нөхцөл байдлаа энгийнээр тайлбарлаарай. Таны нөхцөл байдлыг ойлгож,
-          холбогдох эрх зүйн чиглэлийг тодорхойлоход тусална.
+          Асуудлаа өөрийнхөөрөө бичээрэй. Хуулийн нэр томъёо мэдэх шаардлагагүй.
         </p>
       </div>
 

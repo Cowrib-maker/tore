@@ -9,6 +9,7 @@ import {
 } from "@/engine/gateway";
 import { createIntentEngine } from "@/engine/intent";
 import { createReasoningEngine } from "@/engine/reasoning";
+import { createLegalRelevanceEngine } from "@/engine/relevance";
 import { KnowledgeLegalCorpusRetriever } from "@/infrastructure/ai/knowledge-legal-corpus-retriever";
 import { OpenAiLegalAiCompletion } from "@/infrastructure/ai/openai-legal-ai-completion";
 import { PrismaLegalAiStore } from "@/infrastructure/ai/prisma-legal-ai-store";
@@ -18,6 +19,15 @@ import {
   HttpLegalCorpusRetriever,
   UnavailableLegalCorpusRetriever,
 } from "@/infrastructure/legal-data-engine/http-legal-corpus-retriever";
+import { createLegalQuestionAccess } from "@/application/legal-ai/legal-question-access";
+import {
+  prismaConversationBillingStore,
+  prismaGuestSessionStore,
+} from "@/infrastructure/legal-ai/prisma-guest-session-store";
+import {
+  entitlementUsageRepository,
+  subscriptionRepository,
+} from "@/infrastructure/repositories";
 import { PrismaKnowledgeRepository } from "@/infrastructure/repositories/prisma-legal-knowledge-repository";
 import { env } from "@/lib/env";
 
@@ -60,15 +70,24 @@ function createCorpusRetriever(): LegalCorpusRetriever {
  * Routes must call this instead of wiring engine internals.
  */
 export function createLegalAiService(): LegalAiService {
+  const domainFilter = new RuleBasedDomainFilter();
+  const intent = createIntentEngine();
   return new LegalAiService({
-    domainFilter: new RuleBasedDomainFilter(),
+    domainFilter,
     userTypeService: new UserTypeService(),
     promptBuilder: new PromptBuilderService(),
-    intent: createIntentEngine(),
+    intent,
     reasoning: createReasoningEngine(),
+    legalRelevance: createLegalRelevanceEngine({ domainFilter, intent }),
     store: new PrismaLegalAiStore(),
     completion: new OpenAiLegalAiCompletion(env.OPENAI_API_KEY),
     corpusRetriever: createCorpusRetriever(),
+    legalQuestionAccess: createLegalQuestionAccess({
+      guestSessions: prismaGuestSessionStore,
+      conversations: prismaConversationBillingStore,
+      subscriptionRepository,
+      entitlementUsageRepository,
+    }),
   });
 }
 

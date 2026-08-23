@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { LEGAL_AI_DOCUMENT_MAX_BYTES } from "@/application/ai/legal-ai-document.constants";
 import { attachConversationPdfUseCase } from "@/application/use-cases/ai/attach-conversation-pdf";
-import { UserRole } from "@/domain/enums";
+import { UserRole, LegalQuestionStatus } from "@/domain/enums";
 import { ConflictError, ForbiddenError, ValidationError } from "@/domain/errors/domain-error";
 import type { FileStorage } from "@/domain/ports/file-storage";
 import type { LegalAiStore } from "@/application/ai/legal-ai.types";
@@ -33,12 +33,24 @@ function createStore(): LegalAiStore & {
   async findOwnedConversation(id, userId) {
     const row = conversations.get(id);
     if (!row || row.userId !== userId) return null;
-    return { id: row.id };
+    return { id: row.id, questionStatus: LegalQuestionStatus.NEW, billedQuestionCount: 0 };
   },
+    async findAccessibleConversation(input) {
+      const row = conversations.get(input.id);
+      if (!row) return null;
+      if (input.userId && row.userId === input.userId) {
+        return { id: row.id, questionStatus: LegalQuestionStatus.NEW, billedQuestionCount: 0 };
+      }
+      return null;
+    },
     async createConversation(input) {
       const id = `conv-${input.userId}-new`;
-      conversations.set(id, { id, userId: input.userId });
-      return { id };
+      conversations.set(id, { id, userId: input.userId ?? "unknown" });
+      return { id, questionStatus: LegalQuestionStatus.NEW, billedQuestionCount: 0 };
+    },
+    async updateQuestionThread() {},
+    async countBilledQuestionsForUser() {
+      return 0;
     },
     async createUserMessage() {},
     async listMessages() {

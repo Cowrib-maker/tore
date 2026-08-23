@@ -58,15 +58,77 @@ export const TEAM_PLAN: SubscriptionPlanDefinition = {
   },
 };
 
+/**
+ * Citizen catalog entries. Price and LEGAL_AI_QUERY quota are product
+ * configuration — not hard-coded in LegalAiService.
+ */
+export const CITIZEN_BASIC_PLAN: SubscriptionPlanDefinition = {
+  code: SubscriptionPlanCode.CITIZEN_BASIC,
+  name: "TORE Citizen Basic",
+  priceMnt: 19_900,
+  seatLimit: 1,
+  quotas: {
+    caseAnalysis: 0,
+    documentAnalysis: 0,
+    legalAiQueries: 20,
+  },
+  tokenCeilings: {
+    inputTokens: 500_000,
+    outputTokens: 100_000,
+  },
+};
+
+export const CITIZEN_PLUS_PLAN: SubscriptionPlanDefinition = {
+  code: SubscriptionPlanCode.CITIZEN_PLUS,
+  name: "TORE Citizen Plus",
+  priceMnt: 49_900,
+  seatLimit: 1,
+  quotas: {
+    caseAnalysis: 0,
+    documentAnalysis: 0,
+    legalAiQueries: 80,
+  },
+  tokenCeilings: {
+    inputTokens: 2_000_000,
+    outputTokens: 400_000,
+  },
+};
+
+/** One complete legal-question thread without a paid citizen plan. */
+export const UNPAID_CITIZEN_FREE_LEGAL_QUESTIONS = 1;
+export const GUEST_FREE_LEGAL_QUESTIONS = 1;
+export const GUEST_FREE_LEGAL_QUESTION_LIMIT = GUEST_FREE_LEGAL_QUESTIONS;
+
+export const CITIZEN_PLANS: readonly SubscriptionPlanCode[] = [
+  SubscriptionPlanCode.CITIZEN_BASIC,
+  SubscriptionPlanCode.CITIZEN_PLUS,
+];
+
+export const LAWYER_PLANS: readonly SubscriptionPlanCode[] = [
+  SubscriptionPlanCode.SOLO,
+  SubscriptionPlanCode.TEAM,
+];
+
 const PLANS: Record<SubscriptionPlanCode, SubscriptionPlanDefinition> = {
   [SubscriptionPlanCode.SOLO]: SOLO_PLAN,
   [SubscriptionPlanCode.TEAM]: TEAM_PLAN,
+  [SubscriptionPlanCode.CITIZEN_BASIC]: CITIZEN_BASIC_PLAN,
+  [SubscriptionPlanCode.CITIZEN_PLUS]: CITIZEN_PLUS_PLAN,
 };
 
 export function getPlanDefinition(
   code: SubscriptionPlanCode,
 ): SubscriptionPlanDefinition {
   return PLANS[code];
+}
+
+/** Catalog price for QPay verification. Unknown and unpriced plans return null. */
+export function getPricedPlanDefinition(
+  code: SubscriptionPlanCode,
+): SubscriptionPlanDefinition | null {
+  const plan: SubscriptionPlanDefinition | undefined = PLANS[code];
+  if (!plan || plan.priceMnt <= 0) return null;
+  return plan;
 }
 
 export const FEATURE_QUOTA_EXCEEDED_MESSAGES: Record<
@@ -89,3 +151,9 @@ export const ACCOUNT_SHARING_RESTRICTED_MESSAGE =
 
 export const BILLING_REQUIRED_MESSAGE =
   "Таны TORE SOLO багц идэвхгүй байна. Төлбөр төлж багцаа идэвхжүүлнэ үү.";
+
+export const CITIZEN_BILLING_REQUIRED_MESSAGE =
+  "Шинэ хууль зүйн асуулт асуухад төлбөртэй багц шаардлагатай. Үнэгүй тодруулга энэ асуултын хүрээнд үргэлжилнэ.";
+
+export const LEGAL_AI_AUTHENTICATION_REQUIRED_MESSAGE =
+  "Үнэгүй хууль зүйн асуултынхаа хариуг авсан тул шинэ асуултад нэвтэрч, багц идэвхжүүлнэ үү.";

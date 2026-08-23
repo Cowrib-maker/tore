@@ -15,6 +15,7 @@ import { EntitlementFeature } from "@/domain/enums";
 export async function guardLawyerAiHttp(
   actor: ActorContext,
   feature: EntitlementFeature,
+  options?: { checkQuota?: boolean },
 ): Promise<LawyerAiGuardResult> {
   const ctx = await readLawyerSessionHttpContext();
   const deps = lawyerEntitlementDeps();
@@ -27,6 +28,7 @@ export async function guardLawyerAiHttp(
       ipHash: ctx.ipHash,
       policy,
       feature,
+      checkQuota: options?.checkQuota,
     },
     deps,
   );

@@ -90,6 +90,13 @@ export const envSchema = z.object({
    * OpenAI. Server-only. Optional at boot — required when a legal AI completion
    * runs. Never prefix with NEXT_PUBLIC_.
    */
+  /**
+   * Launch-required server secrets (never NEXT_PUBLIC_):
+   * DATABASE_URL, AUTH_SECRET, AUTH_URL (production), OPENAI_API_KEY,
+   * QPAY_CLIENT_ID, QPAY_CLIENT_SECRET, QPAY_CALLBACK_URL, QPAY_INVOICE_CODE,
+   * EMAIL_PROVIDER + RESEND_API_KEY or SMTP_*, REDIS_URL unless allow-flagged.
+   * Missing values must fail safely at call time — do not invent credentials.
+   */
   OPENAI_API_KEY: emptyToUndefined(z.string().optional()),
   /**
    * QPay Merchant V2. Server-only. Sandbox vs production is selected by BASE_URL.

@@ -30,6 +30,14 @@ function createPrismaClient() {
   });
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+function getPrismaClient() {
+  const cached = globalForPrisma.prisma;
+  if (cached?.guestSession) {
+    return cached;
+  }
+  const created = createPrismaClient();
+  globalForPrisma.prisma = created;
+  return created;
+}
 
-globalForPrisma.prisma = prisma;
+export const prisma = getPrismaClient();

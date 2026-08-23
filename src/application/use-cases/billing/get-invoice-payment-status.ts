@@ -66,7 +66,8 @@ export async function getOwnInvoicePaymentStatus(
       if (
         error instanceof PaymentVerificationError &&
         (error.code === "PAYMENT_NOT_SUCCESSFUL" ||
-          error.code === "WRONG_AMOUNT")
+          error.code === "WRONG_AMOUNT" ||
+          error.code === "UNPRICED_PLAN")
       ) {
         const latest = await deps.invoiceRepository.findById(invoice.id);
         return toStatusView(latest ?? invoice, null, now);

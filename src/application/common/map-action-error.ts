@@ -1,6 +1,15 @@
 import type { ActionState } from "@/application/common/action-state";
 import { DomainError } from "@/domain/errors/domain-error";
 
+function isCredentialsSigninError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const candidate = error as { type?: unknown; name?: unknown };
+  return (
+    candidate.type === "CredentialsSignin" ||
+    candidate.name === "CredentialsSignin"
+  );
+}
+
 /**
  * Maps domain/unknown errors to safe, user-facing ActionState messages.
  * Never expose internal IDs, stack traces, or infrastructure details.
@@ -20,6 +29,12 @@ export function mapActionError(error: unknown): ActionState {
         // Validation / conflict messages are intentionally user-facing.
         return { error: error.message };
     }
+  }
+
+  // Auth.js v5 `signIn(..., { redirect: false })` still throws CredentialsSignin
+  // on failed credentials instead of returning `{ error }`.
+  if (isCredentialsSigninError(error)) {
+    return { error: "Invalid email or password" };
   }
 
   console.error(error);

@@ -33,6 +33,13 @@ function requireRequest(request: CaseAnalysisRequest): CaseAnalysisRequest {
   return request;
 }
 
+function nextAnalyzedAt(previous: Date | null, now = new Date()): Date {
+  if (previous && now.getTime() <= previous.getTime()) {
+    return new Date(previous.getTime() + 1);
+  }
+  return now;
+}
+
 function upsertActiveMapping(
   mappings: ExplicitFactMappingInput[],
   next: ExplicitFactMappingInput,
@@ -108,7 +115,7 @@ export async function submitManualMappingForLawyer(
   try {
     const result = await deps.runAnalysis(nextRequest, file.fixtureRules);
     reviewSnapshot = result.review;
-    lastAnalyzedAt = new Date();
+    lastAnalyzedAt = nextAnalyzedAt(file.lastAnalyzedAt);
     analysisStatus = CaseFileAnalysisStatus.ANALYZED;
   } catch {
     analysisStatus = CaseFileAnalysisStatus.ANALYSIS_FAILED;
@@ -151,7 +158,7 @@ export async function rerunCaseAnalysisForLawyer(
   try {
     const result = await deps.runAnalysis(request, file.fixtureRules);
     reviewSnapshot = result.review;
-    lastAnalyzedAt = new Date();
+    lastAnalyzedAt = nextAnalyzedAt(file.lastAnalyzedAt);
     analysisStatus = CaseFileAnalysisStatus.ANALYZED;
   } catch {
     analysisStatus = CaseFileAnalysisStatus.ANALYSIS_FAILED;

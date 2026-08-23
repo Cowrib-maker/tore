@@ -20,9 +20,12 @@ import {
   DuplicateActiveSoloError,
   type SubscriptionRepository,
 } from "@/domain/repositories/subscription-repository";
-import { SOLO_PLAN } from "@/domain/constants/subscription-plans";
+import {
+  getPlanDefinition,
+  getPricedPlanDefinition,
+} from "@/domain/constants/subscription-plans";
 import { decideSoloSubscriptionPeriod } from "@/domain/services/subscription-period";
-import { verifySoloQpayPayment } from "@/domain/services/qpay-payment-verification";
+import { verifyQpayCatalogPayment } from "@/domain/services/qpay-payment-verification";
 
 export type ProcessQpayPaymentDeps = {
   qpayGateway: QpayGateway;
@@ -53,17 +56,29 @@ export async function processQpayInvoicePayment(
     throw new PaymentVerificationError("Invoice was not found", "WRONG_INVOICE");
   }
 
+  const plan = getPricedPlanDefinition(invoice.planCode);
+  if (!plan) {
+    await deps.invoiceRepository
+      .updateStatus(invoice.id, InvoiceStatus.FAILED)
+      .catch(() => undefined);
+    throw new PaymentVerificationError(
+      "Plan is not priced for payment",
+      "UNPRICED_PLAN",
+    );
+  }
+
   const checked = await deps.qpayGateway.checkPayment(invoice.providerInvoiceId);
   let verified;
   try {
-    verified = verifySoloQpayPayment({
+    verified = verifyQpayCatalogPayment({
       expectedProviderInvoiceId: invoice.providerInvoiceId,
+      expectedAmountMnt: plan.priceMnt,
       checked,
     });
   } catch (error) {
     if (
       error instanceof PaymentVerificationError &&
-      error.code === "WRONG_AMOUNT"
+      (error.code === "WRONG_AMOUNT" || error.code === "UNPRICED_PLAN")
     ) {
       await deps.invoiceRepository
         .updateStatus(invoice.id, InvoiceStatus.FAILED)
@@ -116,8 +131,9 @@ export async function processQpayInvoicePayment(
       current.id,
       InvoiceStatus.PAID,
     );
-    const subscription = await activateOrRenewSoloSubscription({
+    const subscription = await activateOrRenewPaidSubscription({
       userId: current.userId,
+      planCode: current.planCode,
       providerInvoiceId: current.providerInvoiceId!,
       now,
       repos,
@@ -142,21 +158,23 @@ async function alreadyProcessedResult(
     ? await subscriptionRepository.findById(invoice.subscriptionId)
     : await subscriptionRepository.findLatestOwnedByUserId(
         invoice.userId,
-        SubscriptionPlanCode.SOLO,
+        invoice.planCode,
       );
   return { alreadyProcessed: true, invoice, subscription };
 }
 
-async function activateOrRenewSoloSubscription(input: {
+async function activateOrRenewPaidSubscription(input: {
   userId: string;
+  planCode: SubscriptionPlanCode;
   providerInvoiceId: string;
   now: Date;
   repos: BillingRepositories;
 }): Promise<Subscription> {
+  const plan = getPlanDefinition(input.planCode);
   const existing =
     await input.repos.subscriptionRepository.findLatestOwnedByUserId(
       input.userId,
-      SubscriptionPlanCode.SOLO,
+      input.planCode,
     );
   const decision = decideSoloSubscriptionPeriod({
     now: input.now,
@@ -167,9 +185,9 @@ async function activateOrRenewSoloSubscription(input: {
     try {
       const created = await input.repos.subscriptionRepository.create({
         ownerUserId: input.userId,
-        planCode: SOLO_PLAN.code,
+        planCode: plan.code,
         status: SubscriptionStatus.ACTIVE,
-        seatLimit: SOLO_PLAN.seatLimit,
+        seatLimit: plan.seatLimit,
         currentPeriodStart: decision.startsAt,
         currentPeriodEnd: decision.expiresAt,
         providerInvoiceId: input.providerInvoiceId,
@@ -185,7 +203,7 @@ async function activateOrRenewSoloSubscription(input: {
         const raced =
           await input.repos.subscriptionRepository.findLatestOwnedByUserId(
             input.userId,
-            SubscriptionPlanCode.SOLO,
+            input.planCode,
           );
         if (raced) {
           return applyPeriod(raced, input);

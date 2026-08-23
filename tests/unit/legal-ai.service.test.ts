@@ -17,6 +17,8 @@ import type {
   LegalAiStore,
   LegalAiStoredMessage,
 } from "@/application/ai/legal-ai.types";
+import type { LegalQuestionAccessPort } from "@/application/legal-ai/legal-question-access";
+import { LegalQuestionStatus } from "@/domain/enums";
 import {
   DomainLabel,
   PromptBuilderService,
@@ -26,9 +28,23 @@ import {
 } from "@/engine/gateway";
 import { IntentType, createIntentEngine } from "@/engine/intent";
 import { createReasoningEngine } from "@/engine/reasoning";
+import {
+  LEGAL_CLARIFICATION_PREFIX,
+  clarificationContainsForbiddenJargon,
+  createLegalRelevanceEngine,
+} from "@/engine/relevance";
 
 function createStore(): LegalAiStore & {
-  conversations: Map<string, { id: string; userId: string }>;
+  conversations: Map<
+    string,
+    {
+      id: string;
+      userId?: string;
+      guestSessionId?: string;
+      questionStatus: LegalQuestionStatus;
+      billedQuestionCount: number;
+    }
+  >;
   userMessages: string[];
   assistantMessages: string[];
   usageCount: number;
@@ -43,7 +59,16 @@ function createStore(): LegalAiStore & {
     { userId: string; fileName: string; extractedText: string }
   >;
 } {
-  const conversations = new Map<string, { id: string; userId: string }>();
+  const conversations = new Map<
+    string,
+    {
+      id: string;
+      userId?: string;
+      guestSessionId?: string;
+      questionStatus: LegalQuestionStatus;
+      billedQuestionCount: number;
+    }
+  >();
   const messages = new Map<string, LegalAiStoredMessage[]>();
   const documentExtracts = new Map<
     string,
@@ -68,13 +93,54 @@ function createStore(): LegalAiStore & {
       if (!row || row.userId !== userId) {
         return null;
       }
-      return { id: row.id };
+      return {
+        id: row.id,
+        questionStatus: row.questionStatus,
+        billedQuestionCount: row.billedQuestionCount,
+      };
+    },
+    async findAccessibleConversation(input) {
+      const row = conversations.get(input.id);
+      if (!row) return null;
+      const userOk = input.userId && row.userId === input.userId;
+      const guestOk =
+        input.guestSessionId && row.guestSessionId === input.guestSessionId;
+      if (!userOk && !guestOk) return null;
+      return {
+        id: row.id,
+        questionStatus: row.questionStatus,
+        billedQuestionCount: row.billedQuestionCount,
+      };
     },
     async createConversation(input) {
       const id = `conv-${++seq}`;
-      conversations.set(id, { id, userId: input.userId });
+      const row = {
+        id,
+        userId: input.userId,
+        guestSessionId: input.guestSessionId,
+        questionStatus: LegalQuestionStatus.NEW,
+        billedQuestionCount: 0,
+      };
+      conversations.set(id, row);
       messages.set(id, []);
-      return { id };
+      return {
+        id,
+        questionStatus: row.questionStatus,
+        billedQuestionCount: 0,
+      };
+    },
+    async updateQuestionThread(input) {
+      const row = conversations.get(input.conversationId);
+      if (!row) return;
+      row.questionStatus = input.questionStatus;
+      if (input.incrementBilledQuestion) {
+        row.billedQuestionCount += 1;
+      }
+    },
+    async countBilledQuestionsForUser(userId) {
+      return [...conversations.values()]
+        .filter((row) => row.userId === userId)
+        .reduce((sum, row) => sum + row.billedQuestionCount, 0);
     },
     async createUserMessage(input) {
       this.userMessages.push(input.content);
@@ -270,26 +336,43 @@ function sampleAuthority(overrides: Partial<{
 const NON_LEGAL_REFUSAL_MESSAGE =
   "Би TORE Legal AI — хууль зүйн асуудлаар туслах зориулалттай AI. Таны асуулт хууль зүйн асуудалтай холбоогүй байна. Хэрэв танд хууль, эрх зүйн асуудал байгаа бол нөхцөл байдлаа бичээрэй, би тусалъя.";
 
+function paidLegalQuestionAccess(
+  overrides?: Partial<LegalQuestionAccessPort>,
+): LegalQuestionAccessPort {
+  return {
+    async assertCanStartNewLegalQuestion() {},
+    async consumeNewLegalQuestion() {},
+    async hasPaidLegalAiAccess() {
+      return true;
+    },
+    ...overrides,
+  };
+}
+
 function createService(overrides?: {
   store?: ReturnType<typeof createStore>;
   completion?: ReturnType<typeof createCompletion>;
   reasoning?: ReturnType<typeof createReasoningEngine>;
   corpusRetriever?: ReturnType<typeof createRetriever>;
+  legalQuestionAccess?: LegalQuestionAccessPort;
 }) {
   const store = overrides?.store ?? createStore();
   const completion = overrides?.completion ?? createCompletion();
   const reasoning = overrides?.reasoning ?? createReasoningEngine();
   const corpusRetriever = overrides?.corpusRetriever ?? createRetriever();
   const intent = createIntentEngine();
+  const domainFilter = new RuleBasedDomainFilter();
   const service = new LegalAiService({
-    domainFilter: new RuleBasedDomainFilter(),
+    domainFilter,
     userTypeService: new UserTypeService(),
     promptBuilder: new PromptBuilderService(),
     intent,
     reasoning,
+    legalRelevance: createLegalRelevanceEngine({ domainFilter, intent }),
     store,
     completion,
     corpusRetriever,
+    legalQuestionAccess: overrides?.legalQuestionAccess,
   });
   return { service, store, completion, reasoning, corpusRetriever, intent };
 }
@@ -385,6 +468,92 @@ describe("LegalAiService", () => {
     expect(completion.complete).not.toHaveBeenCalled();
     expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
     expect(corpusRetriever.verifyCitation).not.toHaveBeenCalled();
+  });
+
+  it("answers a paid citizen general question without consuming a legal question", async () => {
+    const consumeNewLegalQuestion = vi.fn();
+    const { service, store, completion, corpusRetriever } = createService({
+      legalQuestionAccess: paidLegalQuestionAccess({
+        consumeNewLegalQuestion,
+      }),
+    });
+
+    const result = await service.createTurn({
+      userId: "paid-1",
+      message: "Elon Musk гэж хэн бэ?",
+    });
+
+    expect(result.turnKind).toBe(PromptTurnKind.GENERAL);
+    expect(result.message.content).not.toBe(NON_LEGAL_REFUSAL_MESSAGE);
+    expect(result.message.content).toBe("mocked-answer");
+    expect(completion.complete).toHaveBeenCalledOnce();
+    const systemPrompt =
+      completion.complete.mock.calls[0]?.[0]?.systemPrompt ?? "";
+    expect(systemPrompt).toContain("ердийн");
+    expect(systemPrompt).not.toContain("хууль зүйн мэдээллийн асуулт");
+    expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
+    expect(consumeNewLegalQuestion).not.toHaveBeenCalled();
+    expect(
+      [...store.conversations.values()].every(
+        (row) => row.billedQuestionCount === 0,
+      ),
+    ).toBe(true);
+  });
+
+  it("does not consume quota when a paid general OpenAI call fails", async () => {
+    const consumeNewLegalQuestion = vi.fn();
+    const { service, store } = createService({
+      completion: createCompletion(async () => {
+        throw new Error("openai unavailable");
+      }),
+      legalQuestionAccess: paidLegalQuestionAccess({
+        consumeNewLegalQuestion,
+      }),
+    });
+
+    await expect(
+      service.createTurn({
+        userId: "paid-1",
+        message: "Elon Musk гэж хэн бэ?",
+      }),
+    ).rejects.toBeTruthy();
+    expect(consumeNewLegalQuestion).not.toHaveBeenCalled();
+    expect(
+      [...store.conversations.values()].every(
+        (row) => row.billedQuestionCount === 0,
+      ),
+    ).toBe(true);
+  });
+
+  it("returns 503 for paid general questions when OpenAI is not configured", async () => {
+    const { service, store, completion } = createService({
+      completion: createCompletion(undefined, false),
+      legalQuestionAccess: paidLegalQuestionAccess(),
+    });
+
+    await expect(
+      service.createTurn({
+        userId: "paid-1",
+        message: "Elon Musk гэж хэн бэ?",
+      }),
+    ).rejects.toMatchObject({
+      statusCode: 503,
+      code: "AI_NOT_CONFIGURED",
+    });
+    expect(store.conversations.size).toBe(0);
+    expect(completion.complete).not.toHaveBeenCalled();
+  });
+
+  it("still refuses a guest general question", async () => {
+    const { service, completion } = createService();
+
+    const result = await service.createTurn({
+      guestSessionId: "guest-1",
+      message: "Elon Musk гэж хэн бэ?",
+    });
+
+    expect(result.message.content).toBe(NON_LEGAL_REFUSAL_MESSAGE);
+    expect(completion.complete).not.toHaveBeenCalled();
   });
 
   it("treats an ambiguous legal question as clarification, not a firm conclusion", async () => {
@@ -953,5 +1122,137 @@ describe("LegalAiService", () => {
     expect(systemPrompt).toContain("баталгаатай эх өгөөгүй");
     expect(systemPrompt).not.toContain("LEGAL RULE");
     expect(systemPrompt).not.toContain("VERIFIED LEGAL SOURCES");
+  });
+
+  it("does not treat everyday theft language as NON_LEGAL", async () => {
+    const reasoning = createReasoningEngine();
+    const prepare = vi.spyOn(reasoning, "prepare");
+    const { service, completion, corpusRetriever } = createService({
+      reasoning,
+    });
+
+    const result = await service.createTurn({
+      userId: "user-1",
+      message: "Айлд хүн байхгүй байхад ороод зурагт аваад явсан",
+    });
+
+    expect(result.turnKind).toBe(PromptTurnKind.AMBIGUOUS);
+    expect(result.message.content).toContain(LEGAL_CLARIFICATION_PREFIX);
+    expect(clarificationContainsForbiddenJargon(result.message.content)).toBe(
+      false,
+    );
+    expect(completion.complete).not.toHaveBeenCalled();
+    expect(prepare).not.toHaveBeenCalled();
+    expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
+  });
+
+  it("routes a natural-language firing as employment clarification, not a refusal", async () => {
+    const { service, completion } = createService();
+
+    const result = await service.createTurn({
+      userId: "user-1",
+      message: "Манай дарга намайг өнөөдөр ажлаас гаргасан",
+    });
+
+    expect(result.message.content).not.toBe(NON_LEGAL_REFUSAL_MESSAGE);
+    expect(result.message.content).toContain(LEGAL_CLARIFICATION_PREFIX);
+    expect(result.message.content).toMatch(/ажлаас|эрх|үүрэг/);
+    expect(result.message.content).not.toMatch(/ямар хууль|иргэний үү|эрүүгийн үү/);
+    expect(completion.complete).not.toHaveBeenCalled();
+  });
+
+  it("routes unpaid lending as a civil path or clarification, not NON_LEGAL", async () => {
+    const { service, completion } = createService();
+
+    const result = await service.createTurn({
+      userId: "user-1",
+      message: "Надаас мөнгө зээлээд буцааж өгөхгүй байна",
+    });
+
+    expect(result.message.content).not.toBe(NON_LEGAL_REFUSAL_MESSAGE);
+    expect(result.turnKind).not.toBe(PromptTurnKind.GENERAL);
+    expect(completion.complete).not.toHaveBeenCalled();
+  });
+
+  it("routes a child-taken story as family-related, not NON_LEGAL", async () => {
+    const { service, completion } = createService();
+
+    const result = await service.createTurn({
+      userId: "user-1",
+      message: "Нөхөр маань хүүхдээ аваад явчихсан, би яах вэ?",
+    });
+
+    expect(result.message.content).not.toBe(NON_LEGAL_REFUSAL_MESSAGE);
+    expect(result.message.content).toMatch(/хүүхэд|гэр бүл|хамтран/);
+    expect(completion.complete).not.toHaveBeenCalled();
+  });
+
+  it("still refuses a movie question as NON_LEGAL", async () => {
+    const { service, completion, corpusRetriever } = createService();
+
+    const result = await service.createTurn({
+      userId: "user-1",
+      message: "Өнөөдөр ямар кино үзэх вэ?",
+    });
+
+    expect(result.turnKind).toBe(PromptTurnKind.GENERAL);
+    expect(result.message.content).toBe(NON_LEGAL_REFUSAL_MESSAGE);
+    expect(completion.complete).not.toHaveBeenCalled();
+    expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
+  });
+
+  it("keeps exact citation lookup for a statute question", async () => {
+    const corpusRetriever = createRetriever(
+      async () => ({
+        kind: "retrieved",
+        status: "ok",
+        retrievedAt: "2026-08-17T00:00:00.000Z",
+        authorities: [sampleAuthority()],
+      }),
+      async () => ({
+        ok: true,
+        verdict: sampleVerdict(CitationVerificationStatus.VALID),
+      }),
+    );
+    const { service, completion } = createService({ corpusRetriever });
+
+    await service.createTurn({
+      userId: "user-1",
+      message: "Эрүүгийн хуулийн 17.1 дүгээр зүйл юу гэж заасан бэ?",
+    });
+
+    expect(corpusRetriever.retrieveExactCitation).toHaveBeenCalledOnce();
+    expect(corpusRetriever.verifyCitation).toHaveBeenCalledOnce();
+    expect(completion.complete).toHaveBeenCalledOnce();
+  });
+
+  it("asks a clarification without OpenAI, then continues the legal pipeline on follow-up", async () => {
+    const store = createStore();
+    const { service } = createService({
+      store,
+      completion: createCompletion(undefined, false),
+    });
+
+    const first = await service.createTurn({
+      userId: "user-1",
+      message: "Манай дарга намайг гаргачихлаа.",
+    });
+
+    expect(first.message.content).toContain(LEGAL_CLARIFICATION_PREFIX);
+    expect(first.turnKind).toBe(PromptTurnKind.AMBIGUOUS);
+
+    const { service: nextService, completion } = createService({
+      store,
+    });
+
+    const second = await nextService.createTurn({
+      userId: "user-1",
+      conversationId: first.conversationId,
+      message: "Тийм, ажлаасаа халуулсан тухай асууж байна.",
+    });
+
+    expect(completion.complete).toHaveBeenCalledOnce();
+    expect(second.turnKind).not.toBe(PromptTurnKind.GENERAL);
+    expect(second.message.content).not.toBe(NON_LEGAL_REFUSAL_MESSAGE);
   });
 });

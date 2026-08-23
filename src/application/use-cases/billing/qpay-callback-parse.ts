@@ -1,4 +1,10 @@
 import { DomainError } from "@/domain/errors/domain-error";
+import {
+  BILLING_FORBIDDEN_MESSAGE,
+  BILLING_NOT_FOUND_MESSAGE,
+  BILLING_UNAUTHORIZED_MESSAGE,
+  BILLING_UNEXPECTED_MESSAGE,
+} from "@/application/common/public-service-errors";
 
 export function parseQpayCallbackInvoiceId(rawBody: string, url: URL): string | null {
   const fromQuery = url.searchParams.get("invoice_id")?.trim();
@@ -23,14 +29,14 @@ export function billingApiErrorResponse(error: unknown): Response {
       error.code === "VALIDATION_ERROR" ? 400 : error.statusCode;
     const message =
       error.code === "NOT_FOUND"
-        ? "The requested resource was not found."
+        ? BILLING_NOT_FOUND_MESSAGE
         : error.code === "FORBIDDEN"
-          ? "You do not have permission to perform this action."
+          ? BILLING_FORBIDDEN_MESSAGE
           : error.code === "UNAUTHORIZED"
-            ? "Please sign in to continue."
+            ? BILLING_UNAUTHORIZED_MESSAGE
             : error.message;
     return Response.json({ error: message, code: error.code }, { status });
   }
   console.error(error);
-  return Response.json({ error: "Unexpected error" }, { status: 500 });
+  return Response.json({ error: BILLING_UNEXPECTED_MESSAGE }, { status: 500 });
 }

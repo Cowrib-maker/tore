@@ -2,12 +2,16 @@ import { NextResponse } from "next/server";
 
 import { LegalAiError } from "@/application/ai/legal-ai.errors";
 import { getLegalAiService } from "@/application/ai/create-legal-ai-service";
-import { guardLawyerAiHttp, recordLawyerFeatureUsage } from "@/application/common/guard-lawyer-ai-http";
+import { guardLawyerAiHttp } from "@/application/common/guard-lawyer-ai-http";
 import { rateLimitHttpResponse } from "@/application/common/rate-limit-http";
 import { requireActor } from "@/application/common/require-actor";
+import { getSessionUser } from "@/application/common/session";
 import { assertEmailVerified } from "@/application/common/require-verified-email";
+import { resolveGuestSession } from "@/application/legal-ai/resolve-guest-session";
 import { DomainError } from "@/domain/errors/domain-error";
+import { EntitlementError } from "@/domain/errors/entitlement-error";
 import { EntitlementFeature, UserRole } from "@/domain/enums";
+import { GUEST_SESSION_COOKIE } from "@/infrastructure/legal-ai/guest-session-cookie";
 import {
   consumeRateLimit,
   LEGAL_AI_CHAT_RATE_LIMIT,
@@ -22,14 +26,36 @@ type ChatRequest = {
 
 export async function POST(request: Request) {
   try {
-    const actor = await requireActor();
+    const session = await getSessionUser();
+    const actor = session?.user?.id
+      ? await requireActor().catch(() => null)
+      : null;
 
-    if (actor.role === UserRole.LAWYER) {
+    if (actor?.role === UserRole.LAWYER) {
       await assertEmailVerified(actor.userId);
+      await guardLawyerAiHttp(actor, EntitlementFeature.LEGAL_AI_QUERY, {
+        checkQuota: false,
+      });
     }
 
+    const guest = actor
+      ? await resolveGuestSession({
+          claimForUserId: actor.userId,
+          createIfMissing: false,
+        })
+      : await resolveGuestSession();
+
+    if (!actor && !guest) {
+      throw new EntitlementError(
+        "Зочны сесс олдсонгүй. Хуудсаа дахин ачаална уу.",
+        "AUTHENTICATION_REQUIRED",
+        401,
+      );
+    }
+
+    const rateKey = actor?.userId ?? `guest:${guest!.id}`;
     const rate = await consumeRateLimit(
-      legalAiChatRateLimitKey(actor.userId),
+      legalAiChatRateLimitKey(rateKey),
       LEGAL_AI_CHAT_RATE_LIMIT.limit,
       LEGAL_AI_CHAT_RATE_LIMIT.windowMs,
     );
@@ -37,35 +63,18 @@ export async function POST(request: Request) {
       return rateLimitHttpResponse(rate.retryAfterSeconds);
     }
 
-    let usageId: string | undefined;
-
-    if (actor.role === UserRole.LAWYER) {
-      const guard = await guardLawyerAiHttp(
-        actor,
-        EntitlementFeature.LEGAL_AI_QUERY,
-      );
-      usageId = guard.usageId;
-    }
-
     const body = (await request.json()) as ChatRequest;
     const result = await getLegalAiService().createTurn({
-      userId: actor.userId,
+      userId: actor?.userId,
+      guestSessionId: actor ? undefined : guest?.id,
+      actorRole: actor?.role,
       message: body.message ?? "",
       conversationId: body.conversationId,
-      userContext: {
-        role: actor.role,
-      },
+      userContext: actor ? { role: actor.role } : undefined,
       mode: body.mode,
     });
 
-    if (usageId) {
-      await recordLawyerFeatureUsage(usageId, EntitlementFeature.LEGAL_AI_QUERY, {
-        inputTokens: result.usage.inputTokens,
-        outputTokens: result.usage.outputTokens,
-      });
-    }
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       conversationId: result.conversationId,
       message: {
         id: result.message.id,
@@ -84,7 +93,23 @@ export async function POST(request: Request) {
         })),
       },
     });
+
+    if (!actor && guest?.cookieValue) {
+      response.cookies.set(GUEST_SESSION_COOKIE, guest.cookieValue, {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        expires: guest.expiresAt,
+      });
+    }
+    return response;
   } catch (error) {
+    if (error instanceof EntitlementError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.statusCode },
+      );
+    }
     if (error instanceof LegalAiError) {
       return NextResponse.json(
         {

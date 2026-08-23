@@ -34,6 +34,18 @@ import {
 import type { IntentClassification, IntentService } from "@/engine/intent";
 import { IntentType } from "@/engine/intent";
 import type { ReasoningPlan, ReasoningService } from "@/engine/reasoning";
+import {
+  LegalRelevance,
+  buildClarificationMessage,
+  type LegalRelevanceService,
+} from "@/engine/relevance";
+import { LegalQuestionStatus, UserRole } from "@/domain/enums";
+import { decideLegalQuestionThreadAction } from "@/domain/legal-ai/legal-question-thread";
+import {
+  allowAllLegalQuestionAccess,
+  type LegalQuestionAccessPort,
+  type LegalQuestionSubject,
+} from "@/application/legal-ai/legal-question-access";
 
 const HISTORY_LIMIT = 30;
 const INTENT_CONFIDENCE_FLOOR = 0.5;
@@ -60,9 +72,11 @@ export type LegalAiServiceDependencies = {
   promptBuilder: IPromptBuilder;
   intent: IntentService;
   reasoning: ReasoningService;
+  legalRelevance: LegalRelevanceService;
   store: LegalAiStore;
   completion: LegalAiCompletionPort;
   corpusRetriever: LegalCorpusRetriever;
+  legalQuestionAccess?: LegalQuestionAccessPort;
 };
 
 /**
@@ -73,7 +87,12 @@ export type LegalAiServiceDependencies = {
  * completion, and persistence.
  */
 export class LegalAiService {
-  constructor(private readonly dependencies: LegalAiServiceDependencies) {}
+  private readonly legalQuestionAccess: LegalQuestionAccessPort;
+
+  constructor(private readonly dependencies: LegalAiServiceDependencies) {
+    this.legalQuestionAccess =
+      dependencies.legalQuestionAccess ?? allowAllLegalQuestionAccess();
+  }
 
   async createTurn(
     input: LegalAiCreateTurnInput,
@@ -83,10 +102,59 @@ export class LegalAiService {
       throw new LegalAiError("Асуултаа оруулна уу.", 400);
     }
 
-    const domainResult = await this.dependencies.domainFilter.classify(message);
-    const isNonLegal = domainResult.domain === DomainLabel.NON_LEGAL;
+    const subject = this.requireSubject(input);
 
-    if (!isNonLegal && !this.dependencies.completion.isConfigured()) {
+    let priorMessages: LegalAiStoredMessage[] = [];
+    let conversationState: {
+      id?: string;
+      questionStatus: LegalQuestionStatus;
+    } = { questionStatus: LegalQuestionStatus.NEW };
+
+    if (input.conversationId) {
+      const existing = await this.dependencies.store.findAccessibleConversation({
+        id: input.conversationId,
+        userId: input.userId,
+        guestSessionId: input.guestSessionId,
+      });
+      if (!existing) {
+        throw new LegalAiError("Яриа олдсонгүй.", 404);
+      }
+      conversationState = {
+        id: existing.id,
+        questionStatus: existing.questionStatus ?? LegalQuestionStatus.NEW,
+      };
+      priorMessages = await this.dependencies.store.listMessages(
+        existing.id,
+        HISTORY_LIMIT,
+      );
+    }
+
+    const relevance = await this.dependencies.legalRelevance.classify({
+      message,
+      conversationContext: priorMessages.map((item) => ({
+        role: item.role,
+        content: item.content,
+      })),
+    });
+
+    const thread = decideLegalQuestionThreadAction({
+      status: conversationState.questionStatus,
+      relevance: relevance.relevance,
+    });
+
+    if (thread.type === "START_NEW") {
+      await this.legalQuestionAccess.assertCanStartNewLegalQuestion(subject);
+    }
+
+    const paidGeneralAccess =
+      relevance.relevance === LegalRelevance.NON_LEGAL
+        ? await this.legalQuestionAccess.hasPaidLegalAiAccess(subject)
+        : false;
+
+    if (
+      (relevance.relevance === LegalRelevance.LEGAL || paidGeneralAccess) &&
+      !this.dependencies.completion.isConfigured()
+    ) {
       console.error("OPENAI_API_KEY is not configured.");
       throw new LegalAiError(
         "AI үйлчилгээний тохиргоо хийгдээгүй байна.",
@@ -96,8 +164,7 @@ export class LegalAiService {
     }
 
     const conversation = await this.resolveConversation(
-      input.userId,
-      input.conversationId,
+      input,
       message,
     );
 
@@ -106,14 +173,55 @@ export class LegalAiService {
       content: message,
     });
 
-    if (isNonLegal) {
-      return this.persistSafeReply({
+    const afterReply = async <T extends LegalAiCreateTurnResult>(
+      result: T,
+    ): Promise<T> => {
+      await this.dependencies.store.updateQuestionThread({
         conversationId: conversation.id,
-        content: NON_LEGAL_REFUSAL_MESSAGE,
-        turnKind: PromptTurnKind.GENERAL,
+        questionStatus: thread.nextStatus,
+        incrementBilledQuestion: thread.type === "START_NEW",
       });
+      if (thread.type === "START_NEW") {
+        await this.legalQuestionAccess.consumeNewLegalQuestion(subject);
+      }
+      return result;
+    };
+
+    if (relevance.relevance === LegalRelevance.NON_LEGAL) {
+      if (!paidGeneralAccess) {
+        return afterReply(
+          await this.persistSafeReply({
+            conversationId: conversation.id,
+            content: NON_LEGAL_REFUSAL_MESSAGE,
+            turnKind: PromptTurnKind.GENERAL,
+          }),
+        );
+      }
+
+      return afterReply(
+        await this.completeGeneralAnswer({
+          conversationId: conversation.id,
+          message,
+          userContext: input.userContext,
+          mode: input.mode,
+          userId: input.userId,
+        }),
+      );
     }
 
+    if (relevance.relevance === LegalRelevance.POSSIBLY_LEGAL) {
+      return afterReply(
+        await this.persistSafeReply({
+          conversationId: conversation.id,
+          content:
+            relevance.clarificationMessage ??
+            buildClarificationMessage(relevance.issueFamily),
+          turnKind: PromptTurnKind.AMBIGUOUS,
+        }),
+      );
+    }
+
+    const analysisText = relevance.analysisText || message;
     const history = await this.dependencies.store.listMessages(
       conversation.id,
       HISTORY_LIMIT,
@@ -122,8 +230,10 @@ export class LegalAiService {
     const userType = this.dependencies.userTypeService.resolve(
       input.userContext,
     );
-    const intent = await this.dependencies.intent.classify(message);
-    const turnKind = resolveTurnKind(domainResult.domain, intent);
+    await this.dependencies.domainFilter.classify(analysisText);
+    const pipelineDomain = DomainLabel.LEGAL;
+    const intent = await this.dependencies.intent.classify(analysisText);
+    const turnKind = resolveTurnKind(pipelineDomain, intent);
     const exactCitation = detectExactCitation(message);
 
     const verifiedResolution = exactCitation
@@ -135,11 +245,13 @@ export class LegalAiService {
       : { kind: "skipped" as const };
 
     if (verifiedResolution.kind === "refused") {
-      return this.persistSafeReply({
-        conversationId: conversation.id,
-        content: verifiedResolution.message,
-        turnKind,
-      });
+      return afterReply(
+        await this.persistSafeReply({
+          conversationId: conversation.id,
+          content: verifiedResolution.message,
+          turnKind,
+        }),
+      );
     }
 
     const verifiedAuthorities =
@@ -148,15 +260,17 @@ export class LegalAiService {
         : undefined;
 
     const reasoningPlan = this.prepareReasoningPlan(message, intent);
-    const document = await this.dependencies.store.findOwnedDocumentExtract(
-      conversation.id,
-      input.userId,
-    );
+    const document = input.userId
+      ? await this.dependencies.store.findOwnedDocumentExtract(
+          conversation.id,
+          input.userId,
+        )
+      : null;
 
     const prompt = this.dependencies.promptBuilder.build({
       message,
       userType,
-      domain: domainResult.domain,
+      domain: pipelineDomain,
       turnKind,
       mode: input.mode ?? "CITIZEN",
       intentType: intent.intent,
@@ -189,13 +303,15 @@ export class LegalAiService {
         outputTokens: completion.outputTokens,
       });
 
-    await this.dependencies.store.recordUsage({
-      userId: input.userId,
-      provider: "OPENAI",
-      model: completion.model,
-      inputTokens: completion.inputTokens,
-      outputTokens: completion.outputTokens,
-    });
+    if (input.userId) {
+      await this.dependencies.store.recordUsage({
+        userId: input.userId,
+        provider: "OPENAI",
+        model: completion.model,
+        inputTokens: completion.inputTokens,
+        outputTokens: completion.outputTokens,
+      });
+    }
 
     let citations: LegalAiSafeCitation[] = [];
     if (verifiedAuthorities?.length) {
@@ -224,7 +340,7 @@ export class LegalAiService {
       });
     }
 
-    return {
+    return afterReply({
       conversationId: conversation.id,
       message: {
         ...assistantMessage,
@@ -235,7 +351,7 @@ export class LegalAiService {
         outputTokens: completion.outputTokens,
       },
       turnKind,
-    };
+    });
   }
 
   private async resolveVerifiedAuthorities(input: {
@@ -357,6 +473,76 @@ export class LegalAiService {
     );
   }
 
+  private async completeGeneralAnswer(input: {
+    conversationId: string;
+    message: string;
+    userContext: LegalAiCreateTurnInput["userContext"];
+    mode: LegalAiCreateTurnInput["mode"];
+    userId?: string;
+  }): Promise<LegalAiCreateTurnResult> {
+    const history = await this.dependencies.store.listMessages(
+      input.conversationId,
+      HISTORY_LIMIT,
+    );
+    const userType = this.dependencies.userTypeService.resolve(
+      input.userContext,
+    );
+    const document = input.userId
+      ? await this.dependencies.store.findOwnedDocumentExtract(
+          input.conversationId,
+          input.userId,
+        )
+      : null;
+    const prompt = this.dependencies.promptBuilder.build({
+      message: input.message,
+      userType,
+      domain: DomainLabel.NON_LEGAL,
+      turnKind: PromptTurnKind.GENERAL,
+      mode: input.mode ?? "CITIZEN",
+      corpusAvailable: false,
+      documentExtract: document?.extractedText.slice(
+        0,
+        MAX_DOCUMENT_EXTRACT_CHARS,
+      ),
+      documentFileName: document?.fileName,
+    });
+    const completion = await this.dependencies.completion.complete({
+      systemPrompt: prompt.systemPrompt,
+      messages: toModelHistory(history),
+    });
+    const assistantMessage =
+      await this.dependencies.store.createAssistantMessage({
+        conversationId: input.conversationId,
+        content:
+          completion.content.trim() || "Хариу боловсруулах явцад алдаа гарлаа.",
+        provider: "OPENAI",
+        model: completion.model,
+        inputTokens: completion.inputTokens,
+        outputTokens: completion.outputTokens,
+      });
+    if (input.userId) {
+      await this.dependencies.store.recordUsage({
+        userId: input.userId,
+        provider: "OPENAI",
+        model: completion.model,
+        inputTokens: completion.inputTokens,
+        outputTokens: completion.outputTokens,
+      });
+    }
+    return {
+      conversationId: input.conversationId,
+      message: {
+        ...assistantMessage,
+        citations: [],
+      },
+      usage: {
+        inputTokens: completion.inputTokens,
+        outputTokens: completion.outputTokens,
+      },
+      turnKind: PromptTurnKind.GENERAL,
+    };
+  }
+
   private async persistSafeReply(input: {
     conversationId: string;
     content: string;
@@ -382,22 +568,37 @@ export class LegalAiService {
     };
   }
 
+  private requireSubject(input: LegalAiCreateTurnInput): LegalQuestionSubject {
+    if (input.userId) {
+      return {
+        kind: "user",
+        userId: input.userId,
+        role: input.actorRole ?? UserRole.CLIENT,
+      };
+    }
+    if (input.guestSessionId) {
+      return { kind: "guest", guestSessionId: input.guestSessionId };
+    }
+    throw new LegalAiError("Асуултаа оруулна уу.", 400);
+  }
+
   private async resolveConversation(
-    userId: string,
-    conversationId: string | undefined,
+    input: LegalAiCreateTurnInput,
     message: string,
   ) {
-    if (!conversationId) {
+    if (!input.conversationId) {
       return this.dependencies.store.createConversation({
-        userId,
+        userId: input.userId,
+        guestSessionId: input.guestSessionId,
         title: message.slice(0, 80),
       });
     }
 
-    const existing = await this.dependencies.store.findOwnedConversation(
-      conversationId,
-      userId,
-    );
+    const existing = await this.dependencies.store.findAccessibleConversation({
+      id: input.conversationId,
+      userId: input.userId,
+      guestSessionId: input.guestSessionId,
+    });
     if (!existing) {
       throw new LegalAiError("Яриа олдсонгүй.", 404);
     }

@@ -3,8 +3,10 @@ import type {
   LegalAiSafeCitation,
 } from "@/application/ai/legal-ai-citation";
 import type { PromptTurnKind, UserTypeContext } from "@/engine/gateway";
+import { type UserRole, LegalQuestionStatus } from "@/domain/enums";
 
 export type { LegalAiSafeCitation } from "@/application/ai/legal-ai-citation";
+export { LegalQuestionStatus };
 
 export type LegalAiMessageRole = "USER" | "ASSISTANT" | "SYSTEM";
 
@@ -15,6 +17,8 @@ export type LegalAiStoredMessage = {
 
 export type LegalAiConversation = {
   id: string;
+  questionStatus: LegalQuestionStatus;
+  billedQuestionCount: number;
 };
 
 export type LegalAiAssistantMessage = {
@@ -27,7 +31,9 @@ export type LegalAiAssistantMessage = {
 export type LegalAiMode = "CITIZEN" | "PROFESSIONAL";
 
 export type LegalAiCreateTurnInput = {
-  userId: string;
+  userId?: string;
+  guestSessionId?: string;
+  actorRole?: UserRole;
   message: string;
   conversationId?: string;
   userContext?: UserTypeContext;
@@ -66,10 +72,22 @@ export type LegalAiStore = {
     id: string,
     userId: string,
   ): Promise<LegalAiConversation | null>;
+  findAccessibleConversation(input: {
+    id: string;
+    userId?: string;
+    guestSessionId?: string;
+  }): Promise<LegalAiConversation | null>;
   createConversation(input: {
-    userId: string;
+    userId?: string;
+    guestSessionId?: string;
     title: string;
   }): Promise<LegalAiConversation>;
+  updateQuestionThread(input: {
+    conversationId: string;
+    questionStatus: LegalQuestionStatus;
+    incrementBilledQuestion?: boolean;
+  }): Promise<void>;
+  countBilledQuestionsForUser(userId: string): Promise<number>;
   createUserMessage(input: {
     conversationId: string;
     content: string;

@@ -47,7 +47,10 @@ export function LandingHero({
           </p>
 
           <div className="mt-8">
-            <HeroLegalAiComposer placeholder={t.aiComposerPlaceholder} />
+            <HeroLegalAiComposer
+              placeholder={t.aiComposerPlaceholder}
+              checkoutEnabled={composerMode === "client"}
+            />
           </div>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">

@@ -3,6 +3,7 @@ import { DomainError } from "@/domain/errors/domain-error";
 export type PaymentVerificationCode =
   | "WRONG_AMOUNT"
   | "WRONG_INVOICE"
+  | "UNPRICED_PLAN"
   | "PAYMENT_NOT_SUCCESSFUL"
   | "BILLING_PROVIDER_NOT_CONFIGURED"
   | "QPAY_NOT_CONFIGURED"

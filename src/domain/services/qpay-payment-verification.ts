@@ -1,4 +1,3 @@
-import { SOLO_PLAN } from "@/domain/constants/subscription-plans";
 import type { QpayCheckedPayment } from "@/domain/ports/qpay-gateway";
 import { PaymentVerificationError } from "@/domain/errors/payment-verification-error";
 
@@ -10,10 +9,12 @@ export function roundMnt(value: number): number {
 
 /**
  * Accept a QPay payment/check payload only when a PAID row matches the
- * server-side SOLO catalog (49,000 MNT). Unknown extra fields are ignored.
+ * server-side catalog amount for the stored invoice's plan. Callers must
+ * pass the catalog price — never a callback-supplied amount.
  */
-export function verifySoloQpayPayment(input: {
+export function verifyQpayCatalogPayment(input: {
   expectedProviderInvoiceId: string;
+  expectedAmountMnt: number;
   checked: QpayCheckedPayment;
 }): {
   paymentId: string;
@@ -25,6 +26,14 @@ export function verifySoloQpayPayment(input: {
     throw new PaymentVerificationError("Invoice was not found", "WRONG_INVOICE");
   }
 
+  const catalogAmount = roundMnt(input.expectedAmountMnt);
+  if (!Number.isFinite(catalogAmount) || catalogAmount <= 0) {
+    throw new PaymentVerificationError(
+      "Plan is not priced for payment",
+      "UNPRICED_PLAN",
+    );
+  }
+
   const paidRows = input.checked.rows.filter((row) => row.status === "PAID");
   if (paidRows.length === 0) {
     throw new PaymentVerificationError(
@@ -33,7 +42,6 @@ export function verifySoloQpayPayment(input: {
     );
   }
 
-  const catalogAmount = SOLO_PLAN.priceMnt;
   const paidAmount = roundMnt(input.checked.paidAmountMnt);
   if (paidAmount !== catalogAmount) {
     throw new PaymentVerificationError(

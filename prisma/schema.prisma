@@ -172,6 +172,14 @@ enum OrganizationMembershipStatus {
 enum SubscriptionPlanCode {
   SOLO
   TEAM
+  CITIZEN_BASIC
+  CITIZEN_PLUS
+}
+
+enum LegalQuestionStatus {
+  NEW
+  CLARIFYING
+  ANSWERED
 }
 
 enum SubscriptionStatus {
@@ -263,6 +271,7 @@ model User {
   deviceSessions     DeviceSession[]
   entitlementUsages  EntitlementUsage[]
   billingInvoices    Invoice[]
+  guestSessions      GuestSession[] @relation("GuestSessionClaimedBy")
 
 
   @@index([role, status])
@@ -910,18 +919,39 @@ enum AIDocumentExtractStatus {
   FAILED
 }
 
-model AIConversation {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  title     String?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+model GuestSession {
+  id                     String   @id @default(cuid())
+  tokenHash              String   @unique @map("token_hash")
+  expiresAt              DateTime @map("expires_at")
+  freeLegalQuestionsUsed Int      @default(0) @map("free_legal_questions_used")
+  claimedByUserId        String?  @map("claimed_by_user_id")
+  createdAt              DateTime @default(now()) @map("created_at")
+  lastSeenAt             DateTime @default(now()) @map("last_seen_at")
 
-  user     User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages AIMessage[]
-  document AIConversationDocument?
+  claimedBy     User?             @relation("GuestSessionClaimedBy", fields: [claimedByUserId], references: [id], onDelete: SetNull)
+  conversations AIConversation[]
+
+  @@index([expiresAt])
+  @@map("guest_sessions")
+}
+
+model AIConversation {
+  id                  String               @id @default(cuid())
+  userId              String?              @map("user_id")
+  guestSessionId      String?              @map("guest_session_id")
+  title               String?
+  questionStatus      LegalQuestionStatus  @default(NEW) @map("question_status")
+  billedQuestionCount Int                  @default(0) @map("billed_question_count")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guestSession GuestSession? @relation(fields: [guestSessionId], references: [id], onDelete: SetNull)
+  messages     AIMessage[]
+  document     AIConversationDocument?
 
   @@index([userId, updatedAt(sort: Desc)])
+  @@index([guestSessionId, updatedAt(sort: Desc)])
   @@map("ai_conversations")
 }
 

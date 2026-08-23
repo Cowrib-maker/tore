@@ -178,6 +178,14 @@ export enum ActiveContextType {
 export enum SubscriptionPlanCode {
   SOLO = "SOLO",
   TEAM = "TEAM",
+  CITIZEN_BASIC = "CITIZEN_BASIC",
+  CITIZEN_PLUS = "CITIZEN_PLUS",
+}
+
+export enum LegalQuestionStatus {
+  NEW = "NEW",
+  CLARIFYING = "CLARIFYING",
+  ANSWERED = "ANSWERED",
 }
 
 export enum SubscriptionStatus {

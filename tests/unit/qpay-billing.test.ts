@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ActorContext } from "@/application/common/actor-context";
+import { createCitizenPlanCheckout } from "@/application/use-cases/billing/create-plan-checkout";
 import { createSoloCheckout } from "@/application/use-cases/billing/create-solo-checkout";
 import { getOwnInvoicePaymentStatus } from "@/application/use-cases/billing/get-invoice-payment-status";
 import { parseQpayCallbackInvoiceId } from "@/application/use-cases/billing/qpay-callback-parse";
@@ -9,8 +10,13 @@ import { assertLawyerAiOperation } from "@/application/use-cases/entitlements/as
 import { requireActiveLawyerEntitlement } from "@/application/use-cases/entitlements/ensure-lawyer-solo-subscription";
 import { getLawyerBillingSnapshot } from "@/application/use-cases/entitlements/get-lawyer-billing-snapshot";
 import { DEFAULT_SESSION_PROTECTION_POLICY } from "@/domain/constants/session-protection-policy";
-import { SOLO_PLAN } from "@/domain/constants/subscription-plans";
 import {
+  CITIZEN_BASIC_PLAN,
+  CITIZEN_PLUS_PLAN,
+  SOLO_PLAN,
+} from "@/domain/constants/subscription-plans";
+import {
+  BILLING_PROVIDER_QPAY,
   EntitlementFeature,
   InvoiceStatus,
   SeatStatus,
@@ -545,5 +551,241 @@ describe("QPay-activated SOLO subscriptions", () => {
         QPAY_CALLBACK_URL: "not-a-url",
       }),
     ).toBe(false);
+  });
+
+  it("creates a citizen checkout from planCode using the catalog price", async () => {
+    const view = await createCitizenPlanCheckout(
+      client,
+      SubscriptionPlanCode.CITIZEN_BASIC,
+      {
+        invoiceRepository: invoices,
+        qpayGateway: qpay,
+        qpayCallbackUrl: CALLBACK_URL,
+      },
+      now,
+    );
+    expect(view.planCode).toBe(SubscriptionPlanCode.CITIZEN_BASIC);
+    expect(view.amountMnt).toBe(CITIZEN_BASIC_PLAN.priceMnt);
+    expect(view.amountMnt).toBe(19_900);
+    expect(qpay.created).toHaveLength(1);
+    expect(qpay.created[0]?.amountMnt).toBe(19_900);
+  });
+
+  it("accepts a 19,900 MNT CITIZEN_BASIC payment and activates Basic", async () => {
+    const view = await createCitizenPlanCheckout(
+      client,
+      SubscriptionPlanCode.CITIZEN_BASIC,
+      {
+        invoiceRepository: invoices,
+        qpayGateway: qpay,
+        qpayCallbackUrl: CALLBACK_URL,
+      },
+      now,
+    );
+    qpay.nextCheck = paidCheck("pay-basic", 19_900);
+    const processed = await processQpayInvoicePayment(
+      `qpay-${view.invoiceId}`,
+      billingDeps(),
+      now,
+    );
+    expect(qpay.checks).toEqual([`qpay-${view.invoiceId}`]);
+    expect(processed.alreadyProcessed).toBe(false);
+    expect(processed.invoice.planCode).toBe(SubscriptionPlanCode.CITIZEN_BASIC);
+    expect(processed.subscription?.planCode).toBe(
+      SubscriptionPlanCode.CITIZEN_BASIC,
+    );
+    expect(processed.subscription?.status).toBe(SubscriptionStatus.ACTIVE);
+    expect(processed.invoice.status).toBe(InvoiceStatus.PAID);
+  });
+
+  it("rejects a 49,900 MNT payment against a CITIZEN_BASIC invoice", async () => {
+    const view = await createCitizenPlanCheckout(
+      client,
+      SubscriptionPlanCode.CITIZEN_BASIC,
+      {
+        invoiceRepository: invoices,
+        qpayGateway: qpay,
+        qpayCallbackUrl: CALLBACK_URL,
+      },
+      now,
+    );
+    qpay.nextCheck = paidCheck("pay-basic-wrong", 49_900);
+    await expect(
+      processQpayInvoicePayment(`qpay-${view.invoiceId}`, billingDeps(), now),
+    ).rejects.toMatchObject({ code: "WRONG_AMOUNT" });
+    expect(await subscriptions.findLatestOwnedByUserId(client.userId)).toBeNull();
+    expect((await invoices.findById(view.invoiceId))?.status).toBe(
+      InvoiceStatus.FAILED,
+    );
+  });
+
+  it("accepts a 49,900 MNT CITIZEN_PLUS payment and activates Plus", async () => {
+    const view = await createCitizenPlanCheckout(
+      client,
+      SubscriptionPlanCode.CITIZEN_PLUS,
+      {
+        invoiceRepository: invoices,
+        qpayGateway: qpay,
+        qpayCallbackUrl: CALLBACK_URL,
+      },
+      now,
+    );
+    expect(view.amountMnt).toBe(CITIZEN_PLUS_PLAN.priceMnt);
+    qpay.nextCheck = paidCheck("pay-plus", 49_900);
+    const processed = await processQpayInvoicePayment(
+      `qpay-${view.invoiceId}`,
+      billingDeps(),
+      now,
+    );
+    expect(qpay.checks).toEqual([`qpay-${view.invoiceId}`]);
+    expect(processed.invoice.planCode).toBe(SubscriptionPlanCode.CITIZEN_PLUS);
+    expect(processed.subscription?.planCode).toBe(
+      SubscriptionPlanCode.CITIZEN_PLUS,
+    );
+    expect(processed.subscription?.status).toBe(SubscriptionStatus.ACTIVE);
+  });
+
+  it("rejects a 19,900 MNT payment against a CITIZEN_PLUS invoice", async () => {
+    const view = await createCitizenPlanCheckout(
+      client,
+      SubscriptionPlanCode.CITIZEN_PLUS,
+      {
+        invoiceRepository: invoices,
+        qpayGateway: qpay,
+        qpayCallbackUrl: CALLBACK_URL,
+      },
+      now,
+    );
+    qpay.nextCheck = paidCheck("pay-plus-wrong", 19_900);
+    await expect(
+      processQpayInvoicePayment(`qpay-${view.invoiceId}`, billingDeps(), now),
+    ).rejects.toMatchObject({ code: "WRONG_AMOUNT" });
+    expect(await subscriptions.findLatestOwnedByUserId(client.userId)).toBeNull();
+    expect((await invoices.findById(view.invoiceId))?.status).toBe(
+      InvoiceStatus.FAILED,
+    );
+  });
+
+  it("activates the stored invoice planCode, not a callback-supplied plan", async () => {
+    const view = await createCitizenPlanCheckout(
+      client,
+      SubscriptionPlanCode.CITIZEN_BASIC,
+      {
+        invoiceRepository: invoices,
+        qpayGateway: qpay,
+        qpayCallbackUrl: CALLBACK_URL,
+      },
+      now,
+    );
+    const providerInvoiceId = parseQpayCallbackInvoiceId(
+      JSON.stringify({
+        invoice_id: `qpay-${view.invoiceId}`,
+        planCode: SubscriptionPlanCode.CITIZEN_PLUS,
+        amount: 1,
+        amountMnt: 49_900,
+      }),
+      new URL(CALLBACK_URL),
+    );
+    expect(providerInvoiceId).toBe(`qpay-${view.invoiceId}`);
+    qpay.nextCheck = paidCheck("pay-ignored-body", 19_900);
+    const processed = await processQpayInvoicePayment(
+      providerInvoiceId!,
+      billingDeps(),
+      now,
+    );
+    expect(processed.subscription?.planCode).toBe(
+      SubscriptionPlanCode.CITIZEN_BASIC,
+    );
+    expect(processed.subscription?.planCode).not.toBe(
+      SubscriptionPlanCode.CITIZEN_PLUS,
+    );
+    expect(processed.invoice.planCode).toBe(SubscriptionPlanCode.CITIZEN_BASIC);
+  });
+
+  it("treats a duplicate citizen callback as idempotent", async () => {
+    const view = await createCitizenPlanCheckout(
+      client,
+      SubscriptionPlanCode.CITIZEN_BASIC,
+      {
+        invoiceRepository: invoices,
+        qpayGateway: qpay,
+        qpayCallbackUrl: CALLBACK_URL,
+      },
+      now,
+    );
+    qpay.nextCheck = paidCheck("pay-basic-dup", 19_900);
+    const first = await processQpayInvoicePayment(
+      `qpay-${view.invoiceId}`,
+      billingDeps(),
+      now,
+    );
+    const second = await processQpayInvoicePayment(
+      `qpay-${view.invoiceId}`,
+      billingDeps(),
+      now,
+    );
+    expect(second.alreadyProcessed).toBe(true);
+    expect(second.subscription?.id).toBe(first.subscription?.id);
+    expect(second.subscription?.planCode).toBe(SubscriptionPlanCode.CITIZEN_BASIC);
+    expect(second.subscription?.currentPeriodEnd).toEqual(
+      first.subscription?.currentPeriodEnd,
+    );
+    expect(await invoices.listByUserId(client.userId)).toHaveLength(1);
+    expect(qpay.checks).toHaveLength(2);
+  });
+
+  it("rejects an unknown planCode without activating", async () => {
+    const invoice = await invoices.create({
+      userId: client.userId,
+      planCode: "NOT_A_PLAN" as SubscriptionPlanCode,
+      amountMnt: 19_900,
+      currency: "MNT",
+      provider: BILLING_PROVIDER_QPAY,
+      status: InvoiceStatus.PENDING,
+      expiresAt: new Date(now.getTime() + 60_000),
+    });
+    await invoices.attachProviderInvoice(invoice.id, {
+      providerInvoiceId: `qpay-${invoice.id}`,
+      qrText: "qr",
+      qrImage: "img",
+      shortUrl: "https://qpay.mn/s/unknown",
+      deeplinks: [],
+    });
+    qpay.nextCheck = paidCheck("pay-unknown", 19_900);
+    await expect(
+      processQpayInvoicePayment(`qpay-${invoice.id}`, billingDeps(), now),
+    ).rejects.toMatchObject({ code: "UNPRICED_PLAN" });
+    expect(await subscriptions.findLatestOwnedByUserId(client.userId)).toBeNull();
+    expect((await invoices.findById(invoice.id))?.status).toBe(
+      InvoiceStatus.FAILED,
+    );
+    expect(qpay.checks).toEqual([]);
+  });
+
+  it("rejects an unpriced TEAM planCode without activating", async () => {
+    const invoice = await invoices.create({
+      userId: lawyer.userId,
+      planCode: SubscriptionPlanCode.TEAM,
+      amountMnt: 49_000,
+      currency: "MNT",
+      provider: BILLING_PROVIDER_QPAY,
+      status: InvoiceStatus.PENDING,
+      expiresAt: new Date(now.getTime() + 60_000),
+    });
+    await invoices.attachProviderInvoice(invoice.id, {
+      providerInvoiceId: `qpay-${invoice.id}`,
+      qrText: "qr",
+      qrImage: "img",
+      shortUrl: "https://qpay.mn/s/team",
+      deeplinks: [],
+    });
+    qpay.nextCheck = paidCheck("pay-team", 49_000);
+    await expect(
+      processQpayInvoicePayment(`qpay-${invoice.id}`, billingDeps(), now),
+    ).rejects.toMatchObject({ code: "UNPRICED_PLAN" });
+    expect(await subscriptions.findLatestOwnedByUserId(lawyer.userId)).toBeNull();
+    expect((await invoices.findById(invoice.id))?.status).toBe(
+      InvoiceStatus.FAILED,
+    );
   });
 });

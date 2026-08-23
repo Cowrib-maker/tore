@@ -2,9 +2,15 @@ import { randomBytes } from "node:crypto";
 
 import bcrypt from "bcryptjs";
 
-import { prisma } from "@/infrastructure/database/prisma";
-import { createQpayGateway } from "@/infrastructure/billing/create-qpay-gateway";
+import {
+  CITIZEN_BASIC_PLAN,
+  CITIZEN_PLUS_PLAN,
+  SOLO_PLAN,
+} from "@/domain/constants/subscription-plans";
+import { UserRole, UserStatus } from "@/domain/enums";
 import { addUtcCalendarMonth } from "@/domain/services/subscription-period";
+import { createQpayGateway } from "@/infrastructure/billing/create-qpay-gateway";
+import { prisma } from "@/infrastructure/database/prisma";
 
 export const REQUIRED_QPAY_ENV = [
   "QPAY_BASE_URL",
@@ -24,7 +30,18 @@ export type CheckoutView = {
   qrText: string | null;
   qrImage: string | null;
   shortUrl: string | null;
-  deeplinks: Array<{ name: string; description: string; logo: string; link: string }>;
+  deeplinks: Array<{
+    name: string;
+    description: string;
+    logo: string;
+    link: string;
+  }>;
+};
+
+export type SandboxE2eConfig = {
+  baseUrl: string;
+  paymentWaitMs: number;
+  pollMs: number;
 };
 
 export class CookieJar {
@@ -34,7 +51,7 @@ export class CookieJar {
     const lines =
       typeof headers.getSetCookie === "function"
         ? headers.getSetCookie()
-        : headerSetCookieFallback(headers);
+        : fallbackSetCookie(headers);
     for (const line of lines) {
       const pair = line.split(";")[0];
       if (!pair) continue;
@@ -53,17 +70,13 @@ export class CookieJar {
   }
 }
 
-function headerSetCookieFallback(headers: Headers): string[] {
+function fallbackSetCookie(headers: Headers): string[] {
   const raw = headers.get("set-cookie");
   if (!raw) return [];
   return raw.split(/,(?=\s*[^;=]+=[^;]+)/);
 }
 
-export function readSandboxE2eConfig(): {
-  baseUrl: string;
-  paymentWaitMs: number;
-  pollMs: number;
-} {
+export function readSandboxE2eConfig(): SandboxE2eConfig {
   const missing = REQUIRED_QPAY_ENV.filter((key) => !process.env[key]?.trim());
   if (missing.length > 0) {
     throw new Error(
@@ -93,11 +106,11 @@ export function readSandboxE2eConfig(): {
 
 export function assertNoQpaySecretsInPayload(payload: unknown): void {
   const serialized = JSON.stringify(payload);
-  const secretKeys = [
+  const secrets = [
     process.env.QPAY_CLIENT_ID,
     process.env.QPAY_CLIENT_SECRET,
   ].filter((value): value is string => typeof value === "string" && value.length >= 8);
-  for (const secret of secretKeys) {
+  for (const secret of secrets) {
     if (serialized.includes(secret)) {
       throw new Error("QPay credential leaked into a client-facing payload");
     }
@@ -107,17 +120,19 @@ export function assertNoQpaySecretsInPayload(payload: unknown): void {
   }
 }
 
-export async function ensureE2eLawyer(): Promise<{
-  id: string;
-  email: string;
-  password: string;
-}> {
+async function ensureE2eUser(input: {
+  role: UserRole;
+  emailEnv: string;
+  passwordEnv: string;
+  defaultLocalPart: string;
+  name: string;
+}): Promise<{ id: string; email: string; password: string }> {
   const password =
-    process.env.QPAY_E2E_LAWYER_PASSWORD?.trim() ||
+    process.env[input.passwordEnv]?.trim() ||
     `QpayE2e-${randomBytes(6).toString("hex")}1`;
   const email = (
-    process.env.QPAY_E2E_LAWYER_EMAIL?.trim() ||
-    `qpay-e2e+${Date.now()}@tore.test`
+    process.env[input.emailEnv]?.trim() ||
+    `${input.defaultLocalPart}+${Date.now()}@tore.test`
   ).toLowerCase();
   const passwordHash = await bcrypt.hash(password, 12);
 
@@ -128,8 +143,8 @@ export async function ensureE2eLawyer(): Promise<{
     const updated = await prisma.user.update({
       where: { id: existing.id },
       data: {
-        role: "LAWYER",
-        status: "ACTIVE",
+        role: input.role,
+        status: UserStatus.ACTIVE,
         passwordHash,
         emailVerified: existing.emailVerified ?? new Date(),
       },
@@ -140,9 +155,9 @@ export async function ensureE2eLawyer(): Promise<{
   const created = await prisma.user.create({
     data: {
       email,
-      name: "QPay Sandbox E2E Lawyer",
-      role: "LAWYER",
-      status: "ACTIVE",
+      name: input.name,
+      role: input.role,
+      status: UserStatus.ACTIVE,
       passwordHash,
       emailVerified: new Date(),
       preferredLanguage: "mn",
@@ -151,7 +166,39 @@ export async function ensureE2eLawyer(): Promise<{
   return { id: created.id, email, password };
 }
 
-export async function loginLawyer(
+export async function ensureE2eLawyer(): Promise<{
+  id: string;
+  email: string;
+  password: string;
+}> {
+  return ensureE2eUser({
+    role: UserRole.LAWYER,
+    emailEnv: "QPAY_E2E_LAWYER_EMAIL",
+    passwordEnv: "QPAY_E2E_LAWYER_PASSWORD",
+    defaultLocalPart: "qpay-e2e-lawyer",
+    name: "QPay Sandbox E2E Lawyer",
+  });
+}
+
+export async function ensureE2eCitizen(tag: "basic" | "plus"): Promise<{
+  id: string;
+  email: string;
+  password: string;
+}> {
+  const emailEnv =
+    tag === "basic"
+      ? "QPAY_E2E_CITIZEN_BASIC_EMAIL"
+      : "QPAY_E2E_CITIZEN_PLUS_EMAIL";
+  return ensureE2eUser({
+    role: UserRole.CLIENT,
+    emailEnv,
+    passwordEnv: "QPAY_E2E_CITIZEN_PASSWORD",
+    defaultLocalPart: `qpay-e2e-citizen-${tag}`,
+    name: `QPay Sandbox E2E Citizen ${tag}`,
+  });
+}
+
+export async function loginUser(
   baseUrl: string,
   email: string,
   password: string,
@@ -175,7 +222,7 @@ export async function loginLawyer(
     csrfToken: csrfJson.csrfToken,
     email,
     password,
-    callbackUrl: `${baseUrl}/lawyer/dashboard`,
+    callbackUrl: `${baseUrl}/`,
     json: "true",
     redirect: "false",
   });
@@ -191,12 +238,9 @@ export async function loginLawyer(
   jar.absorb(loginRes.headers);
   if (loginRes.status >= 400) {
     const text = await loginRes.text();
-    throw new Error(
-      `Lawyer login failed (${loginRes.status}). ${text.slice(0, 300)}`,
-    );
+    throw new Error(`Login failed (${loginRes.status}). ${text.slice(0, 300)}`);
   }
-  const cookieHeader = jar.header();
-  if (!/session-token/i.test(cookieHeader)) {
+  if (!/session-token/i.test(jar.header())) {
     throw new Error(
       "Login did not set a session cookie. Check AUTH_SECRET / AUTH_URL match the running Next.js process.",
     );
@@ -238,6 +282,7 @@ export function printSandboxPayInstructions(
   console.log("\n========== QPay Sandbox — pay this invoice ==========");
   console.log(`TORE invoice id:     ${checkout.invoiceId}`);
   console.log(`QPay provider id:    ${providerInvoiceId}`);
+  console.log(`Plan:                ${checkout.planCode}`);
   console.log(`Amount:              ${checkout.amountMnt} ${checkout.currency}`);
   console.log(`Short URL:           ${checkout.shortUrl ?? "(none)"}`);
   console.log(`QR text:             ${checkout.qrText ?? "(none)"}`);
@@ -271,15 +316,33 @@ export async function waitForSandboxPayment(
       return { paid: true, check: checked };
     }
     console.log(
-      `[qpay-sandbox-e2e] waiting for payment… count=${checked.count} paid_amount=${checked.paidAmountMnt}`,
+      `[qpay-sandbox-e2e] waiting for payment… count=${checked.count} paidAmountMnt=${checked.paidAmountMnt}`,
     );
     await new Promise((resolve) => setTimeout(resolve, pollMs));
   }
   return { paid: false, check: last };
 }
 
-export function expectedSoloExpiry(startsAt: Date): Date {
+export function expectedPeriodEnd(startsAt: Date): Date {
   return addUtcCalendarMonth(startsAt);
 }
+
+export const SANDBOX_PLAN_EXPECTATIONS = {
+  SOLO: {
+    planCode: SOLO_PLAN.code,
+    amountMnt: SOLO_PLAN.priceMnt,
+    legalAiQueries: SOLO_PLAN.quotas.legalAiQueries,
+  },
+  CITIZEN_BASIC: {
+    planCode: CITIZEN_BASIC_PLAN.code,
+    amountMnt: CITIZEN_BASIC_PLAN.priceMnt,
+    legalAiQueries: CITIZEN_BASIC_PLAN.quotas.legalAiQueries,
+  },
+  CITIZEN_PLUS: {
+    planCode: CITIZEN_PLUS_PLAN.code,
+    amountMnt: CITIZEN_PLUS_PLAN.priceMnt,
+    legalAiQueries: CITIZEN_PLUS_PLAN.quotas.legalAiQueries,
+  },
+} as const;
 
 export { prisma };

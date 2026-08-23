@@ -1,3 +1,4 @@
+import { QPAY_NOT_CONFIGURED_MESSAGE } from "@/application/common/public-service-errors";
 import {
   DEFAULT_QPAY_BASE_URL,
   type Env,
@@ -58,7 +59,7 @@ export function isQpayConfigured(env: QpayEnv): boolean {
 export function readQpayConfig(env: QpayEnv): QpayConfig {
   if (!isQpayConfigured(env)) {
     throw new PaymentVerificationError(
-      "QPay is not configured",
+      QPAY_NOT_CONFIGURED_MESSAGE,
       "BILLING_PROVIDER_NOT_CONFIGURED",
       503,
     );

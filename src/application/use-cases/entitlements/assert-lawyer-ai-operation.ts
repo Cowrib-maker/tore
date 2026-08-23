@@ -36,6 +36,7 @@ export type LawyerAiGuardContext = {
   now?: Date;
   policy: SessionProtectionPolicy;
   feature: EntitlementFeature;
+  checkQuota?: boolean;
 };
 
 export type LawyerAiGuardResult = {
@@ -90,18 +91,20 @@ export async function assertLawyerAiOperation(
     subscriptionId: subscription.id,
     periodStart: entitlement.periodStart,
   });
-  const decision = evaluateFeatureQuota({
-    feature: input.feature,
-    entitlement,
-    usage: usage ?? emptyUsageCounts(),
-  });
-  if (!decision.ok) {
-    throw new EntitlementError(
-      decision.message,
-      decision.kind === "TOKEN"
-        ? "TOKEN_CEILING_REACHED"
-        : "FEATURE_QUOTA_EXCEEDED",
-    );
+  if (input.checkQuota !== false) {
+    const decision = evaluateFeatureQuota({
+      feature: input.feature,
+      entitlement,
+      usage: usage ?? emptyUsageCounts(),
+    });
+    if (!decision.ok) {
+      throw new EntitlementError(
+        decision.message,
+        decision.kind === "TOKEN"
+          ? "TOKEN_CEILING_REACHED"
+          : "FEATURE_QUOTA_EXCEEDED",
+      );
+    }
   }
 
   return { entitlement, session, risk, usageId: usage.id };

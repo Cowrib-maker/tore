@@ -8,7 +8,8 @@ export class EntitlementError extends DomainError {
       | "TOKEN_CEILING_REACHED"
       | "ACCOUNT_SHARING_RESTRICTED"
       | "SUBSCRIPTION_INACTIVE"
-      | "BILLING_REQUIRED",
+      | "BILLING_REQUIRED"
+      | "AUTHENTICATION_REQUIRED",
     statusCode = 403,
   ) {
     super(message, code, statusCode);

@@ -3,15 +3,20 @@
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { ArrowUp } from "lucide-react";
 
+import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
+import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
 import { useLegalAiChatSession } from "@/components/legal-ai/use-legal-ai-chat-session";
 
 export function HeroLegalAiComposer({
   placeholder,
+  checkoutEnabled = false,
 }: {
   placeholder: string;
+  checkoutEnabled?: boolean;
 }) {
   const [question, setQuestion] = useState("");
-  const { messages, loading, error, sendMessage } = useLegalAiChatSession();
+  const { messages, loading, error, accessGate, sendMessage } =
+    useLegalAiChatSession({ checkoutEnabled });
   const transcriptRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -19,22 +24,26 @@ export function HeroLegalAiComposer({
       top: transcriptRef.current.scrollHeight,
       behavior: "smooth",
     });
-  }, [messages, loading]);
+  }, [messages, loading, accessGate]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const text = question.trim();
     if (!text || loading) return;
     setQuestion("");
-    await sendMessage(text);
+    const result = await sendMessage(text);
+    if (result === "gated") {
+      setQuestion(text);
+    }
   }
 
   return (
-    <div className="mx-auto w-full max-w-xl">
+    <div className="mx-auto w-full max-w-xl space-y-3">
+      <LegalAiEntitlementBanner />
       {messages.length > 0 ? (
         <div
           ref={transcriptRef}
-          className="mb-3 max-h-80 space-y-3 overflow-y-auto rounded-2xl border border-[#0B1F3A]/10 bg-white p-4 text-left shadow-[0_16px_40px_-20px_rgba(11,31,58,0.3)]"
+          className="max-h-80 space-y-3 overflow-y-auto rounded-2xl border border-[#0B1F3A]/10 bg-white p-4 text-left shadow-[0_16px_40px_-20px_rgba(11,31,58,0.3)]"
         >
           {messages.map((item, index) => (
             <div
@@ -66,6 +75,7 @@ export function HeroLegalAiComposer({
           ) : null}
         </div>
       ) : null}
+      {accessGate ? <LegalAiAccessGateCard gate={accessGate} /> : null}
 
       <form
         onSubmit={handleSubmit}

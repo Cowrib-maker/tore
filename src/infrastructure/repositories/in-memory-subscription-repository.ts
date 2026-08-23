@@ -33,12 +33,14 @@ export class InMemorySubscriptionRepository implements SubscriptionRepository {
   async create(input: CreateSubscriptionInput): Promise<Subscription> {
     if (
       input.status === SubscriptionStatus.ACTIVE &&
-      input.planCode === SubscriptionPlanCode.SOLO
+      (input.planCode === SubscriptionPlanCode.SOLO ||
+        input.planCode === SubscriptionPlanCode.CITIZEN_BASIC ||
+        input.planCode === SubscriptionPlanCode.CITIZEN_PLUS)
     ) {
       const conflict = [...this.subscriptions.values()].some(
         (item) =>
           item.ownerUserId === input.ownerUserId &&
-          item.planCode === SubscriptionPlanCode.SOLO &&
+          item.planCode === input.planCode &&
           item.status === SubscriptionStatus.ACTIVE,
       );
       if (conflict) {

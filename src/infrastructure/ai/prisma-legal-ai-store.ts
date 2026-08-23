@@ -13,6 +13,18 @@ import {
   type LegalAiSafeCitation,
 } from "@/application/ai/legal-ai-citation";
 
+function toConversation(row: {
+  id: string;
+  questionStatus: string;
+  billedQuestionCount: number;
+}): LegalAiConversation {
+  return {
+    id: row.id,
+    questionStatus: row.questionStatus as LegalAiConversation["questionStatus"],
+    billedQuestionCount: row.billedQuestionCount,
+  };
+}
+
 export class PrismaLegalAiStore implements LegalAiStore {
   async countUserLegalAiQuestions(userId: string): Promise<number> {
     return prisma.aIMessage.count({
@@ -31,22 +43,93 @@ export class PrismaLegalAiStore implements LegalAiStore {
   ): Promise<LegalAiConversation | null> {
     const conversation = await prisma.aIConversation.findFirst({
       where: { id, userId },
-      select: { id: true },
+      select: {
+        id: true,
+        questionStatus: true,
+        billedQuestionCount: true,
+      },
     });
-    return conversation;
+    return conversation
+      ? {
+          id: conversation.id,
+          questionStatus: conversation.questionStatus as LegalAiConversation["questionStatus"],
+          billedQuestionCount: conversation.billedQuestionCount,
+        }
+      : null;
+  }
+
+  async findAccessibleConversation(input: {
+    id: string;
+    userId?: string;
+    guestSessionId?: string;
+  }): Promise<LegalAiConversation | null> {
+    const conversation = await prisma.aIConversation.findFirst({
+      where: {
+        id: input.id,
+        OR: [
+          input.userId ? { userId: input.userId } : undefined,
+          input.guestSessionId
+            ? { guestSessionId: input.guestSessionId }
+            : undefined,
+        ].filter(Boolean) as object[],
+      },
+      select: {
+        id: true,
+        questionStatus: true,
+        billedQuestionCount: true,
+      },
+    });
+    return conversation
+      ? {
+          id: conversation.id,
+          questionStatus: conversation.questionStatus as LegalAiConversation["questionStatus"],
+          billedQuestionCount: conversation.billedQuestionCount,
+        }
+      : null;
   }
 
    async createConversation(input: {
-    userId: string;
+    userId?: string;
+    guestSessionId?: string;
     title: string;
   }): Promise<LegalAiConversation> {
-    return prisma.aIConversation.create({
+    const created = await prisma.aIConversation.create({
       data: {
         userId: input.userId,
+        guestSessionId: input.guestSessionId,
         title: input.title,
       },
-      select: { id: true },
+      select: {
+        id: true,
+        questionStatus: true,
+        billedQuestionCount: true,
+      },
     });
+    return toConversation(created);
+  }
+
+  async updateQuestionThread(input: {
+    conversationId: string;
+    questionStatus: "NEW" | "CLARIFYING" | "ANSWERED";
+    incrementBilledQuestion?: boolean;
+  }): Promise<void> {
+    await prisma.aIConversation.update({
+      where: { id: input.conversationId },
+      data: {
+        questionStatus: input.questionStatus,
+        ...(input.incrementBilledQuestion
+          ? { billedQuestionCount: { increment: 1 } }
+          : {}),
+      },
+    });
+  }
+
+  async countBilledQuestionsForUser(userId: string): Promise<number> {
+    const aggregate = await prisma.aIConversation.aggregate({
+      where: { userId },
+      _sum: { billedQuestionCount: true },
+    });
+    return aggregate._sum.billedQuestionCount ?? 0;
   }
 
   async createUserMessage(input: {
