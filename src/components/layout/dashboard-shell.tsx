@@ -62,13 +62,13 @@ export function DashboardShell({
   return (
     <div className="min-h-svh flex flex-col">
       <header className="border-b">
-        <div className="mx-auto flex h-[4.5rem] max-w-6xl items-center justify-between gap-3 px-4 sm:gap-4 sm:px-6">
-          <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-6">
+        <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-6">
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4 lg:gap-6">
             <BrandLink brand={brand} logo={BRAND_LOGO_SHELL} />
             {nav && nav.length > 0 && (
               <>
                 <nav
-                  className="hidden min-w-0 flex-1 items-center gap-1.5 overflow-x-auto sm:flex [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                  className="hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto sm:flex [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                   aria-label={navAriaLabel}
                 >
                   <DashboardNavLinks items={nav} />
@@ -82,12 +82,12 @@ export function DashboardShell({
             {profileHref ? (
               <Link
                 href={profileHref}
-                className="hidden max-w-[10rem] truncate text-sm text-muted-foreground hover:text-foreground hover:underline md:inline"
+                className="hidden max-w-[8rem] truncate text-sm text-muted-foreground hover:text-foreground hover:underline lg:inline"
               >
                 {user.name ?? user.email}
               </Link>
             ) : (
-              <span className="hidden max-w-[10rem] truncate text-sm text-muted-foreground md:inline">
+              <span className="hidden max-w-[8rem] truncate text-sm text-muted-foreground lg:inline">
                 {user.name ?? user.email}
               </span>
             )}
@@ -105,7 +105,7 @@ export function DashboardShell({
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 p-4 sm:p-6">
+      <main className="mx-auto w-full max-w-7xl flex-1 p-4 sm:p-6">
         {title ? <DashboardPageHeading>{title}</DashboardPageHeading> : null}
         {children}
       </main>

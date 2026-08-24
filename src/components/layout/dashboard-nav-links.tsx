@@ -19,7 +19,7 @@ export function DashboardNavLinks({ items }: { items: DashboardNavItem[] }) {
             key={item.href}
             href={item.href}
             className={cn(
-              "shrink-0 cursor-pointer whitespace-nowrap rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors",
+              "shrink-0 cursor-pointer whitespace-nowrap rounded-md px-2.5 py-1.5 text-[12.5px] font-medium transition-colors lg:px-3 lg:text-[13px]",
               active
                 ? "bg-[#0B1F3A] text-white"
                 : "text-[#5C6570] ring-1 ring-[#0B1F3A]/10 hover:bg-[#0B1F3A]/5",
