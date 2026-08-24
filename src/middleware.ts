@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import NextAuth from "next-auth";
 
 import { UserRole, UserStatus } from "@/domain/enums";
+import { isSessionBouncingAuthRoute } from "@/application/services/email-verification-flow";
 import {
   canAccessRoute,
   getDashboardPath,
@@ -36,11 +37,7 @@ export default auth((req) => {
   const role = req.auth?.user?.role as UserRole | undefined;
   const status = req.auth?.user?.status;
 
-  const isAuthRoute =
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/register") ||
-    pathname.startsWith("/forgot-password") ||
-    pathname.startsWith("/verify-email");
+  const isAuthRoute = isSessionBouncingAuthRoute(pathname);
 
   // Boundary-aware prefixes — `/lawyer` must not match public `/lawyers`.
   const isProtectedRoute = isProtectedAppRoute(pathname);

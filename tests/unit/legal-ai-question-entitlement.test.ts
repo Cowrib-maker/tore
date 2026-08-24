@@ -34,6 +34,7 @@ function createStore(): LegalAiStore & {
       id: string;
       userId?: string;
       guestSessionId?: string;
+      caseFileId?: string;
       questionStatus: LegalQuestionStatus;
       billedQuestionCount: number;
     }
@@ -45,6 +46,7 @@ function createStore(): LegalAiStore & {
       id: string;
       userId?: string;
       guestSessionId?: string;
+      caseFileId?: string;
       questionStatus: LegalQuestionStatus;
       billedQuestionCount: number;
     }
@@ -77,12 +79,35 @@ function createStore(): LegalAiStore & {
         id,
         userId: input.userId,
         guestSessionId: input.guestSessionId,
+        caseFileId: input.caseFileId,
         questionStatus: LegalQuestionStatus.NEW,
         billedQuestionCount: 0,
       };
       conversations.set(id, row);
       messages.set(id, []);
       return row;
+    },
+    async listOwnedCaseConversations(userId, caseFileId) {
+      return [...conversations.values()]
+        .filter((row) => row.userId === userId && row.caseFileId === caseFileId)
+        .map((row) => ({
+          id: row.id,
+          title: null,
+          createdAt: new Date("2026-01-01T00:00:00.000Z"),
+          updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        }));
+    },
+    async listOwnedRecentConversations(userId, take) {
+      return [...conversations.values()]
+        .filter((row) => row.userId === userId)
+        .slice(0, take)
+        .map((row) => ({
+          id: row.id,
+          title: null,
+          caseFileId: row.caseFileId ?? null,
+          createdAt: new Date("2026-01-01T00:00:00.000Z"),
+          updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+        }));
     },
     async updateQuestionThread(input) {
       const row = conversations.get(input.conversationId);

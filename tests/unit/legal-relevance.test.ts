@@ -98,3 +98,76 @@ describe("LegalRelevanceService", () => {
     expect(switched.relevance).toBe(LegalRelevance.NON_LEGAL);
   });
 });
+
+const mustNotBeNonLegal = [
+  "Өнөөдөр шүүх хуралд орох гэж байгаа юм.",
+  "Хүний юм хулгайлчихсан чинь цагдаад шалгагдаад дууссан.",
+  "Өнөөдөр шүүх хуралд орох гэж байгаа юм. Хүний юм хулгайлчихсан чинь цагдаад шалгагдаад дууссан.",
+  "Цагдаагаас намайг дуудсан.",
+  "Прокурорт дуудагдсан.",
+  "Дарга намайг ажлаас халчихлаа.",
+  "Цалингаа хоёр сар аваагүй.",
+  "Мөнгөө өгчихсөн чинь буцааж өгөхгүй байна.",
+  "Өчигдөр машинаар осолд орчихсон.",
+  "Хүүхдийн тэтгэлэг өгөхгүй байна.",
+  "Цагдаагаас намайг дуудсан, юу авч очих вэ?",
+  "Дарга намайг өнөөдөр шууд ажлаас халчихлаа.",
+  "Прокурорт дуудагдсан, яах вэ?",
+  "Хүүхдийн тэтгэлгээ авч чадахгүй байна.",
+] as const;
+
+describe("fact-based legal relevance", () => {
+  const engine = createLegalRelevanceEngine();
+
+  it.each(mustNotBeNonLegal)(
+    "does not treat lived facts as NON_LEGAL: %s",
+    async (message) => {
+      const result = await engine.classify({ message });
+      expect(result.relevance).not.toBe(LegalRelevance.NON_LEGAL);
+      expect([
+        LegalRelevance.POSSIBLY_LEGAL,
+        LegalRelevance.LEGAL,
+      ]).toContain(result.relevance);
+    },
+  );
+
+  it("classifies court plus theft as LEGAL or POSSIBLY_LEGAL, never NON_LEGAL", async () => {
+    const result = await engine.classify({
+      message:
+        "Өнөөдөр шүүх хуралд орох гэж байгаа юм. Хүний юм хулгайлчихсан чинь цагдаад шалгагдаад дууссан.",
+    });
+    expect(result.relevance).not.toBe(LegalRelevance.NON_LEGAL);
+    expect(result.reasons.join(" ")).not.toContain("no-legal-signal");
+  });
+
+  it("asks a useful employment clarification for a vague workplace problem", async () => {
+    const result = await engine.classify({
+      message: "Даргатай асуудал гарчихлаа.",
+    });
+    expect(result.relevance).toBe(LegalRelevance.POSSIBLY_LEGAL);
+    expect(result.issueFamily).toBe("EMPLOYMENT");
+    expect(result.clarificationMessage).toMatch(/ажлын тань ямар асуудал/i);
+    expect(result.clarificationMessage).not.toMatch(
+      /ямар хууль|иргэний үү|эрүүгийн үү/,
+    );
+  });
+
+  it("keeps movie and definition mentions NON_LEGAL", async () => {
+    await expect(
+      engine.classify({ message: "Шүүхийн тухай кино үзлээ." }),
+    ).resolves.toMatchObject({ relevance: LegalRelevance.NON_LEGAL });
+    await expect(
+      engine.classify({ message: "Цагдаагийн тухай кино байна." }),
+    ).resolves.toMatchObject({ relevance: LegalRelevance.NON_LEGAL });
+    await expect(
+      engine.classify({ message: "Хулгай гэдэг үг ямар утгатай вэ?" }),
+    ).resolves.toMatchObject({ relevance: LegalRelevance.NON_LEGAL });
+  });
+
+  it("keeps a genuinely non-legal question NON_LEGAL", async () => {
+    const result = await engine.classify({
+      message: "Elon Musk гэж хэн бэ?",
+    });
+    expect(result.relevance).toBe(LegalRelevance.NON_LEGAL);
+  });
+});

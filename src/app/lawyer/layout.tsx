@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
-import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { LawyerAppChrome } from "@/components/layout/lawyer-app-chrome";
 import { AccountSharingBanner } from "@/components/account/account-sharing-banner";
 import { DeviceSessionBeacon } from "@/components/account/device-session-beacon";
 import { UserRole } from "@/domain/enums";
@@ -24,7 +24,7 @@ export default async function LawyerLayout({
   const i18n = await getShellI18n("lawyer");
 
   return (
-    <DashboardShell
+    <LawyerAppChrome
       user={session.user}
       nav={i18n.nav}
       profileHref={getProfilePath(session.user.role as UserRole)}
@@ -33,6 +33,6 @@ export default async function LawyerLayout({
       <DeviceSessionBeacon />
       <AccountSharingBanner copy={i18n.dict.marketplace.account} />
       {children}
-    </DashboardShell>
+    </LawyerAppChrome>
   );
 }

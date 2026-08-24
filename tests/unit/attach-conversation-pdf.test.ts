@@ -48,6 +48,12 @@ function createStore(): LegalAiStore & {
       conversations.set(id, { id, userId: input.userId ?? "unknown" });
       return { id, questionStatus: LegalQuestionStatus.NEW, billedQuestionCount: 0 };
     },
+    async listOwnedCaseConversations() {
+      return [];
+    },
+    async listOwnedRecentConversations() {
+      return [];
+    },
     async updateQuestionThread() {},
     async countBilledQuestionsForUser() {
       return 0;

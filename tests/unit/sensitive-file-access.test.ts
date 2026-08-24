@@ -75,12 +75,30 @@ describe("sensitive file access", () => {
     ).rejects.toBeInstanceOf(ForbiddenError);
   });
 
-  it("denies clients", async () => {
+  it("allows the owning lawyer to download case evidence and denies others", async () => {
+    const evidenceKey = "evidence/lawyer1/uuid-contract.pdf";
+    const evidenceDeps = {
+      ...deps,
+      findOwnedEvidenceByFileReference: vi.fn(async (ownerId: string, key: string) =>
+        ownerId === "lawyer1" && key === evidenceKey
+          ? { id: "ev1", caseFileId: "case-1" }
+          : null,
+      ),
+    };
+
     await expect(
       assertCanAccessStoredFile(
-        { userId: "client1", role: UserRole.CLIENT },
-        key,
-        deps as never,
+        { userId: "lawyer1", role: UserRole.LAWYER },
+        evidenceKey,
+        evidenceDeps as never,
+      ),
+    ).resolves.toBeUndefined();
+
+    await expect(
+      assertCanAccessStoredFile(
+        { userId: "lawyer2", role: UserRole.LAWYER },
+        evidenceKey,
+        evidenceDeps as never,
       ),
     ).rejects.toBeInstanceOf(ForbiddenError);
   });

@@ -6,6 +6,7 @@ import {
   caseIntakeAction,
   rerunCaseAnalysisAction,
   submitManualMappingAction,
+  updateCaseTitleAction,
   type CaseReviewActionState,
 } from "@/application/actions/case-review.actions";
 import {
@@ -28,6 +29,10 @@ import {
   type TraceKind,
   type TraceSelection,
 } from "@/application/use-cases/case-review/view-model";
+import {
+  analysisStatusLabelMn,
+  legalDomainLabelMn,
+} from "@/application/use-cases/case-review/labels";
 import { highlightedClass, StatusBadge } from "@/components/case-review/status-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,9 +61,19 @@ import {
   CaseFactSourceType,
 } from "@/domain/entities/case-file";
 import { cn } from "@/lib/utils";
+import type {
+  CaseActivityItem,
+  CaseConversationSummary,
+  CaseDocumentView,
+} from "@/application/use-cases/case-review";
+import { CaseWorkspaceHome } from "@/components/case-review/case-workspace-home";
 
 type Props = {
   payload: CaseReviewWorkspacePayload;
+  createdAt: string;
+  conversations: CaseConversationSummary[];
+  documents: CaseDocumentView[];
+  activity: CaseActivityItem[];
 };
 
 function Panel({
@@ -85,7 +100,13 @@ function Panel({
   );
 }
 
-export function CaseReviewWorkspace({ payload: initial }: Props) {
+export function CaseReviewWorkspace({
+  payload: initial,
+  createdAt,
+  conversations,
+  documents,
+  activity,
+}: Props) {
   const [mapState, formAction, pending] = useActionState(
     submitManualMappingAction,
     {} as CaseReviewActionState,
@@ -98,10 +119,15 @@ export function CaseReviewWorkspace({ payload: initial }: Props) {
     caseIntakeAction,
     {} as CaseReviewActionState,
   );
+  const [titleState, titleAction, titlePending] = useActionState(
+    updateCaseTitleAction,
+    {} as CaseReviewActionState,
+  );
   const payload = [
     intakeState.payload,
     rerunState.payload,
     mapState.payload,
+    titleState.payload,
     initial,
   ]
     .filter((value): value is NonNullable<typeof value> => Boolean(value))
@@ -141,27 +167,48 @@ export function CaseReviewWorkspace({ payload: initial }: Props) {
   }
 
   return (
-    <div className="space-y-4" data-testid="case-review-workspace">
+    <div className="space-y-8" data-testid="case-review-workspace">
+      <CaseWorkspaceHome
+        payload={payload}
+        createdAt={createdAt}
+        conversations={conversations}
+        documents={documents}
+        activity={activity}
+        titleAction={titleAction}
+        titlePending={titlePending}
+        titleError={titleState.error}
+        titleSuccess={titleState.success}
+      />
+
+      <section id="case-analysis" className="space-y-4 scroll-mt-6">
+        <div>
+          <h2 className="text-sm font-semibold tracking-wide text-[#0A0F14] uppercase">
+            Хэрэг шинжлэх
+          </h2>
+          <p className="mt-1 text-sm text-[#5C6570]">
+            Баримт, холбоос болон шинжилгээний үр дүн энд харагдана. AI ярианаас тусдаа.
+          </p>
+        </div>
       <header
         data-testid="case-review-header"
         className="ds-surface grid gap-2 rounded-xl px-4 py-3 sm:grid-cols-5"
       >
-        <HeaderField label="Case" value={payload.title} />
-        <HeaderField label="Legal domain" value={payload.domain} />
+        <HeaderField label="Хэрэг" value={payload.title} />
+        <HeaderField label="Эрх зүйн салбар" value={legalDomainLabelMn(payload.domain)} />
         <HeaderField
-          label="Analysis date"
+          label="Шинжилсэн огноо"
           value={
             payload.analyzedAt
               ? payload.analyzedAt.slice(0, 19).replace("T", " ")
               : "—"
           }
         />
-        <HeaderField label="applicableAt" value={payload.applicableAt} />
+        <HeaderField label="Хэрэглэх огноо" value={payload.applicableAt} />
         <div>
           <p className="text-[11px] font-medium uppercase tracking-wide text-brand-muted">
-            Analysis status
+            Шинжилгээний төлөв
           </p>
-          <StatusBadge value={payload.status} />
+          <p className="mt-1 text-sm font-medium">{analysisStatusLabelMn(payload.status)}</p>
         </div>
       </header>
 
@@ -171,7 +218,7 @@ export function CaseReviewWorkspace({ payload: initial }: Props) {
           className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive"
           role="status"
         >
-          {payload.lastAnalysisError} Previous review is preserved.
+          {payload.lastAnalysisError} Өмнөх шинжилгээ хадгалагдана.
         </div>
       ) : null}
 
@@ -327,6 +374,7 @@ export function CaseReviewWorkspace({ payload: initial }: Props) {
         pending={rerunPending}
         error={rerunState.error}
       />
+      </section>
     </div>
   );
 }

@@ -939,6 +939,8 @@ model AIConversation {
   id                  String               @id @default(cuid())
   userId              String?              @map("user_id")
   guestSessionId      String?              @map("guest_session_id")
+  /// Nullable so existing threads stay valid. Set only after CaseFile ownership is verified.
+  caseFileId          String?              @map("case_file_id")
   title               String?
   questionStatus      LegalQuestionStatus  @default(NEW) @map("question_status")
   billedQuestionCount Int                  @default(0) @map("billed_question_count")
@@ -947,11 +949,13 @@ model AIConversation {
 
   user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
   guestSession GuestSession? @relation(fields: [guestSessionId], references: [id], onDelete: SetNull)
+  caseFile     CaseFile?     @relation(fields: [caseFileId], references: [id], onDelete: SetNull)
   messages     AIMessage[]
   document     AIConversationDocument?
 
   @@index([userId, updatedAt(sort: Desc)])
   @@index([guestSessionId, updatedAt(sort: Desc)])
+  @@index([caseFileId, updatedAt(sort: Desc)])
   @@map("ai_conversations")
 }
 
@@ -1307,8 +1311,9 @@ model CaseFile {
   updatedAt         DateTime  @updatedAt @map("updated_at")
 
   owner User @relation("LawyerCaseFiles", fields: [ownerLawyerId], references: [id], onDelete: Restrict)
-  facts    CaseFact[]
-  evidence CaseEvidence[]
+  facts           CaseFact[]
+  evidence        CaseEvidence[]
+  aiConversations AIConversation[]
 
   @@index([ownerLawyerId, updatedAt(sort: Desc)])
   @@map("case_files")

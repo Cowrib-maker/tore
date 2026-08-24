@@ -57,6 +57,37 @@ const LAUNCH_PHRASES = [
     message: "Машин зарсан чинь мөнгөө өгөхгүй байна",
     notNonLegal: true,
   },
+  {
+    id: 11,
+    message:
+      "Өнөөдөр шүүх хуралд орох гэж байгаа юм. Хүний юм хулгайлчихсан чинь цагдаад шалгагдаад дууссан.",
+    notNonLegal: true,
+  },
+  {
+    id: 12,
+    message: "Цагдаагаас намайг дуудсан",
+    notNonLegal: true,
+  },
+  {
+    id: 13,
+    message: "Прокурорт дуудагдсан",
+    notNonLegal: true,
+  },
+  {
+    id: 14,
+    message: "Цалингаа хоёр сар аваагүй",
+    notNonLegal: true,
+  },
+  {
+    id: 15,
+    message: "Өчигдөр машинаар осолд орчихсон",
+    notNonLegal: true,
+  },
+  {
+    id: 16,
+    message: "Хүүхдийн тэтгэлэг өгөхгүй байна",
+    notNonLegal: true,
+  },
 ] as const;
 
 describe("launch legal-situation matrix", () => {
@@ -83,6 +114,13 @@ describe("launch legal-situation matrix", () => {
   it("keeps a movie question NON_LEGAL", async () => {
     const result = await engine.classify({
       message: "Өнөөдөр ямар кино үзэх вэ?",
+    });
+    expect(result.relevance).toBe(LegalRelevance.NON_LEGAL);
+  });
+
+  it("keeps a court-themed movie NON_LEGAL", async () => {
+    const result = await engine.classify({
+      message: "Шүүхийн тухай кино үзлээ.",
     });
     expect(result.relevance).toBe(LegalRelevance.NON_LEGAL);
   });

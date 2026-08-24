@@ -3,7 +3,10 @@
 import { useActionState } from "react";
 
 import { resendVerificationEmailAction } from "@/application/actions/auth.actions";
-import type { ActionState } from "@/application/common/action-state";
+import {
+  AUTH_ACTION_CODE,
+  type ActionState,
+} from "@/application/common/action-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,59 +16,81 @@ const initialState: ActionState = {};
 
 export function ResendVerificationForm({
   copy,
+  defaultEmail,
+  submitLabel,
+  hideEmailField = false,
 }: {
   copy: Dictionary["auth"];
+  defaultEmail?: string | null;
+  submitLabel?: string;
+  hideEmailField?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(
     resendVerificationEmailAction,
     initialState,
   );
 
+  const knownEmail = defaultEmail?.trim() ?? "";
+  const showEmailField = !hideEmailField || !knownEmail;
+  const successMessage =
+    state.success && state.code === AUTH_ACTION_CODE.RESEND_SENT
+      ? copy.resendGenericSuccess
+      : state.success
+        ? copy.resendGenericSuccess
+        : null;
+  const errorMessage =
+    state.code === AUTH_ACTION_CODE.RATE_LIMITED
+      ? copy.verifyRateLimited
+      : state.error;
+
   return (
-    <form action={formAction} className="space-y-3 rounded-lg border p-4">
-      <div>
-        <p className="text-sm font-medium">{copy.resendTitle}</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {copy.resendDescription}
-        </p>
-      </div>
-      {state.error && (
+    <form action={formAction} className="space-y-3">
+      {errorMessage && (
         <div
           id="resend-verification-form-error"
           role="alert"
           aria-live="assertive"
           className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
         >
-          {state.error}
+          {errorMessage}
         </div>
       )}
-      {state.success && state.message && (
-        <div className="rounded-md bg-emerald-500/10 px-3 py-2 text-sm text-emerald-800">
-          {state.message}
+      {successMessage && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="rounded-md bg-emerald-500/10 px-3 py-2 text-sm text-emerald-800"
+        >
+          {successMessage}
         </div>
       )}
-      <div className="space-y-2">
-        <Label htmlFor="resend-email">{copy.email}</Label>
-        <Input
-          id="resend-email"
-          name="email"
-          type="email"
-          placeholder={copy.emailPlaceholder}
-          required
-          autoComplete="email"
-          aria-invalid={Boolean(state.error)}
-          aria-describedby={
-            state.error ? "resend-verification-form-error" : undefined
-          }
-        />
-      </div>
+      {showEmailField ? (
+        <div className="space-y-2">
+          <Label htmlFor="resend-email">{copy.email}</Label>
+          <Input
+            id="resend-email"
+            name="email"
+            type="email"
+            defaultValue={knownEmail}
+            placeholder={copy.emailPlaceholder}
+            required
+            autoComplete="email"
+            aria-invalid={Boolean(errorMessage)}
+            aria-describedby={
+              errorMessage ? "resend-verification-form-error" : undefined
+            }
+          />
+        </div>
+      ) : (
+        <input type="hidden" name="email" value={knownEmail} />
+      )}
       <Button
         type="submit"
         variant="outline"
         className="w-full"
         disabled={pending}
       >
-        {pending ? copy.resendSending : copy.resendSubmit}
+        {pending ? copy.resendSending : (submitLabel ?? copy.verifyResend)}
       </Button>
     </form>
   );

@@ -147,6 +147,7 @@ describe("registration personal tenant provisioning", () => {
   it("TEST 1 · flag OFF · CLIENT registration leaves personalTenantId null", async () => {
     const user = await registerClientUseCase(registerInput, deps());
     expect(user.role).toBe(UserRole.CLIENT);
+    expect(user.emailVerified).toBeNull();
     expect(user.personalTenantId).toBeNull();
     expect(ensurePersonalTenantForUser).not.toHaveBeenCalled();
     expect(createClientProfile).toHaveBeenCalled();
@@ -156,6 +157,7 @@ describe("registration personal tenant provisioning", () => {
   it("TEST 2 · flag OFF · LAWYER registration leaves personalTenantId null", async () => {
     const user = await registerLawyerUseCase(registerInput, deps());
     expect(user.role).toBe(UserRole.LAWYER);
+    expect(user.emailVerified).toBeNull();
     expect(user.personalTenantId).toBeNull();
     expect(ensurePersonalTenantForUser).not.toHaveBeenCalled();
     expect(createLawyerProfile).toHaveBeenCalled();

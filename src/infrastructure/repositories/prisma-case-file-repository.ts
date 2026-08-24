@@ -239,6 +239,20 @@ export class PrismaCaseFileRepository implements CaseFileRepository {
     return rows.map(mapCaseFile);
   }
 
+  async findOwnedEvidenceByFileReference(
+    ownerLawyerId: string,
+    fileReference: string,
+  ): Promise<{ id: string; caseFileId: string } | null> {
+    const row = await this.db.caseEvidence.findFirst({
+      where: {
+        fileReference,
+        caseFile: { ownerLawyerId },
+      },
+      select: { id: true, caseFileId: true },
+    });
+    return row;
+  }
+
   async updateIfVersionMatch(
     id: string,
     expectedVersion: number,

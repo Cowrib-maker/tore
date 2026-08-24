@@ -11,6 +11,10 @@ export type StoredFileAccessDeps = {
   findLegalAiDocumentByStorageKey?: (
     key: string,
   ) => Promise<{ userId: string } | null>;
+  findOwnedEvidenceByFileReference?: (
+    ownerLawyerId: string,
+    fileReference: string,
+  ) => Promise<{ id: string; caseFileId: string } | null>;
 };
 
 /**
@@ -65,6 +69,24 @@ export async function assertCanAccessStoredFile(
     }
     const document = await lookup(key);
     if (!document || document.userId !== actor.userId) {
+      throw new ForbiddenError();
+    }
+    return;
+  }
+
+  if (purpose === "evidence") {
+    if (actor.role !== UserRole.LAWYER) {
+      throw new ForbiddenError();
+    }
+    if (actor.userId !== ownerId) {
+      throw new ForbiddenError();
+    }
+    const lookup = deps.findOwnedEvidenceByFileReference;
+    if (!lookup) {
+      throw new ForbiddenError();
+    }
+    const evidence = await lookup(actor.userId, key);
+    if (!evidence) {
       throw new ForbiddenError();
     }
     return;

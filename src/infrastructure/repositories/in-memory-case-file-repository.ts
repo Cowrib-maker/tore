@@ -64,6 +64,22 @@ export class InMemoryCaseFileRepository implements CaseFileRepository {
       .map((row) => clone(row));
   }
 
+  async findOwnedEvidenceByFileReference(
+    ownerLawyerId: string,
+    fileReference: string,
+  ): Promise<{ id: string; caseFileId: string } | null> {
+    for (const file of this.rows.values()) {
+      if (file.ownerLawyerId !== ownerLawyerId) continue;
+      const evidence = file.evidence.find(
+        (item) => item.fileReference === fileReference,
+      );
+      if (evidence) {
+        return { id: evidence.id, caseFileId: file.id };
+      }
+    }
+    return null;
+  }
+
   async updateIfVersionMatch(
     id: string,
     expectedVersion: number,

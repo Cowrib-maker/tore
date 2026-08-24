@@ -1,9 +1,13 @@
 import { getSessionUser } from "@/application/common/session";
 import { getLegalAiService } from "@/application/ai/create-legal-ai-service";
+import { loadLawyerAiWorkbench } from "@/application/use-cases/ai/load-lawyer-ai-workbench";
 import { LegalAiChat } from "@/components/legal-ai/legal-ai-chat";
+import { LawyerAiWorkbench } from "@/components/legal-ai/lawyer-ai-workbench";
+import { LawyerWorkspaceFrame } from "@/components/case-review/lawyer-workspace-frame";
 import { UserRole } from "@/domain/enums";
-import { getDashboardPath } from "@/domain/services/rbac";
+import { getDashboardPath, getProfilePath } from "@/domain/services/rbac";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -20,6 +24,10 @@ export default async function LegalAiPage({
   const initialQuestion = typeof params.q === "string" ? params.q : "";
   const conversationId =
     typeof params.conversationId === "string" ? params.conversationId : undefined;
+  const caseFileId =
+    typeof params.caseId === "string" && params.caseId.trim()
+      ? params.caseId.trim()
+      : undefined;
   const dashboardHref =
     session?.user?.role &&
     (session.user.role === UserRole.CLIENT ||
@@ -37,6 +45,7 @@ export default async function LegalAiPage({
     extractStatus: "OK" | "EMPTY" | "FAILED";
     pageCount: number | null;
   } | null = null;
+  let ownedConversationId: string | undefined;
   if (conversationId && session?.user?.id) {
     try {
       const history = await getLegalAiService().getConversationMessages(
@@ -54,19 +63,53 @@ export default async function LegalAiPage({
           session.user.id,
           conversationId,
         );
+      ownedConversationId = conversationId;
     } catch {
       // Conversation missing or not owned by this user — fall back to empty state.
     }
   }
 
+  if (session?.user?.role === UserRole.LAWYER) {
+    const actor = {
+      userId: session.user.id,
+      role: UserRole.LAWYER,
+    };
+    const workbench = await loadLawyerAiWorkbench(actor, {
+      conversationId: ownedConversationId,
+      caseId: caseFileId,
+    });
+    const i18n = await getShellI18n("lawyer");
+    return (
+      <LawyerWorkspaceFrame
+        variant="workbench"
+        user={session.user}
+        profileHref={getProfilePath(UserRole.LAWYER) || "/lawyer/profile"}
+        locale={i18n.locale}
+        languageLabel={i18n.shellProps.languageLabel}
+        signOutLabel={i18n.shellProps.signOutLabel}
+      >
+        <LawyerAiWorkbench
+          key={
+            workbench.conversationId ??
+            `new-${workbench.caseFileId ?? "unattached"}`
+          }
+          initialConversationId={workbench.conversationId}
+          initialCaseFileId={workbench.caseFileId}
+          initialMessages={initialMessages}
+          initialAttachedDocument={initialAttachedDocument}
+          caseContext={workbench.caseContext}
+          history={workbench.history}
+        />
+      </LawyerWorkspaceFrame>
+    );
+  }
+
   return (
     <LegalAiChat
       initialQuestion={initialQuestion}
-      initialConversationId={
-        initialMessages.length || initialAttachedDocument
-          ? conversationId
-          : undefined
-      }
+      initialConversationId={ownedConversationId}
+      initialCaseFileId={caseFileId}
+      initialMode={caseFileId ? "PROFESSIONAL" : undefined}
       initialMessages={initialMessages}
       initialAttachedDocument={initialAttachedDocument}
       documentUploadEnabled={session?.user?.role === UserRole.LAWYER}

@@ -591,6 +591,7 @@ export class LegalAiService {
         userId: input.userId,
         guestSessionId: input.guestSessionId,
         title: message.slice(0, 80),
+        caseFileId: input.userId ? input.caseFileId : undefined,
       });
     }
 

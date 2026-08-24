@@ -2,12 +2,22 @@
 
 import { redirect } from "next/navigation";
 
-import type { ActionState } from "@/application/common/action-state";
+import {
+  AUTH_ACTION_CODE,
+  type ActionState,
+} from "@/application/common/action-state";
 import { getClientIp } from "@/application/common/client-ip";
 import { mapActionError } from "@/application/common/map-action-error";
 import { parseWithSchema } from "@/application/common/parse-form";
 import { enforceRateLimit } from "@/application/common/rate-limit-action";
-import { issueVerificationEmailAfterRegister, getEmailVerificationDeps } from "@/application/services/issue-verification-email";
+import {
+  issueVerificationEmailAfterRegister,
+  getEmailVerificationDeps,
+} from "@/application/services/issue-verification-email";
+import {
+  buildEmailVerificationPendingPath,
+  resolvePostCredentialLogin,
+} from "@/application/services/email-verification-flow";
 import { registerClientUseCase } from "@/application/use-cases/auth/register-client";
 import { registerLawyerUseCase } from "@/application/use-cases/auth/register-lawyer";
 import { resendEmailVerificationUseCase } from "@/application/use-cases/auth/email-verification";
@@ -35,7 +45,7 @@ import {
   resetPasswordSchema,
 } from "@/application/validators/auth.schema";
 import { UserRole, UserStatus } from "@/domain/enums";
-import { getDashboardPath, getPostAuthRedirect } from "@/domain/services/rbac";
+import { getPostAuthRedirect } from "@/domain/services/rbac";
 import {
   platformSettingRepository,
   unitOfWork,
@@ -83,17 +93,12 @@ export async function registerClientAction(
 
   await issueVerificationEmailAfterRegister(parsed.data.email);
 
-  const signInResult = await signIn("credentials", {
-    email: parsed.data.email,
-    password: parsed.data.password,
-    redirect: false,
-  });
-
-  if (signInResult?.error) {
-    redirect("/login");
-  }
-
-  redirect(getPostAuthRedirect(UserRole.CLIENT, formData.get("callbackUrl")));
+  redirect(
+    buildEmailVerificationPendingPath({
+      email: parsed.data.email,
+      callbackUrl: formData.get("callbackUrl"),
+    }),
+  );
 }
 
 export async function registerLawyerAction(
@@ -125,17 +130,11 @@ export async function registerLawyerAction(
 
   await issueVerificationEmailAfterRegister(parsed.data.email);
 
-  const signInResult = await signIn("credentials", {
-    email: parsed.data.email,
-    password: parsed.data.password,
-    redirect: false,
-  });
-
-  if (signInResult?.error) {
-    redirect("/login");
-  }
-
-  redirect(getDashboardPath(UserRole.LAWYER));
+  redirect(
+    buildEmailVerificationPendingPath({
+      email: parsed.data.email,
+    }),
+  );
 }
 
 export async function loginAction(
@@ -178,6 +177,19 @@ export async function loginAction(
     return { error: "Your account is not active" };
   }
 
+  const account = await userRepository.findByEmail(parsed.data.email);
+  const loginGate = resolvePostCredentialLogin(account);
+  if (loginGate !== "ok") {
+    await signOut({ redirect: false });
+    if (loginGate === "unverified") {
+      return {
+        code: AUTH_ACTION_CODE.EMAIL_NOT_VERIFIED,
+        email: parsed.data.email,
+      };
+    }
+    return { error: "Invalid email or password" };
+  }
+
   const role = session?.user?.role as UserRole | undefined;
 
   if (role && role in UserRole) {
@@ -205,20 +217,13 @@ export async function resendVerificationEmailAction(
   if (limited) return limited;
 
   try {
-    const result = await resendEmailVerificationUseCase(
+    await resendEmailVerificationUseCase(
       parsed.data.email,
       getEmailVerificationDeps(),
     );
-    if (result.alreadyVerified) {
-      return {
-        success: true,
-        message: "This email is already verified. You can sign in.",
-      };
-    }
     return {
       success: true,
-      message:
-        "If an unverified account exists for that email, a verification link has been sent.",
+      code: AUTH_ACTION_CODE.RESEND_SENT,
     };
   } catch (error) {
     console.error("[email:verification] resend action failed", error);

@@ -30,9 +30,12 @@ export {
   LEGAL_CLARIFICATION_PREFIX,
 } from "./legal-clarification";
 export {
+  analyzeLegalFactContext,
   hasFirstPersonProblemNarrative,
+  isDetachedLegalMention,
   matchNonLegalTopic,
   matchSituationSignals,
+  stripColloquialAspect,
 } from "./legal-situation-signals";
 
 export function createLegalRelevanceEngine(

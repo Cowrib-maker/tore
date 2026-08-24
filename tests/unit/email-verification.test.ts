@@ -5,6 +5,8 @@ import {
   sendEmailVerificationUseCase,
   verifyEmailTokenUseCase,
 } from "@/application/use-cases/auth/email-verification";
+import { EmailVerificationLinkError } from "@/domain/errors/domain-error";
+import { UserRole } from "@/domain/enums";
 import {
   buildEmailVerificationUrl,
   generateEmailVerificationRawToken,
@@ -182,9 +184,112 @@ describe("email-verification use-cases", () => {
     const result = await verifyEmailTokenUseCase(raw, deps);
 
     expect(result.email).toBe(user.email);
+    expect(result.role).toBe(UserRole.CLIENT);
     expect(deps.userRepository.markEmailVerified).toHaveBeenCalledWith(user.id);
     expect(
       deps.emailVerificationTokenRepository.deleteForIdentifier,
     ).toHaveBeenCalledWith(user.email);
+  });
+
+  it("resend creates a hashed token and sends mail for unverified accounts", async () => {
+    const result = await resendEmailVerificationUseCase(
+      "client@example.com",
+      deps,
+    );
+
+    expect(result).toEqual({ ok: true });
+    expect(replaceForIdentifier).toHaveBeenCalledWith(
+      expect.objectContaining({
+        identifier: "client@example.com",
+        tokenHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+        expires: expect.any(Date),
+      }),
+    );
+    expect(emailSend).toHaveBeenCalledTimes(1);
+  });
+
+  it("resend does not send for already-verified accounts and hides existence", async () => {
+    (deps.userRepository.findByEmail as ReturnType<typeof vi.fn>).mockResolvedValue(
+      { ...user, emailVerified: new Date() },
+    );
+    const result = await resendEmailVerificationUseCase(
+      "client@example.com",
+      deps,
+    );
+    expect(result).toEqual({ ok: true, alreadyVerified: true });
+    expect(emailSend).not.toHaveBeenCalled();
+    expect(replaceForIdentifier).not.toHaveBeenCalled();
+  });
+
+  it("resend still returns success when send fails after a token is persisted", async () => {
+    emailSend.mockRejectedValue(new Error("smtp_timeout"));
+    const result = await resendEmailVerificationUseCase(
+      "client@example.com",
+      deps,
+    );
+    expect(result).toEqual({ ok: true });
+    expect(replaceForIdentifier).toHaveBeenCalled();
+  });
+
+  it("rejects an expired token without marking the user verified", async () => {
+    const raw = generateEmailVerificationRawToken();
+    const tokenHash = hashEmailVerificationToken(raw);
+    (
+      deps.emailVerificationTokenRepository.findByTokenHash as ReturnType<
+        typeof vi.fn
+      >
+    ).mockResolvedValue({
+      identifier: user.email,
+      tokenHash,
+      expires: new Date(Date.now() - 1_000),
+    });
+
+    await expect(verifyEmailTokenUseCase(raw, deps)).rejects.toMatchObject({
+      name: "EmailVerificationLinkError",
+      reason: "expired",
+      code: "EMAIL_VERIFICATION_INVALID",
+    });
+    expect(deps.userRepository.markEmailVerified).not.toHaveBeenCalled();
+    expect(
+      deps.emailVerificationTokenRepository.deleteByTokenHash,
+    ).toHaveBeenCalledWith(tokenHash);
+  });
+
+  it("rejects an invalid token without revealing internals", async () => {
+    (
+      deps.emailVerificationTokenRepository.findByTokenHash as ReturnType<
+        typeof vi.fn
+      >
+    ).mockResolvedValue(null);
+
+    try {
+      await verifyEmailTokenUseCase(generateEmailVerificationRawToken(), deps);
+      throw new Error("expected EmailVerificationLinkError");
+    } catch (error) {
+      expect(error).toBeInstanceOf(EmailVerificationLinkError);
+      expect(error).toMatchObject({ reason: "invalid" });
+      expect(String(error)).not.toMatch(/prisma|smtp|resend|hash|sha256/i);
+    }
+    expect(deps.userRepository.markEmailVerified).not.toHaveBeenCalled();
+  });
+
+  it("verifies a lawyer token and returns the professional role", async () => {
+    const lawyer = { ...user, role: UserRole.LAWYER, email: "lawyer@example.com" };
+    (deps.userRepository.findByEmail as ReturnType<typeof vi.fn>).mockResolvedValue(
+      lawyer,
+    );
+    const raw = generateEmailVerificationRawToken();
+    (
+      deps.emailVerificationTokenRepository.findByTokenHash as ReturnType<
+        typeof vi.fn
+      >
+    ).mockResolvedValue({
+      identifier: lawyer.email,
+      tokenHash: hashEmailVerificationToken(raw),
+      expires: new Date(Date.now() + 60_000),
+    });
+
+    const result = await verifyEmailTokenUseCase(raw, deps);
+    expect(result).toEqual({ email: lawyer.email, role: UserRole.LAWYER });
   });
 });

@@ -6,9 +6,9 @@ import {
   isLegalClarificationMessage,
 } from "./legal-clarification";
 import {
+  analyzeLegalFactContext,
   hasFirstPersonProblemNarrative,
   matchNonLegalTopic,
-  matchSituationSignals,
 } from "./legal-situation-signals";
 import {
   LegalIssueFamily,
@@ -100,9 +100,12 @@ export class LegalRelevanceService {
 
     const citation = detectExactCitation(message);
     const domain = await this.dependencies.domainFilter.classify(message);
-    const situations = matchSituationSignals(message);
+    const factContext = analyzeLegalFactContext(message);
+    const situations = factContext.situations;
     const nonLegalTopic = matchNonLegalTopic(message);
     const issueFamily = situations[0]?.family;
+    const detachedWithoutFacts =
+      factContext.detachedMention && situations.length === 0;
 
     if (citation) {
       return finish({
@@ -114,7 +117,7 @@ export class LegalRelevanceService {
       });
     }
 
-    if (domain.domain === DomainLabel.LEGAL) {
+    if (domain.domain === DomainLabel.LEGAL && !detachedWithoutFacts) {
       return finish({
         relevance: LegalRelevance.LEGAL,
         confidence: clamp01(domain.confidence ?? 0.7),
@@ -125,10 +128,17 @@ export class LegalRelevanceService {
     }
 
     if (situations.length > 0) {
+      const relevance = relevanceFromFactDimensions(factContext.dimensions);
       return finish({
-        relevance: LegalRelevance.POSSIBLY_LEGAL,
-        confidence: Math.min(0.82, 0.52 + situations.length * 0.1),
-        reasons: situations.map((hit) => `situation:${hit.id}`),
+        relevance,
+        confidence: Math.min(
+          relevance === LegalRelevance.LEGAL ? 0.88 : 0.82,
+          0.52 + situations.length * 0.1,
+        ),
+        reasons: [
+          ...situations.map((hit) => `situation:${hit.id}`),
+          ...(relevance === LegalRelevance.LEGAL ? ["fact-context"] : []),
+        ],
         issueFamily,
         analysisText: message,
       });
@@ -184,6 +194,16 @@ function finish(result: LegalRelevanceResult): LegalRelevanceResult {
     ...result,
     clarificationMessage: buildClarificationMessage(result.issueFamily),
   };
+}
+
+function relevanceFromFactDimensions(
+  dimensions: readonly string[],
+): (typeof LegalRelevance)[keyof typeof LegalRelevance] {
+  const set = new Set(dimensions);
+  if (set.has("procedure") && (set.has("harm") || set.has("status"))) {
+    return LegalRelevance.LEGAL;
+  }
+  return LegalRelevance.POSSIBLY_LEGAL;
 }
 
 function lastMessageWithRole(

@@ -1,20 +1,18 @@
-import Link from "next/link";
-
 import { AuthPageChrome } from "@/components/auth/auth-page-chrome";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { EmailVerificationPanel } from "@/components/auth/email-verification-panel";
 import { getEmailVerificationDeps } from "@/application/services/issue-verification-email";
+import {
+  invalidEmailVerificationPageModel,
+  normalizeVerificationEmail,
+  pendingEmailVerificationPageModel,
+  successEmailVerificationPageModel,
+  type EmailVerificationPageModel,
+} from "@/application/services/email-verification-flow";
 import { verifyEmailTokenUseCase } from "@/application/use-cases/auth/email-verification";
-import { DomainError } from "@/domain/errors/domain-error";
+import { EmailVerificationLinkError } from "@/domain/errors/domain-error";
+import { safeLegalAiCallback } from "@/domain/services/rbac";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
-import { cn } from "@/lib/utils";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -30,50 +28,38 @@ export default async function VerifyEmailPage({
   ]);
   const rawToken =
     typeof params.token === "string" ? params.token.trim() : "";
+  const email = normalizeVerificationEmail(params.email);
+  const callbackUrl = safeLegalAiCallback(
+    typeof params.callbackUrl === "string" ? params.callbackUrl : null,
+  );
 
-  let status: "success" | "error" = "error";
-  let message = dict.auth.verifyMissingToken;
+  let model: EmailVerificationPageModel = pendingEmailVerificationPageModel(
+    email,
+    callbackUrl,
+  );
 
   if (rawToken) {
     try {
-      const result = await verifyEmailTokenUseCase(rawToken, getEmailVerificationDeps());
-      status = "success";
-      message = dict.auth.verifySuccess.replace("{email}", result.email);
+      const result = await verifyEmailTokenUseCase(
+        rawToken,
+        getEmailVerificationDeps(),
+      );
+      model = successEmailVerificationPageModel(
+        result.email,
+        result.role,
+        callbackUrl,
+      );
     } catch (error) {
-      console.error("[email:verification] verify page failed", error);
-      status = "error";
-      message =
-        error instanceof DomainError
-          ? error.message
-          : dict.auth.verifyFailed;
+      if (!(error instanceof EmailVerificationLinkError)) {
+        console.error("[email:verification] verify page failed", error);
+      }
+      model = invalidEmailVerificationPageModel(email);
     }
   }
 
   return (
     <AuthPageChrome locale={locale} dict={dict}>
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>
-            {status === "success"
-              ? dict.auth.verifyTitleSuccess
-              : dict.auth.verifyTitleError}
-          </CardTitle>
-          <CardDescription>{message}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-3">
-          <Link
-            href="/login"
-            className={cn(buttonVariants(), "w-full")}
-          >
-            {dict.auth.backToSignIn}
-          </Link>
-          {status === "error" && (
-            <p className="text-center text-sm text-muted-foreground">
-              {dict.auth.verifyResendHint}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      <EmailVerificationPanel copy={dict.auth} model={model} />
     </AuthPageChrome>
   );
 }

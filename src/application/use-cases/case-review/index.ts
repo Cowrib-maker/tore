@@ -30,6 +30,25 @@ export type { SampleCaseVariant } from "./fixtures";
 export type { CaseFileDeps } from "./deps";
 export { runPersistedCaseAnalysis } from "./deps";
 export {
+  startCaseConversationForLawyer,
+  listCaseConversationsForLawyer,
+  assertOwnedCaseFileForAi,
+} from "./case-conversations";
+export type { CaseConversationSummary, CaseAiDeps } from "./case-conversations";
+export { attachCasePdfForLawyer, formatPdfSize } from "./case-documents";
+export { deriveCaseActivity, toCaseDocumentViews } from "./case-activity";
+export type { CaseActivityItem, CaseDocumentView } from "./case-activity";
+export { loadCaseWorkspaceForLawyer } from "./load-case-workspace";
+export type { CaseWorkspaceView } from "./load-case-workspace";
+export { loadLawyerWorkspaceHome } from "./load-lawyer-workspace-home";
+export type {
+  LawyerWorkspaceHomeView,
+  LawyerWorkspaceCaseCard,
+  LawyerWorkspaceRecentConversation,
+  LawyerWorkspaceSummary,
+} from "./load-lawyer-workspace-home";
+export { legalDomainLabelMn, analysisStatusLabelMn } from "./labels";
+export {
   validateManualMapping,
   isCaseAnalysisReview,
   isCaseAnalysisRequest,

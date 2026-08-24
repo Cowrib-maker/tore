@@ -5,6 +5,7 @@ import { assertCanAccessStoredFile } from "@/application/services/assert-can-acc
 import { DomainError } from "@/domain/errors/domain-error";
 import { PrismaLegalAiStore } from "@/infrastructure/ai/prisma-legal-ai-store";
 import {
+  caseFileRepository,
   lawyerCredentialRepository,
   lawyerProfileRepository,
 } from "@/infrastructure/repositories";
@@ -29,6 +30,11 @@ export async function GET(_request: Request, context: RouteContext) {
       lawyerCredentialRepository,
       findLegalAiDocumentByStorageKey: (storageKey) =>
         legalAiStore.findDocumentByStorageKey(storageKey),
+      findOwnedEvidenceByFileReference: (ownerLawyerId, fileReference) =>
+        caseFileRepository.findOwnedEvidenceByFileReference(
+          ownerLawyerId,
+          fileReference,
+        ),
     });
 
     const object = await getFileStorage().getObject(key);

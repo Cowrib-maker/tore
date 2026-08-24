@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 
-import { loadCaseReviewForPage } from "@/application/actions/case-review.actions";
+import { loadCaseWorkspaceForPage } from "@/application/actions/case-review.actions";
 import { requireActor } from "@/application/common/require-actor";
 import { isCaseReviewWorkspacePayload } from "@/application/use-cases/case-review/view-model";
 import { CaseReviewWorkspace } from "@/components/case-review/case-review-workspace";
-import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
+import { CaseWorkspaceLayout } from "@/components/case-review/case-workspace-layout";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DomainError } from "@/domain/errors/domain-error";
 import { UserRole } from "@/domain/enums";
@@ -28,46 +28,54 @@ export default async function LawyerCaseReviewPage({
   }
 
   try {
-    const payload = await loadCaseReviewForPage(caseId);
-    if (!isCaseReviewWorkspacePayload(payload)) {
+    const workspace = await loadCaseWorkspaceForPage(caseId);
+    if (!isCaseReviewWorkspacePayload(workspace.payload)) {
       return (
-        <>
-          <DashboardPageHeading>Case review</DashboardPageHeading>
+        <CaseWorkspaceLayout active="cases">
           <EmptyState
-            title="Malformed review payload"
-            description="The engine result could not be displayed. Uncertainty is not hidden."
+            title="Шинжилгээний үр дүнг харуулах боломжгүй"
+            description="Хөдөлгүүрийн хариу буруу бүтэцтэй байна. Тодорхойгүй байдлыг нуухгүй."
           />
-        </>
+        </CaseWorkspaceLayout>
       );
     }
     return (
-      <>
-        <DashboardPageHeading>Case review</DashboardPageHeading>
-        <p className="mb-4 max-w-3xl text-sm text-muted-foreground">
-          Persisted case file. Manual mappings re-run the existing engine; this
-          screen does not invent doctrine or conclusions.{" "}
+      <CaseWorkspaceLayout active="cases">
+        <p className="mb-5 text-sm text-[#5C6570]">
+          <a
+            href="/lawyer/workspace"
+            className="font-medium text-[#0B1F3A] underline underline-offset-4"
+          >
+            Ажлын талбар
+          </a>
+          <span className="mx-2 text-[#8A939D]">/</span>
           <a
             href="/lawyer/workspace/cases"
-            className="font-medium underline underline-offset-4"
+            className="font-medium text-[#0B1F3A] underline underline-offset-4"
           >
-            Back to cases
+            Миний хэргүүд
           </a>
         </p>
-        <CaseReviewWorkspace payload={payload} />
-      </>
+        <CaseReviewWorkspace
+          payload={workspace.payload}
+          createdAt={workspace.createdAt}
+          conversations={workspace.conversations}
+          documents={workspace.documents}
+          activity={workspace.activity}
+        />
+      </CaseWorkspaceLayout>
     );
   } catch (error) {
     if (error instanceof DomainError && error.code === "FORBIDDEN") {
       return (
-        <>
-          <DashboardPageHeading>Case review</DashboardPageHeading>
+        <CaseWorkspaceLayout active="cases">
           <div data-testid="unauthorized-case-review">
             <EmptyState
-              title="Not authorized"
-              description="You may only review cases you are authorized to access."
+              title="Хандах эрхгүй"
+              description="Та зөвхөн өөрийн хэргээ нээж болно."
             />
           </div>
-        </>
+        </CaseWorkspaceLayout>
       );
     }
     if (error instanceof DomainError && error.code === "NOT_FOUND") {

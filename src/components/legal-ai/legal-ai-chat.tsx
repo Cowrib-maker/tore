@@ -70,6 +70,8 @@ type AttachedDocument = {
 type LegalAiChatProps = {
   initialQuestion?: string;
   initialConversationId?: string;
+  initialCaseFileId?: string;
+  initialMode?: "CITIZEN" | "PROFESSIONAL";
   initialMessages?: Message[];
   initialAttachedDocument?: AttachedDocument | null;
   documentUploadEnabled?: boolean;
@@ -116,6 +118,8 @@ const QUICK_ACTIONS = [
 export function LegalAiChat({
   initialQuestion = "",
   initialConversationId,
+  initialCaseFileId,
+  initialMode,
   initialMessages = [],
   initialAttachedDocument = null,
   documentUploadEnabled = false,
@@ -127,7 +131,9 @@ export function LegalAiChat({
 }: LegalAiChatProps) {
   const [message, setMessage] = useState(initialQuestion);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [mode, setMode] = useState<"CITIZEN" | "PROFESSIONAL">("CITIZEN");
+  const [mode, setMode] = useState<"CITIZEN" | "PROFESSIONAL">(
+    initialMode ?? (initialCaseFileId ? "PROFESSIONAL" : "CITIZEN"),
+  );
   const [conversationId, setConversationId] = useState<string | undefined>(
     initialConversationId,
   );
@@ -354,7 +360,8 @@ export function LegalAiChat({
         body: JSON.stringify({
           message: text,
           conversationId,
-          mode,
+          caseFileId: conversationId ? undefined : initialCaseFileId,
+          mode: initialCaseFileId ? "PROFESSIONAL" : mode,
         }),
       });
 

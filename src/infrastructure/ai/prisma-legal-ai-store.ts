@@ -1,9 +1,11 @@
 import { prisma } from "@/infrastructure/database/prisma";
 import type {
   LegalAiAssistantMessage,
+  LegalAiCaseConversationSummary,
   LegalAiConversation,
   LegalAiConversationDocumentExtract,
   LegalAiConversationDocumentMeta,
+  LegalAiRecentConversationSummary,
   LegalAiStore,
   LegalAiStoredMessage,
 } from "@/application/ai/legal-ai.types";
@@ -17,11 +19,13 @@ function toConversation(row: {
   id: string;
   questionStatus: string;
   billedQuestionCount: number;
+  caseFileId?: string | null;
 }): LegalAiConversation {
   return {
     id: row.id,
     questionStatus: row.questionStatus as LegalAiConversation["questionStatus"],
     billedQuestionCount: row.billedQuestionCount,
+    caseFileId: row.caseFileId ?? null,
   };
 }
 
@@ -47,15 +51,10 @@ export class PrismaLegalAiStore implements LegalAiStore {
         id: true,
         questionStatus: true,
         billedQuestionCount: true,
+        caseFileId: true,
       },
     });
-    return conversation
-      ? {
-          id: conversation.id,
-          questionStatus: conversation.questionStatus as LegalAiConversation["questionStatus"],
-          billedQuestionCount: conversation.billedQuestionCount,
-        }
-      : null;
+    return conversation ? toConversation(conversation) : null;
   }
 
   async findAccessibleConversation(input: {
@@ -92,12 +91,14 @@ export class PrismaLegalAiStore implements LegalAiStore {
     userId?: string;
     guestSessionId?: string;
     title: string;
+    caseFileId?: string;
   }): Promise<LegalAiConversation> {
     const created = await prisma.aIConversation.create({
       data: {
         userId: input.userId,
         guestSessionId: input.guestSessionId,
         title: input.title,
+        caseFileId: input.caseFileId,
       },
       select: {
         id: true,
@@ -106,6 +107,40 @@ export class PrismaLegalAiStore implements LegalAiStore {
       },
     });
     return toConversation(created);
+  }
+
+  async listOwnedCaseConversations(
+    userId: string,
+    caseFileId: string,
+  ): Promise<LegalAiCaseConversationSummary[]> {
+    return prisma.aIConversation.findMany({
+      where: { userId, caseFileId },
+      orderBy: { updatedAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async listOwnedRecentConversations(
+    userId: string,
+    take: number,
+  ): Promise<LegalAiRecentConversationSummary[]> {
+    return prisma.aIConversation.findMany({
+      where: { userId },
+      orderBy: { updatedAt: "desc" },
+      take,
+      select: {
+        id: true,
+        title: true,
+        caseFileId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   }
 
   async updateQuestionThread(input: {

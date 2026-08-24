@@ -50,7 +50,7 @@ describe("email verification gate", () => {
     expect(() => assertUserEmailVerified(lawyer())).not.toThrow();
   });
 
-  it("still allows unverified login", async () => {
+  it("still allows unverified credentials to be checked", async () => {
     const user = lawyer({ emailVerified: null });
     const passwordHash = await hash("correct-password", 4);
     const deps: VerifyCredentialsDeps = {

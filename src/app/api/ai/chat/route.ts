@@ -8,6 +8,7 @@ import { requireActor } from "@/application/common/require-actor";
 import { getSessionUser } from "@/application/common/session";
 import { assertEmailVerified } from "@/application/common/require-verified-email";
 import { resolveGuestSession } from "@/application/legal-ai/resolve-guest-session";
+import { assertOwnedCaseFileForAi } from "@/application/use-cases/case-review";
 import { DomainError } from "@/domain/errors/domain-error";
 import { EntitlementError } from "@/domain/errors/entitlement-error";
 import { EntitlementFeature, UserRole } from "@/domain/enums";
@@ -21,6 +22,7 @@ import {
 type ChatRequest = {
   message?: string;
   conversationId?: string;
+  caseFileId?: string;
   mode?: "CITIZEN" | "PROFESSIONAL";
 };
 
@@ -64,14 +66,26 @@ export async function POST(request: Request) {
     }
 
     const body = (await request.json()) as ChatRequest;
+    const requestedCaseFileId =
+      typeof body.caseFileId === "string" ? body.caseFileId.trim() : "";
+    // Citizens/guests never attach a case. Lawyers must own the CaseFile.
+    const caseFileId =
+      actor?.role === UserRole.LAWYER && requestedCaseFileId && !body.conversationId
+        ? requestedCaseFileId
+        : undefined;
+    if (caseFileId && actor) {
+      await assertOwnedCaseFileForAi(actor, caseFileId);
+    }
+
     const result = await getLegalAiService().createTurn({
       userId: actor?.userId,
       guestSessionId: actor ? undefined : guest?.id,
       actorRole: actor?.role,
       message: body.message ?? "",
       conversationId: body.conversationId,
+      caseFileId,
       userContext: actor ? { role: actor.role } : undefined,
-      mode: body.mode,
+      mode: caseFileId ? "PROFESSIONAL" : body.mode,
     });
 
     const response = NextResponse.json({

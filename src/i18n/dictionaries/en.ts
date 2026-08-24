@@ -236,6 +236,20 @@ export const en: Dictionary = {
       "This link is invalid or has expired. Request a new verification email from the sign-in page.",
     verifyMissingToken: "A valid verification token is required to open this page.",
     verifyResendHint: "Return to sign-in to request a new verification email.",
+    verifyPendingTitle: "Please confirm your email",
+    verifyPendingBody:
+      "We sent a confirmation link to the email address on your account.",
+    verifyResend: "Resend confirmation email",
+    verifyBackToLogin: "Back to the sign-in page",
+    verifySpamHint: "If the email did not arrive, check your Spam/Junk folder.",
+    verifyExpiredOrInvalid:
+      "This confirmation link is invalid or has expired.",
+    verifyRequestNew: "Get a new confirmation email",
+    verifyContinue: "Sign in",
+    resendGenericSuccess:
+      "If an unverified account exists for that email, a confirmation link has been sent.",
+    verifyNeedsLink: "Need to confirm your email?",
+    verifyRateLimited: "Too many attempts. Please wait and try again.",
     newToTore: "New to TORE?",
     registerClientLink: "Register as a client",
     registerLawyerLink: "Register as a lawyer",

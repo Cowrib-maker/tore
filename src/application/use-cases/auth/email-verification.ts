@@ -1,9 +1,11 @@
 import { buildEmailVerificationMessage } from "@/application/services/email-verification-message";
 import {
   ConflictError,
+  EmailVerificationLinkError,
   NotFoundError,
   ValidationError,
 } from "@/domain/errors/domain-error";
+import type { UserRole } from "@/domain/enums";
 import type { EmailSender } from "@/domain/ports/email-sender";
 import type { EmailVerificationTokenRepository } from "@/domain/repositories/email-verification-token-repository";
 import type { UserRepository } from "@/domain/repositories/user-repository";
@@ -115,7 +117,15 @@ export async function resendEmailVerificationUseCase(
     return { ok: true, alreadyVerified: true };
   }
 
-  await sendEmailVerificationUseCase(user.email, deps);
+  try {
+    await sendEmailVerificationUseCase(user.email, deps);
+  } catch (error) {
+    // Public resend must not distinguish send failure from unknown email.
+    console.error("[email:verification] resend send failed", {
+      email: user.email,
+      error,
+    });
+  }
   return { ok: true };
 }
 
@@ -125,9 +135,9 @@ export async function verifyEmailTokenUseCase(
     EmailVerificationDeps,
     "userRepository" | "emailVerificationTokenRepository"
   >,
-): Promise<{ email: string }> {
+): Promise<{ email: string; role: UserRole }> {
   if (!rawToken || rawToken.length < 16) {
-    throw new ValidationError("Invalid or missing verification token");
+    throw new EmailVerificationLinkError("missing");
   }
 
   const tokenHash = hashEmailVerificationToken(rawToken);
@@ -135,18 +145,18 @@ export async function verifyEmailTokenUseCase(
     await deps.emailVerificationTokenRepository.findByTokenHash(tokenHash);
 
   if (!record) {
-    throw new ValidationError("This verification link is invalid or has already been used");
+    throw new EmailVerificationLinkError("invalid");
   }
 
   if (record.expires.getTime() <= Date.now()) {
     await deps.emailVerificationTokenRepository.deleteByTokenHash(tokenHash);
-    throw new ValidationError("This verification link has expired. Request a new one from the sign-in page.");
+    throw new EmailVerificationLinkError("expired");
   }
 
   const user = await deps.userRepository.findByEmail(record.identifier);
   if (!user) {
     await deps.emailVerificationTokenRepository.deleteByTokenHash(tokenHash);
-    throw new NotFoundError("User");
+    throw new EmailVerificationLinkError("invalid");
   }
 
   if (!user.emailVerified) {
@@ -158,5 +168,5 @@ export async function verifyEmailTokenUseCase(
   );
 
   console.info("[email:verification] confirmed", { email: user.email });
-  return { email: user.email };
+  return { email: user.email, role: user.role };
 }

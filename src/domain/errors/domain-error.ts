@@ -41,6 +41,18 @@ export class ValidationError extends DomainError {
   }
 }
 
+/** Email verification link failures. Client copy must stay generic. */
+export class EmailVerificationLinkError extends DomainError {
+  constructor(public readonly reason: "invalid" | "expired" | "missing") {
+    super(
+      "This verification link is invalid or has expired.",
+      "EMAIL_VERIFICATION_INVALID",
+      400,
+    );
+    this.name = "EmailVerificationLinkError";
+  }
+}
+
 export class ConflictError extends DomainError {
   constructor(message: string) {
     super(message, "CONFLICT", 409);

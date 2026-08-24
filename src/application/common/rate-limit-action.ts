@@ -1,4 +1,7 @@
-import type { ActionState } from "@/application/common/action-state";
+import {
+  AUTH_ACTION_CODE,
+  type ActionState,
+} from "@/application/common/action-state";
 import {
   consumeRateLimit,
   type RateLimitResult,
@@ -17,6 +20,7 @@ export function rateLimitExceeded(
 ): ActionState {
   const noun = kind === "attempts" ? "attempts" : "requests";
   return {
+    code: AUTH_ACTION_CODE.RATE_LIMITED,
     error: `Too many ${noun}. Try again in ${retryAfterSeconds} seconds.`,
   };
 }

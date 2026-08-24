@@ -19,6 +19,7 @@ export type LegalAiConversation = {
   id: string;
   questionStatus: LegalQuestionStatus;
   billedQuestionCount: number;
+  caseFileId?: string | null;
 };
 
 export type LegalAiAssistantMessage = {
@@ -36,6 +37,8 @@ export type LegalAiCreateTurnInput = {
   actorRole?: UserRole;
   message: string;
   conversationId?: string;
+  /** Set only after the HTTP layer verifies CaseFile.ownerLawyerId === userId. */
+  caseFileId?: string;
   userContext?: UserTypeContext;
   mode?: LegalAiMode;
 };
@@ -64,6 +67,21 @@ export type LegalAiConversationDocumentMeta = {
   pageCount: number | null;
 };
 
+export type LegalAiCaseConversationSummary = {
+  id: string;
+  title: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type LegalAiRecentConversationSummary = {
+  id: string;
+  title: string | null;
+  caseFileId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export type LegalAiStore = {
   countUserLegalAiQuestions(
     userId: string,
@@ -81,7 +99,16 @@ export type LegalAiStore = {
     userId?: string;
     guestSessionId?: string;
     title: string;
+    caseFileId?: string;
   }): Promise<LegalAiConversation>;
+  listOwnedCaseConversations(
+    userId: string,
+    caseFileId: string,
+  ): Promise<LegalAiCaseConversationSummary[]>;
+  listOwnedRecentConversations(
+    userId: string,
+    take: number,
+  ): Promise<LegalAiRecentConversationSummary[]>;
   updateQuestionThread(input: {
     conversationId: string;
     questionStatus: LegalQuestionStatus;

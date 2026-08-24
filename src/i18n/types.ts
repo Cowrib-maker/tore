@@ -46,6 +46,17 @@ export type Dictionary = {
     verifyFailed: string;
     verifyMissingToken: string;
     verifyResendHint: string;
+    verifyPendingTitle: string;
+    verifyPendingBody: string;
+    verifyResend: string;
+    verifyBackToLogin: string;
+    verifySpamHint: string;
+    verifyExpiredOrInvalid: string;
+    verifyRequestNew: string;
+    verifyContinue: string;
+    resendGenericSuccess: string;
+    verifyNeedsLink: string;
+    verifyRateLimited: string;
     newToTore: string;
     registerClientLink: string;
     registerLawyerLink: string;
