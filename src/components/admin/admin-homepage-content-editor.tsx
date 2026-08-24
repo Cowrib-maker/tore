@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LandingPage } from "@/components/marketing/landing-page";
+import type { HomepageEditController } from "@/components/marketing/homepage-editable-text";
 import { HomepageImageDropzone } from "@/components/admin/homepage-image-dropzone";
 import type { HomepageSectionKey } from "@/domain/entities/homepage-section";
 import type { HomepageLandingContent } from "@/domain/entities/homepage-content";
@@ -21,6 +22,19 @@ type ImageCopy = Pick<
 >;
 
 type Content = HomepageLandingContent;
+
+const IMAGE_SECTION_KEYS: HomepageSectionKey[] = [
+  "hero",
+  "experiences",
+  "legal-ai",
+  "knowledge",
+  "workspace",
+  "marketplace",
+  "enterprise",
+  "trust",
+  "how",
+  "faq",
+];
 
 /* ── small field primitives ─────────────────────────────────────────── */
 
@@ -202,6 +216,49 @@ function Section({
   );
 }
 
+/* ── path-based get/set helpers for inline preview editing ────────────
+   Paths are either a top-level string field ("headline"), an array item
+   ("experiences.0"), or an array-of-object field ("experiences.0.title") —
+   this mirrors exactly how HomepageLandingContent is shaped. */
+
+function readPath(content: Content, path: string): string {
+  const parts = path.split(".");
+  const root = (content as unknown as Record<string, unknown>)[parts[0]];
+  if (parts.length === 1) {
+    return typeof root === "string" ? root : "";
+  }
+  const idx = Number(parts[1]);
+  const item = Array.isArray(root) ? (root as unknown[])[idx] : undefined;
+  if (parts.length === 2) {
+    return typeof item === "string" ? item : "";
+  }
+  const field = parts[2];
+  const value = (item as Record<string, unknown> | undefined)?.[field];
+  return typeof value === "string" ? value : "";
+}
+
+function writePath(
+  content: Content,
+  path: string,
+  value: string,
+): Content {
+  const parts = path.split(".");
+  const key = parts[0];
+  if (parts.length === 1) {
+    return { ...content, [key]: value } as Content;
+  }
+  const idx = Number(parts[1]);
+  const root = (content as unknown as Record<string, unknown>)[key];
+  const arr = Array.isArray(root) ? [...(root as unknown[])] : [];
+  if (parts.length === 2) {
+    arr[idx] = value;
+  } else {
+    const field = parts[2];
+    arr[idx] = { ...(arr[idx] as Record<string, unknown>), [field]: value };
+  }
+  return { ...content, [key]: arr } as Content;
+}
+
 /* ── main editor ────────────────────────────────────────────────────── */
 
 export function AdminHomepageContentEditor({
@@ -271,15 +328,39 @@ export function AdminHomepageContentEditor({
 
   const livePreviewDict: Dictionary = { ...previewDict, landing: content };
 
+  const editController: HomepageEditController = {
+    getValue: (path) => readPath(content, path),
+    setValue: (path, value) =>
+      setContent((prev) => writePath(prev, path, value)),
+  };
+
+  const sectionImageSlots: Partial<Record<HomepageSectionKey, ReactNode>> =
+    Object.fromEntries(
+      IMAGE_SECTION_KEYS.map((key) => [
+        key,
+        <HomepageImageDropzone
+          key={key}
+          sectionKey={key}
+          label=""
+          imageUrl={images[key]}
+          copy={imageCopy}
+          onImageChange={(url) => setImage(key, url)}
+          compact
+        />,
+      ]),
+    );
+
   return (
     <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)] lg:items-start">
     <div className="grid min-w-0 gap-4">
       <div className="rounded-lg border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground">
-        Хэсэг бүрийн зургийг чирж (drag &amp; drop) эсвэл дарж сонгоод
-        байршуулна уу — зураг тухайн хэсэгт яг хаана харагдахыг баруун талын
-        урьдчилан харах дээр шууд харах боломжтой. Текстийн хувьд энд зөвхөн{" "}
-        <strong>Монгол</strong> хувилбарыг засварлана. Хадгалахад англи,
-        хятад, солонгос хувилбарууд автоматаар орчуулагдаж шинэчлэгдэнэ.
+        Баруун талын урьдчилан харах дээр зурган хэсэг болон текст бүр шууд
+        засварлагдана: зургийг чирж (drag &amp; drop) эсвэл дарж сонгоод
+        байршуулна, текстийг шууд дарж бичээрэй (Enter эсвэл өөр газар дарахад
+        хадгалагдана). Доорх маягтыг ашиглаж бас засварлаж болно — хоёул нэг
+        дор шинэчлэгдэнэ. Текстийн хувьд энд зөвхөн <strong>Монгол</strong>{" "}
+        хувилбарыг засварлана. Хадгалахад англи, хятад, солонгос хувилбарууд
+        автоматаар орчуулагдаж шинэчлэгдэнэ.
       </div>
 
       <Section title="Эхлэл хэсэг (Hero)" defaultOpen>
@@ -882,10 +963,16 @@ export function AdminHomepageContentEditor({
       <div className="sticky top-4 h-[calc(100vh-2rem)] w-full min-w-0 overflow-hidden rounded-xl border bg-white">
         <div className="flex items-center justify-between border-b bg-muted/40 px-3 py-2">
           <p className="text-xs font-medium text-muted-foreground">
-            Урьдчилан харах — Нүүр хуудас (Монгол)
+            Урьдчилан харах — Нүүр хуудас (Монгол) · зурган болон текст
+            хэсгүүд шууд засварлагдана
           </p>
         </div>
-        <LivePreviewPanel dict={livePreviewDict} sectionImages={images} />
+        <LivePreviewPanel
+          dict={livePreviewDict}
+          sectionImages={images}
+          sectionImageSlots={sectionImageSlots}
+          editController={editController}
+        />
       </div>
     </div>
     </div>
@@ -899,9 +986,13 @@ const PREVIEW_WIDTH = 1280;
 function LivePreviewPanel({
   dict,
   sectionImages,
+  sectionImageSlots,
+  editController,
 }: {
   dict: Dictionary;
   sectionImages: Record<HomepageSectionKey, string | null>;
+  sectionImageSlots: Partial<Record<HomepageSectionKey, ReactNode>>;
+  editController: HomepageEditController;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -952,6 +1043,8 @@ function LivePreviewPanel({
             composerMode="guest"
             exploreHref={LEGAL_AI_PATH}
             sectionImages={sectionImages}
+            sectionImageSlots={sectionImageSlots}
+            editController={editController}
           />
         </div>
       </div>

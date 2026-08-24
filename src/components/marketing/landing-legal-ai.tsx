@@ -1,5 +1,7 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
+import { EditableText } from "@/components/marketing/homepage-editable-text";
 import { LandingReveal } from "@/components/marketing/landing-reveal";
 import {
   LandingEyebrow,
@@ -14,26 +16,38 @@ export function LandingLegalAi({
   t,
   exploreHref,
   imageUrl,
+  imageSlot,
 }: {
   t: Dictionary["landing"];
   exploreHref: string;
   imageUrl?: string | null;
+  imageSlot?: ReactNode;
 }) {
   return (
-    <LandingSection id="ai" imageUrl={imageUrl}>
+    <LandingSection id="ai" imageUrl={imageUrl} imageSlot={imageSlot}>
       <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-14">
         <LandingReveal>
-          <LandingEyebrow>{t.aiEyebrow}</LandingEyebrow>
-          <LandingHeading>{t.aiTitle}</LandingHeading>
-          <LandingLead>{t.aiSupport}</LandingLead>
-          <p className="mt-5 text-[14px] leading-7 text-[#5C6570]">{t.aiSupportDetail}</p>
-          <p className="mt-5 text-sm font-medium text-[#0B1F3A]">{t.aiDisclaimer}</p>
+          <LandingEyebrow>
+            <EditableText path="aiEyebrow">{t.aiEyebrow}</EditableText>
+          </LandingEyebrow>
+          <LandingHeading>
+            <EditableText path="aiTitle">{t.aiTitle}</EditableText>
+          </LandingHeading>
+          <LandingLead>
+            <EditableText path="aiSupport">{t.aiSupport}</EditableText>
+          </LandingLead>
+          <p className="mt-5 text-[14px] leading-7 text-[#5C6570]">
+            <EditableText path="aiSupportDetail">{t.aiSupportDetail}</EditableText>
+          </p>
+          <p className="mt-5 text-sm font-medium text-[#0B1F3A]">
+            <EditableText path="aiDisclaimer">{t.aiDisclaimer}</EditableText>
+          </p>
 
           <Link
             href={exploreHref}
             className="mt-8 inline-flex h-11 items-center rounded-lg bg-[#0B1F3A] px-5 text-[13px] font-semibold text-white transition hover:bg-[#16365F]"
           >
-            {t.aiComposerSubmit}
+            <EditableText path="aiComposerSubmit">{t.aiComposerSubmit}</EditableText>
           </Link>
 
           <div className="mt-8 flex flex-wrap items-center gap-2 text-[11px] text-[#5C6570]">
@@ -45,7 +59,7 @@ export function LandingLegalAi({
                   </span>
                 ) : null}
                 <span className="rounded-md bg-[#EEF3F8] px-2.5 py-1 font-medium text-[#0B1F3A]">
-                  {step}
+                  <EditableText path={`aiTrustFlow.${index}`}>{step}</EditableText>
                 </span>
               </div>
             ))}
@@ -65,29 +79,33 @@ export function LandingLegalAi({
                       : "bg-white text-[#5C6570] ring-1 ring-[#0B1F3A]/10",
                   )}
                 >
-                  {tab}
+                  <EditableText path={`aiTabs.${index}`}>{tab}</EditableText>
                 </span>
               ))}
             </div>
 
             <div className="space-y-3 bg-[#FAFBFC] p-4 sm:p-5">
               <div className="ml-6 rounded-2xl rounded-tr-md bg-[#0B1F3A] px-3.5 py-2.5 text-[13px] leading-relaxed text-white">
-                {t.aiPrompt}
+                <EditableText path="aiPrompt">{t.aiPrompt}</EditableText>
               </div>
               <div className="mr-2 space-y-3 rounded-2xl rounded-tl-md border border-[#0B1F3A]/10 bg-white p-4">
                 <p className="text-[13px] leading-relaxed text-[#0A0F14]">
-                  {t.aiConclusion}
+                  <EditableText path="aiConclusion">{t.aiConclusion}</EditableText>
                 </p>
                 <div className="rounded-lg border border-[#0B1F3A]/10 bg-[#F7F9FC] px-3 py-2.5">
-                  <p className="text-[11px] font-medium text-[#0B1F3A]">{t.aiCitation}</p>
-                  <p className="mt-1 text-[11px] text-[#5C6570]">{t.aiSource}</p>
+                  <p className="text-[11px] font-medium text-[#0B1F3A]">
+                    <EditableText path="aiCitation">{t.aiCitation}</EditableText>
+                  </p>
+                  <p className="mt-1 text-[11px] text-[#5C6570]">
+                    <EditableText path="aiSource">{t.aiSource}</EditableText>
+                  </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <span className="rounded-md border border-[#0B1F3A]/12 px-2 py-1 text-[10px] font-medium text-[#0B1F3A]">
-                    {t.aiConfidence}
+                    <EditableText path="aiConfidence">{t.aiConfidence}</EditableText>
                   </span>
                   <span className="rounded-md bg-[#F4F6F8] px-2 py-1 text-[10px] text-[#5C6570]">
-                    {t.aiAuthority}
+                    <EditableText path="aiAuthority">{t.aiAuthority}</EditableText>
                   </span>
                 </div>
               </div>

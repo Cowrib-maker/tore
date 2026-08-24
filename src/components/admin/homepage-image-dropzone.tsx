@@ -26,6 +26,7 @@ export function HomepageImageDropzone({
   imageUrl,
   copy,
   onImageChange,
+  compact = false,
 }: {
   sectionKey: HomepageSectionKey;
   label: string;
@@ -39,6 +40,12 @@ export function HomepageImageDropzone({
     removed: string;
   };
   onImageChange: (url: string | null) => void;
+  /**
+   * Renders without the label row / "нүүр хуудсанд энд харагдана" badge and
+   * with tighter chrome, so it can be dropped straight into the live
+   * preview in place of the real image without looking like a form field.
+   */
+  compact?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const objectUrlRef = useRef<string | null>(null);
@@ -100,6 +107,7 @@ export function HomepageImageDropzone({
 
   function handleDrop(e: DragEvent<HTMLDivElement>) {
     e.preventDefault();
+    e.stopPropagation();
     setDragOver(false);
     const file = e.dataTransfer.files?.[0];
     if (file) {
@@ -127,24 +135,33 @@ export function HomepageImageDropzone({
 
   return (
     <div className="grid gap-2">
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-muted-foreground">{label}</p>
-        <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
-          нүүр хуудсанд энд харагдана
-        </span>
-      </div>
+      {!compact ? (
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-medium text-muted-foreground">{label}</p>
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+            нүүр хуудсанд энд харагдана
+          </span>
+        </div>
+      ) : null}
 
       <div
         onDragOver={(e) => {
           e.preventDefault();
+          e.stopPropagation();
           setDragOver(true);
         }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
-        onClick={() => inputRef.current?.click()}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          inputRef.current?.click();
+        }}
         className={cn(
-          "relative flex aspect-video w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-dashed transition-colors",
+          "relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-dashed transition-colors",
+          compact ? "aspect-[16/6] max-h-96" : "aspect-video",
           dragOver ? "border-primary bg-primary/5" : "border-input",
+          compact && !displayUrl && "bg-muted/20 hover:bg-muted/30",
           pending && "opacity-60",
         )}
       >
@@ -161,6 +178,11 @@ export function HomepageImageDropzone({
             <span>Чирж оруулах эсвэл дарж сонгох</span>
           </div>
         )}
+        {displayUrl ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-[#0B1F3A]/0 text-xs font-medium text-white opacity-0 transition-opacity hover:bg-[#0B1F3A]/40 hover:opacity-100">
+            {copy.change}
+          </div>
+        ) : null}
         {pending ? (
           <div className="absolute inset-0 flex items-center justify-center bg-white/70 text-xs font-medium">
             Хадгалж байна…
@@ -176,28 +198,43 @@ export function HomepageImageDropzone({
         className="hidden"
       />
 
-      <div className="flex flex-wrap items-center gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          disabled={pending}
-          onClick={() => inputRef.current?.click()}
-        >
-          {imageUrl ? copy.change : copy.upload}
-        </Button>
-        {imageUrl ? (
+      {!compact ? (
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             size="sm"
             disabled={pending}
-            onClick={handleRemove}
+            onClick={() => inputRef.current?.click()}
           >
-            {copy.remove}
+            {imageUrl ? copy.change : copy.upload}
           </Button>
-        ) : null}
-      </div>
+          {imageUrl ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={pending}
+              onClick={handleRemove}
+            >
+              {copy.remove}
+            </Button>
+          ) : null}
+        </div>
+      ) : imageUrl ? (
+        <button
+          type="button"
+          disabled={pending}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleRemove();
+          }}
+          className="w-fit text-[11px] font-medium text-muted-foreground underline-offset-2 hover:text-destructive hover:underline"
+        >
+          {copy.remove}
+        </button>
+      ) : null}
 
       {localError ? (
         <p className="text-xs text-destructive">{localError}</p>

@@ -8,12 +8,21 @@ export function LandingSection({
   className,
   muted = false,
   imageUrl,
+  imageSlot,
 }: {
   id?: string;
   children: ReactNode;
   className?: string;
   muted?: boolean;
   imageUrl?: string | null;
+  /**
+   * Admin-preview-only override: when provided, this is rendered in place
+   * of the plain `<img>` (regardless of whether `imageUrl` is set), so the
+   * admin editor can show a click/drag-and-drop upload control exactly
+   * where the image will render on the real homepage. Never set on the
+   * public homepage.
+   */
+  imageSlot?: ReactNode;
 }) {
   return (
     <section
@@ -25,7 +34,9 @@ export function LandingSection({
       )}
     >
       <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-16 lg:py-18">
-        {imageUrl ? (
+        {imageSlot ? (
+          <div className="mb-10">{imageSlot}</div>
+        ) : imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={imageUrl}

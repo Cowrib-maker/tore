@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
+import { EditableText } from "@/components/marketing/homepage-editable-text";
 import { cn } from "@/lib/utils";
 import type { Dictionary } from "@/i18n/types";
 
@@ -24,7 +25,7 @@ export function LandingFaq({ faqs }: { faqs: FaqItem[] }) {
               onClick={() => setOpen(isOpen ? -1 : index)}
             >
               <span className="text-[15px] font-semibold tracking-tight text-[#0A0F14] sm:text-base">
-                {item.q}
+                <EditableText path={`faqs.${index}.q`}>{item.q}</EditableText>
               </span>
               <ChevronDown
                 className={cn(
@@ -41,7 +42,7 @@ export function LandingFaq({ faqs }: { faqs: FaqItem[] }) {
             >
               <div className="overflow-hidden">
                 <p className="pb-5 pr-8 text-sm leading-relaxed text-[#5A6B64] sm:pb-6 sm:text-[15px]">
-                  {item.a}
+                  <EditableText path={`faqs.${index}.a`}>{item.a}</EditableText>
                 </p>
               </div>
             </div>
