@@ -112,5 +112,11 @@ export function useLegalAiChatSession(initial?: {
     accessGate,
     sendMessage,
     setMessages,
+    /**
+     * Lets a caller sync in a conversationId obtained from a side-channel
+     * (e.g. a PDF upload endpoint that creates/reuses the conversation
+     * before the first chat message is sent).
+     */
+    setConversationId,
   };
 }
