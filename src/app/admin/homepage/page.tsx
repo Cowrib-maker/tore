@@ -51,7 +51,7 @@ export default async function AdminHomepagePage() {
           <CardDescription>{ah.pageHelp}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="p-4">
+          <div className="min-w-0 p-4">
             {contentResult.status === "ok" ? (
               <AdminHomepageContentEditor
                 initialContent={contentResult.content}

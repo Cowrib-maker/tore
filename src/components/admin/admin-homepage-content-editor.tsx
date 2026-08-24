@@ -272,8 +272,8 @@ export function AdminHomepageContentEditor({
   const livePreviewDict: Dictionary = { ...previewDict, landing: content };
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,440px)_1fr] lg:items-start">
-    <div className="grid gap-4">
+    <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)] lg:items-start">
+    <div className="grid min-w-0 gap-4">
       <div className="rounded-lg border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground">
         Хэсэг бүрийн зургийг чирж (drag &amp; drop) эсвэл дарж сонгоод
         байршуулна уу — зураг тухайн хэсэгт яг хаана харагдахыг баруун талын
@@ -878,8 +878,8 @@ export function AdminHomepageContentEditor({
       </div>
     </div>
 
-    <div className="hidden lg:block">
-      <div className="sticky top-4 h-[calc(100vh-2rem)] overflow-hidden rounded-xl border bg-white">
+    <div className="hidden min-w-0 lg:block">
+      <div className="sticky top-4 h-[calc(100vh-2rem)] w-full min-w-0 overflow-hidden rounded-xl border bg-white">
         <div className="flex items-center justify-between border-b bg-muted/40 px-3 py-2">
           <p className="text-xs font-medium text-muted-foreground">
             Урьдчилан харах — Нүүр хуудас (Монгол)
@@ -934,7 +934,7 @@ function LivePreviewPanel({
   return (
     <div
       ref={scrollRef}
-      className="h-[calc(100%-2.25rem)] overflow-y-auto overflow-x-hidden bg-[#F7F9FC]"
+      className="h-[calc(100%-2.25rem)] w-full min-w-0 overflow-y-auto overflow-x-hidden bg-[#F7F9FC]"
     >
       <div style={{ height: contentHeight * scale || undefined }}>
         <div
