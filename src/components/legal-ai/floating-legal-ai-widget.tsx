@@ -36,7 +36,13 @@ export function FloatingLegalAiWidget() {
       window.removeEventListener(OPEN_LEGAL_AI_WIDGET_EVENT, handleOpenRequest);
   }, []);
 
-  if (pathname === "/" || pathname?.startsWith(HIDDEN_PATH_PREFIX)) {
+  // usePathname() can be null during SSR; never render the chrome until the
+  // path is known, otherwise "/" SSR may emit the FAB and the client removes it.
+  if (
+    !pathname ||
+    pathname === "/" ||
+    pathname.startsWith(HIDDEN_PATH_PREFIX)
+  ) {
     return null;
   }
 

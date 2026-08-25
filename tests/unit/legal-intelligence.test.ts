@@ -42,7 +42,7 @@ describe("legal intelligence classification", () => {
     ).toEqual(emptyLegalIntelligenceFeed());
   });
 
-  it("places existing law metadata into enacted laws and keeps unknown feeds empty", () => {
+  it("places clean law metadata into enacted laws", () => {
     const feed = classifyLegalIntelligence([
       row({
         id: "law-1",
@@ -98,7 +98,50 @@ describe("legal intelligence classification", () => {
     ]);
   });
 
-  it("includes undated laws without inventing enactment dates", () => {
+  it("does not classify repeal / invalidation acts as newly enacted laws", () => {
+    const feed = classifyLegalIntelligence([
+      row({
+        id: "repeal-1",
+        title:
+          "ГААЛИЙН АЛБАН ТАТВАРЫГ ХӨНГӨЛӨХ ТУХАЙ ХУУЛЬ ХҮЧИНГҮЙ БОЛСОНД ТООЦОХ ТУХАЙ",
+        documentType: "LAW",
+        validFrom: "2024-11-08",
+        sourceExcerpt:
+          "2024 оны 11 дүгээр сарын 08-ны өдөр баталсан Гаалийн албан татварыг хөнгөлөх тухай хуулийг хүчингүй болсонд тооцсугай.",
+      }),
+      row({
+        id: "amend-title",
+        title: "ИРГЭНИЙ ХУУЛЬД НЭМЭЛТ, ӨӨРЧЛӨЛТ ОРУУЛАХ ТУХАЙ",
+        documentType: "LAW",
+        validFrom: "2023-05-01",
+      }),
+      row({
+        id: "clean",
+        title: "ЗӨРЧИЛ ШАЛГАН ШИЙДВЭРЛЭХ ТУХАЙ",
+        documentType: "LAW",
+        validFrom: "2024-01-01",
+      }),
+    ]);
+
+    expect(feed.bySection.enactedLaws.map((item) => item.id)).toEqual([
+      "clean",
+    ]);
+    expect(feed.bySection.amendments.map((item) => item.id).sort()).toEqual([
+      "amend-title",
+      "repeal-1",
+    ]);
+    expect(
+      toLegalIntelligenceRecord(
+        row({
+          id: "repeal-1",
+          title: "ХУУЛЬ ХҮЧИНГҮЙ БОЛСОНД ТООЦОХ ТУХАЙ",
+          documentType: "LAW",
+        }),
+      )?.status,
+    ).toBe(LegalIntelligenceStatus.UNKNOWN);
+  });
+
+  it("includes undated clean laws without inventing enactment dates", () => {
     const feed = classifyLegalIntelligence([
       row({ id: "undated", title: "Undated law", documentType: "LAW" }),
     ]);
@@ -160,5 +203,22 @@ describe("legal intelligence classification", () => {
     expect(feed.bySection.enactedLaws.length).toBeLessThanOrEqual(5);
     expect(feed.latest.length).toBeLessThanOrEqual(12);
     expect(feed.totalCount).toBe(feed.latest.length);
+  });
+
+  it("sorts ties with locale-independent title order", () => {
+    const feed = buildLegalIntelligenceFeed(
+      [
+        toLegalIntelligenceRecord(
+          row({ id: "b", title: "Beta law", documentType: "LAW" }),
+        ),
+        toLegalIntelligenceRecord(
+          row({ id: "a", title: "Alpha law", documentType: "LAW" }),
+        ),
+      ].filter((record) => record !== null),
+    );
+    expect(feed.latest.map((item) => item.title)).toEqual([
+      "Alpha law",
+      "Beta law",
+    ]);
   });
 });

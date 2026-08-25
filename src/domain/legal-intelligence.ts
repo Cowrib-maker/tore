@@ -163,26 +163,66 @@ const DRAFT_TYPE = /draft|bill|төсөл/i;
 const DISCUSSION_TYPE = /discussion|хэлэлцүүлэг|debate/i;
 const AMEND_TYPE = /amend|revision|өөрчлөлт/i;
 
+/**
+ * Source-title / excerpt signals that the instrument repeals, invalidates,
+ * or otherwise ends another act — never "newly enacted" substantive law.
+ */
+const REPEAL_SIGNAL =
+  /хүчингүй\s*болсонд\s*тооцох|хүчингүй\s*болгох|хүчингүй\s*болсон|repeal|invalidat|supersed/i;
+
+/**
+ * Source-title / excerpt signals of amendment or change (including repeal acts).
+ */
+const AMENDMENT_SIGNAL =
+  /нэмэлт\s*,?\s*өөрчлөлт|өөрчлөлт\s*оруулах|хуульд\s*нэмэлт|amend|revision|хүчингүй\s*болсонд\s*тооцох/i;
+
+function sourceTextSignals(row: LegalIntelligenceSourceRow): string {
+  return `${row.title}\n${row.sourceExcerpt ?? ""}`;
+}
+
+/**
+ * Classify using documentType plus existing title/excerpt/version/temporal
+ * metadata. Ambiguous rows return null rather than a misleading category.
+ */
 export function classifySourceCategory(
-  documentType: string | null,
-  version: number,
+  row: Pick<
+    LegalIntelligenceSourceRow,
+    "documentType" | "version" | "title" | "sourceExcerpt"
+  >,
 ): LegalIntelligenceCategory | null {
-  const type = documentType?.trim() ?? "";
+  const type = row.documentType?.trim() ?? "";
   if (!type) return null;
+
+  const signals = sourceTextSignals(
+    row as LegalIntelligenceSourceRow,
+  );
+
   if (DRAFT_TYPE.test(type)) return LegalIntelligenceCategory.DRAFT_BILL;
   if (DISCUSSION_TYPE.test(type)) return LegalIntelligenceCategory.DISCUSSION;
   if (COURT_TYPE.test(type)) return LegalIntelligenceCategory.COURT_DECISION;
-  if (AMEND_TYPE.test(type) || (LAW_TYPE.test(type) && version > 1)) {
-    return LegalIntelligenceCategory.AMENDMENT;
+
+  if (AMEND_TYPE.test(type)) return LegalIntelligenceCategory.AMENDMENT;
+
+  if (LAW_TYPE.test(type)) {
+    // Title/excerpt metadata wins over raw documentType for repeal/change acts.
+    if (REPEAL_SIGNAL.test(signals) || AMENDMENT_SIGNAL.test(signals)) {
+      return LegalIntelligenceCategory.AMENDMENT;
+    }
+    if (row.version > 1) {
+      return LegalIntelligenceCategory.AMENDMENT;
+    }
+    return LegalIntelligenceCategory.ENACTED_LAW;
   }
-  if (LAW_TYPE.test(type)) return LegalIntelligenceCategory.ENACTED_LAW;
+
   return null;
 }
 
 export function statusForCategory(
   category: LegalIntelligenceCategory,
-  version: number,
+  row: Pick<LegalIntelligenceSourceRow, "version" | "title" | "sourceExcerpt">,
 ): LegalIntelligenceStatus {
+  const signals = sourceTextSignals(row as LegalIntelligenceSourceRow);
+
   switch (category) {
     case LegalIntelligenceCategory.ENACTED_LAW:
       return LegalIntelligenceStatus.IN_FORCE;
@@ -191,9 +231,13 @@ export function statusForCategory(
     case LegalIntelligenceCategory.DISCUSSION:
       return LegalIntelligenceStatus.IN_DISCUSSION;
     case LegalIntelligenceCategory.AMENDMENT:
-      return version > 1
+      if (REPEAL_SIGNAL.test(signals)) {
+        // Do not invent "in force" / "amended" for repeal instruments.
+        return LegalIntelligenceStatus.UNKNOWN;
+      }
+      return row.version > 1
         ? LegalIntelligenceStatus.AMENDED
-        : LegalIntelligenceStatus.IN_FORCE;
+        : LegalIntelligenceStatus.UNKNOWN;
     case LegalIntelligenceCategory.COURT_DECISION:
       return LegalIntelligenceStatus.DECIDED;
     default:
@@ -224,14 +268,14 @@ export function toLegalIntelligenceRecord(
   const sourceUrl = httpUrl(row.sourceUrl);
   if (!title || !sourceUrl) return null;
 
-  const category = classifySourceCategory(row.documentType, row.version);
+  const category = classifySourceCategory(row);
   if (!category) return null;
 
   return {
     id: row.id,
     title,
     category,
-    status: statusForCategory(category, row.version),
+    status: statusForCategory(category, row),
     sourceName: sourceNameForAuthority(authority),
     sourceUrl,
     authority,
@@ -334,11 +378,18 @@ function dedupeById(list: LegalIntelligenceItem[]): LegalIntelligenceItem[] {
   return result;
 }
 
+/** Locale-independent ordering so Node SSR and browser hydration stay aligned. */
+function compareAscii(a: string, b: string): number {
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
+}
+
 function compareDateDesc(
   a: LegalIntelligenceItem,
   b: LegalIntelligenceItem,
 ): number {
-  const byDate = (b.date ?? "").localeCompare(a.date ?? "");
+  const byDate = compareAscii(b.date ?? "", a.date ?? "");
   if (byDate !== 0) return byDate;
-  return a.title.localeCompare(b.title);
+  return compareAscii(a.title, b.title);
 }
