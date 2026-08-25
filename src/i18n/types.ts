@@ -8,6 +8,31 @@ export type PublicHomeProductCopy = {
   cta: string;
 };
 
+export type PublicHomeStudentPageCopy = {
+  comingSoon: string;
+  lead: string;
+  modulesTitle: string;
+  modules: {
+    theory: string;
+    library: string;
+    lawLibrary: string;
+    courtLibrary: string;
+    problems: string;
+    exams: string;
+    aiTutor: string;
+    progress: string;
+  };
+  planBasic: string;
+  planPlus: string;
+  priceBasic: string;
+  pricePlus: string;
+  perMonth: string;
+  disclaimer: string;
+  ctaFeedback: string;
+  ctaChat: string;
+  backHome: string;
+};
+
 export type PublicHomeCopy = {
   tagline: string;
   chatTitle: string;
@@ -23,9 +48,21 @@ export type PublicHomeCopy = {
     student: PublicHomeProductCopy;
     legalAi: PublicHomeProductCopy;
   };
+  studentComingSoon: string;
+  studentPage: PublicHomeStudentPageCopy;
   intelligenceTitle: string;
   intelligenceLead: string;
   intelligenceEmpty: string;
+  intelligenceAll: string;
+  intelligenceReadMore: string;
+  intelligenceBack: string;
+  intelligencePublished: string;
+  intelligenceEffective: string;
+  intelligenceDateUnknown: string;
+  intelligenceSourceExcerpt: string;
+  intelligenceSourceExcerptNote: string;
+  intelligenceOfficialSource: string;
+  intelligenceOpenSource: string;
   intelligenceSections: {
     enactedLaws: string;
     draftBills: string;
@@ -33,6 +70,14 @@ export type PublicHomeCopy = {
     courtDecisions: string;
     amendments: string;
     highlights: string;
+  };
+  intelligenceStatuses: {
+    UNKNOWN: string;
+    IN_FORCE: string;
+    DRAFT: string;
+    IN_DISCUSSION: string;
+    AMENDED: string;
+    DECIDED: string;
   };
   feedbackTitle: string;
   feedbackLead: string;

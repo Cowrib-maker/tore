@@ -8,7 +8,6 @@ import {
 } from "@/domain/services/homepage-routing";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
-import { legalIntelligenceRepository } from "@/infrastructure/repositories";
 
 export default async function HomePage() {
   const locale = await getLocale();
@@ -16,7 +15,7 @@ export default async function HomePage() {
   const [dict, session, intelligence] = await Promise.all([
     getDictionary(locale),
     getSessionUser(),
-    loadLegalIntelligence(legalIntelligenceRepository),
+    loadLegalIntelligence(),
   ]);
 
   const role = session?.user?.role as UserRole | undefined;

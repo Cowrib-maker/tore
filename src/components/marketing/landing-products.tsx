@@ -16,9 +16,15 @@ export function LandingProducts({
     key: ProductKey;
     id: string;
     copy: Dictionary["publicHome"]["products"][ProductKey];
+    badge?: string;
   }> = [
     { key: "chat", id: "citizen", copy: home.products.chat },
-    { key: "student", id: "student", copy: home.products.student },
+    {
+      key: "student",
+      id: "student",
+      copy: home.products.student,
+      badge: home.studentComingSoon,
+    },
     { key: "legalAi", id: "legal-ai", copy: home.products.legalAi },
   ];
 
@@ -41,9 +47,16 @@ export function LandingProducts({
                 id={item.id}
                 className="flex h-full scroll-mt-28 flex-col rounded-2xl border border-[#0B1F3A]/10 bg-[#F7F6F2] p-5 sm:p-6"
               >
-                <p className="text-[11px] font-semibold tracking-[0.12em] text-[#1A7A72] uppercase">
-                  {item.copy.audience}
-                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-[11px] font-semibold tracking-[0.12em] text-[#1A7A72] uppercase">
+                    {item.copy.audience}
+                  </p>
+                  {item.badge ? (
+                    <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold tracking-wide text-[#5C6570]">
+                      {item.badge}
+                    </span>
+                  ) : null}
+                </div>
                 <h3 className="mt-2 text-[17px] font-semibold tracking-tight text-[#0B1F3A]">
                   {item.copy.name}
                 </h3>

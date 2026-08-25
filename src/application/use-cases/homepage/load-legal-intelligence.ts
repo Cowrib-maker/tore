@@ -1,20 +1,8 @@
-import {
-  classifyLegalIntelligence,
-  emptyLegalIntelligenceFeed,
-  type LegalIntelligenceFeed,
-} from "@/domain/legal-intelligence";
-import type { LegalIntelligenceRepository } from "@/domain/repositories/legal-intelligence-repository";
+import { loadLegalIntelligenceFeed } from "@/application/use-cases/legal-intelligence/load-feed";
+import type { LegalIntelligenceFeed } from "@/domain/legal-intelligence";
+import { legalIntelligenceAdapters } from "@/infrastructure/legal-intelligence";
 
-const SOURCE_SCAN_LIMIT = 40;
-
-export async function loadLegalIntelligence(
-  repository: LegalIntelligenceRepository,
-): Promise<LegalIntelligenceFeed> {
-  try {
-    const rows = await repository.listPublicSummaries(SOURCE_SCAN_LIMIT);
-    return classifyLegalIntelligence(rows);
-  } catch (error) {
-    console.error("[homepage] legal intelligence feed unavailable", error);
-    return emptyLegalIntelligenceFeed();
-  }
+/** Homepage entry — aggregates ready + stub adapters. */
+export async function loadLegalIntelligence(): Promise<LegalIntelligenceFeed> {
+  return loadLegalIntelligenceFeed(legalIntelligenceAdapters);
 }
