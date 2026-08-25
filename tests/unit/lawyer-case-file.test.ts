@@ -233,7 +233,7 @@ describe("persisted lawyer case files", () => {
       failing,
     );
     expect(failed.status).toBe(CaseFileAnalysisStatus.ANALYSIS_FAILED);
-    expect(failed.lastAnalysisError).toMatch(/Previous review was preserved/);
+    expect(failed.lastAnalysisError).toMatch(/Өмнөх шинжилгээг хадгаллаа/);
     expect(failed.review.conclusions[0]?.disposition).toBe(
       ConclusionDisposition.SUPPORTED,
     );

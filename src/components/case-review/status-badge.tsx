@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { engineStatusLabelMn } from "@/application/use-cases/case-review/labels";
 import {
   ConclusionDisposition,
   MappingMethod,
@@ -29,7 +30,7 @@ export function StatusBadge({ value }: { value: string }) {
         tone,
       )}
     >
-      {value}
+      {engineStatusLabelMn(value)}
     </span>
   );
 }

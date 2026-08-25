@@ -340,16 +340,16 @@ export function validateManualMapping(
   const evidenceList = catalog?.evidence ?? review.evidence;
 
   if (!factId) {
-    return { ok: false, error: "Select a fact." };
+    return { ok: false, error: "Нөхцөл байдал сонгоно уу." };
   }
   if (!elementId) {
-    return { ok: false, error: "Select a target element." };
+    return { ok: false, error: "Элемент сонгоно уу." };
   }
   if (!facts.some((f) => f.id === factId)) {
-    return { ok: false, error: "Unknown fact." };
+    return { ok: false, error: "Үл мэдэгдэх нөхцөл байдал." };
   }
   if (!review.elements.some((e) => e.id === elementId)) {
-    return { ok: false, error: "Unknown element." };
+    return { ok: false, error: "Үл мэдэгдэх элемент." };
   }
   if (
     !MAPPING_RELATIONS.includes(
@@ -358,19 +358,19 @@ export function validateManualMapping(
   ) {
     return {
       ok: false,
-      error: "Relation must be SUPPORTS, NEGATES, UNCERTAIN, or IRRELEVANT.",
+      error: "Хамаарал буруу байна.",
     };
   }
 
   for (const evidenceId of evidenceIds) {
     const matches = evidenceList.filter((e) => e.id === evidenceId);
     if (matches.length === 0) {
-      return { ok: false, error: `Unknown evidence ${evidenceId}.` };
+      return { ok: false, error: `Үл мэдэгдэх нотлох баримт: ${evidenceId}.` };
     }
     if (!matches.some((e) => e.factId === factId)) {
       return {
         ok: false,
-        error: `Evidence ${evidenceId} does not belong to fact ${factId}.`,
+        error: `Нотлох баримт ${evidenceId} нь тухайн нөхцөл байдалд хамаарахгүй.`,
       };
     }
   }
@@ -464,8 +464,8 @@ export function formatValidityPeriod(
   validFrom: string | null | undefined,
   validTo: string | null | undefined,
 ): string {
-  if (!validFrom && !validTo) return "Validity period not recorded";
-  return `${validFrom ?? "—"} → ${validTo ?? "open"}`;
+  if (!validFrom && !validTo) return "Хүчинтэй хугацаа бүртгэгдээгүй";
+  return `${validFrom ?? "—"} → ${validTo ?? "нээлттэй"}`;
 }
 
 export function isManualMethod(method: string): boolean {

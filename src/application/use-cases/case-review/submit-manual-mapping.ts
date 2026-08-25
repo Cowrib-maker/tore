@@ -28,7 +28,7 @@ export type SubmitManualMappingInput = {
 
 function requireRequest(request: CaseAnalysisRequest): CaseAnalysisRequest {
   if (!isCaseAnalysisRequest(request)) {
-    throw new ValidationError("Malformed analysis request.");
+    throw new ValidationError("Шинжилгээний хүсэлт буруу бүтэцтэй байна.");
   }
   return request;
 }
@@ -60,7 +60,7 @@ export async function submitManualMappingForLawyer(
 ): Promise<CaseReviewWorkspacePayload> {
   const file = await requireOwnedCaseFile(actor, input.caseId, deps.repository);
   if (!Number.isInteger(input.expectedVersion) || input.expectedVersion < 1) {
-    throw new ValidationError("A current case version is required.");
+    throw new ValidationError("Хэргийн одоогийн хувилбар шаардлагатай.");
   }
   const request = requireRequest(file.request);
   const review = toWorkspacePayload(file).review;
@@ -119,7 +119,7 @@ export async function submitManualMappingForLawyer(
     analysisStatus = CaseFileAnalysisStatus.ANALYZED;
   } catch {
     analysisStatus = CaseFileAnalysisStatus.ANALYSIS_FAILED;
-    lastAnalysisError = "Analysis failed. Previous review was preserved.";
+    lastAnalysisError = "Шинжилгээ амжилтгүй. Өмнөх шинжилгээг хадгаллаа.";
   }
 
   const updated = await deps.repository.updateIfVersionMatch(
@@ -135,7 +135,7 @@ export async function submitManualMappingForLawyer(
     },
   );
   if (!updated) {
-    throw new ConflictError("Case file was updated in another session.");
+    throw new ConflictError("Хэргийг өөр сессэд шинэчилсэн байна.");
   }
   return toWorkspacePayload(updated);
 }
@@ -147,7 +147,7 @@ export async function rerunCaseAnalysisForLawyer(
 ): Promise<CaseReviewWorkspacePayload> {
   const file = await requireOwnedCaseFile(actor, input.caseId, deps.repository);
   if (!Number.isInteger(input.expectedVersion) || input.expectedVersion < 1) {
-    throw new ValidationError("A current case version is required.");
+    throw new ValidationError("Хэргийн одоогийн хувилбар шаардлагатай.");
   }
   const request = requireRequest(file.request);
 
@@ -162,7 +162,7 @@ export async function rerunCaseAnalysisForLawyer(
     analysisStatus = CaseFileAnalysisStatus.ANALYZED;
   } catch {
     analysisStatus = CaseFileAnalysisStatus.ANALYSIS_FAILED;
-    lastAnalysisError = "Analysis failed. Previous review was preserved.";
+    lastAnalysisError = "Шинжилгээ амжилтгүй. Өмнөх шинжилгээг хадгаллаа.";
   }
 
   const updated = await deps.repository.updateIfVersionMatch(
@@ -176,7 +176,7 @@ export async function rerunCaseAnalysisForLawyer(
     },
   );
   if (!updated) {
-    throw new ConflictError("Case file was updated in another session.");
+    throw new ConflictError("Хэргийг өөр сессэд шинэчилсэн байна.");
   }
   return toWorkspacePayload(updated);
 }

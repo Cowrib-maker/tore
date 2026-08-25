@@ -24,7 +24,7 @@ export async function getCaseReviewForLawyer(
 ): Promise<CaseReviewWorkspacePayload> {
   const file = await requireOwnedCaseFile(actor, caseId, deps.repository);
   if (!isCaseAnalysisRequest(file.request)) {
-    throw new ValidationError("Malformed analysis request.");
+    throw new ValidationError("Шинжилгээний хүсэлт буруу бүтэцтэй байна.");
   }
   return toWorkspacePayload(file);
 }

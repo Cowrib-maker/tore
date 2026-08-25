@@ -33,7 +33,7 @@ export async function loadCaseWorkspaceForLawyer(
 ): Promise<CaseWorkspaceView> {
   const file = await requireOwnedCaseFile(actor, caseId, deps.repository);
   if (!isCaseAnalysisRequest(file.request)) {
-    throw new ValidationError("Malformed analysis request.");
+    throw new ValidationError("Шинжилгээний хүсэлт буруу бүтэцтэй байна.");
   }
   const conversations = await listCaseConversationsForLawyer(actor, caseId, deps);
   return {

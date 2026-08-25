@@ -25,7 +25,7 @@ export function todayIsoDate(now = new Date()): string {
 function requireTitle(title: string): string {
   const trimmed = title.trim();
   if (!trimmed) {
-    throw new ValidationError("Title is required.");
+    throw new ValidationError("Гарчиг шаардлагатай.");
   }
   return trimmed;
 }
@@ -33,7 +33,7 @@ function requireTitle(title: string): string {
 function requireDomain(domain: string): string {
   const trimmed = domain.trim();
   if (!LEGAL_DOMAINS.has(trimmed)) {
-    throw new ValidationError("Unknown legal domain.");
+    throw new ValidationError("Эрх зүйн салбар буруу байна.");
   }
   return trimmed;
 }
@@ -41,7 +41,7 @@ function requireDomain(domain: string): string {
 function requireApplicableAt(value: string | null | undefined): string {
   const trimmed = (value ?? todayIsoDate()).trim();
   if (!/^\d{4}-\d{2}-\d{2}/.test(trimmed)) {
-    throw new ValidationError("applicableAt must be an ISO date.");
+    throw new ValidationError("Хэрэглэх огноо ISO форматтай байх ёстой.");
   }
   return trimmed.slice(0, 10);
 }
@@ -85,7 +85,7 @@ export async function updateCaseFileForLawyer(
 ): Promise<CaseFile> {
   const file = await requireOwnedCaseFile(actor, input.caseId, deps.repository);
   if (!Number.isInteger(input.expectedVersion) || input.expectedVersion < 1) {
-    throw new ValidationError("A current case version is required.");
+    throw new ValidationError("Хэргийн одоогийн хувилбар шаардлагатай.");
   }
   const nextRequest = { ...file.request };
   const patch: Parameters<CaseFileDeps["repository"]["updateIfVersionMatch"]>[2] =
@@ -111,5 +111,5 @@ export async function updateCaseFileForLawyer(
     patch,
   );
   if (updated) return updated;
-  throw new ConflictError("Case file was updated in another session.");
+  throw new ConflictError("Хэргийг өөр сессэд шинэчилсэн байна.");
 }

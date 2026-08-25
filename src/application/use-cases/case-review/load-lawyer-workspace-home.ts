@@ -57,7 +57,7 @@ export async function loadLawyerWorkspaceHome(
   deps: CaseAiDeps,
 ): Promise<LawyerWorkspaceHomeView> {
   if (actor.role !== UserRole.LAWYER) {
-    throw new ForbiddenError("Only licensed lawyers may open this workspace.");
+    throw new ForbiddenError("Зөвхөн өмгөөлөгч энэ ажлын орчныг нээж болно.");
   }
 
   const files = await deps.repository.listByOwnerLawyerId(actor.userId);

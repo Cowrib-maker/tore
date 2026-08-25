@@ -6,7 +6,7 @@ import { ForbiddenError, NotFoundError } from "@/domain/errors/domain-error";
 
 export function assertLawyerReviewer(actor: ActorContext): void {
   if (actor.role !== UserRole.LAWYER) {
-    throw new ForbiddenError("Only licensed lawyers may review case analysis.");
+    throw new ForbiddenError("Зөвхөн өмгөөлөгч хэрэг шинжилгээ хийж болно.");
   }
 }
 
@@ -18,10 +18,10 @@ export async function requireOwnedCaseFile(
   assertLawyerReviewer(actor);
   const file = await repository.findById(caseId);
   if (!file) {
-    throw new NotFoundError("Case file");
+    throw new NotFoundError("Хэрэг");
   }
   if (file.ownerLawyerId !== actor.userId) {
-    throw new ForbiddenError("You are not authorized to review this case.");
+    throw new ForbiddenError("Та энэ хэргийг харах эрхгүй.");
   }
   return file;
 }

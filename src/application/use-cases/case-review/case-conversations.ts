@@ -30,7 +30,7 @@ export async function assertOwnedCaseFileForAi(
   repository: CaseFileRepository = defaultCaseFileDeps().repository,
 ): Promise<void> {
   if (actor.role !== UserRole.LAWYER) {
-    throw new ForbiddenError("Only licensed lawyers may link AI chats to a case.");
+    throw new ForbiddenError("Зөвхөн өмгөөлөгч AI яриаг хэрэгтэй холбож болно.");
   }
   await requireOwnedCaseFile(actor, caseFileId, repository);
 }

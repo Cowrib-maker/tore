@@ -28,17 +28,19 @@ const EVIDENCE_TYPES = new Set<string>(Object.values(CaseEvidenceType));
 
 function requireExpectedVersion(expectedVersion: number): void {
   if (!Number.isInteger(expectedVersion) || expectedVersion < 1) {
-    throw new ValidationError("A current case version is required.");
+    throw new ValidationError("Хэргийн одоогийн хувилбар шаардлагатай.");
   }
 }
 
 function requireFactText(text: string): string {
   const trimmed = text.trim();
   if (!trimmed) {
-    throw new ValidationError("Fact text is required.");
+    throw new ValidationError("Нөхцөл байдлын текст шаардлагатай.");
   }
   if (trimmed.length > FACT_TEXT_MAX) {
-    throw new ValidationError(`Fact text must be at most ${FACT_TEXT_MAX} characters.`);
+    throw new ValidationError(
+      `Нөхцөл байдлын текст хамгийн ихдээ ${FACT_TEXT_MAX} тэмдэгт байна.`,
+    );
   }
   return trimmed;
 }
@@ -46,7 +48,7 @@ function requireFactText(text: string): string {
 function requireSourceType(value: string | null | undefined): string {
   const trimmed = (value ?? CaseFactSourceType.MANUAL).trim();
   if (!SOURCE_TYPES.has(trimmed)) {
-    throw new ValidationError("Unknown fact source type.");
+    throw new ValidationError("Эх сурвалжийн төрөл буруу байна.");
   }
   return trimmed;
 }
@@ -59,11 +61,11 @@ function optionalReference(value: string | null | undefined): string | null {
 function requireEvidenceTitle(title: string): string {
   const trimmed = title.trim();
   if (!trimmed) {
-    throw new ValidationError("Evidence title is required.");
+    throw new ValidationError("Баримтын гарчиг шаардлагатай.");
   }
   if (trimmed.length > EVIDENCE_TITLE_MAX) {
     throw new ValidationError(
-      `Evidence title must be at most ${EVIDENCE_TITLE_MAX} characters.`,
+      `Баримтын гарчиг хамгийн ихдээ ${EVIDENCE_TITLE_MAX} тэмдэгт байна.`,
     );
   }
   return trimmed;
@@ -73,7 +75,7 @@ function optionalDescription(value: string | null | undefined): string | null {
   const trimmed = value?.trim() ? value.trim() : null;
   if (trimmed && trimmed.length > EVIDENCE_DESCRIPTION_MAX) {
     throw new ValidationError(
-      `Evidence description must be at most ${EVIDENCE_DESCRIPTION_MAX} characters.`,
+      `Баримтын тайлбар хамгийн ихдээ ${EVIDENCE_DESCRIPTION_MAX} тэмдэгт байна.`,
     );
   }
   return trimmed;
@@ -82,7 +84,7 @@ function optionalDescription(value: string | null | undefined): string | null {
 function requireEvidenceType(value: string): string {
   const trimmed = value.trim();
   if (!EVIDENCE_TYPES.has(trimmed)) {
-    throw new ValidationError("Unknown evidence type.");
+    throw new ValidationError("Баримтын төрөл буруу байна.");
   }
   return trimmed;
 }
@@ -114,7 +116,7 @@ async function persistIntake(
     },
   );
   if (!updated) {
-    throw new ConflictError("Case file was updated in another session.");
+    throw new ConflictError("Хэргийг өөр сессэд шинэчилсэн байна.");
   }
   return updated;
 }
@@ -177,7 +179,7 @@ export async function updateCaseFactForLawyer(
   requireExpectedVersion(input.expectedVersion);
   const current = file.facts.find((fact) => fact.id === input.factId);
   if (!current) {
-    throw new ValidationError("Unknown fact.");
+    throw new ValidationError("Үл мэдэгдэх нөхцөл байдал.");
   }
   const facts = file.facts.map((fact) =>
     fact.id === current.id
@@ -224,7 +226,7 @@ export async function deleteCaseFactForLawyer(
   const file = await requireOwnedCaseFile(actor, input.caseId, deps.repository);
   requireExpectedVersion(input.expectedVersion);
   if (!file.facts.some((fact) => fact.id === input.factId)) {
-    throw new ValidationError("Unknown fact.");
+    throw new ValidationError("Үл мэдэгдэх нөхцөл байдал.");
   }
   const updated = await persistIntake(
     file,
@@ -305,7 +307,7 @@ export async function updateCaseEvidenceForLawyer(
   requireExpectedVersion(input.expectedVersion);
   const current = file.evidence.find((item) => item.id === input.evidenceId);
   if (!current) {
-    throw new ValidationError("Unknown evidence.");
+    throw new ValidationError("Үл мэдэгдэх нотлох баримт.");
   }
   const evidence = file.evidence.map((item) =>
     item.id === current.id
@@ -363,7 +365,7 @@ export async function deleteCaseEvidenceForLawyer(
   const file = await requireOwnedCaseFile(actor, input.caseId, deps.repository);
   requireExpectedVersion(input.expectedVersion);
   if (!file.evidence.some((item) => item.id === input.evidenceId)) {
-    throw new ValidationError("Unknown evidence.");
+    throw new ValidationError("Үл мэдэгдэх нотлох баримт.");
   }
   const updated = await persistIntake(
     file,
@@ -395,10 +397,10 @@ export async function linkCaseFactEvidenceForLawyer(
   const file = await requireOwnedCaseFile(actor, input.caseId, deps.repository);
   requireExpectedVersion(input.expectedVersion);
   if (!file.facts.some((fact) => fact.id === input.factId)) {
-    throw new ValidationError("Unknown fact.");
+    throw new ValidationError("Үл мэдэгдэх нөхцөл байдал.");
   }
   if (!file.evidence.some((item) => item.id === input.evidenceId)) {
-    throw new ValidationError("Unknown evidence.");
+    throw new ValidationError("Үл мэдэгдэх нотлох баримт.");
   }
   const alreadyLinked = file.factEvidenceLinks.some(
     (link) =>
@@ -440,7 +442,7 @@ export async function unlinkCaseFactEvidenceForLawyer(
       link.factId === input.factId && link.evidenceId === input.evidenceId,
   );
   if (!exists) {
-    throw new ValidationError("Unknown fact/evidence link.");
+    throw new ValidationError("Үл мэдэгдэх холбоос.");
   }
   const updated = await persistIntake(
     file,

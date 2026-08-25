@@ -1,3 +1,4 @@
+import { caseReviewUi as ui } from "@/application/use-cases/case-review/labels";
 import {
   blockingElements,
   factsForElement,
@@ -73,7 +74,7 @@ export function CaseReviewSnapshot({
       </section>
 
       <section data-testid="rule-panel">
-        {review.rules.length === 0 ? <p>No retrieved rule</p> : null}
+        {review.rules.length === 0 ? <p>{ui.noRuleTitle}</p> : null}
         {review.rules.map((rule) => (
           <article key={rule.id} data-testid={`rule-${rule.id}`}>
             <h3>{rule.title}</h3>
@@ -83,13 +84,13 @@ export function CaseReviewSnapshot({
             <span>{formatValidityPeriod(rule.validFrom, rule.validTo)}</span>
             <StatusBadge value={rule.supportStatus ?? "UNKNOWN"} />
             {!isAuthoritativeRule(rule) ? (
-              <span data-testid="non-authoritative-rule">Not authoritative</span>
+              <span data-testid="non-authoritative-rule">{ui.notAuthoritative}</span>
             ) : null}
             {sourceUnavailable(rule) ? (
-              <span data-testid="unavailable-source">Official source unavailable</span>
+              <span data-testid="unavailable-source">{ui.officialSourceUnavailable}</span>
             ) : (
               <a data-testid="official-source-link" href={rule.officialUrl || rule.sourceUrl || ""}>
-                Open official source
+                {ui.openOfficialSource}
               </a>
             )}
             <p>{rule.statement}</p>
@@ -98,7 +99,7 @@ export function CaseReviewSnapshot({
       </section>
 
       <section data-testid="legal-test-panel">
-        {review.tests.length === 0 ? <p>No LegalTest</p> : null}
+        {review.tests.length === 0 ? <p>{ui.noLegalTestTitle}</p> : null}
         {review.tests.map((test) => (
           <article key={test.id} data-testid={`legal-test-${test.id}`}>
             <StatusBadge value={test.extractionStatus ?? "UNKNOWN"} />

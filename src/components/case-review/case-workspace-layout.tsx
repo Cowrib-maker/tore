@@ -53,7 +53,7 @@ export function CaseWorkspaceLayout({
         <p className="px-2 text-[10px] font-semibold tracking-[0.16em] text-[#C8A45D] uppercase">
           Ажлын орчин
         </p>
-        <nav className="mt-4 space-y-1" aria-label="Case workspace">
+        <nav className="mt-4 space-y-1" aria-label="Хэргийн ажлын орчин">
           {NAV.map((item) => {
             const Icon = item.icon;
             const href =

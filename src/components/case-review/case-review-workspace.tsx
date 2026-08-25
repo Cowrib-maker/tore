@@ -31,7 +31,13 @@ import {
 } from "@/application/use-cases/case-review/view-model";
 import {
   analysisStatusLabelMn,
+  caseReviewUi as ui,
+  errorBannerMessageMn,
+  evidenceTypeLabelMn,
+  factSourceTypeLabelMn,
   legalDomainLabelMn,
+  relationLabelMn,
+  traceKindLabelMn,
 } from "@/application/use-cases/case-review/labels";
 import { highlightedClass, StatusBadge } from "@/components/case-review/status-badge";
 import { Button } from "@/components/ui/button";
@@ -218,7 +224,7 @@ export function CaseReviewWorkspace({
           className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive"
           role="status"
         >
-          {payload.lastAnalysisError} Өмнөх шинжилгээ хадгалагдана.
+          {payload.lastAnalysisError} {ui.analysisPreserved}
         </div>
       ) : null}
 
@@ -228,7 +234,7 @@ export function CaseReviewWorkspace({
           className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive"
           role="status"
         >
-          {errorBanner(errorKey, conclusion?.statement)}
+          {errorBannerMessageMn(errorKey, conclusion?.statement)}
         </div>
       ) : null}
 
@@ -241,12 +247,12 @@ export function CaseReviewWorkspace({
 
       <div className="grid gap-4 xl:grid-cols-[minmax(16rem,1fr)_minmax(0,2fr)_minmax(18rem,1fr)]">
         <Panel
-          title="Issues"
-          description="Select an issue to highlight its reasoning trace."
+          title={ui.issuesTitle}
+          description={ui.issuesDescription}
           testId="issue-panel"
         >
           {review.issues.length === 0 ? (
-            <EmptyState title="No issues" description="The review contains no legal issues." />
+            <EmptyState title={ui.noIssuesTitle} description={ui.noIssuesDescription} />
           ) : (
             <ul className="space-y-2">
               {review.issues.map((issue) => (
@@ -269,7 +275,7 @@ export function CaseReviewWorkspace({
                       <StatusBadge value={issue.status ?? payload.status} />
                     </div>
                     <p className="mt-1 font-mono text-[11px] text-brand-muted">
-                      {issue.kind ?? "unclassified"} · {issue.domain}
+                      {issue.kind ?? ui.unclassified} · {issue.domain}
                     </p>
                   </button>
                 </li>
@@ -294,17 +300,17 @@ export function CaseReviewWorkspace({
         </div>
 
         <Panel
-          title="Mapped facts"
+          title={ui.mappedFactsTitle}
           description={
             selectedElementId
-              ? `Engine facts mapped to ${selectedElementId}`
-              : "Facts from the last successful analysis"
+              ? ui.mappedFactsForElement(selectedElementId)
+              : ui.mappedFactsDefault
           }
           testId="facts-panel"
         >
           {selectedFacts.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No facts mapped to the selected element.
+              {ui.noMappedFacts}
             </p>
           ) : (
             <ul className="space-y-2">
@@ -326,11 +332,11 @@ export function CaseReviewWorkspace({
                     <p className="font-mono text-[11px] text-brand-muted">{fact.id}</p>
                     <p>{fact.statement}</p>
                     <p className="mt-1 text-[11px] text-muted-foreground">
-                      Evidence:{" "}
+                      {ui.evidencePrefix}{" "}
                       {evidenceForFact(review, fact.id)
                         .map((e) => e.id)
-                        .join(", ") || "none"}
-                      {fact.disputed ? " · disputed" : ""}
+                        .join(", ") || ui.none}
+                      {fact.disputed ? ` · ${ui.disputed}` : ""}
                     </p>
                   </button>
                 </li>
@@ -390,25 +396,6 @@ function HeaderField({ label, value }: { label: string; value: string }) {
   );
 }
 
-function errorBanner(key: string, statement?: string): string {
-  switch (key) {
-    case "no-issues":
-      return "No legal issues were identified. Uncertainty is preserved.";
-    case "no-rule":
-      return "No retrieved rule. An unsupported proposition is not shown as authority.";
-    case "no-legal-test":
-      return "No LegalTest was extracted from the source article.";
-    case "insufficient-facts":
-      return statement ?? "Insufficient facts for required elements.";
-    case "conflicting-authority":
-      return statement ?? "Conflicting authority blocks a supported conclusion.";
-    case "malformed":
-      return "The review payload is malformed and cannot be displayed as authority.";
-    default:
-      return statement ?? key;
-  }
-}
-
 function RulePanel({
   review,
   isOn,
@@ -420,10 +407,10 @@ function RulePanel({
 }) {
   if (review.rules.length === 0) {
     return (
-      <Panel title="Rule / Article" testId="rule-panel">
+      <Panel title={ui.ruleTitle} testId="rule-panel">
         <EmptyState
-          title="No retrieved rule"
-          description="Nothing is displayed as authoritative positive law."
+          title={ui.noRuleTitle}
+          description={ui.noRuleDescription}
         />
       </Panel>
     );
@@ -431,8 +418,8 @@ function RulePanel({
 
   return (
     <Panel
-      title="Rule / Article"
-      description="Authoritative source metadata. Source text is not paraphrased."
+      title={ui.ruleTitle}
+      description={ui.ruleDescription}
       testId="rule-panel"
     >
       <ul className="space-y-3">
@@ -456,23 +443,23 @@ function RulePanel({
                 onClick={() => onSelect(rule.id)}
               >
                 <p className="font-medium">
-                  {rule.title ?? "Untitled legal document"}
+                  {rule.title ?? ui.untitledDocument}
                 </p>
                 <dl className="mt-2 grid gap-1 text-[12px] sm:grid-cols-2">
                   <div>
-                    <dt className="text-brand-muted">Article</dt>
+                    <dt className="text-brand-muted">{ui.article}</dt>
                     <dd className="font-mono">{rule.articleNumber ?? "—"}</dd>
                   </div>
                   <div>
-                    <dt className="text-brand-muted">Source type</dt>
-                    <dd>{rule.sourceType ?? "unknown"}</dd>
+                    <dt className="text-brand-muted">{ui.sourceType}</dt>
+                    <dd>{rule.sourceType ?? ui.unknown}</dd>
                   </div>
                   <div>
-                    <dt className="text-brand-muted">Source version</dt>
+                    <dt className="text-brand-muted">{ui.sourceVersion}</dt>
                     <dd className="font-mono">{rule.sourceVersion ?? "—"}</dd>
                   </div>
                   <div>
-                    <dt className="text-brand-muted">Validity</dt>
+                    <dt className="text-brand-muted">{ui.validity}</dt>
                     <dd>{formatValidityPeriod(rule.validFrom, rule.validTo)}</dd>
                   </div>
                 </dl>
@@ -481,7 +468,7 @@ function RulePanel({
                 <StatusBadge value={rule.supportStatus ?? "UNKNOWN"} />
                 {rule.confidence != null ? (
                   <span className="font-mono text-[11px] text-muted-foreground">
-                    confidence {rule.confidence.toFixed(2)}
+                    {ui.confidence} {rule.confidence.toFixed(2)}
                   </span>
                 ) : null}
                 {!authoritative ? (
@@ -489,12 +476,12 @@ function RulePanel({
                     data-testid="non-authoritative-rule"
                     className="text-[11px] text-destructive"
                   >
-                    Not displayed as authoritative.
+                    {ui.notAuthoritative}
                   </span>
                 ) : null}
                 {sourceUnavailable(rule) ? (
                   <span data-testid="unavailable-source" className="text-[11px] text-destructive">
-                    Official source unavailable
+                    {ui.officialSourceUnavailable}
                   </span>
                 ) : (
                   <a
@@ -504,7 +491,7 @@ function RulePanel({
                     data-testid="official-source-link"
                     className="text-[12px] font-medium text-brand underline underline-offset-4"
                   >
-                    Open official source
+                    {ui.openOfficialSource}
                   </a>
                 )}
               </div>
@@ -532,17 +519,17 @@ function LegalTestPanel({
 }) {
   if (review.tests.length === 0) {
     return (
-      <Panel title="Legal test" testId="legal-test-panel">
+      <Panel title={ui.legalTestTitle} testId="legal-test-panel">
         <EmptyState
-          title="No LegalTest"
-          description="No source-grounded test was extracted."
+          title={ui.noLegalTestTitle}
+          description={ui.noLegalTestDescription}
         />
       </Panel>
     );
   }
 
   return (
-    <Panel title="Legal test" testId="legal-test-panel">
+    <Panel title={ui.legalTestTitle} testId="legal-test-panel">
       {review.tests.map((test) => (
         <div
           key={test.id}
@@ -566,8 +553,8 @@ function LegalTestPanel({
             <TableHeader>
               <TableRow>
                 <TableHead>#</TableHead>
-                <TableHead>sourceText</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>{ui.sourceText}</TableHead>
+                <TableHead>{ui.status}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -587,9 +574,9 @@ function LegalTestPanel({
                   <TableCell>
                     <p className="whitespace-pre-wrap">{el.description}</p>
                     {el.required ? (
-                      <span className="text-[11px] text-brand-muted">required</span>
+                      <span className="text-[11px] text-brand-muted">{ui.required}</span>
                     ) : (
-                      <span className="text-[11px] text-muted-foreground">optional</span>
+                      <span className="text-[11px] text-muted-foreground">{ui.optional}</span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -616,22 +603,22 @@ function MappingPanel({
 }) {
   return (
     <Panel
-      title="Fact → Element mapping"
-      description="EXPLICIT and LEXICAL mappings are read-only. MANUAL mappings are visually distinct."
+      title={ui.mappingTitle}
+      description={ui.mappingDescription}
       testId="mapping-panel"
     >
       {review.mappings.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No fact–element mappings.</p>
+        <p className="text-sm text-muted-foreground">{ui.noMappings}</p>
       ) : (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Fact</TableHead>
-              <TableHead>Relation</TableHead>
-              <TableHead>Element</TableHead>
-              <TableHead>Confidence</TableHead>
-              <TableHead>Method</TableHead>
-              <TableHead>Evidence</TableHead>
+              <TableHead>{ui.factCol}</TableHead>
+              <TableHead>{ui.relationCol}</TableHead>
+              <TableHead>{ui.elementCol}</TableHead>
+              <TableHead>{ui.confidenceCol}</TableHead>
+              <TableHead>{ui.methodCol}</TableHead>
+              <TableHead>{ui.evidenceCol}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -680,9 +667,9 @@ function SubsumptionPanel({
   onSelect: (id: string) => void;
 }) {
   return (
-    <Panel title="Subsumption" testId="subsumption-panel">
+    <Panel title={ui.subsumptionTitle} testId="subsumption-panel">
       {review.elements.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No elements to subsume.</p>
+        <p className="text-sm text-muted-foreground">{ui.noElements}</p>
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           {review.elements.map((el) => (
@@ -698,36 +685,36 @@ function SubsumptionPanel({
               onClick={() => onSelect(el.id)}
             >
               <p className="font-mono text-[11px] text-brand-muted">
-                ELEMENT {el.order}
+                {ui.elementOrdinal(el.order)}
               </p>
               <p className="whitespace-pre-wrap">{el.description}</p>
               <div className="mt-2 flex items-center gap-2">
                 <StatusBadge value={el.status} />
                 <span className="text-[11px] text-muted-foreground">
-                  {el.required ? "required" : "optional"}
+                  {el.required ? ui.required : ui.optional}
                 </span>
               </div>
               <dl className="mt-2 space-y-1 font-mono text-[11px]">
                 <div>
-                  <dt className="text-brand-muted">Supporting facts</dt>
+                  <dt className="text-brand-muted">{ui.supportingFacts}</dt>
                   <dd>
                     {supportingFactIdsForElement(review, el.id).join(", ") || "—"}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-brand-muted">Negating facts</dt>
+                  <dt className="text-brand-muted">{ui.negatingFacts}</dt>
                   <dd>
                     {negatingFactIdsForElement(review, el.id).join(", ") || "—"}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-brand-muted">Evidence</dt>
+                  <dt className="text-brand-muted">{ui.evidenceCol}</dt>
                   <dd>{evidenceIdsForElement(review, el.id).join(", ") || "—"}</dd>
                 </div>
                 <div>
-                  <dt className="text-brand-muted">Unresolved</dt>
+                  <dt className="text-brand-muted">{ui.unresolved}</dt>
                   <dd className="whitespace-pre-wrap font-sans">
-                    {unresolvedNotesForElement(review, el.id).join(" ") || "none"}
+                    {unresolvedNotesForElement(review, el.id).join(" ") || ui.none}
                   </dd>
                 </div>
               </dl>
@@ -750,16 +737,16 @@ function ConclusionPanel({
 }) {
   if (!conclusion) {
     return (
-      <Panel title="Conclusion" testId="conclusion-panel">
-        <EmptyState title="No backend conclusion" />
+      <Panel title={ui.conclusionTitle} testId="conclusion-panel">
+        <EmptyState title={ui.noConclusion} />
       </Panel>
     );
   }
 
   return (
     <Panel
-      title="Conclusion"
-      description="Rendered from the engine. This screen does not recalculate the disposition."
+      title={ui.conclusionTitle}
+      description={ui.conclusionDescription}
       testId="conclusion-panel"
     >
       <div
@@ -775,7 +762,7 @@ function ConclusionPanel({
       {conclusion.disposition !== "SUPPORTED" && blockers.length > 0 ? (
         <div data-testid="blocking-elements" className="rounded-md bg-muted/60 px-3 py-2">
           <p className="text-xs font-medium uppercase tracking-wide text-brand-muted">
-            Blocking elements
+            {ui.blockingElements}
           </p>
           <ul className="mt-1 space-y-1 text-sm">
             {blockers.map((el) => (
@@ -831,7 +818,7 @@ function TraceView({
   return (
     <details className="ds-surface rounded-xl px-4 py-3" data-testid="trace-view">
       <summary className="cursor-pointer text-sm font-medium">
-        Reasoning trace
+        {ui.traceSummary}
       </summary>
       <ol className="mt-3 space-y-1">
         {TRACE_KINDS.map((kind) => {
@@ -852,8 +839,8 @@ function TraceView({
                 )}
                 onClick={() => id && onSelect(kind, id)}
               >
-                {kind}
-                {id ? ` · ${id}` : " · unavailable"}
+                {traceKindLabelMn(kind)}
+                {id ? ` · ${id}` : ` · ${ui.unavailable}`}
               </button>
               {kind !== "CONCLUSION" ? (
                 <span className="ml-4 text-muted-foreground" aria-hidden>
@@ -890,8 +877,8 @@ function IntakePanels({
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <Panel
-        title="Facts"
-        description="Recorded case facts. Adding a fact does not generate a legal conclusion."
+        title={ui.factsTitle}
+        description={ui.factsDescription}
         testId="intake-facts-panel"
       >
         <form
@@ -905,18 +892,18 @@ function IntakePanels({
             value={String(payload.version)}
           />
           <input type="hidden" name="intent" value="create-fact" />
-          <Label htmlFor="new-fact-text">Add fact</Label>
+          <Label htmlFor="new-fact-text">{ui.addFact}</Label>
           <textarea
             id="new-fact-text"
             name="text"
             required
             rows={3}
             className={fieldClassName}
-            placeholder="What happened, in the lawyer's words"
+            placeholder={ui.factPlaceholder}
           />
           <div className="grid gap-2 sm:grid-cols-2">
             <div className="space-y-1">
-              <Label htmlFor="new-fact-source">Source type</Label>
+              <Label htmlFor="new-fact-source">{ui.sourceType}</Label>
               <NativeSelect
                 id="new-fact-source"
                 name="sourceType"
@@ -924,27 +911,27 @@ function IntakePanels({
               >
                 {Object.values(CaseFactSourceType).map((value) => (
                   <option key={value} value={value}>
-                    {value}
+                    {factSourceTypeLabelMn(value)}
                   </option>
                 ))}
               </NativeSelect>
             </div>
             <div className="space-y-1">
-              <Label htmlFor="new-fact-ref">Source reference (optional)</Label>
+              <Label htmlFor="new-fact-ref">{ui.sourceReferenceOptional}</Label>
               <Input
                 id="new-fact-ref"
                 name="sourceReference"
-                placeholder="Exhibit or note id"
+                placeholder={ui.exhibitOrNoteId}
               />
             </div>
           </div>
           <Button type="submit" size="sm" disabled={pending}>
-            {pending ? "Saving…" : "Add fact"}
+            {pending ? ui.saving : ui.addFactSubmit}
           </Button>
         </form>
 
         {payload.caseFacts.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No facts recorded yet.</p>
+          <p className="text-sm text-muted-foreground">{ui.noFactsYet}</p>
         ) : (
           <ul className="space-y-3">
             {payload.caseFacts.map((fact) => (
@@ -954,7 +941,7 @@ function IntakePanels({
                 className="space-y-2 rounded-lg border border-border p-3"
               >
                 <p className="font-mono text-[11px] text-brand-muted">
-                  {fact.id} · {fact.sourceType}
+                  {fact.id} · {factSourceTypeLabelMn(fact.sourceType)}
                 </p>
                 <form action={formAction} className="space-y-2">
                   <input type="hidden" name="caseId" value={payload.caseId} />
@@ -971,29 +958,29 @@ function IntakePanels({
                     rows={3}
                     defaultValue={fact.text}
                     className={fieldClassName}
-                    aria-label={`Edit fact ${fact.id}`}
+                    aria-label={ui.editFactAria(fact.id)}
                   />
                   <div className="grid gap-2 sm:grid-cols-2">
                     <NativeSelect
                       name="sourceType"
                       defaultValue={fact.sourceType}
-                      aria-label={`Source type for ${fact.id}`}
+                      aria-label={ui.sourceTypeForAria(fact.id)}
                     >
                       {Object.values(CaseFactSourceType).map((value) => (
                         <option key={value} value={value}>
-                          {value}
+                          {factSourceTypeLabelMn(value)}
                         </option>
                       ))}
                     </NativeSelect>
                     <Input
                       name="sourceReference"
                       defaultValue={fact.sourceReference ?? ""}
-                      placeholder="Source reference"
+                      placeholder={ui.sourceReference}
                     />
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Button type="submit" size="xs" disabled={pending}>
-                      Save fact
+                      {ui.saveFact}
                     </Button>
                   </div>
                 </form>
@@ -1012,13 +999,13 @@ function IntakePanels({
                     size="xs"
                     disabled={pending}
                   >
-                    Delete fact
+                    {ui.deleteFact}
                   </Button>
                 </form>
                 <p className="text-[11px] text-muted-foreground">
-                  Linked evidence:{" "}
+                  {ui.linkedEvidence}{" "}
                   {fact.evidenceIds.length === 0
-                    ? "none"
+                    ? ui.none
                     : fact.evidenceIds
                         .map(
                           (id) => evidenceById.get(id)?.title ?? id,
@@ -1046,7 +1033,7 @@ function IntakePanels({
                       size="xs"
                       disabled={pending}
                     >
-                      Unlink {evidenceById.get(evidenceId)?.title ?? evidenceId}
+                      {ui.unlink(evidenceById.get(evidenceId)?.title ?? evidenceId)}
                     </Button>
                   </form>
                 ))}
@@ -1057,8 +1044,8 @@ function IntakePanels({
       </Panel>
 
       <Panel
-        title="Evidence"
-        description="Exhibit metadata only. File upload is not available yet. Recording an exhibit does not establish authenticity or admissibility."
+        title={ui.evidenceTitle}
+        description={ui.evidenceDescription}
         testId="intake-evidence-panel"
       >
         <form
@@ -1072,44 +1059,44 @@ function IntakePanels({
             value={String(payload.version)}
           />
           <input type="hidden" name="intent" value="create-evidence" />
-          <Label htmlFor="new-evidence-title">Add evidence</Label>
+          <Label htmlFor="new-evidence-title">{ui.addEvidence}</Label>
           <Input
             id="new-evidence-title"
             name="title"
             required
-            placeholder="Title"
+            placeholder={ui.titlePlaceholder}
           />
           <textarea
             name="description"
             rows={2}
             className={fieldClassName}
-            placeholder="Description (optional)"
+            placeholder={ui.descriptionOptional}
           />
           <div className="grid gap-2 sm:grid-cols-2">
             <NativeSelect
               name="evidenceType"
               defaultValue={CaseEvidenceType.DOCUMENT}
-              aria-label="Evidence type"
+              aria-label={ui.evidenceTypeAria}
             >
               {Object.values(CaseEvidenceType).map((value) => (
                 <option key={value} value={value}>
-                  {value}
+                  {evidenceTypeLabelMn(value)}
                 </option>
               ))}
             </NativeSelect>
             <Input
               name="sourceReference"
-              placeholder="Source reference (optional)"
+              placeholder={ui.sourceReferenceOptional}
             />
           </div>
           <Button type="submit" size="sm" disabled={pending}>
-            {pending ? "Saving…" : "Add evidence"}
+            {pending ? ui.saving : ui.addEvidenceSubmit}
           </Button>
         </form>
 
         {payload.caseEvidence.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No evidence recorded yet.
+            {ui.noEvidenceYet}
           </p>
         ) : (
           <ul className="space-y-3">
@@ -1120,7 +1107,7 @@ function IntakePanels({
                 className="space-y-2 rounded-lg border border-border p-3"
               >
                 <p className="font-mono text-[11px] text-brand-muted">
-                  {item.id} · {item.evidenceType}
+                  {item.id} · {evidenceTypeLabelMn(item.evidenceType)}
                 </p>
                 <form action={formAction} className="space-y-2">
                   <input type="hidden" name="caseId" value={payload.caseId} />
@@ -1145,18 +1132,18 @@ function IntakePanels({
                     >
                       {Object.values(CaseEvidenceType).map((value) => (
                         <option key={value} value={value}>
-                          {value}
+                          {evidenceTypeLabelMn(value)}
                         </option>
                       ))}
                     </NativeSelect>
                     <Input
                       name="sourceReference"
                       defaultValue={item.sourceReference ?? ""}
-                      placeholder="Source reference"
+                      placeholder={ui.sourceReference}
                     />
                   </div>
                   <Button type="submit" size="xs" disabled={pending}>
-                    Save evidence
+                    {ui.saveEvidence}
                   </Button>
                 </form>
                 <form action={formAction}>
@@ -1174,13 +1161,13 @@ function IntakePanels({
                     size="xs"
                     disabled={pending}
                   >
-                    Delete evidence
+                    {ui.deleteEvidence}
                   </Button>
                 </form>
                 <p className="text-[11px] text-muted-foreground">
-                  Linked facts:{" "}
+                  {ui.linkedFacts}{" "}
                   {item.factIds.length === 0
-                    ? "none"
+                    ? ui.none
                     : item.factIds
                         .map((id) => factsById.get(id)?.text.slice(0, 40) ?? id)
                         .join("; ")}
@@ -1204,7 +1191,7 @@ function IntakePanels({
             <input type="hidden" name="intent" value="link" />
             <NativeSelect name="factId" required defaultValue="">
               <option value="" disabled>
-                Select fact
+                {ui.selectFact}
               </option>
               {payload.caseFacts.map((fact) => (
                 <option key={fact.id} value={fact.id}>
@@ -1214,7 +1201,7 @@ function IntakePanels({
             </NativeSelect>
             <NativeSelect name="evidenceId" required defaultValue="">
               <option value="" disabled>
-                Select evidence
+                {ui.selectEvidence}
               </option>
               {payload.caseEvidence.map((item) => (
                 <option key={item.id} value={item.id}>
@@ -1223,7 +1210,7 @@ function IntakePanels({
               ))}
             </NativeSelect>
             <Button type="submit" size="sm" disabled={pending}>
-              Link evidence to fact
+              {ui.linkEvidenceToFact}
             </Button>
           </form>
         ) : null}
@@ -1259,23 +1246,23 @@ function ManualMappingForm({
 
   return (
     <Panel
-      title="Manual mapping"
-      description="Saves a MANUAL mapping and re-runs the existing engine. Does not edit the conclusion locally."
+      title={ui.manualMappingTitle}
+      description={ui.manualMappingDescription}
       testId="manual-mapping-form"
     >
       {!canMap ? (
         <p className="text-sm text-muted-foreground">
-          Manual mapping requires at least one fact and one LegalTest element.
+          {ui.manualMappingRequires}
         </p>
       ) : (
         <form action={formAction} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <input type="hidden" name="caseId" value={payload.caseId} />
           <input type="hidden" name="expectedVersion" value={String(payload.version)} />
           <div className="space-y-1">
-            <Label htmlFor="factId">Fact</Label>
+            <Label htmlFor="factId">{ui.factLabel}</Label>
             <NativeSelect id="factId" name="factId" required defaultValue="">
               <option value="" disabled>
-                Select fact
+                {ui.selectFact}
               </option>
               {mappingFacts.map((fact) => (
                 <option key={fact.id} value={fact.id}>
@@ -1285,10 +1272,10 @@ function ManualMappingForm({
             </NativeSelect>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="elementId">Element</Label>
+            <Label htmlFor="elementId">{ui.elementLabel}</Label>
             <NativeSelect id="elementId" name="elementId" required defaultValue="">
               <option value="" disabled>
-                Select element
+                {ui.selectElement}
               </option>
               {review.elements.map((el) => (
                 <option key={el.id} value={el.id}>
@@ -1298,7 +1285,7 @@ function ManualMappingForm({
             </NativeSelect>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="relation">Relation</Label>
+            <Label htmlFor="relation">{ui.relationLabel}</Label>
             <NativeSelect
               id="relation"
               name="relation"
@@ -1307,13 +1294,13 @@ function ManualMappingForm({
             >
               {Object.values(FactElementRelation).map((rel) => (
                 <option key={rel} value={rel}>
-                  {rel}
+                  {relationLabelMn(rel)}
                 </option>
               ))}
             </NativeSelect>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="evidenceIds">Evidence IDs (optional)</Label>
+            <Label htmlFor="evidenceIds">{ui.evidenceIdsOptional}</Label>
             <Input
               id="evidenceIds"
               name="evidenceIds"
@@ -1322,7 +1309,7 @@ function ManualMappingForm({
           </div>
           <div className="flex items-end">
             <Button type="submit" disabled={pending} size="sm">
-              {pending ? "Re-running analysis…" : "Save mapping and re-run"}
+              {pending ? ui.reRunningAnalysis : ui.saveMappingAndRerun}
             </Button>
           </div>
         </form>
@@ -1349,18 +1336,18 @@ function RerunForm({
 }) {
   return (
     <Panel
-      title="Re-run analysis"
-      description="Reloads the persisted request and calls the existing engine. Does not calculate a conclusion in the browser."
+      title={ui.rerunTitle}
+      description={ui.rerunDescription}
       testId="rerun-form"
     >
       <form action={formAction} className="flex flex-wrap items-center gap-3">
         <input type="hidden" name="caseId" value={payload.caseId} />
         <input type="hidden" name="expectedVersion" value={String(payload.version)} />
         <Button type="submit" variant="outline" size="sm" disabled={pending}>
-          {pending ? "Re-running…" : "Re-run engine"}
+          {pending ? ui.reRunning : ui.rerunEngine}
         </Button>
         <span className="font-mono text-[11px] text-muted-foreground">
-          version {payload.version}
+          {ui.version} {payload.version}
         </span>
       </form>
       {error ? (

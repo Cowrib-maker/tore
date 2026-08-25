@@ -8,16 +8,16 @@ export function caseFileErrorResponse(error: unknown): NextResponse {
       error.code === "VALIDATION_ERROR" ? 400 : error.statusCode;
     const message =
       error.code === "NOT_FOUND"
-        ? "The requested resource was not found."
+        ? "Хүссэн нөөц олдсонгүй."
         : error.code === "FORBIDDEN"
-          ? "You do not have permission to perform this action."
+          ? "Энэ үйлдлийг хийх эрхгүй."
           : error.code === "UNAUTHORIZED"
-            ? "Please sign in to continue."
+            ? "Үргэлжлүүлэхийн тулд нэвтэрнэ үү."
             : error.code === "CONFLICT"
-              ? "Case file was updated in another session."
+              ? "Хэргийг өөр сессэд шинэчилсэн байна."
               : error.message;
     return NextResponse.json({ error: message, code: error.code }, { status });
   }
   console.error(error);
-  return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
+  return NextResponse.json({ error: "Гэнэтийн алдаа гарлаа." }, { status: 500 });
 }

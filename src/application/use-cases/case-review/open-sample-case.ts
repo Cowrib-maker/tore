@@ -29,7 +29,7 @@ export async function openSampleCaseForLawyer(
 ): Promise<CaseReviewWorkspacePayload> {
   assertLawyerReviewer(actor);
   if (!isSampleCaseVariant(variant)) {
-    throw new ValidationError("Unknown sample case.");
+    throw new ValidationError("Үл мэдэгдэх жишээ хэрэг.");
   }
 
   const blueprint = sampleCaseBlueprint(variant);

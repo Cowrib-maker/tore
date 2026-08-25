@@ -70,7 +70,7 @@ describe("lawyer case review workspace", () => {
     expect(markup).toContain("CIVIL");
     expect(markup).toContain("2024-06-01");
     expect(markup).toContain("SUPPORTED");
-    expect(markup).toContain("Open official source");
+    expect(markup).toContain("Албан ёсны эх сурвалж нээх");
     expect(markup).toContain("Civil Code of Mongolia — Article 15");
     expect(markup).toContain("15");
     expect(markup).toContain("a valid contract exists");
@@ -133,7 +133,7 @@ describe("lawyer case review workspace", () => {
     expect(reviewErrorState(payload.review)).toBe("no-rule");
     const markup = html(payload);
     expect(markup).toContain("error-no-rule");
-    expect(markup).toContain("No retrieved rule");
+    expect(markup).toContain("Дүрэм олдсонгүй");
     expect(markup).toContain("UNSUPPORTED");
   });
 
