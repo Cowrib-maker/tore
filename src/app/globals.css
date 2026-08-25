@@ -276,10 +276,12 @@
   }
 
   .landing-page {
-    --landing-canvas: #ffffff;
-    --landing-canvas-muted: #f5f7fa;
+    --landing-canvas: #f7f6f2;
+    --landing-canvas-muted: #eef4f2;
     --landing-ink: #0a0f14;
     --landing-accent: #0b1f3a;
+    --landing-teal: #1a7a72;
+    --landing-mint: #e8f4f1;
   }
 
   .landing-product-panel {
@@ -374,11 +376,11 @@
 
   .landing-nav-link {
     @apply rounded-full px-4 py-2 text-[13px] font-medium tracking-tight text-[#5C6570] transition-colors duration-[200ms] ease-in-out;
-    background-color: #f3f4f6;
+    background-color: transparent;
   }
 
   .landing-nav-link:hover {
-    background-color: #e5e7eb;
+    background-color: rgb(232 244 241 / 0.8);
     color: #0b1f3a;
   }
 

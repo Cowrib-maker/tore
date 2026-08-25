@@ -187,3 +187,9 @@ export const LEGAL_AI_DOCUMENT_RATE_LIMIT = {
 export function legalAiDocumentRateLimitKey(userId: string): string {
   return `ai-document:${userId}`;
 }
+
+/** Public homepage feedback: 5 / 15 minutes / IP */
+export const HOMEPAGE_FEEDBACK_RATE_LIMIT = {
+  limit: 5,
+  windowMs: 15 * 60 * 1000,
+};

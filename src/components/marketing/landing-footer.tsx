@@ -2,7 +2,6 @@ import { Children, type ReactNode } from "react";
 import Link from "next/link";
 
 import { logoutAction } from "@/application/actions/auth.actions";
-import { BrandTagline } from "@/components/brand/brand-tagline";
 import { BRAND_LOGO_LANDING } from "@/components/brand/tokens";
 import { BrandLink } from "@/components/layout/brand-link";
 import type { LandingAuthUser } from "@/components/marketing/landing-nav";
@@ -16,30 +15,26 @@ export function LandingFooter({
   authUser?: LandingAuthUser | null;
 }) {
   const t = dict.landing;
+  const home = dict.publicHome;
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-[#0B1F3A]/8 bg-[#F7F8FA]">
-      <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-14">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="sm:col-span-2 lg:col-span-1">
-            <div className="inline-flex flex-col items-center">
-              <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_LANDING} />
-              <BrandTagline />
-            </div>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-[#5C6570]">
-              {t.footerTagline}
+    <footer className="border-t border-[#0B1F3A]/8 bg-[#EEF4F2]">
+      <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-14">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_LANDING} />
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-[#5C6570]">
+              {home.footerTagline}
             </p>
           </div>
-          <FooterColumn title={t.footerProduct}>
-            <a href="#platform">{t.footerPlatform}</a>
-            <a href="#citizens">{t.footerSolutions}</a>
-            <a href="#workspace">{t.footerLawyers}</a>
-            <a href="#businesses">{t.footerBusinesses}</a>
-            <a href="#enterprise">{t.footerEnterprise}</a>
-            <a href="#how">{t.footerHow}</a>
+          <FooterColumn title={home.navProducts}>
+            <a href="#chat">{home.products.chat.name}</a>
+            <a href="#student">{home.products.student.name}</a>
+            <a href="#legal-ai">{home.products.legalAi.name}</a>
+            <a href="#intelligence">{home.intelligenceTitle}</a>
           </FooterColumn>
-          <FooterColumn title={t.footerAccounts}>
+          <FooterColumn title={t.footerCompany}>
             {authUser ? (
               <>
                 <Link href={authUser.dashboardHref}>{authUser.displayName}</Link>
@@ -51,19 +46,15 @@ export function LandingFooter({
                     {dict.common.signOut}
                   </button>
                 </form>
-                <Link href="/lawyers">{t.footerDirectory}</Link>
               </>
             ) : (
               <>
                 <Link href="/login">{dict.common.signIn}</Link>
                 <Link href="/register/client">{t.footerClientReg}</Link>
                 <Link href="/register/lawyer">{t.footerLawyerReg}</Link>
-                <Link href="/lawyers">{t.footerDirectory}</Link>
               </>
             )}
-          </FooterColumn>
-          <FooterColumn title={t.footerCompany}>
-            <a href="#resources">{t.footerFaq}</a>
+            <a href="#feedback">{home.navFeedback}</a>
             <Link href="/terms">{t.footerTerms}</Link>
             <Link href="/privacy">{t.footerPrivacy}</Link>
           </FooterColumn>
@@ -88,7 +79,7 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold tracking-[0.12em] text-[#5C6570] uppercase">
+      <p className="text-[11px] font-semibold tracking-[0.12em] text-[#1A7A72] uppercase">
         {title}
       </p>
       <ul className="mt-3 space-y-2.5 text-sm text-[#3D4A57] [&_a]:transition-colors [&_a]:hover:text-[#0B1F3A]">

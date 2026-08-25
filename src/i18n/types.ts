@@ -1,6 +1,61 @@
 import type { MarketplaceDictionary } from "@/i18n/marketplace-types";
 import type { HomepageLandingContent } from "@/domain/entities/homepage-content";
 
+export type PublicHomeProductCopy = {
+  name: string;
+  audience: string;
+  description: string;
+  cta: string;
+};
+
+export type PublicHomeCopy = {
+  tagline: string;
+  chatTitle: string;
+  chatSubtitle: string;
+  chatPlaceholder: string;
+  chatSubmit: string;
+  chatTyping: string;
+  introTitle: string;
+  introBody: string;
+  productsEyebrow: string;
+  products: {
+    chat: PublicHomeProductCopy;
+    student: PublicHomeProductCopy;
+    legalAi: PublicHomeProductCopy;
+  };
+  intelligenceTitle: string;
+  intelligenceLead: string;
+  intelligenceEmpty: string;
+  intelligenceSections: {
+    enactedLaws: string;
+    draftBills: string;
+    discussion: string;
+    courtDecisions: string;
+    amendments: string;
+    highlights: string;
+  };
+  feedbackTitle: string;
+  feedbackLead: string;
+  feedbackKindLabel: string;
+  feedbackKinds: {
+    feedback: string;
+    suggestion: string;
+    bug: string;
+  };
+  feedbackMessageLabel: string;
+  feedbackMessagePlaceholder: string;
+  feedbackEmailLabel: string;
+  feedbackEmailOptional: string;
+  feedbackSubmit: string;
+  feedbackPending: string;
+  feedbackSuccess: string;
+  navProducts: string;
+  navIntelligence: string;
+  navFeedback: string;
+  accountWorkspace: string;
+  footerTagline: string;
+};
+
 export type Dictionary = {
   meta: {
     title: string;
@@ -28,6 +83,7 @@ export type Dictionary = {
     faq: string;
   };
   landing: HomepageLandingContent;
+  publicHome: PublicHomeCopy;
   auth: {
     loginTitle: string;
     loginDescription: string;

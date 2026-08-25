@@ -1,55 +1,48 @@
 import { getSessionUser } from "@/application/common/session";
-import { getHomepageSectionImages } from "@/application/actions/homepage.actions";
-import { getHomepageContentOverride } from "@/application/actions/homepage-content.actions";
+import { loadLegalIntelligence } from "@/application/use-cases/homepage/load-legal-intelligence";
 import { LandingPage } from "@/components/marketing/landing-page";
 import { UserRole } from "@/domain/enums";
 import {
-  getDashboardPath,
-  LEGAL_AI_PATH,
-} from "@/domain/services/rbac";
+  getHomepageAccountHref,
+  getHomepageProductHref,
+} from "@/domain/services/homepage-routing";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
+import { legalIntelligenceRepository } from "@/infrastructure/repositories";
 
 export default async function HomePage() {
   const locale = await getLocale();
 
-  const [dict, session, sectionImages, contentOverride] = await Promise.all([
+  const [dict, session, intelligence] = await Promise.all([
     getDictionary(locale),
     getSessionUser(),
-    getHomepageSectionImages(),
-    getHomepageContentOverride(locale),
+    loadLegalIntelligence(legalIntelligenceRepository),
   ]);
 
-  const effectiveDict = contentOverride
-    ? { ...dict, landing: contentOverride }
-    : dict;
-
   const role = session?.user?.role as UserRole | undefined;
-  const dashboardHref =
-    role && role in UserRole ? getDashboardPath(role) : "/login";
+  const dashboardHref = getHomepageAccountHref(role);
   const authUser = session?.user
     ? {
         displayName:
           session.user.name?.trim() ||
           session.user.email ||
-          effectiveDict.common.brand,
+          dict.common.brand,
         dashboardHref,
       }
     : null;
 
-  const composerMode =
-    role === UserRole.CLIENT ? "client" : role ? "other" : "guest";
-  const exploreHref =
-    composerMode === "other" ? dashboardHref : LEGAL_AI_PATH;
-
   return (
     <LandingPage
-      dict={effectiveDict}
+      dict={dict}
       locale={locale}
       authUser={authUser}
-      composerMode={composerMode}
-      exploreHref={exploreHref}
-      sectionImages={sectionImages}
+      checkoutEnabled={role === UserRole.CLIENT}
+      productHrefs={{
+        chat: getHomepageProductHref("chat", role),
+        student: getHomepageProductHref("student", role),
+        legalAi: getHomepageProductHref("legalAi", role),
+      }}
+      intelligence={intelligence}
     />
   );
 }

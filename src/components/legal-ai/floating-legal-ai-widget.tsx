@@ -36,7 +36,7 @@ export function FloatingLegalAiWidget() {
       window.removeEventListener(OPEN_LEGAL_AI_WIDGET_EVENT, handleOpenRequest);
   }, []);
 
-  if (pathname?.startsWith(HIDDEN_PATH_PREFIX)) {
+  if (pathname === "/" || pathname?.startsWith(HIDDEN_PATH_PREFIX)) {
     return null;
   }
 
