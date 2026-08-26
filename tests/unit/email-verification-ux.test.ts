@@ -9,8 +9,10 @@ import {
   invalidEmailVerificationPageModel,
   isSessionBouncingAuthRoute,
   loginHrefAfterEmailVerification,
+  maskEmail,
   pendingEmailVerificationPageModel,
   resolvePostCredentialLogin,
+  shouldBounceAuthenticatedFromAuthRoute,
   successEmailVerificationPageModel,
 } from "@/application/services/email-verification-flow";
 import { UserRole } from "@/domain/enums";
@@ -52,6 +54,8 @@ describe("email verification UX flow", () => {
     expect(registerLawyer).toContain("issueVerificationEmailAfterRegister");
     expect(registerClient).toContain("buildEmailVerificationPendingPath");
     expect(registerLawyer).toContain("buildEmailVerificationPendingPath");
+    expect(registerClient).toContain("sent: issued.sent");
+    expect(registerLawyer).toContain("sent: issued.sent");
     expect(registerClient).not.toContain("signIn");
     expect(registerLawyer).not.toContain("signIn");
   });
@@ -64,14 +68,25 @@ describe("email verification UX flow", () => {
       buildEmailVerificationPendingPath({
         email: "citizen@example.com",
         callbackUrl: "/legal-ai?q=hi",
+        sent: true,
       }),
     ).toBe(
-      "/verify-email?email=citizen%40example.com&callbackUrl=%2Flegal-ai%3Fq%3Dhi",
+      "/verify-email?email=citizen%40example.com&callbackUrl=%2Flegal-ai%3Fq%3Dhi&sent=1",
     );
+    expect(
+      buildEmailVerificationPendingPath({
+        email: "citizen@example.com",
+        sent: true,
+      }),
+    ).toBe("/verify-email?email=citizen%40example.com&sent=1");
+    expect(
+      buildEmailVerificationPendingPath({ email: "citizen@example.com" }),
+    ).not.toMatch(/otp|token=/);
     expect(pendingEmailVerificationPageModel("a@b.mn", null)).toEqual({
       status: "pending",
       email: "a@b.mn",
       callbackUrl: null,
+      sent: false,
     });
   });
 
@@ -165,8 +180,25 @@ describe("email verification UX flow", () => {
       path.join(process.cwd(), "src/middleware.ts"),
       "utf8",
     );
-    expect(middleware).toContain("isSessionBouncingAuthRoute");
+    expect(middleware).toContain("shouldBounceAuthenticatedFromAuthRoute");
     expect(middleware).not.toContain('pathname.startsWith("/verify-email")');
+    expect(middleware).not.toContain("node:crypto");
+    const bounce = readFileSync(
+      path.join(process.cwd(), "src/application/services/email-verification-flow.ts"),
+      "utf8",
+    );
+    expect(bounce).toContain("active-session-constants");
+    expect(bounce).not.toContain('from "@/domain/services/active-session"');
+  });
+
+  it("does not bounce /login when another device replaced the session", () => {
+    expect(shouldBounceAuthenticatedFromAuthRoute("/login", null)).toBe(true);
+    expect(
+      shouldBounceAuthenticatedFromAuthRoute("/login", "other_device"),
+    ).toBe(false);
+    expect(shouldBounceAuthenticatedFromAuthRoute("/register", "other_device")).toBe(
+      true,
+    );
   });
 
   it("login form shows the verification panel instead of English verify copy", () => {
@@ -180,47 +212,127 @@ describe("email verification UX flow", () => {
     expect(loginForm).not.toContain("ResendVerificationForm");
   });
 
-  it("uses the required Mongolian verification copy", () => {
+  it("uses the required Mongolian OTP verification copy", () => {
     const mn = getDictionarySync("mn").auth;
-    expect(mn.verifyPendingTitle).toBe("Имэйлээ баталгаажуулна уу");
+    expect(mn.verifyPendingTitle).toBe("И-мэйлээ баталгаажуулна уу");
     expect(mn.verifyPendingBody).toBe(
-      "Таны бүртгэлтэй имэйл хаяг руу баталгаажуулах холбоос илгээлээ.",
+      "Таны и-мэйл хаяг руу 6 оронтой баталгаажуулах код илгээлээ.",
     );
-    expect(mn.verifyResend).toBe("Имэйлийг дахин илгээх");
+    expect(mn.verifyOtpLabel).toBe("Баталгаажуулах код");
+    expect(mn.verifyOtpSubmit).toBe("Баталгаажуулах");
+    expect(mn.verifyResend).toBe("Код дахин илгээх");
+    expect(mn.verifySuccess).toBe("И-мэйл амжилттай баталгаажлаа.");
+    expect(mn.verifyOtpInvalid).toBe("Баталгаажуулах код буруу байна.");
+    expect(mn.verifyOtpExpired).toBe(
+      "Баталгаажуулах кодын хугацаа дууссан байна. Шинэ код авна уу.",
+    );
+    expect(mn.verifyAlreadyVerified).toBe(
+      "Таны и-мэйл аль хэдийн баталгаажсан байна.",
+    );
+    expect(mn.verifyRateLimited).toBe(
+      "Хэт олон удаа оролдсон байна. Түр хүлээгээд дахин оролдоно уу.",
+    );
+    expect(mn.verifyDeliveryFailed).toBe(
+      "Баталгаажуулах код илгээхэд алдаа гарлаа. Дахин оролдоно уу.",
+    );
+    expect(mn.verifyResendCountdown).toBe("Дахин код авах боломжтой: {time}");
     expect(mn.verifyBackToLogin).toBe("Нэвтрэх хуудас руу буцах");
-    expect(mn.verifySpamHint).toBe(
-      "Имэйл ирээгүй бол Spam/Junk хавтсаа шалгана уу.",
-    );
-    expect(mn.verifyExpiredOrInvalid).toBe(
-      "Энэ баталгаажуулах холбоос хүчингүй болсон эсвэл хугацаа нь дууссан байна.",
-    );
-    expect(mn.verifyRequestNew).toBe("Шинэ баталгаажуулах имэйл авах");
   });
 
-  it("verify-email page does not render provider or domain error text", () => {
+  it("masks the registered email on the verification page", () => {
+    expect(maskEmail("erdenebayr@example.com")).toBe("er***@example.com");
+    expect(maskEmail("ab@tore.mn")).toBe("ab***@tore.mn");
+    expect(maskEmail("a@tore.mn")).toBe("a***@tore.mn");
+  });
+
+  it("verify-email page does not consume URL tokens or render internals", () => {
     const page = readFileSync(
       path.join(process.cwd(), "src/app/(auth)/verify-email/page.tsx"),
       "utf8",
     );
     expect(page).toContain("EmailVerificationPanel");
-    expect(page).toContain("verifyEmailTokenUseCase");
+    expect(page).toContain("pendingEmailVerificationPageModel");
+    expect(page).not.toContain("verifyEmailTokenUseCase");
+    expect(page).not.toContain("params.token");
     expect(page).not.toContain("error.message");
     expect(page).not.toContain("Please verify");
   });
 
-  it("resend action reuses the existing use case and stays generic", () => {
+  it("resend action maps typed failures instead of a generic English catch", () => {
     const actions = readFileSync(
       path.join(process.cwd(), "src/application/actions/auth.actions.ts"),
       "utf8",
     );
     const resend = actions.slice(
       actions.indexOf("export async function resendVerificationEmailAction"),
-      actions.indexOf("function getPasswordResetDeps"),
+      actions.indexOf("export async function verifyEmailOtpAction"),
     );
     expect(resend).toContain("resendEmailVerificationUseCase");
     expect(resend).toContain("RESEND_VERIFICATION_RATE_LIMIT");
     expect(resend).toContain("AUTH_ACTION_CODE.RESEND_SENT");
-    expect(resend).not.toContain("alreadyVerified");
+    expect(resend).toContain("mapEmailVerificationActionError");
+    expect(resend).not.toContain("mapActionError");
     expect(resend).not.toContain("If an unverified account exists");
+
+    const form = readFileSync(
+      path.join(process.cwd(), "src/components/auth/resend-verification-form.tsx"),
+      "utf8",
+    );
+    expect(form).toContain("userFacingResendFeedback");
+    expect(form).not.toContain("state.error");
+  });
+
+  it("verifies OTP through a rate-limited action and six-cell input", () => {
+    const actions = readFileSync(
+      path.join(process.cwd(), "src/application/actions/auth.actions.ts"),
+      "utf8",
+    );
+    const otpAction = actions.slice(
+      actions.indexOf("export async function verifyEmailOtpAction"),
+      actions.indexOf("function getPasswordResetDeps"),
+    );
+    expect(otpAction).toContain("verifyEmailOtpUseCase");
+    expect(otpAction).toContain("VERIFY_EMAIL_OTP_RATE_LIMIT");
+    expect(otpAction).toContain("AUTH_ACTION_CODE.EMAIL_VERIFIED");
+    expect(otpAction).toContain("mapEmailVerificationActionError");
+    expect(otpAction).toContain("email: result.email");
+    expect(otpAction).not.toContain("otp: result");
+    expect(otpAction).not.toMatch(/searchParams.*otp|otp.*searchParams/);
+
+    const limiter = readFileSync(
+      path.join(process.cwd(), "src/infrastructure/security/rate-limiter.ts"),
+      "utf8",
+    );
+    expect(limiter).toContain("VERIFY_EMAIL_OTP_RATE_LIMIT");
+    expect(limiter).toMatch(/VERIFY_EMAIL_OTP_RATE_LIMIT = \{\s*limit: 5,/);
+    expect(limiter).toMatch(/RESEND_VERIFICATION_RATE_LIMIT = \{\s*limit: 3,/);
+
+    const panel = readFileSync(
+      path.join(process.cwd(), "src/components/auth/email-verification-panel.tsx"),
+      "utf8",
+    );
+    expect(panel).toContain("EmailVerificationOtpForm");
+    expect(panel).toContain("maskEmail");
+
+    const otpForm = readFileSync(
+      path.join(
+        process.cwd(),
+        "src/components/auth/email-verification-otp-form.tsx",
+      ),
+      "utf8",
+    );
+    expect(otpForm).toContain("verifyEmailOtpAction");
+    expect(otpForm).toContain("copy.verifyOtpSubmit");
+    expect(otpForm).toContain("requestSubmit");
+
+    const otpInput = readFileSync(
+      path.join(process.cwd(), "src/components/auth/otp-input.tsx"),
+      "utf8",
+    );
+    expect(otpInput).toContain("data-otp-cell");
+    expect(otpInput).toContain('autoComplete={index === 0 ? "one-time-code"');
+    expect(otpInput).toContain("Backspace");
+    expect(otpInput).toContain("onPaste");
+    expect(otpInput).not.toContain("type=\"hidden\" name={name} value=");
   });
 });

@@ -3,6 +3,7 @@ import type {
   ListUsersInput,
   ListUsersResult,
   UserRepository,
+  AuthPrincipal,
 } from "@/domain/repositories/user-repository";
 import type {
   CreateUserInput,
@@ -201,6 +202,42 @@ export class PrismaUserRepository implements UserRepository {
     } catch (error) {
       mapUniqueViolation(error, "An account with this email already exists");
     }
+  }
+
+  async findAuthPrincipal(id: string): Promise<AuthPrincipal | null> {
+    const record = await this.db.user.findFirst({
+      where: { id, deletedAt: null },
+      select: {
+        id: true,
+        role: true,
+        status: true,
+        activeSessionIdHash: true,
+      },
+    });
+    if (!record) return null;
+    return {
+      id: record.id,
+      role: record.role as UserRole,
+      status: record.status as UserStatus,
+      activeSessionIdHash: record.activeSessionIdHash,
+    };
+  }
+
+  async rotateActiveSessionIdHash(
+    userId: string,
+    sessionIdHash: string,
+  ): Promise<void> {
+    await this.db.user.update({
+      where: { id: userId },
+      data: { activeSessionIdHash: sessionIdHash },
+    });
+  }
+
+  async clearActiveSessionIdHash(userId: string): Promise<void> {
+    await this.db.user.update({
+      where: { id: userId },
+      data: { activeSessionIdHash: null },
+    });
   }
 }
 

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { getSessionUser } from "@/application/common/session";
+import { requirePageSession } from "@/application/common/session";
 import { LawyerAppChrome } from "@/components/layout/lawyer-app-chrome";
 import { AccountSharingBanner } from "@/components/account/account-sharing-banner";
 import { DeviceSessionBeacon } from "@/components/account/device-session-beacon";
@@ -13,10 +13,7 @@ export default async function LawyerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getSessionUser();
-  if (!session?.user) {
-    redirect("/login");
-  }
+  const session = await requirePageSession();
   if (session.user.role !== UserRole.LAWYER) {
     redirect(getDashboardPath(session.user.role as UserRole));
   }

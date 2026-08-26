@@ -1,3 +1,4 @@
+import { EmailConfigurationError } from "@/domain/errors/domain-error";
 import type { EmailSender } from "@/domain/ports/email-sender";
 import { ConsoleEmailSender } from "@/infrastructure/email/console-email-sender";
 import { ResendEmailSender } from "@/infrastructure/email/resend-email-sender";
@@ -17,12 +18,18 @@ let cached: EmailSender | null = null;
  * Composition-root factory. Application code depends on EmailSender only.
  */
 export function createEmailSender(config: Env = env): EmailSender {
-  const provider = resolveEmailProvider(config);
+  let provider: ResolvedEmailProvider;
+  try {
+    provider = resolveEmailProvider(config);
+  } catch (error) {
+    console.error("[email] provider resolution failed", error);
+    throw new EmailConfigurationError();
+  }
   const from = config.EMAIL_FROM;
 
   if (provider === "resend") {
     if (!config.RESEND_API_KEY) {
-      throw new Error("EMAIL_PROVIDER=resend requires RESEND_API_KEY");
+      throw new EmailConfigurationError();
     }
     console.info("[email] Using ResendEmailSender");
     return new ResendEmailSender(config.RESEND_API_KEY, from);
@@ -30,7 +37,7 @@ export function createEmailSender(config: Env = env): EmailSender {
 
   if (provider === "smtp") {
     if (!config.SMTP_HOST) {
-      throw new Error("EMAIL_PROVIDER=smtp requires SMTP_HOST");
+      throw new EmailConfigurationError();
     }
     console.info("[email] Using SmtpEmailSender", { host: config.SMTP_HOST });
     return new SmtpEmailSender({

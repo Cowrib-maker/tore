@@ -72,31 +72,55 @@ type Props = {
 
 const CASE_SUGGESTIONS = [
   {
-    label: "Баримтын тойм",
-    prompt: "Энэ хэргийн одоогийн баримт, баримт бичгийг тоймло.",
+    label: "Хэрэг шинжлэх",
+    prompt: "Энэ хэргийг хууль зүйн асуудал, баримт, холбогдох зохицуулалтаар шинжил.",
   },
   {
-    label: "Дутуу зүйл",
-    prompt: "Хэрэг шинжлэхэд ямар баримт, факт дутуу вэ?",
+    label: "Хууль зүйн судалгаа",
+    prompt: "Энэ хэрэгт холбоотой Монгол Улсын хуулийн зүйлүүдийг баталгаатай эхээс гарга.",
   },
   {
-    label: "Холбоотой хууль",
-    prompt: "Энэ хэрэгт холбоотой Монгол Улсын хуулийн зүйлүүдийг гарга.",
+    label: "Баримт шинжлэх",
+    prompt: "Хэргийн баримт, баримт бичгийг шинжилж, тогтоогдсон болон маргаантай зүйлийг ялга.",
+  },
+  {
+    label: "Нотлох баримт үнэлэх",
+    prompt: "Нотлох баримтын дэмжлэг, дутуу баримт, зөрчлийг үнэл.",
+  },
+  {
+    label: "Эсрэг байр суурь боловсруулах",
+    prompt: "Яллах/нэхэмжлэлийн болон хамгаалалтын эсрэг байр суурийг боловсруул.",
+  },
+  {
+    label: "Баримт бичиг боловсруулах",
+    prompt: "Энэ хэрэгт хэрэгтэй мэргэжлийн баримт бичгийн төслийг боловсруул.",
   },
 ] as const;
 
 const OPEN_SUGGESTIONS = [
   {
-    label: "Гэрээний эрсдэл",
-    prompt: "Гэрээний гол эрсдэлийг хэрхэн шалгах вэ?",
-  },
-  {
-    label: "Маргааны стратеги",
-    prompt: "Иргэний маргаанд бэлтгэхдээ юуг анхаарах вэ?",
-  },
-  {
-    label: "Шинжилгээний арга",
+    label: "Хэрэг шинжлэх",
     prompt: "Хэргийг шинжлэхдээ ямар дараалал баримтлах вэ?",
+  },
+  {
+    label: "Хууль зүйн судалгаа",
+    prompt: "Хууль зүйн судалгааг баталгаатай эх сурвалжид тулгуурлан хэрхэн хийх вэ?",
+  },
+  {
+    label: "Баримт шинжлэх",
+    prompt: "Гэрээ, баримт бичгийг хэрхэн мэргэжлийн түвшинд шинжлэх вэ?",
+  },
+  {
+    label: "Нотлох баримт үнэлэх",
+    prompt: "Нотлох баримтыг хэрхэн үнэлж, дутуу баримтыг хэрхэн тодорхойлох вэ?",
+  },
+  {
+    label: "Эсрэг байр суурь боловсруулах",
+    prompt: "Иргэний маргаанд эсрэг байр суурь, хамгаалалтын аргументыг хэрхэн боловсруулах вэ?",
+  },
+  {
+    label: "Баримт бичиг боловсруулах",
+    prompt: "Нэхэмжлэл, хариу, гэрээний төслийг хэрхэн боловсруулах вэ?",
   },
 ] as const;
 
@@ -242,7 +266,6 @@ export function LawyerAiWorkbench({
           message: text,
           conversationId,
           caseFileId: conversationId ? undefined : caseFileId,
-          mode: "PROFESSIONAL",
         }),
       });
       const data = (await response.json()) as {
@@ -310,10 +333,16 @@ export function LawyerAiWorkbench({
           <div className="min-w-0">
             {caseContext ? (
               <div data-testid="lawyer-ai-case-header">
+                <p className="text-[11px] font-semibold tracking-[0.16em] text-[#8A6B2A]">
+                  TORE Legal AI
+                </p>
                 <h1 className="truncate text-[1.05rem] font-semibold text-[#0B1F3A]">
                   {caseContext.title}
                 </h1>
-                <p className="text-xs text-[#5C6570]">AI туслах</p>
+                <p className="text-xs text-[#5C6570]">
+                  Хэрэг, баримт, хууль зүйн эх сурвалжид тулгуурлан мэргэжлийн
+                  түвшний шинжилгээ хийх AI.
+                </p>
                 <p className="mt-1 hidden text-[11px] text-[#8A939D] sm:block">
                   Баримт {caseContext.documentCount}
                   <span className="mx-1.5">·</span>
@@ -324,10 +353,16 @@ export function LawyerAiWorkbench({
               </div>
             ) : (
               <div>
+                <p className="text-[11px] font-semibold tracking-[0.16em] text-[#8A6B2A]">
+                  TORE Legal AI
+                </p>
                 <h1 className="text-[1.05rem] font-semibold text-[#0B1F3A]">
-                  AI туслах
+                  TORE Legal AI
                 </h1>
-                <p className="text-xs text-[#5C6570]">Хэрэгт холбоогүй яриа</p>
+                <p className="text-xs text-[#5C6570]">
+                  Хэрэг, баримт, хууль зүйн эх сурвалжид тулгуурлан мэргэжлийн
+                  түвшний шинжилгээ хийх AI.
+                </p>
               </div>
             )}
           </div>
@@ -601,10 +636,9 @@ function Welcome({
       <h2 className="mt-5 text-[1.65rem] font-semibold tracking-tight text-[#0B1F3A]">
         {caseLinked ? "Энэ хэрэг дээр юу хийх вэ?" : "Юу дээр ажиллах вэ?"}
       </h2>
-      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#5C6570]">
-        {caseLinked
-          ? "Хэргийн баримт, шинжилгээ болон стратегийг эндээс үргэлжлүүлнэ."
-          : "Гэрээ, маргаан, судалгаа — ажлаа эндээс эхлүүлнэ."}
+      <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-[#5C6570]">
+        Хэрэг, баримт, хууль зүйн эх сурвалжид тулгуурлан мэргэжлийн түвшний
+        шинжилгээ хийх AI.
       </p>
       <div className="mx-auto mt-5 flex max-w-xl flex-wrap justify-center gap-2">
         {suggestions.map((item) => (
@@ -649,6 +683,9 @@ function MessageBubble({
     >
       <AiMark />
       <div className="max-w-[90%] rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-white px-4 py-4 text-[15px] leading-7 whitespace-pre-wrap text-[#3F4852] shadow-[0_10px_28px_-22px_rgba(11,31,58,0.4)]">
+        <p className="mb-2 text-[11px] font-semibold tracking-[0.12em] text-[#8A6B2A]">
+          TORE-ийн дүгнэлт
+        </p>
         {message.content}
         <LegalAiCitationList citations={message.citations} />
       </div>

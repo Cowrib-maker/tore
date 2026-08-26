@@ -102,6 +102,12 @@ export const RESEND_VERIFICATION_RATE_LIMIT = {
   windowMs: 15 * 60 * 1000,
 };
 
+/** OTP verification attempts: 5 / 15 minutes / IP+email */
+export const VERIFY_EMAIL_OTP_RATE_LIMIT = {
+  limit: 5,
+  windowMs: 15 * 60 * 1000,
+};
+
 /** Password reset request: 5 attempts / 15 minutes / IP+email */
 export const PASSWORD_RESET_REQUEST_RATE_LIMIT = {
   limit: 5,

@@ -34,7 +34,8 @@ export class RuleBasedLegalDomainClassifier
     if (
       /\b(criminal|crime|offence|offense|prosecut|mens rea|actus reus)\b/.test(
         text,
-      )
+      ) ||
+      /эрүү|гэмт\s*хэрэг|яллах|яллагдагч|шүүгдэгч|сэжигтэн/.test(text)
     ) {
       return {
         domain: LegalDomain.CRIMINAL,
@@ -46,7 +47,8 @@ export class RuleBasedLegalDomainClassifier
     if (
       /\b(administrative|agency|licence|license|permit|regulatory)\b/.test(
         text,
-      )
+      ) ||
+      /захиргаа|зөвшөөрөл|лиценз|төрийн\s*байгуул/.test(text)
     ) {
       return {
         domain: LegalDomain.ADMINISTRATIVE,
@@ -56,7 +58,8 @@ export class RuleBasedLegalDomainClassifier
       };
     }
     if (
-      /\b(civil|contract|tort|damages|property|obligation)\b/.test(text)
+      /\b(civil|contract|tort|damages|property|obligation)\b/.test(text) ||
+      /иргэн(ий)?|гэрээ|хохирол|өмч|үүрэг|нэхэмжлэл|хариуцагч/.test(text)
     ) {
       return {
         domain: LegalDomain.CIVIL,
@@ -65,7 +68,10 @@ export class RuleBasedLegalDomainClassifier
         confidence: 0.55,
       };
     }
-    if (/\b(constitution|constitutional)\b/.test(text)) {
+    if (
+      /\b(constitution|constitutional)\b/.test(text) ||
+      /үндсэн\s*хуул/.test(text)
+    ) {
       return {
         domain: LegalDomain.CONSTITUTIONAL,
         topics: ["constitutional"],
@@ -73,7 +79,10 @@ export class RuleBasedLegalDomainClassifier
         confidence: 0.55,
       };
     }
-    if (/\b(procedure|procedural|jurisdiction|standing)\b/.test(text)) {
+    if (
+      /\b(procedure|procedural|jurisdiction|standing)\b/.test(text) ||
+      /процесс|журам|харьяалал|хөөн\s*хэлэлцэх/.test(text)
+    ) {
       return {
         domain: LegalDomain.PROCEDURAL,
         topics: ["procedure"],

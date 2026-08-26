@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { getSessionUser } from "@/application/common/session";
+import { requirePageSession } from "@/application/common/session";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { UserRole } from "@/domain/enums";
 import { getDashboardPath, getProfilePath } from "@/domain/services/rbac";
@@ -11,10 +11,7 @@ export default async function ClientLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getSessionUser();
-  if (!session?.user) {
-    redirect("/login");
-  }
+  const session = await requirePageSession();
   if (session.user.role !== UserRole.CLIENT) {
     redirect(getDashboardPath(session.user.role as UserRole));
   }

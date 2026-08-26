@@ -1,6 +1,11 @@
 import type { NextAuthConfig } from "next-auth";
 
 import { UserRole, UserStatus } from "@/domain/enums";
+import {
+  decideActiveSession,
+  generateActiveSessionId,
+  hashActiveSessionId,
+} from "@/domain/services/active-session";
 import { isAdminDevtoolsEnabled } from "@/lib/feature-flags";
 
 const ROLE_VALUES = new Set<string>(Object.values(UserRole));
@@ -17,6 +22,12 @@ function isUserStatus(value: unknown): value is UserStatus {
   return typeof value === "string" && STATUS_VALUES.has(value);
 }
 
+function tokenSid(token: { sid?: unknown }): string | undefined {
+  return typeof token.sid === "string" && token.sid.trim()
+    ? token.sid
+    : undefined;
+}
+
 type ImpersonationUpdate = {
   impersonateUserId?: string;
   stopImpersonation?: boolean;
@@ -25,25 +36,36 @@ type ImpersonationUpdate = {
 /**
  * Node runtime callbacks: refresh role + status from the database so demotions
  * and suspensions take effect without waiting for full JWT expiry.
+ * Also enforces a single active session identifier per account.
  * Privilege fields are never accepted from session.update payloads — except
  * admin-devtools impersonation, which is verified server-side against the DB.
  */
 export const nodeAuthCallbacks: NonNullable<NextAuthConfig["callbacks"]> = {
   async jwt({ token, user, trigger, session }) {
+    const isNewSignIn = Boolean(user);
+
     if (user) {
-      if (!user.id || !isUserRole(user.role) || !isUserStatus(user.status)) {
-        // Fail closed — corrupt sign-in principal.
+      if (
+        !user.id ||
+        !isUserRole(user.role) ||
+        !isUserStatus(user.status) ||
+        typeof user.sessionId !== "string" ||
+        !user.sessionId
+      ) {
         return {};
       }
       token.id = user.id;
       token.role = user.role;
       token.status = user.status;
+      token.sid = user.sessionId;
       token.statusCheckedAt = Date.now();
       delete token.impersonatorId;
+      delete token.sessionReplaced;
     }
 
     if (trigger === "update" && session && typeof session === "object") {
       const update = session as ImpersonationUpdate;
+      // Never copy sid/sessionId from session.update — those are not client-writable.
       const { userRepository } = await import(
         "@/infrastructure/repositories"
       );
@@ -61,11 +83,8 @@ export const nodeAuthCallbacks: NonNullable<NextAuthConfig["callbacks"]> = {
           token.status = admin.status;
           token.statusCheckedAt = Date.now();
           delete token.impersonatorId;
-          return token;
         }
-      }
-
-      if (
+      } else if (
         update.impersonateUserId &&
         typeof update.impersonateUserId === "string" &&
         isAdminDevtoolsEnabled()
@@ -94,7 +113,6 @@ export const nodeAuthCallbacks: NonNullable<NextAuthConfig["callbacks"]> = {
             token.role = target.role;
             token.status = target.status;
             token.statusCheckedAt = Date.now();
-            return token;
           }
         }
       }
@@ -104,16 +122,66 @@ export const nodeAuthCallbacks: NonNullable<NextAuthConfig["callbacks"]> = {
       return {};
     }
 
+    const { userRepository } = await import(
+      "@/infrastructure/repositories"
+    );
+    const sessionOwnerId =
+      typeof token.impersonatorId === "string"
+        ? token.impersonatorId
+        : token.id;
+    const sessionOwner = await userRepository.findAuthPrincipal(sessionOwnerId);
+    if (!sessionOwner) {
+      return {};
+    }
+
+    if (isNewSignIn) {
+      const sid = tokenSid(token);
+      if (!sid) {
+        return {};
+      }
+      // Last completed login wins if two authorizes race.
+      await userRepository.rotateActiveSessionIdHash(
+        sessionOwnerId,
+        hashActiveSessionId(sid),
+      );
+    } else {
+      const decision = decideActiveSession(
+        tokenSid(token),
+        sessionOwner.activeSessionIdHash,
+      );
+      if (decision.action === "replaced") {
+        return { sessionReplaced: true };
+      }
+      if (decision.action === "bind-new") {
+        const raw = generateActiveSessionId();
+        await userRepository.rotateActiveSessionIdHash(
+          sessionOwnerId,
+          hashActiveSessionId(raw),
+        );
+        token.sid = raw;
+      } else if (decision.action === "bind-token") {
+        const sid = tokenSid(token);
+        if (!sid) {
+          return { sessionReplaced: true };
+        }
+        await userRepository.rotateActiveSessionIdHash(
+          sessionOwnerId,
+          hashActiveSessionId(sid),
+        );
+      }
+    }
+
     const checkedAt =
       typeof token.statusCheckedAt === "number" ? token.statusCheckedAt : 0;
     const now = Date.now();
+    const privilegeUserId = token.id;
 
-    if (user || now - checkedAt >= PRIVILEGE_REFRESH_MS) {
-      const { userRepository } = await import(
-        "@/infrastructure/repositories"
-      );
-      const record = await userRepository.findById(token.id);
-      if (!record || record.deletedAt) {
+    if (isNewSignIn || now - checkedAt >= PRIVILEGE_REFRESH_MS) {
+      const record =
+        privilegeUserId === sessionOwnerId
+          ? sessionOwner
+          : await userRepository.findAuthPrincipal(privilegeUserId);
+      if (!record) {
         return {};
       }
       token.role = record.role;
@@ -128,13 +196,18 @@ export const nodeAuthCallbacks: NonNullable<NextAuthConfig["callbacks"]> = {
       return session;
     }
 
+    if (token.sessionReplaced === true) {
+      session.sessionReplaced = true;
+      session.user.id = undefined as unknown as string;
+      return session;
+    }
+
     if (
       !token.id ||
       typeof token.id !== "string" ||
       !isUserRole(token.role) ||
       !isUserStatus(token.status)
     ) {
-      // Fail closed: incomplete privilege claims → empty session user id.
       session.user.id = undefined as unknown as string;
       return session;
     }

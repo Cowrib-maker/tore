@@ -1,8 +1,9 @@
 "use client";
 
+import { useCallback, useState } from "react";
 import Link from "next/link";
 
-import { ResendVerificationForm } from "@/components/auth/resend-verification-form";
+import { EmailVerificationOtpForm } from "@/components/auth/email-verification-otp-form";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -11,7 +12,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { EmailVerificationPageModel } from "@/application/services/email-verification-flow";
+import {
+  loginHrefAfterEmailVerification,
+  maskEmail,
+  type EmailVerificationPageModel,
+} from "@/application/services/email-verification-flow";
+import { UserRole } from "@/domain/enums";
 import { cn } from "@/lib/utils";
 import type { Dictionary } from "@/i18n/types";
 
@@ -22,20 +28,35 @@ export function EmailVerificationPanel({
   copy: Dictionary["auth"];
   model: EmailVerificationPageModel;
 }) {
-  if (model.status === "success") {
+  const [outcome, setOutcome] = useState<"verified" | "already" | null>(null);
+  const handleOutcome = useCallback((next: "verified" | "already") => {
+    setOutcome((current) => (current === "verified" ? current : next));
+  }, []);
+
+  const continueHref =
+    model.status === "success"
+      ? model.continueHref
+      : model.status === "pending"
+        ? loginHrefAfterEmailVerification(UserRole.CLIENT, model.callbackUrl)
+        : "/login";
+
+  if (model.status === "success" || outcome) {
     return (
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>{copy.verifyTitleSuccess}</CardTitle>
+          <CardTitle>
+            {outcome === "already"
+              ? copy.verifyPendingTitle
+              : copy.verifyTitleSuccess}
+          </CardTitle>
           <CardDescription>
-            {copy.verifySuccess.replace("{email}", model.email)}
+            {outcome === "already"
+              ? copy.verifyAlreadyVerified
+              : copy.verifySuccess}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
-          <Link
-            href={model.continueHref}
-            className={cn(buttonVariants(), "w-full")}
-          >
+          <Link href={continueHref} className={cn(buttonVariants(), "w-full")}>
             {copy.verifyContinue}
           </Link>
         </CardContent>
@@ -44,24 +65,38 @@ export function EmailVerificationPanel({
   }
 
   const isInvalid = model.status === "invalid";
+  const isUnavailable = model.status === "unavailable";
+  const description = isInvalid
+    ? copy.verifyOtpExpired
+    : isUnavailable
+      ? copy.verifyTemporaryFailure
+      : copy.verifyPendingBody;
+  const email = model.email;
+  const startCooldown = model.status === "pending" && model.sent;
 
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>{copy.verifyPendingTitle}</CardTitle>
-        <CardDescription>
-          {isInvalid ? copy.verifyExpiredOrInvalid : copy.verifyPendingBody}
-        </CardDescription>
+        <CardTitle>
+          {isInvalid ? copy.verifyTitleError : copy.verifyPendingTitle}
+        </CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        {!isInvalid ? (
+        {email ? (
+          <p className="text-center text-sm font-medium" aria-live="polite">
+            {maskEmail(email)}
+          </p>
+        ) : null}
+        {!isInvalid && !isUnavailable ? (
           <p className="text-sm text-muted-foreground">{copy.verifySpamHint}</p>
         ) : null}
-        <ResendVerificationForm
+        <EmailVerificationOtpForm
           copy={copy}
-          defaultEmail={model.email}
-          hideEmailField={Boolean(model.email) && !isInvalid}
-          submitLabel={isInvalid ? copy.verifyRequestNew : copy.verifyResend}
+          email={email}
+          hideEmailField={Boolean(email)}
+          startCooldown={startCooldown}
+          onOutcome={handleOutcome}
         />
         <Link
           href="/login"

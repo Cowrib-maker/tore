@@ -33,7 +33,7 @@ export function useLegalAiChatSession(initial?: {
 
   async function sendMessage(
     text: string,
-    mode: "CITIZEN" | "PROFESSIONAL" = "CITIZEN",
+    _mode?: "CITIZEN" | "PROFESSIONAL",
   ): Promise<"ok" | "gated" | "error"> {
     setError("");
     setAccessGate(null);
@@ -45,7 +45,7 @@ export function useLegalAiChatSession(initial?: {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, conversationId, mode }),
+        body: JSON.stringify({ message: text, conversationId }),
       });
 
       const data = (await response.json()) as {

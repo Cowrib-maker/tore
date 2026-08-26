@@ -17,6 +17,7 @@ export interface EmailVerificationTokenRepository {
     input: CreateEmailVerificationTokenInput,
   ): Promise<void>;
   findByTokenHash(tokenHash: string): Promise<EmailVerificationToken | null>;
+  findByIdentifier(identifier: string): Promise<EmailVerificationToken | null>;
   deleteByTokenHash(tokenHash: string): Promise<void>;
   deleteForIdentifier(identifier: string): Promise<void>;
 }

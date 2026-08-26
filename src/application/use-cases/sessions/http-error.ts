@@ -13,7 +13,9 @@ export function sessionApiErrorResponse(error: unknown): NextResponse {
           ? "You do not have permission to perform this action."
           : error.code === "UNAUTHORIZED"
             ? "Please sign in to continue."
-            : error.message;
+            : error.code === "SESSION_REPLACED"
+              ? error.message
+              : error.message;
     return NextResponse.json({ error: message, code: error.code }, { status });
   }
   console.error(error);

@@ -1,10 +1,11 @@
 import { cache } from "react";
 
 import type { ActorContext } from "@/application/common/actor-context";
-import { getSessionUser } from "@/application/common/session";
+import { lookupAuthSession } from "@/application/common/session";
 import { UserRole, UserStatus } from "@/domain/enums";
 import {
   ForbiddenError,
+  SessionReplacedError,
   UnauthorizedError,
 } from "@/domain/errors/domain-error";
 import { userRepository } from "@/infrastructure/repositories";
@@ -16,7 +17,10 @@ const ROLE_VALUES = new Set<string>(Object.values(UserRole));
  * Authorization trusts the current database role/status (not only JWT claims).
  */
 export async function requireActor(role?: UserRole): Promise<ActorContext> {
-  const session = await getSessionUser();
+  const { session, replaced } = await lookupAuthSession();
+  if (replaced) {
+    throw new SessionReplacedError();
+  }
   if (!session?.user?.id) {
     throw new UnauthorizedError("You must be signed in");
   }

@@ -70,8 +70,6 @@ type AttachedDocument = {
 type LegalAiChatProps = {
   initialQuestion?: string;
   initialConversationId?: string;
-  initialCaseFileId?: string;
-  initialMode?: "CITIZEN" | "PROFESSIONAL";
   initialMessages?: Message[];
   initialAttachedDocument?: AttachedDocument | null;
   documentUploadEnabled?: boolean;
@@ -118,8 +116,6 @@ const QUICK_ACTIONS = [
 export function LegalAiChat({
   initialQuestion = "",
   initialConversationId,
-  initialCaseFileId,
-  initialMode,
   initialMessages = [],
   initialAttachedDocument = null,
   documentUploadEnabled = false,
@@ -131,9 +127,6 @@ export function LegalAiChat({
 }: LegalAiChatProps) {
   const [message, setMessage] = useState(initialQuestion);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [mode, setMode] = useState<"CITIZEN" | "PROFESSIONAL">(
-    initialMode ?? (initialCaseFileId ? "PROFESSIONAL" : "CITIZEN"),
-  );
   const [conversationId, setConversationId] = useState<string | undefined>(
     initialConversationId,
   );
@@ -360,8 +353,6 @@ export function LegalAiChat({
         body: JSON.stringify({
           message: text,
           conversationId,
-          caseFileId: conversationId ? undefined : initialCaseFileId,
-          mode: initialCaseFileId ? "PROFESSIONAL" : mode,
         }),
       });
 
@@ -493,6 +484,7 @@ export function LegalAiChat({
               >
                 <ImagePlus className="size-4" />
               </ComposerIconButton>
+              {documentUploadEnabled ? (
               <ComposerIconButton
                 label="PDF хавсаргах"
                 onClick={() => {
@@ -503,6 +495,7 @@ export function LegalAiChat({
               >
                 <Paperclip className="size-4" />
               </ComposerIconButton>
+              ) : null}
               <ComposerIconButton
                 label={listening ? "Бичлэгийг зогсоох" : "Микрофон"}
                 pressed={listening}
@@ -523,10 +516,8 @@ export function LegalAiChat({
           </div>
         </div>
         <p className="mt-2 px-1 text-[11px] leading-4 text-[#8A939D]">
-          TORE Legal AI нь ерөнхий хууль зүйн мэдээлэл, урьдчилсан чиглэл
-          өгнө. Мэргэжлийн зөвлөгөө, төлөөлөл биш. Native-text PDF-ийн
-          уншигдсан текстийг шинжилнэ. DOCX, зураг, скан хийсэн PDF одоогоор
-          боломжгүй.
+          TORE Chat нь ерөнхий хууль зүйн мэдээлэл, урьдчилсан чиглэл өгнө.
+          Мэргэжлийн зөвлөгөө, төлөөлөл биш.
         </p>
       </div>
     </form>
@@ -542,7 +533,7 @@ export function LegalAiChat({
           className="w-[18rem] max-w-[85vw] gap-0 border-r-0 bg-[#0B1F3A] p-0 text-[#F7FAF8] [&>button]:text-[#F7FAF8]"
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>TORE Legal AI цэс</SheetTitle>
+            <SheetTitle>TORE Chat цэс</SheetTitle>
             <SheetDescription>Яриа болон холбоосууд</SheetDescription>
           </SheetHeader>
           {sidebar}
@@ -564,66 +555,14 @@ export function LegalAiChat({
             </Button>
             <div className="min-w-0">
               <p className="text-[11px] font-semibold tracking-[0.16em] text-[#8A6B2A]">
-                TORE LEGAL AI
+                TORE Chat
               </p>
               <p className="truncate text-sm font-medium text-[#0A0F14]">
-                Хууль зүйн ажлын талбар
+                Таны асуудлыг ойлгож, хуульд тулгуурлан дараагийн алхмыг
+                тодорхойлоход тусална.
               </p>
             </div>
-<div className="hidden items-center rounded-lg bg-[#F1F3F5] p-0.5 sm:flex">
-  <button
-    type="button"
-    onClick={() => setMode("CITIZEN")}
-    className={cn(
-      "rounded-md px-3 py-1.5 text-xs font-medium transition",
-      mode === "CITIZEN"
-        ? "bg-white text-[#0B1F3A] shadow-sm"
-        : "text-[#66717D]",
-    )}
-  >
-    Иргэн
-  </button>
-
-  <button
-    type="button"
-    onClick={() => setMode("PROFESSIONAL")}
-    className={cn(
-      "rounded-md px-3 py-1.5 text-xs font-medium transition",
-      mode === "PROFESSIONAL"
-        ? "bg-[#0B1F3A] text-white shadow-sm"
-        : "text-[#66717D]",
-    )}
-  >
-    Хуульч / Өмгөөлөгч
-  </button>
-</div>
-          </div><div className="hidden items-center rounded-lg border border-[#D9DEE5] bg-[#F8FAFC] p-1 sm:flex">
-  <button
-    type="button"
-    onClick={() => setMode("CITIZEN")}
-    className={cn(
-      "rounded-md px-3 py-1.5 text-xs font-medium transition",
-      mode === "CITIZEN"
-        ? "bg-white text-[#0B1F3A] shadow-sm"
-        : "text-[#66717D] hover:text-[#0B1F3A]",
-    )}
-  >
-    Иргэн
-  </button>
-
-  <button
-    type="button"
-    onClick={() => setMode("PROFESSIONAL")}
-    className={cn(
-      "rounded-md px-3 py-1.5 text-xs font-medium transition",
-      mode === "PROFESSIONAL"
-        ? "bg-[#0B1F3A] text-white shadow-sm"
-        : "text-[#66717D] hover:text-[#0B1F3A]",
-    )}
-  >
-    Хуульч / Өмгөөлөгч
-  </button>
-</div>
+          </div>
           <div className="flex shrink-0 items-center gap-2 text-sm">
             {dashboardHref ? (
               <Link
@@ -692,7 +631,7 @@ export function LegalAiChat({
                   <div className="flex items-start gap-3">
                     <WorkspaceMark />
                     <div className="rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-white px-4 py-3 text-sm text-[#66717D] shadow-[0_8px_24px_-16px_rgba(11,31,58,0.35)]">
-                      TORE Legal AI хариулж байна...
+                      TORE Chat хариулж байна...
                     </div>
                   </div>
                 ) : null}
@@ -747,10 +686,10 @@ function LegalAiSidebar({
           Шинэ яриа
         </Button>
 
-        <nav className="space-y-1" aria-label="Legal AI">
+        <nav className="space-y-1" aria-label="TORE Chat">
           <SidebarLink href={LEGAL_AI_PATH} onClick={onNavigate} active>
             <SquarePen className="size-4" />
-            Legal AI
+            TORE Chat
           </SidebarLink>
           <SidebarLink href="/lawyers" onClick={onNavigate}>
             <Users className="size-4" />
@@ -810,13 +749,14 @@ function EmptyWorkspace({
           <ToreLogo variant="mark" tone="on-light" markClassName="size-8" />
         </div>
         <p className="mt-6 text-[11px] font-semibold tracking-[0.18em] text-[#8A6B2A]">
-          TORE LEGAL AI
+          TORE Chat
         </p>
         <h1 className="mt-2 text-[1.75rem] font-semibold leading-[1.2] tracking-[-0.03em] text-[#0A0F14] sm:text-[2rem]">
           Танд юу тохиолдсон бэ?
         </h1>
         <p className="mx-auto mt-3 max-w-lg text-[15px] leading-[1.6] text-[#5C6570]">
-          Асуудлаа өөрийнхөөрөө бичээрэй. Хуулийн нэр томъёо мэдэх шаардлагагүй.
+          Таны асуудлыг ойлгож, хуульд тулгуурлан дараагийн алхмыг тодорхойлоход
+          тусална.
         </p>
       </div>
 
@@ -852,6 +792,9 @@ function MessageBubble({ message }: { message: Message }) {
     <div className="flex items-start gap-3">
       <WorkspaceMark />
       <div className="max-w-[85%] rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-white px-4 py-4 text-sm leading-6 whitespace-pre-wrap text-[#3F4852] shadow-[0_10px_28px_-20px_rgba(11,31,58,0.4)]">
+        <p className="mb-2 text-[11px] font-semibold tracking-[0.12em] text-[#8A6B2A]">
+          TORE-ийн дүгнэлт
+        </p>
         {message.content}
         <LegalAiCitationList citations={message.citations} />
       </div>

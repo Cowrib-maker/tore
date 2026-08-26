@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import NextAuth from "next-auth";
 
 import { UserRole, UserStatus } from "@/domain/enums";
-import { isSessionBouncingAuthRoute } from "@/application/services/email-verification-flow";
+import { shouldBounceAuthenticatedFromAuthRoute } from "@/application/services/email-verification-flow";
 import {
   canAccessRoute,
   getDashboardPath,
@@ -33,11 +33,14 @@ function attachLocaleCookie(
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
-  const isLoggedIn = !!req.auth;
+  const isLoggedIn = Boolean(req.auth?.user?.id);
   const role = req.auth?.user?.role as UserRole | undefined;
   const status = req.auth?.user?.status;
 
-  const isAuthRoute = isSessionBouncingAuthRoute(pathname);
+  const isAuthRoute = shouldBounceAuthenticatedFromAuthRoute(
+    pathname,
+    req.nextUrl.searchParams.get("reason"),
+  );
 
   // Boundary-aware prefixes — `/lawyer` must not match public `/lawyers`.
   const isProtectedRoute = isProtectedAppRoute(pathname);

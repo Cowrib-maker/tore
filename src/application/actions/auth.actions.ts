@@ -8,6 +8,7 @@ import {
 } from "@/application/common/action-state";
 import { getClientIp } from "@/application/common/client-ip";
 import { mapActionError } from "@/application/common/map-action-error";
+import { mapEmailVerificationActionError } from "@/application/common/map-email-verification-error";
 import { parseWithSchema } from "@/application/common/parse-form";
 import { enforceRateLimit } from "@/application/common/rate-limit-action";
 import {
@@ -20,13 +21,14 @@ import {
 } from "@/application/services/email-verification-flow";
 import { registerClientUseCase } from "@/application/use-cases/auth/register-client";
 import { registerLawyerUseCase } from "@/application/use-cases/auth/register-lawyer";
-import { resendEmailVerificationUseCase } from "@/application/use-cases/auth/email-verification";
+import { resendEmailVerificationUseCase, verifyEmailOtpUseCase } from "@/application/use-cases/auth/email-verification";
 import {
   LOGIN_RATE_LIMIT,
   PASSWORD_RESET_REQUEST_RATE_LIMIT,
   PASSWORD_RESET_SUBMIT_RATE_LIMIT,
   REGISTER_RATE_LIMIT,
   RESEND_VERIFICATION_RATE_LIMIT,
+  VERIFY_EMAIL_OTP_RATE_LIMIT,
 } from "@/infrastructure/security/rate-limiter";
 import { signIn, signOut, auth } from "@/lib/auth";
 import { env } from "@/lib/env";
@@ -43,6 +45,7 @@ import {
   registerLawyerSchema,
   resendVerificationSchema,
   resetPasswordSchema,
+  verifyEmailOtpSchema,
 } from "@/application/validators/auth.schema";
 import { UserRole, UserStatus } from "@/domain/enums";
 import { getPostAuthRedirect } from "@/domain/services/rbac";
@@ -91,12 +94,13 @@ export async function registerClientAction(
     return mapActionError(error);
   }
 
-  await issueVerificationEmailAfterRegister(parsed.data.email);
+  const issued = await issueVerificationEmailAfterRegister(parsed.data.email);
 
   redirect(
     buildEmailVerificationPendingPath({
       email: parsed.data.email,
       callbackUrl: formData.get("callbackUrl"),
+      sent: issued.sent,
     }),
   );
 }
@@ -128,11 +132,12 @@ export async function registerLawyerAction(
     return mapActionError(error);
   }
 
-  await issueVerificationEmailAfterRegister(parsed.data.email);
+  const issued = await issueVerificationEmailAfterRegister(parsed.data.email);
 
   redirect(
     buildEmailVerificationPendingPath({
       email: parsed.data.email,
+      sent: issued.sent,
     }),
   );
 }
@@ -206,15 +211,24 @@ export async function resendVerificationEmailAction(
   const parsed = parseWithSchema(resendVerificationSchema, {
     email: formData.get("email"),
   });
-  if (!parsed.ok) return parsed.state;
+  if (!parsed.ok) {
+    return { code: AUTH_ACTION_CODE.INVALID_EMAIL };
+  }
 
   const ipAddress = await getClientIp();
-  const limited = await enforceRateLimit(
-    `resend-verify:${ipAddress ?? "unknown"}:${parsed.data.email}`,
-    RESEND_VERIFICATION_RATE_LIMIT,
-    "attempts",
-  );
-  if (limited) return limited;
+  try {
+    const limited = await enforceRateLimit(
+      `resend-verify:${ipAddress ?? "unknown"}:${parsed.data.email}`,
+      RESEND_VERIFICATION_RATE_LIMIT,
+      "attempts",
+    );
+    if (limited) {
+      return { code: AUTH_ACTION_CODE.RATE_LIMITED };
+    }
+  } catch (error) {
+    console.error("[email:verification] resend rate-limit failed", error);
+    return { code: AUTH_ACTION_CODE.TEMPORARY_FAILURE };
+  }
 
   try {
     await resendEmailVerificationUseCase(
@@ -227,7 +241,56 @@ export async function resendVerificationEmailAction(
     };
   } catch (error) {
     console.error("[email:verification] resend action failed", error);
-    return mapActionError(error);
+    return mapEmailVerificationActionError(error);
+  }
+}
+
+export async function verifyEmailOtpAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const parsed = parseWithSchema(verifyEmailOtpSchema, {
+    email: formData.get("email"),
+    otp: formData.get("otp"),
+  });
+  if (!parsed.ok) {
+    const emailOnly = parseWithSchema(resendVerificationSchema, {
+      email: formData.get("email"),
+    });
+    return {
+      code: emailOnly.ok
+        ? AUTH_ACTION_CODE.EMAIL_VERIFICATION_INVALID
+        : AUTH_ACTION_CODE.INVALID_EMAIL,
+    };
+  }
+
+  const ipAddress = await getClientIp();
+  try {
+    const limited = await enforceRateLimit(
+      `verify-otp:${ipAddress ?? "unknown"}:${parsed.data.email}`,
+      VERIFY_EMAIL_OTP_RATE_LIMIT,
+      "attempts",
+    );
+    if (limited) {
+      return { code: AUTH_ACTION_CODE.RATE_LIMITED };
+    }
+  } catch (error) {
+    console.error("[email:verification] otp rate-limit failed", error);
+    return { code: AUTH_ACTION_CODE.TEMPORARY_FAILURE };
+  }
+
+  try {
+    const result = await verifyEmailOtpUseCase(
+      parsed.data,
+      getEmailVerificationDeps(),
+    );
+    return {
+      success: true,
+      code: AUTH_ACTION_CODE.EMAIL_VERIFIED,
+      email: result.email,
+    };
+  } catch (error) {
+    return mapEmailVerificationActionError(error);
   }
 }
 

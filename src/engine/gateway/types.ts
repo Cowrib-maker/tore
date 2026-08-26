@@ -120,10 +120,20 @@ export type PromptBuildInput = {
   intentType?: string;
   intentConfidence?: number;
   missingInformation?: readonly string[];
+  /** Shown when retrieval ran but returned no authoritative source. */
+  missingLegalSourceMessage?: string;
   /** True only when verified corpus authorities are attached. */
   corpusAvailable?: boolean;
   verifiedAuthorities?: readonly VerifiedLegalAuthority[];
   mode?: "CITIZEN" | "PROFESSIONAL";
+  /** Server-derived product capability. Wins over {@link mode}. */
+  capability?: "CITIZEN" | "LAWYER";
+  /** Lawyer task classification; ignored for citizen capability. */
+  taskType?: string;
+  /** Reasoning stages selected for this turn. */
+  reasoningStages?: readonly string[];
+  /** Structured owned CaseFile data block (already wrapped). */
+  caseContextBlock?: string;
   /** Native-text extract from the conversation's attached PDF, if any. */
   documentExtract?: string;
   documentFileName?: string;

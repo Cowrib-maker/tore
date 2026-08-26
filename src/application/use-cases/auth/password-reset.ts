@@ -122,6 +122,14 @@ export async function resetPasswordWithTokenUseCase(
 
   const passwordHash = await hash(input.newPassword, 12);
   await deps.userRepository.updatePasswordHash(withHash.user.id, passwordHash);
+  const {
+    generateActiveSessionId,
+    hashActiveSessionId,
+  } = await import("@/domain/services/active-session");
+  await deps.userRepository.rotateActiveSessionIdHash(
+    withHash.user.id,
+    hashActiveSessionId(generateActiveSessionId()),
+  );
   await deps.emailVerificationTokenRepository.deleteByTokenHash(tokenHash);
   // Also clear any other reset tokens for this email.
   await deps.emailVerificationTokenRepository.deleteForIdentifier(

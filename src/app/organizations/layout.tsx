@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { getActiveContextSwitcherModel } from "@/application/common/active-context-switcher-model";
 import { requireActor } from "@/application/common/require-actor";
-import { getSessionUser } from "@/application/common/session";
+import { getSessionUser, requirePageSession } from "@/application/common/session";
 import { ActiveContextSwitcher } from "@/components/organizations/active-context-switcher";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { ActiveContextType } from "@/domain/enums";
@@ -10,6 +10,8 @@ import { getDashboardPath, getProfilePath } from "@/domain/services/rbac";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 import { isFoundationOrgsV1Enabled } from "@/lib/feature-flags";
+import { SessionReplacedError } from "@/domain/errors/domain-error";
+import { sessionReplacedLoginPath } from "@/domain/services/active-session";
 
 export default async function OrganizationsLayout({
   children,
@@ -20,10 +22,15 @@ export default async function OrganizationsLayout({
     try {
       const actor = await requireActor();
       redirect(getDashboardPath(actor.role));
-    } catch {
+    } catch (error) {
+      if (error instanceof SessionReplacedError) {
+        redirect(sessionReplacedLoginPath());
+      }
       redirect("/login");
     }
   }
+
+  await requirePageSession();
 
   const [actor, session, dict, locale] = await Promise.all([
     requireActor(),

@@ -58,6 +58,7 @@ describe("password reset use cases", () => {
     findByEmail: ReturnType<typeof vi.fn>;
     findByEmailWithPasswordHash: ReturnType<typeof vi.fn>;
     updatePasswordHash: ReturnType<typeof vi.fn>;
+    rotateActiveSessionIdHash: ReturnType<typeof vi.fn>;
   };
   let emailSender: { send: ReturnType<typeof vi.fn> };
 
@@ -72,6 +73,7 @@ describe("password reset use cases", () => {
       findByEmail: vi.fn(),
       findByEmailWithPasswordHash: vi.fn(),
       updatePasswordHash: vi.fn().mockResolvedValue(user),
+      rotateActiveSessionIdHash: vi.fn().mockResolvedValue(undefined),
     };
     emailSender = { send: vi.fn().mockResolvedValue(undefined) };
   });
@@ -143,6 +145,10 @@ describe("password reset use cases", () => {
     expect(userRepository.updatePasswordHash).toHaveBeenCalledWith(
       "u1",
       expect.any(String),
+    );
+    expect(userRepository.rotateActiveSessionIdHash).toHaveBeenCalledWith(
+      "u1",
+      expect.stringMatching(/^[a-f0-9]{64}$/),
     );
     expect(emailVerificationTokenRepository.deleteByTokenHash).toHaveBeenCalledWith(
       tokenHash,

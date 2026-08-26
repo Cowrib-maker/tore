@@ -21,6 +21,8 @@ export function mapActionError(error: unknown): ActionState {
         return { error: "The requested resource was not found." };
       case "UNAUTHORIZED":
         return { error: "Please sign in to continue." };
+      case "SESSION_REPLACED":
+        return { error: error.message };
       case "FORBIDDEN":
         return { error: "You do not have permission to perform this action." };
       case "EMAIL_NOT_VERIFIED":

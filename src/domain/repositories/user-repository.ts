@@ -18,6 +18,13 @@ export type ListUsersResult = {
   total: number;
 };
 
+export type AuthPrincipal = {
+  id: string;
+  role: UserRole;
+  status: UserStatus;
+  activeSessionIdHash: string | null;
+};
+
 export interface UserRepository {
   findById(id: string): Promise<User | null>;
   findByIds(ids: string[]): Promise<User[]>;
@@ -36,4 +43,7 @@ export interface UserRepository {
   updateEmail(userId: string, email: string): Promise<User>;
   listUsers(input: ListUsersInput): Promise<ListUsersResult>;
   updateStatus(userId: string, status: UserStatus): Promise<User>;
+  findAuthPrincipal(id: string): Promise<AuthPrincipal | null>;
+  rotateActiveSessionIdHash(userId: string, sessionIdHash: string): Promise<void>;
+  clearActiveSessionIdHash(userId: string): Promise<void>;
 }

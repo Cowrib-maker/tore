@@ -1,12 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 
 import { resendVerificationEmailAction } from "@/application/actions/auth.actions";
 import {
   AUTH_ACTION_CODE,
   type ActionState,
 } from "@/application/common/action-state";
+import { userFacingResendFeedback } from "@/application/common/map-email-verification-error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,29 +20,35 @@ export function ResendVerificationForm({
   defaultEmail,
   submitLabel,
   hideEmailField = false,
+  onSent,
 }: {
   copy: Dictionary["auth"];
   defaultEmail?: string | null;
   submitLabel?: string;
   hideEmailField?: boolean;
+  onSent?: () => void;
 }) {
+  const onSentRef = useRef(onSent);
+  onSentRef.current = onSent;
   const [state, formAction, pending] = useActionState(
     resendVerificationEmailAction,
     initialState,
   );
 
+  useEffect(() => {
+    if (state.success && state.code === AUTH_ACTION_CODE.RESEND_SENT) {
+      onSentRef.current?.();
+    }
+  }, [state]);
+
   const knownEmail = defaultEmail?.trim() ?? "";
   const showEmailField = !hideEmailField || !knownEmail;
+  const feedback = userFacingResendFeedback(state, copy);
+  const errorMessage = feedback?.tone === "error" ? feedback.text : null;
   const successMessage =
-    state.success && state.code === AUTH_ACTION_CODE.RESEND_SENT
-      ? copy.resendGenericSuccess
-      : state.success
-        ? copy.resendGenericSuccess
-        : null;
-  const errorMessage =
-    state.code === AUTH_ACTION_CODE.RATE_LIMITED
-      ? copy.verifyRateLimited
-      : state.error;
+    feedback?.tone === "success" || feedback?.tone === "info"
+      ? feedback.text
+      : null;
 
   return (
     <form action={formAction} className="space-y-3">

@@ -76,15 +76,10 @@ export class PrismaLegalAiStore implements LegalAiStore {
         id: true,
         questionStatus: true,
         billedQuestionCount: true,
+        caseFileId: true,
       },
     });
-    return conversation
-      ? {
-          id: conversation.id,
-          questionStatus: conversation.questionStatus as LegalAiConversation["questionStatus"],
-          billedQuestionCount: conversation.billedQuestionCount,
-        }
-      : null;
+    return conversation ? toConversation(conversation) : null;
   }
 
    async createConversation(input: {

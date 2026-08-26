@@ -1,10 +1,13 @@
-import { getSessionUser } from "@/application/common/session";
+import { redirect } from "next/navigation";
+
 import { getLegalAiService } from "@/application/ai/create-legal-ai-service";
+import { lookupAuthSession } from "@/application/common/session";
 import { loadLawyerAiWorkbench } from "@/application/use-cases/ai/load-lawyer-ai-workbench";
+import { LawyerWorkspaceFrame } from "@/components/case-review/lawyer-workspace-frame";
 import { LegalAiChat } from "@/components/legal-ai/legal-ai-chat";
 import { LawyerAiWorkbench } from "@/components/legal-ai/lawyer-ai-workbench";
-import { LawyerWorkspaceFrame } from "@/components/case-review/lawyer-workspace-frame";
 import { UserRole } from "@/domain/enums";
+import { sessionReplacedLoginPath } from "@/domain/services/active-session";
 import { getDashboardPath, getProfilePath } from "@/domain/services/rbac";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
@@ -16,11 +19,15 @@ export default async function LegalAiPage({
 }: {
   searchParams: SearchParams;
 }) {
-  const [dict, session, params] = await Promise.all([
+  const [dict, lookup, params] = await Promise.all([
     getDictionary(),
-    getSessionUser(),
+    lookupAuthSession(),
     searchParams,
   ]);
+  if (lookup.replaced) {
+    redirect(sessionReplacedLoginPath());
+  }
+  const session = lookup.session;
   const initialQuestion = typeof params.q === "string" ? params.q : "";
   const conversationId =
     typeof params.conversationId === "string" ? params.conversationId : undefined;
@@ -108,8 +115,6 @@ export default async function LegalAiPage({
     <LegalAiChat
       initialQuestion={initialQuestion}
       initialConversationId={ownedConversationId}
-      initialCaseFileId={caseFileId}
-      initialMode={caseFileId ? "PROFESSIONAL" : undefined}
       initialMessages={initialMessages}
       initialAttachedDocument={initialAttachedDocument}
       documentUploadEnabled={session?.user?.role === UserRole.LAWYER}

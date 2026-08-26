@@ -13,7 +13,9 @@ export function caseFileErrorResponse(error: unknown): NextResponse {
           ? "Энэ үйлдлийг хийх эрхгүй."
           : error.code === "UNAUTHORIZED"
             ? "Үргэлжлүүлэхийн тулд нэвтэрнэ үү."
-            : error.code === "CONFLICT"
+            : error.code === "SESSION_REPLACED"
+              ? error.message
+              : error.code === "CONFLICT"
               ? "Хэргийг өөр сессэд шинэчилсэн байна."
               : error.message;
     return NextResponse.json({ error: message, code: error.code }, { status });

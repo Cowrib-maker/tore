@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { getSessionUser } from "@/application/common/session";
+import { lookupAuthSession } from "@/application/common/session";
 import { getLegalQuestionEntitlementSnapshot } from "@/application/legal-ai/legal-question-access";
 import { resolveGuestSession } from "@/application/legal-ai/resolve-guest-session";
 import { UserRole } from "@/domain/enums";
+import { SessionReplacedError } from "@/domain/errors/domain-error";
 import {
   prismaConversationBillingStore,
   prismaGuestSessionStore,
@@ -14,7 +15,15 @@ import {
 } from "@/infrastructure/repositories";
 
 export async function GET() {
-  const session = await getSessionUser();
+  const lookup = await lookupAuthSession();
+  if (lookup.replaced) {
+    const error = new SessionReplacedError();
+    return NextResponse.json(
+      { error: error.message, code: error.code },
+      { status: error.statusCode },
+    );
+  }
+  const session = lookup.session;
   const actor = session?.user?.id
     ? { userId: session.user.id, role: session.user.role as UserRole }
     : null;

@@ -30,6 +30,9 @@ export function LegalAiCitationList({
       <p className="text-[11px] font-semibold tracking-[0.12em] text-[#8A6B2A]">
         Эх сурвалж
       </p>
+      <p className="mt-1 text-[11px] leading-4 text-[#8A939D]">
+        Доорх нь баталгаатай эх. Дээрх хариулт нь TORE-ийн дүгнэлт — ишлэл биш.
+      </p>
       <ul className="mt-2 space-y-2">
         {citations.map((citation) => {
           const articleLine = formatCitationArticleLine(citation);

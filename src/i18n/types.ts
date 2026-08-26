@@ -132,6 +132,8 @@ export type Dictionary = {
   auth: {
     loginTitle: string;
     loginDescription: string;
+    sessionReplaced: string;
+    sessionReplacedHint: string;
     email: string;
     password: string;
     signingIn: string;
@@ -149,6 +151,12 @@ export type Dictionary = {
     verifyResendHint: string;
     verifyPendingTitle: string;
     verifyPendingBody: string;
+    verifyOtpLabel: string;
+    verifyOtpSubmit: string;
+    verifyOtpSubmitting: string;
+    verifyOtpInvalid: string;
+    verifyOtpExpired: string;
+    verifyResendCountdown: string;
     verifyResend: string;
     verifyBackToLogin: string;
     verifySpamHint: string;
@@ -156,8 +164,15 @@ export type Dictionary = {
     verifyRequestNew: string;
     verifyContinue: string;
     resendGenericSuccess: string;
+    resendSentSuccess: string;
     verifyNeedsLink: string;
     verifyRateLimited: string;
+    verifyAlreadyVerified: string;
+    verifyEmailNotFound: string;
+    verifyEmailInvalid: string;
+    verifyDeliveryFailed: string;
+    verifyEmailMisconfigured: string;
+    verifyTemporaryFailure: string;
     newToTore: string;
     registerClientLink: string;
     registerLawyerLink: string;

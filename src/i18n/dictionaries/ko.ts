@@ -275,6 +275,9 @@ export const ko: Dictionary = {
     loginTitle: "TORE 로그인",
     loginDescription:
       "몽골 법률 마켓플레이스의 고객 또는 변호사 작업 공간에 접속하세요.",
+    sessionReplaced:
+      "Таны бүртгэлээр өөр төхөөрөмжөөс нэвтэрсэн тул энэ төхөөрөмжийн сесс дуусгавар боллоо.",
+    sessionReplacedHint: "Шинээр нэвтрэхийн тулд дахин нэвтэрнэ үү.",
     email: "이메일",
     password: "비밀번호",
     signingIn: "로그인 중…",
@@ -287,14 +290,21 @@ export const ko: Dictionary = {
     resendSending: "보내는 중…",
     verifyTitleSuccess: "이메일 확인 완료",
     verifyTitleError: "인증 실패",
-    verifySuccess: "{email}이(가) 확인되었습니다. 로그인할 수 있습니다.",
+    verifySuccess: "이메일이 확인되었습니다.",
     verifyFailed:
       "이 링크가 유효하지 않거나 만료되었습니다. 로그인 페이지에서 새 인증 이메일을 요청하세요.",
     verifyMissingToken: "이 페이지를 열려면 유효한 인증 토큰이 필요합니다.",
     verifyResendHint: "새 인증 이메일을 요청하려면 로그인으로 돌아가세요.",
     verifyPendingTitle: "이메일을 확인해 주세요",
-    verifyPendingBody: "계정에 등록된 이메일 주소로 확인 링크를 보냈습니다.",
-    verifyResend: "확인 이메일 다시 보내기",
+    verifyPendingBody: "등록하신 이메일 주소로 6자리 인증 코드를 보냈습니다.",
+    verifyOtpLabel: "인증 코드",
+    verifyOtpSubmit: "확인",
+    verifyOtpSubmitting: "확인 중…",
+    verifyOtpInvalid: "인증 코드가 올바르지 않습니다.",
+    verifyOtpExpired:
+      "인증 코드가 만료되었습니다. 새 코드를 요청하세요.",
+    verifyResendCountdown: "새 코드를 요청할 수 있는 시간: {time}",
+    verifyResend: "코드 다시 보내기",
     verifyBackToLogin: "로그인 페이지로 돌아가기",
     verifySpamHint: "메일이 오지 않으면 스팸/정크함을 확인하세요.",
     verifyExpiredOrInvalid: "이 확인 링크는 유효하지 않거나 만료되었습니다.",
@@ -302,8 +312,18 @@ export const ko: Dictionary = {
     verifyContinue: "로그인",
     resendGenericSuccess:
       "해당 이메일로 미확인 계정이 있으면 확인 링크를 보냈습니다.",
+    resendSentSuccess: "확인 이메일을 다시 보냈습니다.",
     verifyNeedsLink: "이메일을 아직 확인하지 않으셨나요?",
     verifyRateLimited: "시도가 너무 많습니다. 잠시 후 다시 시도하세요.",
+    verifyAlreadyVerified: "이메일이 이미 확인되었습니다.",
+    verifyEmailNotFound: "이 이메일로 된 계정을 찾을 수 없습니다.",
+    verifyEmailInvalid: "올바른 이메일 주소를 입력하세요.",
+    verifyDeliveryFailed:
+      "인증 코드를 보내지 못했습니다. 다시 시도하세요.",
+    verifyEmailMisconfigured:
+      "이메일 발송 설정이 되어 있지 않습니다. 나중에 다시 시도하세요.",
+    verifyTemporaryFailure:
+      "일시적인 서버 오류가 발생했습니다. 잠시 후 다시 시도하세요.",
     newToTore: "TORE가 처음이신가요?",
     registerClientLink: "고객으로 등록",
     registerLawyerLink: "변호사로 등록",

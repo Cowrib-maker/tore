@@ -4,7 +4,12 @@
  */
 
 import type { LegalDomainClassificationContract } from "../classification";
-import { issueKindsForDomain } from "../frameworks/issue-catalog";
+import {
+  ADMINISTRATIVE_ISSUE_KINDS,
+  CIVIL_ISSUE_KINDS,
+  CRIMINAL_ISSUE_KINDS,
+  issueKindsForDomain,
+} from "../frameworks/issue-catalog";
 import type { LegalFact } from "../models";
 import {
   LegalDomain,
@@ -37,40 +42,56 @@ export interface IIssueSpotter {
 
 const KIND_HINTS: Record<IssueKind, RegExp> = {
   [LegalIssueKind.ELEMENTS_OF_OFFENSE]:
-    /\b(offense|offence|crime|actus|element|charge)\b/i,
-  [LegalIssueKind.UNLAWFULNESS]: /\b(unlawful|illegal|wrongful|prohibited)\b/i,
+    /\b(offense|offence|crime|actus|element|charge)\b|гэмт\s*хэрэг|бүрэлдэхүүн|яллах|эрүү/i,
+  [LegalIssueKind.UNLAWFULNESS]:
+    /\b(unlawful|illegal|wrongful|prohibited)\b|хууль\s*бус|хориотой|зөрчсөн/i,
   [LegalIssueKind.CULPABILITY]:
-    /\b(intent|mens rea|negligen|reckless|culpab|fault)\b/i,
-  [LegalIssueKind.CAUSATION]: /\b(caus|result|consequence|link)\b/i,
+    /\b(intent|mens rea|negligen|reckless|culpab|fault)\b|санаатай|болгоомжгүй|гэм\s*буруу/i,
+  [LegalIssueKind.CAUSATION]:
+    /\b(caus|result|consequence|link)\b|шалтгаан|үр\s*дагавар|холбоо/i,
   [LegalIssueKind.ATTEMPT_OR_PARTICIPATION]:
-    /\b(attempt|participat|aiding|abetting|accomplic)\b/i,
+    /\b(attempt|participat|aiding|abetting|accomplic)\b|завдсан|хамтран|хамсаатан/i,
   [LegalIssueKind.CIVIL_OBLIGATION]:
-    /\b(obligat|contract|duty|debt|performance)\b/i,
-  [LegalIssueKind.BREACH]: /\b(breach|default|non.?performance|violat)\b/i,
-  [LegalIssueKind.DAMAGES]: /\b(damage|loss|compensat|harm|injury)\b/i,
+    /\b(obligat|contract|duty|debt|performance)\b|гэрээ|үүрэг|өр\b|гүйцэтгэл/i,
+  [LegalIssueKind.BREACH]:
+    /\b(breach|default|non.?performance|violat)\b|зөрчил|биелүүлээгүй|гэрээг?\s*зөрч/i,
+  [LegalIssueKind.DAMAGES]:
+    /\b(damage|loss|compensat|harm|injury)\b|хохирол|нөхөн\s*төлбөр|гэмтэл/i,
   [LegalIssueKind.ADMINISTRATIVE_LEGALITY]:
-    /\b(administrat|agency|licence|license|permit|regulatory)\b/i,
+    /\b(administrat|agency|licence|license|permit|regulatory)\b|захиргаа|зөвшөөрөл|лиценз/i,
   [LegalIssueKind.COMPETENCE_OR_JURISDICTION]:
-    /\b(jurisdiction|competence|authority|forum)\b/i,
+    /\b(jurisdiction|competence|authority|forum)\b|харьяалал|эрх\s*мэдэл/i,
   [LegalIssueKind.PROCEDURAL_LEGALITY]:
-    /\b(procedure|procedural|due process|hearing|notice)\b/i,
+    /\b(procedure|procedural|due process|hearing|notice)\b|журам|процесс|мэдэгдэл|сонсох/i,
   [LegalIssueKind.EVIDENCE_OR_ADMISSIBILITY]:
-    /\b(evidence|admissib|exhibit|witness|proof)\b/i,
+    /\b(evidence|admissib|exhibit|witness|proof)\b|нотлох\s*баримт|гэрч|нотолгоо/i,
 };
 
 const KIND_LABELS: Record<IssueKind, string> = {
-  [LegalIssueKind.ELEMENTS_OF_OFFENSE]: "Elements of an offense",
-  [LegalIssueKind.UNLAWFULNESS]: "Unlawfulness",
-  [LegalIssueKind.CULPABILITY]: "Culpability",
-  [LegalIssueKind.CAUSATION]: "Causation",
-  [LegalIssueKind.ATTEMPT_OR_PARTICIPATION]: "Attempt / participation",
-  [LegalIssueKind.CIVIL_OBLIGATION]: "Civil obligation",
-  [LegalIssueKind.BREACH]: "Breach",
-  [LegalIssueKind.DAMAGES]: "Damages",
-  [LegalIssueKind.ADMINISTRATIVE_LEGALITY]: "Administrative legality",
-  [LegalIssueKind.COMPETENCE_OR_JURISDICTION]: "Competence / jurisdiction",
-  [LegalIssueKind.PROCEDURAL_LEGALITY]: "Procedural legality",
-  [LegalIssueKind.EVIDENCE_OR_ADMISSIBILITY]: "Evidence / admissibility",
+  [LegalIssueKind.ELEMENTS_OF_OFFENSE]: "Гэмт хэргийн бүрэлдэхүүн",
+  [LegalIssueKind.UNLAWFULNESS]: "Хууль бус байдал",
+  [LegalIssueKind.CULPABILITY]: "Гэм буруу",
+  [LegalIssueKind.CAUSATION]: "Шалтгаан холбоо",
+  [LegalIssueKind.ATTEMPT_OR_PARTICIPATION]: "Завдалт / оролцоо",
+  [LegalIssueKind.CIVIL_OBLIGATION]: "Иргэний үүрэг",
+  [LegalIssueKind.BREACH]: "Үүрэг зөрчих",
+  [LegalIssueKind.DAMAGES]: "Хохирол",
+  [LegalIssueKind.ADMINISTRATIVE_LEGALITY]: "Захиргааны хууль ёсны байдал",
+  [LegalIssueKind.COMPETENCE_OR_JURISDICTION]: "Харьяалал / эрх мэдэл",
+  [LegalIssueKind.PROCEDURAL_LEGALITY]: "Процессын хууль ёсны байдал",
+  [LegalIssueKind.EVIDENCE_OR_ADMISSIBILITY]: "Нотлох баримт / хүлээн зөвшөөрөх",
+};
+
+const KIND_DOMAIN: Partial<Record<IssueKind, LegalDomainType>> = {
+  [LegalIssueKind.ELEMENTS_OF_OFFENSE]: LegalDomain.CRIMINAL,
+  [LegalIssueKind.UNLAWFULNESS]: LegalDomain.CRIMINAL,
+  [LegalIssueKind.CULPABILITY]: LegalDomain.CRIMINAL,
+  [LegalIssueKind.ATTEMPT_OR_PARTICIPATION]: LegalDomain.CRIMINAL,
+  [LegalIssueKind.CIVIL_OBLIGATION]: LegalDomain.CIVIL,
+  [LegalIssueKind.BREACH]: LegalDomain.CIVIL,
+  [LegalIssueKind.DAMAGES]: LegalDomain.CIVIL,
+  [LegalIssueKind.ADMINISTRATIVE_LEGALITY]: LegalDomain.ADMINISTRATIVE,
+  [LegalIssueKind.COMPETENCE_OR_JURISDICTION]: LegalDomain.ADMINISTRATIVE,
 };
 
 /**
@@ -85,8 +106,8 @@ export class RuleBasedIssueSpotter implements IIssueSpotter {
   spot(facts: readonly LegalFact[]): IssueSpottingResult {
     const combined = facts.map((f) => f.statement).join(" \n ");
     const classification = this.classifier.classify(combined || "unknown");
-    const domain = classification.domain;
-    const kinds = issueKindsForDomain(domain);
+    let domain = classification.domain;
+    let kinds = issueKindsForDomain(domain);
     const notes: string[] = [];
 
     if (facts.length === 0) {
@@ -95,10 +116,11 @@ export class RuleBasedIssueSpotter implements IIssueSpotter {
     }
 
     if (kinds.length === 0) {
-      notes.push(
-        `domain ${domain} has no issue catalog — candidates empty until doctrine is loaded`,
-      );
-      return { domain, candidates: [], notes };
+      kinds = uniqueKinds([
+        ...CRIMINAL_ISSUE_KINDS,
+        ...CIVIL_ISSUE_KINDS,
+        ...ADMINISTRATIVE_ISSUE_KINDS,
+      ]);
     }
 
     const candidates: CandidateLegalIssue[] = [];
@@ -123,8 +145,14 @@ export class RuleBasedIssueSpotter implements IIssueSpotter {
       notes.push(
         "no candidate issues supported by supplied facts — refusing to invent issues",
       );
+    } else if (domain === LegalDomain.UNKNOWN) {
+      domain = KIND_DOMAIN[candidates[0]!.kind] ?? LegalDomain.UNKNOWN;
     }
 
     return { domain, candidates, notes };
   }
+}
+
+function uniqueKinds(kinds: readonly IssueKind[]): IssueKind[] {
+  return [...new Set(kinds)];
 }

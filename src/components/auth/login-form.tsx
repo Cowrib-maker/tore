@@ -28,9 +28,11 @@ const initialState: ActionState = {};
 export function LoginForm({
   copy,
   callbackUrl,
+  sessionReplaced = false,
 }: {
   copy: Dictionary["auth"];
   callbackUrl?: string | null;
+  sessionReplaced?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
   const registerHref = callbackUrl
@@ -58,6 +60,16 @@ export function LoginForm({
             <input type="hidden" name="callbackUrl" value={callbackUrl} />
           ) : null}
           <CardContent className="space-y-4">
+            {sessionReplaced ? (
+              <div
+                role="alert"
+                aria-live="assertive"
+                className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
+              >
+                <p>{copy.sessionReplaced}</p>
+                <p className="mt-1 text-destructive/90">{copy.sessionReplacedHint}</p>
+              </div>
+            ) : null}
             {state.error && (
               <div
                 id="login-form-error"

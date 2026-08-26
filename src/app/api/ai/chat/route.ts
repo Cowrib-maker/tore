@@ -5,11 +5,14 @@ import { getLegalAiService } from "@/application/ai/create-legal-ai-service";
 import { guardLawyerAiHttp } from "@/application/common/guard-lawyer-ai-http";
 import { rateLimitHttpResponse } from "@/application/common/rate-limit-http";
 import { requireActor } from "@/application/common/require-actor";
-import { getSessionUser } from "@/application/common/session";
+import { lookupAuthSession } from "@/application/common/session";
 import { assertEmailVerified } from "@/application/common/require-verified-email";
 import { resolveGuestSession } from "@/application/legal-ai/resolve-guest-session";
 import { assertOwnedCaseFileForAi } from "@/application/use-cases/case-review";
-import { DomainError } from "@/domain/errors/domain-error";
+import {
+  DomainError,
+  SessionReplacedError,
+} from "@/domain/errors/domain-error";
 import { EntitlementError } from "@/domain/errors/entitlement-error";
 import { EntitlementFeature, UserRole } from "@/domain/enums";
 import { GUEST_SESSION_COOKIE } from "@/infrastructure/legal-ai/guest-session-cookie";
@@ -23,14 +26,22 @@ type ChatRequest = {
   message?: string;
   conversationId?: string;
   caseFileId?: string;
-  mode?: "CITIZEN" | "PROFESSIONAL";
+  /** Ignored. Capability is derived from the authenticated role. */
+  mode?: "CITIZEN" | "PROFESSIONAL" | "LAWYER";
 };
 
 export async function POST(request: Request) {
   try {
-    const session = await getSessionUser();
+    const lookup = await lookupAuthSession();
+    if (lookup.replaced) {
+      throw new SessionReplacedError();
+    }
+    const session = lookup.session;
     const actor = session?.user?.id
-      ? await requireActor().catch(() => null)
+      ? await requireActor().catch((error) => {
+          if (error instanceof SessionReplacedError) throw error;
+          return null;
+        })
       : null;
 
     if (actor?.role === UserRole.LAWYER) {
@@ -85,7 +96,6 @@ export async function POST(request: Request) {
       conversationId: body.conversationId,
       caseFileId,
       userContext: actor ? { role: actor.role } : undefined,
-      mode: caseFileId ? "PROFESSIONAL" : body.mode,
     });
 
     const response = NextResponse.json({

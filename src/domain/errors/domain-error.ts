@@ -1,3 +1,5 @@
+import { SESSION_REPLACED_MESSAGE } from "@/domain/services/active-session-constants";
+
 export class DomainError extends Error {
   constructor(
     message: string,
@@ -57,5 +59,42 @@ export class ConflictError extends DomainError {
   constructor(message: string) {
     super(message, "CONFLICT", 409);
     this.name = "ConflictError";
+  }
+}
+
+/** Safe client mapping only — never attach SMTP/API details. */
+export class EmailAlreadyVerifiedError extends DomainError {
+  constructor() {
+    super("This email is already verified.", "EMAIL_ALREADY_VERIFIED", 409);
+    this.name = "EmailAlreadyVerifiedError";
+  }
+}
+
+export class EmailNotFoundError extends DomainError {
+  constructor() {
+    super("No account was found for this email.", "EMAIL_NOT_FOUND", 404);
+    this.name = "EmailNotFoundError";
+  }
+}
+
+export class EmailConfigurationError extends DomainError {
+  constructor() {
+    super("Email delivery is not configured.", "EMAIL_CONFIGURATION", 503);
+    this.name = "EmailConfigurationError";
+  }
+}
+
+/** Previous device/session was replaced by a newer login. Safe to show to users. */
+export class SessionReplacedError extends DomainError {
+  constructor(message = SESSION_REPLACED_MESSAGE) {
+    super(message, "SESSION_REPLACED", 401);
+    this.name = "SessionReplacedError";
+  }
+}
+
+export class EmailDeliveryError extends DomainError {
+  constructor() {
+    super("The verification email could not be sent.", "EMAIL_DELIVERY_FAILED", 503);
+    this.name = "EmailDeliveryError";
   }
 }

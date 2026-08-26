@@ -71,7 +71,7 @@ export function FloatingLegalAiWidget() {
             >
               <ToreLogo variant="mark" tone="on-dark" markClassName="size-5" />
               <span className="truncate text-sm font-semibold">
-                TORE Legal AI
+                TORE Chat
               </span>
             </Link>
             <button
@@ -112,7 +112,7 @@ export function FloatingLegalAiWidget() {
             )}
             {loading ? (
               <p className="text-xs text-[#8A939D]">
-                TORE Legal AI бичиж байна...
+                TORE Chat бичиж байна...
               </p>
             ) : null}
             {error ? (
@@ -146,7 +146,7 @@ export function FloatingLegalAiWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          aria-label="TORE Legal AI chat нээх"
+          aria-label="TORE Chat нээх"
           className="flex size-14 items-center justify-center rounded-full bg-[#0B1F3A] text-white shadow-[0_16px_40px_rgba(11,31,58,0.35)] transition hover:bg-[#173A66]"
         >
           <MessageCircle className="size-6" />

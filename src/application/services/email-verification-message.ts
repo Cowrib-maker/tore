@@ -1,31 +1,33 @@
 export function buildEmailVerificationMessage(params: {
   appName: string;
   toName: string | null;
-  verifyUrl: string;
-  ttlHours: number;
+  otp: string;
+  ttlMinutes: number;
 }): { subject: string; text: string; html: string } {
-  const greeting = params.toName ? `Dear ${params.toName},` : "Dear client,";
-  const subject = `Confirm your ${params.appName} email address`;
+  const greeting = params.toName
+    ? `${params.toName} танаа,`
+    : "Таны TORE бүртгэлд:";
+  const subject = "TORE — И-мэйл баталгаажуулах код";
+  const ttlLine = `Энэ код ${params.ttlMinutes} минутын хугацаанд хүчинтэй.`;
   const text = [
     greeting,
     "",
-    `Please confirm the email address associated with your ${params.appName} account by opening the link below:`,
-    params.verifyUrl,
+    "Таны TORE баталгаажуулах код:",
+    params.otp,
     "",
-    `This link expires in ${params.ttlHours} hours.`,
+    ttlLine,
     "",
-    "If you did not create this account, you may disregard this message.",
+    "Хэрэв та энэ бүртгэлийг үүсгээгүй бол энэ имэйлийг үл тооно уу.",
     "",
     `— ${params.appName}`,
   ].join("\n");
 
   const html = `
     <p>${greeting}</p>
-    <p>Please confirm the email address associated with your <strong>${params.appName}</strong> account:</p>
-    <p><a href="${params.verifyUrl}">Confirm email address</a></p>
-    <p style="color:#5A6B64;font-size:14px">Or paste this URL into your browser:<br/>${params.verifyUrl}</p>
-    <p style="color:#5A6B64;font-size:14px">This link expires in ${params.ttlHours} hours.</p>
-    <p style="color:#5A6B64;font-size:14px">If you did not create this account, you may disregard this message.</p>
+    <p>Таны TORE баталгаажуулах код:</p>
+    <p style="font-size:28px;letter-spacing:0.35em;font-weight:600">${params.otp}</p>
+    <p style="color:#5A6B64;font-size:14px">${ttlLine}</p>
+    <p style="color:#5A6B64;font-size:14px">Хэрэв та энэ бүртгэлийг үүсгээгүй бол энэ имэйлийг үл тооно уу.</p>
   `.trim();
 
   return { subject, text, html };

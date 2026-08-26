@@ -19,6 +19,10 @@ function isUserStatus(value: unknown): value is UserStatus {
  */
 export const edgeAuthCallbacks: NonNullable<NextAuthConfig["callbacks"]> = {
   async jwt({ token, user }) {
+    if (token.sessionReplaced === true) {
+      return {};
+    }
+
     if (user) {
       if (!user.id || !isUserRole(user.role) || !isUserStatus(user.status)) {
         return {};
@@ -27,12 +31,21 @@ export const edgeAuthCallbacks: NonNullable<NextAuthConfig["callbacks"]> = {
       token.role = user.role;
       token.status = user.status;
       token.statusCheckedAt = Date.now();
+      if (typeof user.sessionId === "string" && user.sessionId) {
+        token.sid = user.sessionId;
+      }
     }
 
     return token;
   },
   async session({ session, token }) {
     if (!session.user) {
+      return session;
+    }
+
+    if (token.sessionReplaced === true) {
+      session.sessionReplaced = true;
+      session.user.id = undefined as unknown as string;
       return session;
     }
 
@@ -59,6 +72,8 @@ export const edgeAuthCallbacks: NonNullable<NextAuthConfig["callbacks"]> = {
 
 declare module "next-auth" {
   interface Session {
+    /** Set when this JWT was replaced by a login on another device. Never show IDs. */
+    sessionReplaced?: boolean;
     user: {
       id: string;
       email: string;
@@ -74,6 +89,8 @@ declare module "next-auth" {
   interface User {
     role?: string;
     status?: string;
+    /** Raw active-session id, copied to the JWT at sign-in only. Never session.user. */
+    sessionId?: string;
   }
 }
 
@@ -83,6 +100,9 @@ declare module "@auth/core/jwt" {
     role?: string;
     status?: string;
     statusCheckedAt?: number;
+    /** Raw active-session identifier. HttpOnly JWT only — not copied to Session.user. */
+    sid?: string;
+    sessionReplaced?: boolean;
     /** Admin user id when impersonating another account (devtools only). */
     impersonatorId?: string;
   }

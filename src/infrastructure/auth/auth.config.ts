@@ -49,6 +49,16 @@ export const authConfig = {
             { userRepository },
           );
 
+          const {
+            generateActiveSessionId,
+            hashActiveSessionId,
+          } = await import("@/domain/services/active-session");
+          const sessionId = generateActiveSessionId();
+          await userRepository.rotateActiveSessionIdHash(
+            user.id,
+            hashActiveSessionId(sessionId),
+          );
+
           await auditLogRepository.create({
             actorUserId: user.id,
             action: AuditAction.LOGIN,
@@ -64,6 +74,7 @@ export const authConfig = {
             image: user.image,
             role: user.role,
             status: user.status,
+            sessionId,
           };
         } catch {
           return null;

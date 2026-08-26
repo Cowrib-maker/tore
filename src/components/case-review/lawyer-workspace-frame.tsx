@@ -119,12 +119,14 @@ export function LawyerWorkspaceFrame({
           >
             <Menu className="size-5 text-[#0B1F3A]" />
           </Button>
-          <ToreLogo
-            tone="on-light"
-            markClassName="size-7"
-            wordmarkClassName="text-[0.95rem]"
-            className="gap-2"
-          />
+          <Link href="/" aria-label="TORE нүүр хуудас">
+            <ToreLogo
+              tone="on-light"
+              markClassName="size-7"
+              wordmarkClassName="text-[0.95rem]"
+              className="gap-2"
+            />
+          </Link>
           {workbench ? (
             <span className="inline-flex h-9 w-9" aria-hidden />
           ) : (
@@ -196,7 +198,8 @@ function WorkspaceSidebar({
   return (
     <div className="flex h-full min-h-svh w-full flex-col bg-[#0B1F3A] px-4 py-5 text-[#F7FAF8]">
       <Link
-        href="/lawyer/workspace"
+        href="/"
+        aria-label="TORE нүүр хуудас"
         onClick={onNavigate}
         className="px-2 py-1"
       >

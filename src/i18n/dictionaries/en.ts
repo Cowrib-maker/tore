@@ -329,6 +329,9 @@ export const en: Dictionary = {
     loginTitle: "Sign in to TORE",
     loginDescription:
       "Access your client or lawyer workspace on Mongolia’s legal marketplace.",
+    sessionReplaced:
+      "Таны бүртгэлээр өөр төхөөрөмжөөс нэвтэрсэн тул энэ төхөөрөмжийн сесс дуусгавар боллоо.",
+    sessionReplacedHint: "Шинээр нэвтрэхийн тулд дахин нэвтэрнэ үү.",
     email: "Email",
     password: "Password",
     signingIn: "Signing in…",
@@ -341,15 +344,22 @@ export const en: Dictionary = {
     resendSending: "Sending…",
     verifyTitleSuccess: "Email confirmed",
     verifyTitleError: "Verification unsuccessful",
-    verifySuccess: "{email} has been verified. You may sign in.",
+    verifySuccess: "Your email has been verified.",
     verifyFailed:
       "This link is invalid or has expired. Request a new verification email from the sign-in page.",
     verifyMissingToken: "A valid verification token is required to open this page.",
     verifyResendHint: "Return to sign-in to request a new verification email.",
     verifyPendingTitle: "Please confirm your email",
     verifyPendingBody:
-      "We sent a confirmation link to the email address on your account.",
-    verifyResend: "Resend confirmation email",
+      "We sent a 6-digit verification code to your email address.",
+    verifyOtpLabel: "Verification code",
+    verifyOtpSubmit: "Verify",
+    verifyOtpSubmitting: "Verifying…",
+    verifyOtpInvalid: "The verification code is incorrect.",
+    verifyOtpExpired:
+      "The verification code has expired. Please request a new code.",
+    verifyResendCountdown: "You can request a new code in: {time}",
+    verifyResend: "Resend code",
     verifyBackToLogin: "Back to the sign-in page",
     verifySpamHint: "If the email did not arrive, check your Spam/Junk folder.",
     verifyExpiredOrInvalid:
@@ -358,8 +368,18 @@ export const en: Dictionary = {
     verifyContinue: "Sign in",
     resendGenericSuccess:
       "If an unverified account exists for that email, a confirmation link has been sent.",
+    resendSentSuccess: "The verification email has been sent again.",
     verifyNeedsLink: "Need to confirm your email?",
     verifyRateLimited: "Too many attempts. Please wait and try again.",
+    verifyAlreadyVerified: "Your email is already verified.",
+    verifyEmailNotFound: "No account was found for this email.",
+    verifyEmailInvalid: "Enter a valid email address.",
+    verifyDeliveryFailed:
+      "The verification code could not be sent. Please try again.",
+    verifyEmailMisconfigured:
+      "Email sending is not configured. Please try again later.",
+    verifyTemporaryFailure:
+      "A temporary server error occurred. Please wait and try again.",
     newToTore: "New to TORE?",
     registerClientLink: "Register as a client",
     registerLawyerLink: "Register as a lawyer",

@@ -586,6 +586,49 @@ describe("case analysis orchestration", () => {
     expect(without.candidates).toHaveLength(0);
   });
 
+  it("spots Mongolian civil facts without English keywords", () => {
+    const spotter = new RuleBasedIssueSpotter(
+      new RuleBasedLegalDomainClassifier(),
+    );
+    const result = spotter.spot([
+      {
+        id: "f1",
+        statement:
+          "Гэрээ байгуулсан боловч нөгөө тал үүргээ биелүүлээгүй, хохирол учирсан",
+        elementId: null,
+        disputed: false,
+      },
+    ]);
+    expect(result.domain).toBe(LegalDomain.CIVIL);
+    expect(result.candidates.some((c) => c.supportedByFacts)).toBe(true);
+    expect(
+      result.candidates.some((c) => c.kind === LegalIssueKind.BREACH),
+    ).toBe(true);
+    expect(
+      result.candidates.some((c) => c.kind === LegalIssueKind.DAMAGES),
+    ).toBe(true);
+  });
+
+  it("spots Mongolian criminal facts without English offense keywords", () => {
+    const spotter = new RuleBasedIssueSpotter(
+      new RuleBasedLegalDomainClassifier(),
+    );
+    const result = spotter.spot([
+      {
+        id: "f1",
+        statement: "Эрүүгийн хэрэгт холбогдож, гэмт хэрэг үйлдсэн гэж яллаж байна",
+        elementId: null,
+        disputed: false,
+      },
+    ]);
+    expect(result.domain).toBe(LegalDomain.CRIMINAL);
+    expect(
+      result.candidates.some(
+        (c) => c.kind === LegalIssueKind.ELEMENTS_OF_OFFENSE && c.supportedByFacts,
+      ),
+    ).toBe(true);
+  });
+
   it("rejects LLM-only conclusions", async () => {
     const el = element("el:llm", 1);
     const retriever = new InMemoryRuleRetriever();

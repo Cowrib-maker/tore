@@ -1,7 +1,7 @@
 import { FallbackLegalCorpusRetriever } from "@/application/ai/fallback-legal-corpus-retriever";
 import type { LegalCorpusRetriever } from "@/application/ai/legal-corpus";
 import { LegalAiService } from "@/application/ai/legal-ai.service";
-import type { ArchiveService } from "@/engine/data/archive";
+import { createOwnedCaseContextLoader } from "@/application/ai/load-owned-legal-ai-case-context";
 import {
   PromptBuilderService,
   RuleBasedDomainFilter,
@@ -11,9 +11,9 @@ import { createIntentEngine } from "@/engine/intent";
 import { createReasoningEngine } from "@/engine/reasoning";
 import { createLegalRelevanceEngine } from "@/engine/relevance";
 import { KnowledgeLegalCorpusRetriever } from "@/infrastructure/ai/knowledge-legal-corpus-retriever";
+import { createReadOnlyKnowledgeRepository } from "@/infrastructure/ai/read-only-knowledge-repository";
 import { OpenAiLegalAiCompletion } from "@/infrastructure/ai/openai-legal-ai-completion";
 import { PrismaLegalAiStore } from "@/infrastructure/ai/prisma-legal-ai-store";
-import { getPrismaClient } from "@/infrastructure/database/prisma-client";
 import { LegalDataEngineClient } from "@/infrastructure/legal-data-engine/legal-data-engine-client";
 import {
   HttpLegalCorpusRetriever,
@@ -25,21 +25,13 @@ import {
   prismaGuestSessionStore,
 } from "@/infrastructure/legal-ai/prisma-guest-session-store";
 import {
+  caseFileRepository,
   entitlementUsageRepository,
   subscriptionRepository,
 } from "@/infrastructure/repositories";
-import { PrismaKnowledgeRepository } from "@/infrastructure/repositories/prisma-legal-knowledge-repository";
 import { env } from "@/lib/env";
 
 let singleton: LegalAiService | undefined;
-
-function readOnlyArchivePlaceholder(): ArchiveService {
-  return {
-    verifyArchiveIntegrity: async () => {
-      throw new Error("Legal AI chat reads knowledge; it does not archive.");
-    },
-  } as unknown as ArchiveService;
-}
 
 function createRemoteCorpusRetriever(): LegalCorpusRetriever {
   if (!env.ENGINE_BASE_URL || !env.ENGINE_SERVICE_TOKEN) {
@@ -57,10 +49,7 @@ function createRemoteCorpusRetriever(): LegalCorpusRetriever {
 
 function createCorpusRetriever(): LegalCorpusRetriever {
   const local = new KnowledgeLegalCorpusRetriever(
-    new PrismaKnowledgeRepository(
-      readOnlyArchivePlaceholder(),
-      getPrismaClient(),
-    ),
+    createReadOnlyKnowledgeRepository(),
   );
   return new FallbackLegalCorpusRetriever(local, createRemoteCorpusRetriever());
 }
@@ -88,6 +77,7 @@ export function createLegalAiService(): LegalAiService {
       subscriptionRepository,
       entitlementUsageRepository,
     }),
+    caseContextLoader: createOwnedCaseContextLoader(caseFileRepository),
   });
 }
 

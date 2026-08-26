@@ -1,8 +1,9 @@
+import { classifyEmailSendFailure } from "@/application/common/map-email-verification-error";
 import { buildEmailVerificationMessage } from "@/application/services/email-verification-message";
 import {
-  ConflictError,
+  EmailAlreadyVerifiedError,
+  EmailNotFoundError,
   EmailVerificationLinkError,
-  NotFoundError,
   ValidationError,
 } from "@/domain/errors/domain-error";
 import type { UserRole } from "@/domain/enums";
@@ -10,10 +11,13 @@ import type { EmailSender } from "@/domain/ports/email-sender";
 import type { EmailVerificationTokenRepository } from "@/domain/repositories/email-verification-token-repository";
 import type { UserRepository } from "@/domain/repositories/user-repository";
 import {
-  buildEmailVerificationUrl,
-  emailVerificationExpiry,
-  generateEmailVerificationRawToken,
-  hashEmailVerificationToken,
+  EMAIL_VERIFICATION_OTP_TTL_MINUTES,
+  emailVerificationHashesMatch,
+  emailVerificationOtpExpiry,
+  generateEmailVerificationOtp,
+  hashEmailVerificationOtp,
+  isCompleteEmailVerificationOtp,
+  normalizeEmailVerificationOtp,
 } from "@/domain/services/email-verification-token";
 
 export type EmailVerificationDeps = {
@@ -22,13 +26,13 @@ export type EmailVerificationDeps = {
   emailSender: EmailSender;
   appUrl: string;
   appName: string;
-  ttlHours: number;
+  ttlMinutes: number;
 };
 
 /**
- * Issue a one-time token and send the verification email.
- * Token is always persisted first; send failures are logged and rethrown
- * so callers can decide UX — resend remains available.
+ * Issue a one-time 6-digit OTP and send it by email.
+ * Only the SHA-256 digest is persisted. Send failures are rethrown after
+ * the digest is stored so resend remains available.
  */
 export async function sendEmailVerificationUseCase(
   email: string,
@@ -37,18 +41,17 @@ export async function sendEmailVerificationUseCase(
   const normalized = email.trim().toLowerCase();
   const user = await deps.userRepository.findByEmail(normalized);
   if (!user) {
-    // Anti-enumeration: behave like success from caller's public API when needed;
-    // internal callers should pass known emails. For resend we still hide existence.
-    throw new NotFoundError("User");
+    throw new EmailNotFoundError();
   }
 
   if (user.emailVerified) {
-    throw new ConflictError("This email is already verified");
+    throw new EmailAlreadyVerifiedError();
   }
 
-  const rawToken = generateEmailVerificationRawToken();
-  const tokenHash = hashEmailVerificationToken(rawToken);
-  const expires = emailVerificationExpiry(deps.ttlHours);
+  const otp = generateEmailVerificationOtp();
+  const tokenHash = hashEmailVerificationOtp(user.email, otp);
+  const ttlMinutes = deps.ttlMinutes || EMAIL_VERIFICATION_OTP_TTL_MINUTES;
+  const expires = emailVerificationOtpExpiry(ttlMinutes);
 
   await deps.emailVerificationTokenRepository.replaceForIdentifier({
     identifier: user.email,
@@ -56,15 +59,11 @@ export async function sendEmailVerificationUseCase(
     expires,
   });
 
-  const verifyUrl = buildEmailVerificationUrl({
-    appUrl: deps.appUrl,
-    rawToken,
-  });
   const message = buildEmailVerificationMessage({
     appName: deps.appName,
     toName: user.name,
-    verifyUrl,
-    ttlHours: deps.ttlHours,
+    otp,
+    ttlMinutes,
   });
 
   try {
@@ -84,22 +83,20 @@ export async function sendEmailVerificationUseCase(
       to: user.email,
       error,
     });
-    throw error instanceof Error
-      ? error
-      : new Error("Failed to send verification email");
+    throw classifyEmailSendFailure(error);
   }
 
   return { sent: true };
 }
 
 /**
- * Public resend path — never reveals whether the email exists.
- * Already-verified and unknown emails return a generic success-shaped result.
+ * Public resend path. Unknown / already-verified / delivery failures are typed
+ * domain errors so the action can map them to safe user-facing copy.
  */
 export async function resendEmailVerificationUseCase(
   email: string,
   deps: EmailVerificationDeps,
-): Promise<{ ok: true; alreadyVerified?: boolean }> {
+): Promise<{ ok: true }> {
   const normalized = email.trim().toLowerCase();
   if (!normalized.includes("@")) {
     throw new ValidationError("Enter a valid email address");
@@ -107,62 +104,64 @@ export async function resendEmailVerificationUseCase(
 
   const user = await deps.userRepository.findByEmail(normalized);
   if (!user) {
-    console.info("[email:verification] resend ignored — unknown email", {
-      email: normalized,
-    });
-    return { ok: true };
+    throw new EmailNotFoundError();
   }
 
   if (user.emailVerified) {
-    return { ok: true, alreadyVerified: true };
+    throw new EmailAlreadyVerifiedError();
   }
 
-  try {
-    await sendEmailVerificationUseCase(user.email, deps);
-  } catch (error) {
-    // Public resend must not distinguish send failure from unknown email.
-    console.error("[email:verification] resend send failed", {
-      email: user.email,
-      error,
-    });
-  }
+  await sendEmailVerificationUseCase(user.email, deps);
   return { ok: true };
 }
 
-export async function verifyEmailTokenUseCase(
-  rawToken: string,
+export async function verifyEmailOtpUseCase(
+  input: { email: string; otp: string },
   deps: Pick<
     EmailVerificationDeps,
     "userRepository" | "emailVerificationTokenRepository"
   >,
 ): Promise<{ email: string; role: UserRole }> {
-  if (!rawToken || rawToken.length < 16) {
-    throw new EmailVerificationLinkError("missing");
+  const email = input.email.trim().toLowerCase();
+  const otp = normalizeEmailVerificationOtp(input.otp);
+
+  if (!email.includes("@")) {
+    throw new ValidationError("Enter a valid email address");
   }
 
-  const tokenHash = hashEmailVerificationToken(rawToken);
+  if (!isCompleteEmailVerificationOtp(otp)) {
+    throw new EmailVerificationLinkError("invalid");
+  }
+
+  const user = await deps.userRepository.findByEmail(email);
+  if (!user) {
+    throw new EmailVerificationLinkError("invalid");
+  }
+
+  if (user.emailVerified) {
+    throw new EmailAlreadyVerifiedError();
+  }
+
   const record =
-    await deps.emailVerificationTokenRepository.findByTokenHash(tokenHash);
+    await deps.emailVerificationTokenRepository.findByIdentifier(user.email);
 
   if (!record) {
     throw new EmailVerificationLinkError("invalid");
   }
 
   if (record.expires.getTime() <= Date.now()) {
-    await deps.emailVerificationTokenRepository.deleteByTokenHash(tokenHash);
+    await deps.emailVerificationTokenRepository.deleteForIdentifier(
+      record.identifier,
+    );
     throw new EmailVerificationLinkError("expired");
   }
 
-  const user = await deps.userRepository.findByEmail(record.identifier);
-  if (!user) {
-    await deps.emailVerificationTokenRepository.deleteByTokenHash(tokenHash);
+  const submittedHash = hashEmailVerificationOtp(user.email, otp);
+  if (!emailVerificationHashesMatch(record.tokenHash, submittedHash)) {
     throw new EmailVerificationLinkError("invalid");
   }
 
-  if (!user.emailVerified) {
-    await deps.userRepository.markEmailVerified(user.id);
-  }
-
+  await deps.userRepository.markEmailVerified(user.id);
   await deps.emailVerificationTokenRepository.deleteForIdentifier(
     record.identifier,
   );

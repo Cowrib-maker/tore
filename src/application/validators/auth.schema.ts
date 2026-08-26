@@ -58,3 +58,13 @@ export const resendVerificationSchema = z.object({
 });
 
 export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>;
+
+export const verifyEmailOtpSchema = z.object({
+  email: emailSchema,
+  otp: z
+    .string()
+    .transform((value) => value.replace(/\D/g, ""))
+    .pipe(z.string().regex(/^\d{6}$/, "Invalid verification code")),
+});
+
+export type VerifyEmailOtpInput = z.infer<typeof verifyEmailOtpSchema>;

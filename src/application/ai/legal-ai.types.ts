@@ -4,6 +4,8 @@ import type {
 } from "@/application/ai/legal-ai-citation";
 import type { PromptTurnKind, UserTypeContext } from "@/engine/gateway";
 import { type UserRole, LegalQuestionStatus } from "@/domain/enums";
+import type { LegalAiCapability } from "@/application/ai/legal-ai-capability";
+import type { LegalAiTaskType } from "@/application/ai/legal-ai-task";
 
 export type { LegalAiSafeCitation } from "@/application/ai/legal-ai-citation";
 export { LegalQuestionStatus };
@@ -40,6 +42,10 @@ export type LegalAiCreateTurnInput = {
   /** Set only after the HTTP layer verifies CaseFile.ownerLawyerId === userId. */
   caseFileId?: string;
   userContext?: UserTypeContext;
+  /**
+   * @deprecated Ignored for authorization. Capability is derived from
+   * {@link actorRole}. Kept so old clients sending `mode` do not fail JSON parse.
+   */
   mode?: LegalAiMode;
 };
 
@@ -51,6 +57,9 @@ export type LegalAiCreateTurnResult = {
     outputTokens: number;
   };
   turnKind: PromptTurnKind;
+  capability: LegalAiCapability;
+  taskType?: LegalAiTaskType;
+  retrievalInvoked?: boolean;
 };
 
 export type LegalAiConversationDocumentExtract = {

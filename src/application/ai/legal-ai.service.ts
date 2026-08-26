@@ -1,20 +1,25 @@
 import { MAX_DOCUMENT_EXTRACT_CHARS } from "@/application/ai/legal-ai-document.constants";
 import {
-  citationPinpointFromLocator,
   nullIfBlank,
   type LegalAiSafeCitation,
 } from "@/application/ai/legal-ai-citation";
 import { LegalAiError } from "@/application/ai/legal-ai.errors";
-import type {
-  LegalCitationVerdict,
-  LegalCorpusRetriever,
-  LegalCorpusRetrieveResult,
-} from "@/application/ai/legal-corpus";
+import type { LegalCorpusRetriever } from "@/application/ai/legal-corpus";
 import {
-  CitationVerificationStatus,
-  selectOfficiallyVerifiedAuthorities,
-  verifyHintFromRetrieved,
-} from "@/application/ai/legal-corpus";
+  LegalAiCapability,
+  resolveLegalAiCapability,
+} from "@/application/ai/legal-ai-capability";
+import type { LegalAiCaseContextLoader } from "@/application/ai/legal-ai-case-context";
+import { formatLegalAiCaseContextBlock } from "@/application/ai/legal-ai-case-context";
+import {
+  classifyLegalAiTask,
+  stagesForTask,
+  taskRequiresLegalRetrieval,
+} from "@/application/ai/legal-ai-task";
+import {
+  MISSING_LEGAL_SOURCE_MESSAGE,
+  resolveLegalAuthorities,
+} from "@/application/ai/resolve-legal-authorities";
 import type {
   LegalAiCompletionPort,
   LegalAiCreateTurnInput,
@@ -23,7 +28,6 @@ import type {
   LegalAiStore,
   LegalAiStoredMessage,
 } from "@/application/ai/legal-ai.types";
-import { detectExactCitation } from "@/engine/citation";
 import {
   DomainLabel,
   PromptTurnKind,
@@ -51,20 +55,11 @@ const HISTORY_LIMIT = 30;
 const INTENT_CONFIDENCE_FLOOR = 0.5;
 const VERIFIED_SOURCE_TYPE = "legal-data-engine";
 
-const UNVERIFIED_CITATION_MESSAGE =
-  "Энэ заалтыг TORE-ийн баталгаатай эрх зүйн эх сурвалжаас одоогоор баталгаажуулж чадсангүй. Тиймээс заалтын агуулгыг таамгаар тайлбарлахгүй.";
+const NON_LEGAL_REFUSAL_CITIZEN =
+  "Би TORE Chat — хууль зүйн асуудлаар энгийнээр туслах зориулалттай. Таны асуулт хууль зүйн асуудалтай холбоогүй байна. Хэрэв танд хууль, эрх зүйн асуудал байгаа бол нөхцөл байдлаа бичээрэй, би тусалъя.";
 
-const CONFLICT_CITATION_MESSAGE =
-  "Энэ ишлэлийг нэг утгатай баталгаажуулж чадсангүй. Тиймээс аль эх нь хамаарахыг таамгаар сонгохгүй, заалтын агуулгыг таамгаар тайлбарлахгүй.";
-
-const AS_OF_UNAVAILABLE_MESSAGE =
-  "Тухайн үед хүчинтэй хувилбарыг баталгаажуулж чадсангүй. Тиймээс заалтын агуулгыг таамгаар тайлбарлахгүй.";
-
-const ENGINE_UNAVAILABLE_MESSAGE =
-  "Баталгаатай эрх зүйн эх сурвалжид одоогоор холбогдож чадсангүй. Тиймээс заалтын агуулгыг таамгаар тайлбарлахгүй.";
-
-const NON_LEGAL_REFUSAL_MESSAGE =
-  "Би TORE Legal AI — хууль зүйн асуудлаар туслах зориулалттай AI. Таны асуулт хууль зүйн асуудалтай холбоогүй байна. Хэрэв танд хууль, эрх зүйн асуудал байгаа бол нөхцөл байдлаа бичээрэй, би тусалъя.";
+const NON_LEGAL_REFUSAL_LAWYER =
+  "Би TORE Legal AI — мэргэжлийн хууль зүйн шинжилгээний туслах. Таны асуулт хууль зүйн асуудалтай холбоогүй байна. Хэргийн баримт, судалгаа, эсвэл эрх зүйн асуултаа бичээрэй.";
 
 export type LegalAiServiceDependencies = {
   domainFilter: IDomainFilter;
@@ -77,6 +72,7 @@ export type LegalAiServiceDependencies = {
   completion: LegalAiCompletionPort;
   corpusRetriever: LegalCorpusRetriever;
   legalQuestionAccess?: LegalQuestionAccessPort;
+  caseContextLoader?: LegalAiCaseContextLoader;
 };
 
 /**
@@ -102,12 +98,16 @@ export class LegalAiService {
       throw new LegalAiError("Асуултаа оруулна уу.", 400);
     }
 
+    const capability = resolveLegalAiCapability({
+      actorRole: input.actorRole,
+    });
     const subject = this.requireSubject(input);
 
     let priorMessages: LegalAiStoredMessage[] = [];
     let conversationState: {
       id?: string;
       questionStatus: LegalQuestionStatus;
+      caseFileId?: string | null;
     } = { questionStatus: LegalQuestionStatus.NEW };
 
     if (input.conversationId) {
@@ -122,6 +122,7 @@ export class LegalAiService {
       conversationState = {
         id: existing.id,
         questionStatus: existing.questionStatus ?? LegalQuestionStatus.NEW,
+        caseFileId: existing.caseFileId,
       };
       priorMessages = await this.dependencies.store.listMessages(
         existing.id,
@@ -166,6 +167,7 @@ export class LegalAiService {
     const conversation = await this.resolveConversation(
       input,
       message,
+      capability,
     );
 
     await this.dependencies.store.createUserMessage({
@@ -192,8 +194,12 @@ export class LegalAiService {
         return afterReply(
           await this.persistSafeReply({
             conversationId: conversation.id,
-            content: NON_LEGAL_REFUSAL_MESSAGE,
+            content:
+              capability === LegalAiCapability.LAWYER
+                ? NON_LEGAL_REFUSAL_LAWYER
+                : NON_LEGAL_REFUSAL_CITIZEN,
             turnKind: PromptTurnKind.GENERAL,
+            capability,
           }),
         );
       }
@@ -203,8 +209,8 @@ export class LegalAiService {
           conversationId: conversation.id,
           message,
           userContext: input.userContext,
-          mode: input.mode,
           userId: input.userId,
+          capability,
         }),
       );
     }
@@ -217,6 +223,7 @@ export class LegalAiService {
             relevance.clarificationMessage ??
             buildClarificationMessage(relevance.issueFamily),
           turnKind: PromptTurnKind.AMBIGUOUS,
+          capability,
         }),
       );
     }
@@ -227,59 +234,106 @@ export class LegalAiService {
       HISTORY_LIMIT,
     );
 
-    const userType = this.dependencies.userTypeService.resolve(
-      input.userContext,
-    );
+    const userType = this.dependencies.userTypeService.resolve({
+      ...input.userContext,
+      role: input.actorRole ?? input.userContext?.role,
+    });
     await this.dependencies.domainFilter.classify(analysisText);
     const pipelineDomain = DomainLabel.LEGAL;
     const intent = await this.dependencies.intent.classify(analysisText);
     const turnKind = resolveTurnKind(pipelineDomain, intent);
-    const exactCitation = detectExactCitation(message);
 
-    const verifiedResolution = exactCitation
-      ? await this.resolveVerifiedAuthorities({
-          question: message,
-          query: exactCitation.query,
-          locator: exactCitation.locator,
-        })
-      : { kind: "skipped" as const };
+    const document =
+      capability === LegalAiCapability.LAWYER && input.userId
+        ? await this.dependencies.store.findOwnedDocumentExtract(
+            conversation.id,
+            input.userId,
+          )
+        : null;
 
-    if (verifiedResolution.kind === "refused") {
+    const ownedCaseFileId =
+      capability === LegalAiCapability.LAWYER
+        ? (conversation.caseFileId ??
+          conversationState.caseFileId ??
+          input.caseFileId)
+        : undefined;
+
+    let caseContextBlock: string | undefined;
+    if (
+      capability === LegalAiCapability.LAWYER &&
+      ownedCaseFileId &&
+      input.userId &&
+      this.dependencies.caseContextLoader
+    ) {
+      const loaded = await this.dependencies.caseContextLoader.loadOwned({
+        userId: input.userId,
+        caseFileId: ownedCaseFileId,
+      });
+      if (loaded) {
+        caseContextBlock = formatLegalAiCaseContextBlock(loaded);
+      }
+    }
+
+    const taskType = classifyLegalAiTask({
+      capability,
+      intent: intent.intent,
+      hasCaseContext: Boolean(caseContextBlock),
+      hasDocument: Boolean(document?.extractedText),
+      message,
+    });
+    const reasoningStages = stagesForTask(capability, taskType, {
+      hasCaseContext: Boolean(caseContextBlock),
+      hasDocument: Boolean(document?.extractedText),
+    });
+    const requireRetrieval =
+      capability === LegalAiCapability.CITIZEN ||
+      taskRequiresLegalRetrieval(taskType);
+
+    const authorities = await resolveLegalAuthorities({
+      question: message,
+      retriever: this.dependencies.corpusRetriever,
+      requireRetrieval,
+    });
+
+    if (authorities.kind === "refused") {
       return afterReply(
         await this.persistSafeReply({
           conversationId: conversation.id,
-          content: verifiedResolution.message,
+          content: authorities.message,
           turnKind,
+          capability,
+          taskType,
+          retrievalInvoked: authorities.retrievalInvoked,
         }),
       );
     }
 
     const verifiedAuthorities =
-      verifiedResolution.kind === "verified"
-        ? verifiedResolution.authorities
+      authorities.kind === "verified" ? authorities.authorities : undefined;
+    const missingLegalSourceMessage =
+      authorities.kind === "empty" && authorities.retrievalInvoked
+        ? MISSING_LEGAL_SOURCE_MESSAGE
         : undefined;
 
     const reasoningPlan = this.prepareReasoningPlan(message, intent);
-    const document = input.userId
-      ? await this.dependencies.store.findOwnedDocumentExtract(
-          conversation.id,
-          input.userId,
-        )
-      : null;
 
     const prompt = this.dependencies.promptBuilder.build({
       message,
       userType,
       domain: pipelineDomain,
       turnKind,
-      mode: input.mode ?? "CITIZEN",
+      capability,
+      taskType,
+      reasoningStages,
       intentType: intent.intent,
       intentConfidence: intent.confidence,
       missingInformation: verifiedAuthorities?.length
         ? undefined
         : reasoningPlan?.missingInformation,
+      missingLegalSourceMessage,
       corpusAvailable: Boolean(verifiedAuthorities?.length),
       verifiedAuthorities,
+      caseContextBlock,
       documentExtract: document?.extractedText.slice(
         0,
         MAX_DOCUMENT_EXTRACT_CHARS,
@@ -317,26 +371,23 @@ export class LegalAiService {
     if (verifiedAuthorities?.length) {
       citations = await this.dependencies.store.createCitations({
         messageId: assistantMessage.id,
-        citations: verifiedAuthorities.map((authority) => {
-          const pinpoint = citationPinpointFromLocator(authority.locator);
-          return {
-            title: authority.title,
-            sourceType: authority.sourceType ?? VERIFIED_SOURCE_TYPE,
-            sourceUrl: nullIfBlank(authority.sourceUrl),
-            reference: [
-              authority.locator,
-              authority.documentId,
-              authority.documentVersionId,
-              authority.nodeId,
-            ].join(" | "),
-            excerpt: authority.excerpt,
-            article: nullIfBlank(authority.article) ?? pinpoint.article,
-            paragraph: nullIfBlank(authority.paragraph) ?? pinpoint.paragraph,
-            sourceVersion: nullIfBlank(authority.sourceVersion),
-            validFrom: nullIfBlank(authority.effectiveFrom),
-            validTo: nullIfBlank(authority.effectiveTo),
-          };
-        }),
+        citations: verifiedAuthorities.map((authority) => ({
+          title: authority.title,
+          sourceType: authority.sourceType ?? VERIFIED_SOURCE_TYPE,
+          sourceUrl: nullIfBlank(authority.sourceUrl),
+          reference: [
+            authority.locator,
+            authority.documentId,
+            authority.documentVersionId,
+            authority.nodeId,
+          ].join(" | "),
+          excerpt: authority.excerpt,
+          article: nullIfBlank(authority.article),
+          paragraph: nullIfBlank(authority.paragraph),
+          sourceVersion: nullIfBlank(authority.sourceVersion),
+          validFrom: nullIfBlank(authority.effectiveFrom),
+          validTo: nullIfBlank(authority.effectiveTo),
+        })),
       });
     }
 
@@ -351,95 +402,10 @@ export class LegalAiService {
         outputTokens: completion.outputTokens,
       },
       turnKind,
+      capability,
+      taskType,
+      retrievalInvoked: authorities.retrievalInvoked,
     });
-  }
-
-  private async resolveVerifiedAuthorities(input: {
-    question: string;
-    query: string;
-    locator: string | null;
-  }): Promise<
-    | {
-        kind: "verified";
-        authorities: Array<{
-          title: string;
-          locator: string;
-          excerpt: string;
-          documentId: string;
-          documentVersionId: string;
-          nodeId: string;
-          effectiveFrom: string | null;
-          effectiveTo: string | null;
-          sourceUrl: string | null;
-          sourceVersion: string | null;
-          article: string | null;
-          paragraph: string | null;
-          sourceType: string;
-        }>;
-      }
-    | { kind: "refused"; message: string }
-  > {
-    const retrieved = await this.dependencies.corpusRetriever.retrieveExactCitation(
-      {
-        question: input.question,
-        query: input.query,
-        locator: input.locator,
-      },
-    );
-
-    const retrieveRefusal = retrieveRefusalMessage(retrieved);
-    if (retrieveRefusal) {
-      return { kind: "refused", message: retrieveRefusal };
-    }
-
-    if (retrieved.kind !== "retrieved") {
-      return { kind: "refused", message: ENGINE_UNAVAILABLE_MESSAGE };
-    }
-
-    const verification = await this.dependencies.corpusRetriever.verifyCitation({
-      question: input.question,
-      query: input.query,
-      ...verifyHintFromRetrieved(retrieved.authorities),
-    });
-
-    if (!verification.ok) {
-      return { kind: "refused", message: ENGINE_UNAVAILABLE_MESSAGE };
-    }
-
-    const verdictRefusal = verificationRefusalMessage(verification.verdict);
-    if (verdictRefusal) {
-      return { kind: "refused", message: verdictRefusal };
-    }
-
-    const verified = selectOfficiallyVerifiedAuthorities(
-      retrieved.authorities,
-      verification.verdict,
-    );
-    if (verified.length === 0) {
-      return { kind: "refused", message: UNVERIFIED_CITATION_MESSAGE };
-    }
-
-    return {
-      kind: "verified",
-      authorities: verified.map((authority) => {
-        const pinpoint = citationPinpointFromLocator(authority.locator);
-        return {
-          title: authority.title,
-          locator: authority.locator,
-          excerpt: authority.excerpt,
-          documentId: authority.documentId,
-          documentVersionId: authority.documentVersionId,
-          nodeId: authority.nodeId,
-          effectiveFrom: authority.effectiveFrom,
-          effectiveTo: authority.effectiveTo,
-          sourceUrl: nullIfBlank(authority.sourceUrl),
-          sourceVersion: nullIfBlank(authority.sourceVersion),
-          article: nullIfBlank(authority.article) ?? pinpoint.article,
-          paragraph: nullIfBlank(authority.paragraph) ?? pinpoint.paragraph,
-          sourceType: authority.sourceType ?? VERIFIED_SOURCE_TYPE,
-        };
-      }),
-    };
   }
 
   async getConversationMessages(
@@ -477,8 +443,8 @@ export class LegalAiService {
     conversationId: string;
     message: string;
     userContext: LegalAiCreateTurnInput["userContext"];
-    mode: LegalAiCreateTurnInput["mode"];
     userId?: string;
+    capability: LegalAiCapability;
   }): Promise<LegalAiCreateTurnResult> {
     const history = await this.dependencies.store.listMessages(
       input.conversationId,
@@ -487,18 +453,19 @@ export class LegalAiService {
     const userType = this.dependencies.userTypeService.resolve(
       input.userContext,
     );
-    const document = input.userId
-      ? await this.dependencies.store.findOwnedDocumentExtract(
-          input.conversationId,
-          input.userId,
-        )
-      : null;
+    const document =
+      input.capability === LegalAiCapability.LAWYER && input.userId
+        ? await this.dependencies.store.findOwnedDocumentExtract(
+            input.conversationId,
+            input.userId,
+          )
+        : null;
     const prompt = this.dependencies.promptBuilder.build({
       message: input.message,
       userType,
       domain: DomainLabel.NON_LEGAL,
       turnKind: PromptTurnKind.GENERAL,
-      mode: input.mode ?? "CITIZEN",
+      capability: input.capability,
       corpusAvailable: false,
       documentExtract: document?.extractedText.slice(
         0,
@@ -540,6 +507,8 @@ export class LegalAiService {
         outputTokens: completion.outputTokens,
       },
       turnKind: PromptTurnKind.GENERAL,
+      capability: input.capability,
+      retrievalInvoked: false,
     };
   }
 
@@ -547,6 +516,9 @@ export class LegalAiService {
     conversationId: string;
     content: string;
     turnKind: PromptTurnKind;
+    capability: LegalAiCapability;
+    taskType?: LegalAiCreateTurnResult["taskType"];
+    retrievalInvoked?: boolean;
   }): Promise<LegalAiCreateTurnResult> {
     const assistantMessage =
       await this.dependencies.store.createAssistantMessage({
@@ -565,6 +537,9 @@ export class LegalAiService {
         outputTokens: 0,
       },
       turnKind: input.turnKind,
+      capability: input.capability,
+      taskType: input.taskType,
+      retrievalInvoked: input.retrievalInvoked ?? false,
     };
   }
 
@@ -585,13 +560,18 @@ export class LegalAiService {
   private async resolveConversation(
     input: LegalAiCreateTurnInput,
     message: string,
+    capability: LegalAiCapability,
   ) {
+    const caseFileId =
+      capability === LegalAiCapability.LAWYER && input.userId
+        ? input.caseFileId
+        : undefined;
     if (!input.conversationId) {
       return this.dependencies.store.createConversation({
         userId: input.userId,
         guestSessionId: input.guestSessionId,
         title: message.slice(0, 80),
-        caseFileId: input.userId ? input.caseFileId : undefined,
+        caseFileId,
       });
     }
 
@@ -637,28 +617,6 @@ export function resolveTurnKind(
     return PromptTurnKind.AMBIGUOUS;
   }
   return PromptTurnKind.LEGAL;
-}
-
-function retrieveRefusalMessage(
-  retrieved: LegalCorpusRetrieveResult,
-): string | null {
-  if (retrieved.kind === "as_of_unavailable") {
-    return AS_OF_UNAVAILABLE_MESSAGE;
-  }
-  if (retrieved.kind === "unavailable") {
-    return ENGINE_UNAVAILABLE_MESSAGE;
-  }
-  return null;
-}
-
-function verificationRefusalMessage(verdict: LegalCitationVerdict): string | null {
-  if (verdict.status === CitationVerificationStatus.CONFLICT) {
-    return CONFLICT_CITATION_MESSAGE;
-  }
-  if (verdict.status === CitationVerificationStatus.UNRESOLVED) {
-    return UNVERIFIED_CITATION_MESSAGE;
-  }
-  return null;
 }
 
 function toModelHistory(

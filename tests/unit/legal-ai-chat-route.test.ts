@@ -27,4 +27,16 @@ describe("POST /api/ai/chat citation contract", () => {
     expect(route).not.toContain("excerpt:");
     expect(route).not.toContain("reference:");
   });
+
+  it("derives capability from the authenticated role, not client mode", () => {
+    expect(route).toContain("actorRole: actor?.role");
+    expect(route).toContain("Capability is derived from the authenticated role");
+    expect(route).not.toContain("mode: body.mode");
+  });
+
+  it("rejects a replaced session instead of falling through to guest", () => {
+    expect(route).toContain("SessionReplacedError");
+    expect(route).toContain("lookup.replaced");
+    expect(route).not.toContain("getSessionUser");
+  });
 });

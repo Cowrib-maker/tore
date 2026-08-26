@@ -61,7 +61,9 @@ export async function GET(_request: Request, context: RouteContext) {
             ? "You do not have permission to perform this action."
             : error.code === "UNAUTHORIZED"
               ? "Please sign in to continue."
-              : "Request failed";
+              : error.code === "SESSION_REPLACED"
+                ? error.message
+                : "Request failed";
       return NextResponse.json({ error: message }, { status: error.statusCode });
     }
     console.error(error);

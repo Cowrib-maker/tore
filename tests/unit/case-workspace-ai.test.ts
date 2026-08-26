@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { createOwnedCaseContextLoader } from "@/application/ai/load-owned-legal-ai-case-context";
 import { LegalAiError } from "@/application/ai/legal-ai.errors";
 import { LegalAiService } from "@/application/ai/legal-ai.service";
 import type {
@@ -102,6 +103,7 @@ function createAiStore(): LegalAiStore & {
           id: row.id,
           questionStatus: row.questionStatus,
           billedQuestionCount: row.billedQuestionCount,
+          caseFileId: row.caseFileId ?? null,
         };
       }
       return null;
@@ -126,6 +128,7 @@ function createAiStore(): LegalAiStore & {
         id,
         questionStatus: row.questionStatus,
         billedQuestionCount: 0,
+        caseFileId: row.caseFileId ?? null,
       };
     },
     async listOwnedCaseConversations(userId, caseFileId) {
@@ -358,9 +361,9 @@ describe("case workspace AI integration", () => {
     const service = createService(store);
     await service.createTurn({
       userId: lawyerA.userId,
+      actorRole: UserRole.LAWYER,
       conversationId: started.conversationId,
       message: "Хөдөлмөрийн гэрээг хэрхэн цуцлах вэ?",
-      mode: "PROFESSIONAL",
     });
 
     await expect(
@@ -380,9 +383,9 @@ describe("case workspace AI integration", () => {
 
     const linked = await service.createTurn({
       userId: lawyerA.userId,
+      actorRole: UserRole.LAWYER,
       caseFileId: file.id,
       message: "Хөдөлмөрийн гэрээг хэрхэн цуцлах вэ?",
-      mode: "PROFESSIONAL",
     });
     expect(store.conversations.get(linked.conversationId)?.caseFileId).toBe(
       file.id,
@@ -390,6 +393,7 @@ describe("case workspace AI integration", () => {
 
     const loose = await service.createTurn({
       userId: lawyerA.userId,
+      actorRole: UserRole.LAWYER,
       message: "Хөдөлмөрийн гэрээг хэрхэн цуцлах вэ?",
     });
     expect(store.conversations.get(loose.conversationId)?.caseFileId).toBeUndefined();
@@ -401,10 +405,12 @@ describe("case workspace AI integration", () => {
     const service = createService(store);
     const first = await service.createTurn({
       userId: lawyerA.userId,
+      actorRole: UserRole.LAWYER,
       message: "Хөдөлмөрийн гэрээг хэрхэн цуцлах вэ?",
     });
     await service.createTurn({
       userId: lawyerA.userId,
+      actorRole: UserRole.LAWYER,
       conversationId: first.conversationId,
       caseFileId: file.id,
       message: "Гэрээний хуулбарыг хавсаргасан.",
@@ -602,5 +608,23 @@ describe("case workspace AI integration", () => {
     expect(view.caseContext).toBeNull();
     expect(view.caseFileId).toBeUndefined();
     expect(view.conversationId).toBeUndefined();
+  });
+
+  it("loads CaseFile AI context only for the owner", async () => {
+    const file = await ownedCase();
+    const loader = createOwnedCaseContextLoader(repository);
+
+    const owned = await loader.loadOwned({
+      userId: lawyerA.userId,
+      caseFileId: file.id,
+    });
+    expect(owned?.caseId).toBe(file.id);
+    expect(owned?.title).toBe("Vehicle sale");
+
+    const stolen = await loader.loadOwned({
+      userId: lawyerB.userId,
+      caseFileId: file.id,
+    });
+    expect(stolen).toBeNull();
   });
 });

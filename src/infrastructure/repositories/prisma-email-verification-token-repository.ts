@@ -44,6 +44,21 @@ export class PrismaEmailVerificationTokenRepository
     };
   }
 
+  async findByIdentifier(
+    identifier: string,
+  ): Promise<EmailVerificationToken | null> {
+    const record = await this.db.verificationToken.findFirst({
+      where: { identifier },
+      orderBy: { expires: "desc" },
+    });
+    if (!record) return null;
+    return {
+      identifier: record.identifier,
+      tokenHash: record.token,
+      expires: record.expires,
+    };
+  }
+
   async deleteByTokenHash(tokenHash: string): Promise<void> {
     await this.db.verificationToken.deleteMany({
       where: { token: tokenHash },
