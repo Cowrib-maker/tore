@@ -12,6 +12,7 @@ import {
   maskEmail,
   pendingEmailVerificationPageModel,
   resolvePostCredentialLogin,
+  resolveResendVerificationEmail,
   shouldBounceAuthenticatedFromAuthRoute,
   successEmailVerificationPageModel,
 } from "@/application/services/email-verification-flow";
@@ -292,12 +293,28 @@ describe("email verification UX flow", () => {
       actions.indexOf("function getPasswordResetDeps"),
     );
     expect(otpAction).toContain("verifyEmailOtpUseCase");
+    expect(otpAction).toContain("getEmailVerificationOtpDeps");
     expect(otpAction).toContain("VERIFY_EMAIL_OTP_RATE_LIMIT");
     expect(otpAction).toContain("AUTH_ACTION_CODE.EMAIL_VERIFIED");
     expect(otpAction).toContain("mapEmailVerificationActionError");
     expect(otpAction).toContain("email: result.email");
-    expect(otpAction).not.toContain("otp: result");
-    expect(otpAction).not.toMatch(/searchParams.*otp|otp.*searchParams/);
+    expect(otpAction).not.toContain("getEmailVerificationDeps()");
+    expect(otpAction).not.toContain("getEmailSender");
+    const issue = readFileSync(
+      path.join(
+        process.cwd(),
+        "src/application/services/issue-verification-email.ts",
+      ),
+      "utf8",
+    );
+    const otpDeps = issue.slice(
+      issue.indexOf("export function getEmailVerificationOtpDeps"),
+      issue.indexOf("export async function issueVerificationEmailAfterRegister"),
+    );
+    expect(otpDeps).toContain("userRepository");
+    expect(otpDeps).toContain("emailVerificationTokenRepository");
+    expect(otpDeps).not.toContain("getEmailSender");
+    expect(otpDeps).not.toContain("emailSender");
 
     const limiter = readFileSync(
       path.join(process.cwd(), "src/infrastructure/security/rate-limiter.ts"),
@@ -334,5 +351,124 @@ describe("email verification UX flow", () => {
     expect(otpInput).toContain("Backspace");
     expect(otpInput).toContain("onPaste");
     expect(otpInput).not.toContain("type=\"hidden\" name={name} value=");
+  });
+
+  it("keeps the verification email after an invalid OTP and does not run resend", () => {
+    const actions = readFileSync(
+      path.join(process.cwd(), "src/application/actions/auth.actions.ts"),
+      "utf8",
+    );
+    const otpAction = actions.slice(
+      actions.indexOf("export async function verifyEmailOtpAction"),
+      actions.indexOf("function getPasswordResetDeps"),
+    );
+    expect(otpAction).toContain("echoVerificationEmail");
+    expect(otpAction).toContain("EMAIL_VERIFICATION_INVALID");
+    expect(otpAction).toContain("emailOnly.data.email");
+    expect(otpAction).toContain("parsed.data.email");
+    expect(otpAction).not.toContain("getEmailVerificationDeps()");
+    expect(otpAction).not.toContain("resendEmailVerificationUseCase");
+
+    const otpForm = readFileSync(
+      path.join(
+        process.cwd(),
+        "src/components/auth/email-verification-otp-form.tsx",
+      ),
+      "utf8",
+    );
+    expect(otpForm.match(/<form[\s>]/g)?.length).toBe(1);
+    expect(otpForm).toContain("normalizeVerificationEmail(state.email)");
+    expect(otpForm).toContain("onRetainEmail");
+
+    const resendForm = readFileSync(
+      path.join(process.cwd(), "src/components/auth/resend-verification-form.tsx"),
+      "utf8",
+    );
+    expect(resendForm).not.toMatch(/<form[\s>]/);
+    expect(resendForm).toContain('type="button"');
+    expect(resendForm).toContain("resendVerificationEmailAction.bind");
+    expect(resendForm).toContain("startTransition");
+    expect(resendForm).not.toContain("action={formAction}");
+
+    const panel = readFileSync(
+      path.join(
+        process.cwd(),
+        "src/components/auth/email-verification-panel.tsx",
+      ),
+      "utf8",
+    );
+    expect(panel).toContain("identityEmail");
+    expect(panel).toContain("handleRetainEmail");
+    expect(panel).toContain("maskEmail(email)");
+  });
+
+  it("resend uses the current verification email and ignores a different form value", () => {
+    expect(
+      resolveResendVerificationEmail(
+        "beadyduk@gmail.com",
+        "other@example.com",
+      ),
+    ).toBe("beadyduk@gmail.com");
+    expect(resolveResendVerificationEmail("  BeadyDuk@Gmail.com  ", "")).toBe(
+      "beadyduk@gmail.com",
+    );
+    expect(resolveResendVerificationEmail(null, "citizen@example.com")).toBe(
+      "citizen@example.com",
+    );
+    expect(resolveResendVerificationEmail(null, "")).toBeNull();
+    expect(resolveResendVerificationEmail("", "name@example.com")).toBe(
+      "name@example.com",
+    );
+    expect(maskEmail("beadyduk@gmail.com")).toBe("be***@gmail.com");
+
+    const actions = readFileSync(
+      path.join(process.cwd(), "src/application/actions/auth.actions.ts"),
+      "utf8",
+    );
+    const resend = actions.slice(
+      actions.indexOf("export async function resendVerificationEmailAction"),
+      actions.indexOf("export async function verifyEmailOtpAction"),
+    );
+    expect(resend.indexOf("resolveResendVerificationEmail")).toBeGreaterThan(-1);
+    expect(resend.indexOf("resolveResendVerificationEmail")).toBeLessThan(
+      resend.indexOf("getEmailVerificationDeps"),
+    );
+    expect(resend.indexOf("AUTH_ACTION_CODE.INVALID_EMAIL")).toBeLessThan(
+      resend.indexOf("getEmailVerificationDeps"),
+    );
+    expect(resend).toContain("AUTH_ACTION_CODE.RESEND_SENT");
+    expect(resend).toContain("RESEND_VERIFICATION_RATE_LIMIT");
+    expect(resend).toContain("boundEmail");
+
+    const resendForm = readFileSync(
+      path.join(process.cwd(), "src/components/auth/resend-verification-form.tsx"),
+      "utf8",
+    );
+    expect(resendForm).toContain("knownEmail || null");
+    expect(resendForm).toContain("formData.set(\"email\", knownEmail || typedEmail)");
+  });
+
+  it("does not map a missing resend email to an email-provider configuration error", () => {
+    expect(resolveResendVerificationEmail(null, null)).toBeNull();
+    expect(resolveResendVerificationEmail(undefined, "   ")).toBeNull();
+
+    const actions = readFileSync(
+      path.join(process.cwd(), "src/application/actions/auth.actions.ts"),
+      "utf8",
+    );
+    const resend = actions.slice(
+      actions.indexOf("export async function resendVerificationEmailAction"),
+      actions.indexOf("export async function verifyEmailOtpAction"),
+    );
+    const invalidEmailReturn = resend.indexOf(
+      "return { code: AUTH_ACTION_CODE.INVALID_EMAIL }",
+    );
+    expect(invalidEmailReturn).toBeGreaterThan(-1);
+    expect(invalidEmailReturn).toBeLessThan(
+      resend.indexOf("getEmailVerificationDeps"),
+    );
+    expect(resend).not.toMatch(
+      /if\s*\(\s*!parsed\.ok[\s\S]*EMAIL_CONFIGURATION/,
+    );
   });
 });

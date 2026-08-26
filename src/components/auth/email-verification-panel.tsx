@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 
 import { EmailVerificationOtpForm } from "@/components/auth/email-verification-otp-form";
@@ -15,6 +15,7 @@ import {
 import {
   loginHrefAfterEmailVerification,
   maskEmail,
+  normalizeVerificationEmail,
   type EmailVerificationPageModel,
 } from "@/application/services/email-verification-flow";
 import { UserRole } from "@/domain/enums";
@@ -29,9 +30,25 @@ export function EmailVerificationPanel({
   model: EmailVerificationPageModel;
 }) {
   const [outcome, setOutcome] = useState<"verified" | "already" | null>(null);
+  const [identityEmail, setIdentityEmail] = useState<string | null>(() =>
+    normalizeVerificationEmail(model.email),
+  );
   const handleOutcome = useCallback((next: "verified" | "already") => {
     setOutcome((current) => (current === "verified" ? current : next));
   }, []);
+  const handleRetainEmail = useCallback((next: string) => {
+    const normalized = normalizeVerificationEmail(next);
+    if (normalized) {
+      setIdentityEmail(normalized);
+    }
+  }, []);
+
+  useEffect(() => {
+    const next = normalizeVerificationEmail(model.email);
+    if (next) {
+      setIdentityEmail(next);
+    }
+  }, [model.email]);
 
   const continueHref =
     model.status === "success"
@@ -71,7 +88,7 @@ export function EmailVerificationPanel({
     : isUnavailable
       ? copy.verifyTemporaryFailure
       : copy.verifyPendingBody;
-  const email = model.email;
+  const email = identityEmail;
   const startCooldown = model.status === "pending" && model.sent;
 
   return (
@@ -97,6 +114,7 @@ export function EmailVerificationPanel({
           hideEmailField={Boolean(email)}
           startCooldown={startCooldown}
           onOutcome={handleOutcome}
+          onRetainEmail={handleRetainEmail}
         />
         <Link
           href="/login"

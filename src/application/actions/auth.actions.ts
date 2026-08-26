@@ -14,10 +14,13 @@ import { enforceRateLimit } from "@/application/common/rate-limit-action";
 import {
   issueVerificationEmailAfterRegister,
   getEmailVerificationDeps,
+  getEmailVerificationOtpDeps,
 } from "@/application/services/issue-verification-email";
 import {
   buildEmailVerificationPendingPath,
+  normalizeVerificationEmail,
   resolvePostCredentialLogin,
+  resolveResendVerificationEmail,
 } from "@/application/services/email-verification-flow";
 import { registerClientUseCase } from "@/application/use-cases/auth/register-client";
 import { registerLawyerUseCase } from "@/application/use-cases/auth/register-lawyer";
@@ -204,13 +207,25 @@ export async function loginAction(
   redirect("/");
 }
 
+function echoVerificationEmail(
+  state: ActionState,
+  email: unknown,
+): ActionState {
+  const normalized = normalizeVerificationEmail(email);
+  if (!normalized) return state;
+  return { ...state, email: normalized };
+}
+
 export async function resendVerificationEmailAction(
+  boundEmail: string | null,
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  const parsed = parseWithSchema(resendVerificationSchema, {
-    email: formData.get("email"),
-  });
+  const email = resolveResendVerificationEmail(
+    boundEmail,
+    formData.get("email"),
+  );
+  const parsed = parseWithSchema(resendVerificationSchema, { email });
   if (!parsed.ok) {
     return { code: AUTH_ACTION_CODE.INVALID_EMAIL };
   }
@@ -223,11 +238,14 @@ export async function resendVerificationEmailAction(
       "attempts",
     );
     if (limited) {
-      return { code: AUTH_ACTION_CODE.RATE_LIMITED };
+      return echoVerificationEmail(limited, parsed.data.email);
     }
   } catch (error) {
     console.error("[email:verification] resend rate-limit failed", error);
-    return { code: AUTH_ACTION_CODE.TEMPORARY_FAILURE };
+    return echoVerificationEmail(
+      { code: AUTH_ACTION_CODE.TEMPORARY_FAILURE },
+      parsed.data.email,
+    );
   }
 
   try {
@@ -235,13 +253,19 @@ export async function resendVerificationEmailAction(
       parsed.data.email,
       getEmailVerificationDeps(),
     );
-    return {
-      success: true,
-      code: AUTH_ACTION_CODE.RESEND_SENT,
-    };
+    return echoVerificationEmail(
+      {
+        success: true,
+        code: AUTH_ACTION_CODE.RESEND_SENT,
+      },
+      parsed.data.email,
+    );
   } catch (error) {
     console.error("[email:verification] resend action failed", error);
-    return mapEmailVerificationActionError(error);
+    return echoVerificationEmail(
+      mapEmailVerificationActionError(error),
+      parsed.data.email,
+    );
   }
 }
 
@@ -257,11 +281,13 @@ export async function verifyEmailOtpAction(
     const emailOnly = parseWithSchema(resendVerificationSchema, {
       email: formData.get("email"),
     });
-    return {
-      code: emailOnly.ok
-        ? AUTH_ACTION_CODE.EMAIL_VERIFICATION_INVALID
-        : AUTH_ACTION_CODE.INVALID_EMAIL,
-    };
+    if (emailOnly.ok) {
+      return echoVerificationEmail(
+        { code: AUTH_ACTION_CODE.EMAIL_VERIFICATION_INVALID },
+        emailOnly.data.email,
+      );
+    }
+    return { code: AUTH_ACTION_CODE.INVALID_EMAIL };
   }
 
   const ipAddress = await getClientIp();
@@ -272,17 +298,20 @@ export async function verifyEmailOtpAction(
       "attempts",
     );
     if (limited) {
-      return { code: AUTH_ACTION_CODE.RATE_LIMITED };
+      return echoVerificationEmail(limited, parsed.data.email);
     }
   } catch (error) {
     console.error("[email:verification] otp rate-limit failed", error);
-    return { code: AUTH_ACTION_CODE.TEMPORARY_FAILURE };
+    return echoVerificationEmail(
+      { code: AUTH_ACTION_CODE.TEMPORARY_FAILURE },
+      parsed.data.email,
+    );
   }
 
   try {
     const result = await verifyEmailOtpUseCase(
       parsed.data,
-      getEmailVerificationDeps(),
+      getEmailVerificationOtpDeps(),
     );
     return {
       success: true,
@@ -290,7 +319,10 @@ export async function verifyEmailOtpAction(
       email: result.email,
     };
   } catch (error) {
-    return mapEmailVerificationActionError(error);
+    return echoVerificationEmail(
+      mapEmailVerificationActionError(error),
+      parsed.data.email,
+    );
   }
 }
 

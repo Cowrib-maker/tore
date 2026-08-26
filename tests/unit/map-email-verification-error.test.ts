@@ -103,6 +103,30 @@ describe("userFacingResendFeedback", () => {
     });
   });
 
+  it("maps an empty or invalid email to the email-invalid copy, not provider configuration", () => {
+    expect(
+      userFacingResendFeedback({ code: AUTH_ACTION_CODE.INVALID_EMAIL }, mn)?.text,
+    ).toBe("И-мэйл хаяг буруу байна.");
+    expect(
+      userFacingResendFeedback({ code: AUTH_ACTION_CODE.INVALID_EMAIL }, mn)
+        ?.text,
+    ).not.toBe(
+      "И-мэйл илгээх тохиргоо дутуу эсвэл буруу байна. Дараа дахин оролдоно уу.",
+    );
+    expect(
+      userFacingResendFeedback(
+        { code: AUTH_ACTION_CODE.EMAIL_VERIFICATION_INVALID },
+        mn,
+      )?.text,
+    ).toBe("Баталгаажуулах код буруу байна.");
+    expect(
+      userFacingResendFeedback(
+        { code: AUTH_ACTION_CODE.EMAIL_VERIFICATION_INVALID },
+        mn,
+      )?.text,
+    ).not.toMatch(/тохиргоо дутуу/);
+  });
+
   it("maps rate limit, missing email, delivery, and configuration to Mongolian errors", () => {
     expect(
       userFacingResendFeedback({ code: AUTH_ACTION_CODE.RATE_LIMITED }, mn)?.text,

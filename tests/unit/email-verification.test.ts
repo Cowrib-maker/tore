@@ -263,6 +263,23 @@ describe("email-verification use-cases", () => {
     expect(emailSend).not.toHaveBeenCalled();
   });
 
+  it("verifies a valid OTP without constructing an email sender", async () => {
+    await sendEmailVerificationUseCase(user.email, deps);
+    const otp = otpFromSentMail(emailSend);
+    const otpDeps = {
+      userRepository: deps.userRepository,
+      emailVerificationTokenRepository: deps.emailVerificationTokenRepository,
+    };
+
+    const result = await verifyEmailOtpUseCase(
+      { email: user.email, otp },
+      otpDeps,
+    );
+
+    expect(result.email).toBe(user.email);
+    expect(deps.userRepository.markEmailVerified).toHaveBeenCalledWith(user.id);
+  });
+
   it("verifies a valid OTP and marks the user verified", async () => {
     await sendEmailVerificationUseCase(user.email, deps);
     const otp = otpFromSentMail(emailSend);

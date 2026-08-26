@@ -8,6 +8,7 @@ import {
   type ActionState,
 } from "@/application/common/action-state";
 import { userFacingResendFeedback } from "@/application/common/map-email-verification-error";
+import { normalizeVerificationEmail } from "@/application/services/email-verification-flow";
 import { OtpInput } from "@/components/auth/otp-input";
 import { ResendVerificationForm } from "@/components/auth/resend-verification-form";
 import { Button } from "@/components/ui/button";
@@ -27,12 +28,14 @@ export function EmailVerificationOtpForm({
   hideEmailField,
   startCooldown,
   onOutcome,
+  onRetainEmail,
 }: {
   copy: Dictionary["auth"];
   email?: string | null;
   hideEmailField?: boolean;
   startCooldown?: boolean;
   onOutcome?: (outcome: "verified" | "already") => void;
+  onRetainEmail?: (email: string) => void;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const autoSubmitLock = useRef(false);
@@ -43,6 +46,11 @@ export function EmailVerificationOtpForm({
   const [cooldown, setCooldown] = useState(
     startCooldown ? EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS : 0,
   );
+
+  const knownEmail =
+    normalizeVerificationEmail(state.email) ??
+    normalizeVerificationEmail(email) ??
+    "";
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -66,8 +74,13 @@ export function EmailVerificationOtpForm({
     }
   }, [state, onOutcome]);
 
-  const knownEmail = email?.trim() ?? "";
-  const showEmailField = !hideEmailField || !knownEmail;
+  useEffect(() => {
+    if (knownEmail) {
+      onRetainEmail?.(knownEmail);
+    }
+  }, [knownEmail, onRetainEmail]);
+
+  const showEmailField = !knownEmail;
   const feedback = userFacingResendFeedback(state, copy);
   const errorMessage = feedback?.tone === "error" ? feedback.text : null;
 
@@ -145,9 +158,10 @@ export function EmailVerificationOtpForm({
         </p>
       ) : (
         <ResendVerificationForm
+          key={knownEmail || "unknown"}
           copy={copy}
           defaultEmail={knownEmail || null}
-          hideEmailField={Boolean(knownEmail) && !showEmailField}
+          hideEmailField={Boolean(knownEmail) || hideEmailField}
           submitLabel={copy.verifyResend}
           onSent={() => setCooldown(EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS)}
         />

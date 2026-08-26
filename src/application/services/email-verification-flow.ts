@@ -41,6 +41,20 @@ export function normalizeVerificationEmail(
   return email;
 }
 
+/**
+ * Resend identity is the current verification-flow email when known.
+ * A different value typed in a client field must not replace that identity.
+ */
+export function resolveResendVerificationEmail(
+  boundEmail: unknown,
+  formEmail: unknown,
+): string | null {
+  return (
+    normalizeVerificationEmail(boundEmail) ??
+    normalizeVerificationEmail(formEmail)
+  );
+}
+
 export function maskEmail(email: string): string {
   const normalized = email.trim().toLowerCase();
   const at = normalized.lastIndexOf("@");

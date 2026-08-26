@@ -23,6 +23,17 @@ export function getEmailVerificationDeps(): EmailVerificationDeps {
   }
 }
 
+/** OTP verify only looks up the hashed token. It must not construct an email sender. */
+export function getEmailVerificationOtpDeps(): Pick<
+  EmailVerificationDeps,
+  "userRepository" | "emailVerificationTokenRepository"
+> {
+  return {
+    userRepository,
+    emailVerificationTokenRepository,
+  };
+}
+
 /**
  * Persist token + send verification email after registration.
  * Registration itself must not fail if delivery fails — token remains for resend.

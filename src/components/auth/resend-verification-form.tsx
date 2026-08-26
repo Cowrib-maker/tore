@@ -1,6 +1,13 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { resendVerificationEmailAction } from "@/application/actions/auth.actions";
 import {
@@ -30,10 +37,19 @@ export function ResendVerificationForm({
 }) {
   const onSentRef = useRef(onSent);
   onSentRef.current = onSent;
-  const [state, formAction, pending] = useActionState(
-    resendVerificationEmailAction,
-    initialState,
+  const knownEmail = defaultEmail?.trim() ?? "";
+  const [typedEmail, setTypedEmail] = useState(knownEmail);
+  const boundAction = useMemo(
+    () => resendVerificationEmailAction.bind(null, knownEmail || null),
+    [knownEmail],
   );
+  const [state, dispatch, pending] = useActionState(boundAction, initialState);
+
+  useEffect(() => {
+    if (knownEmail) {
+      setTypedEmail(knownEmail);
+    }
+  }, [knownEmail]);
 
   useEffect(() => {
     if (state.success && state.code === AUTH_ACTION_CODE.RESEND_SENT) {
@@ -41,7 +57,6 @@ export function ResendVerificationForm({
     }
   }, [state]);
 
-  const knownEmail = defaultEmail?.trim() ?? "";
   const showEmailField = !hideEmailField || !knownEmail;
   const feedback = userFacingResendFeedback(state, copy);
   const errorMessage = feedback?.tone === "error" ? feedback.text : null;
@@ -50,8 +65,16 @@ export function ResendVerificationForm({
       ? feedback.text
       : null;
 
+  function submitResend() {
+    const formData = new FormData();
+    formData.set("email", knownEmail || typedEmail);
+    startTransition(() => {
+      dispatch(formData);
+    });
+  }
+
   return (
-    <form action={formAction} className="space-y-3">
+    <div className="space-y-3">
       {errorMessage && (
         <div
           id="resend-verification-form-error"
@@ -78,7 +101,14 @@ export function ResendVerificationForm({
             id="resend-email"
             name="email"
             type="email"
-            defaultValue={knownEmail}
+            value={typedEmail}
+            onChange={(event) => setTypedEmail(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                submitResend();
+              }
+            }}
             placeholder={copy.emailPlaceholder}
             required
             autoComplete="email"
@@ -88,17 +118,16 @@ export function ResendVerificationForm({
             }
           />
         </div>
-      ) : (
-        <input type="hidden" name="email" value={knownEmail} />
-      )}
+      ) : null}
       <Button
-        type="submit"
+        type="button"
         variant="outline"
         className="w-full"
         disabled={pending}
+        onClick={submitResend}
       >
         {pending ? copy.resendSending : (submitLabel ?? copy.verifyResend)}
       </Button>
-    </form>
+    </div>
   );
 }
