@@ -352,6 +352,8 @@ export const en: Dictionary = {
     verifyPendingTitle: "Please confirm your email",
     verifyPendingBody:
       "We sent a 6-digit verification code to your email address.",
+    verifyUnverifiedLoginBody:
+      "Your email address is not verified. Please enter the verification code.",
     verifyOtpLabel: "Verification code",
     verifyOtpSubmit: "Verify",
     verifyOtpSubmitting: "Verifying…",

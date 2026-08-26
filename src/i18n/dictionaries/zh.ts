@@ -296,6 +296,8 @@ export const zh: Dictionary = {
     verifyResendHint: "请返回登录页重新申请验证邮件。",
     verifyPendingTitle: "请验证您的电子邮箱",
     verifyPendingBody: "我们已向您的电子邮箱发送了 6 位验证码。",
+    verifyUnverifiedLoginBody:
+      "您的电子邮箱尚未验证。请输入验证码。",
     verifyOtpLabel: "验证码",
     verifyOtpSubmit: "验证",
     verifyOtpSubmitting: "正在验证…",

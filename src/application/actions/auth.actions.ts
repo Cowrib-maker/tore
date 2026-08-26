@@ -18,12 +18,14 @@ import {
 } from "@/application/services/issue-verification-email";
 import {
   buildEmailVerificationPendingPath,
+  loginHrefAfterEmailVerification,
   normalizeVerificationEmail,
   resolvePostCredentialLogin,
   resolveResendVerificationEmail,
 } from "@/application/services/email-verification-flow";
 import { registerClientUseCase } from "@/application/use-cases/auth/register-client";
 import { registerLawyerUseCase } from "@/application/use-cases/auth/register-lawyer";
+import { verifyCredentials } from "@/application/use-cases/auth/verify-credentials";
 import { resendEmailVerificationUseCase, verifyEmailOtpUseCase } from "@/application/use-cases/auth/email-verification";
 import {
   LOGIN_RATE_LIMIT,
@@ -163,6 +165,24 @@ export async function loginAction(
   );
   if (limited) return limited;
 
+  const account = await userRepository.findByEmail(parsed.data.email);
+  if (account && !account.emailVerified) {
+    try {
+      await verifyCredentials(parsed.data.email, parsed.data.password, {
+        userRepository,
+      });
+    } catch {
+      return { error: "Invalid email or password" };
+    }
+    redirect(
+      buildEmailVerificationPendingPath({
+        email: parsed.data.email,
+        callbackUrl: formData.get("callbackUrl"),
+        fromUnverifiedLogin: true,
+      }),
+    );
+  }
+
   let session;
   try {
     const result = await signIn("credentials", {
@@ -185,15 +205,19 @@ export async function loginAction(
     return { error: "Your account is not active" };
   }
 
-  const account = await userRepository.findByEmail(parsed.data.email);
-  const loginGate = resolvePostCredentialLogin(account);
+  const loginGate = resolvePostCredentialLogin(
+    account ?? (await userRepository.findByEmail(parsed.data.email)),
+  );
   if (loginGate !== "ok") {
     await signOut({ redirect: false });
     if (loginGate === "unverified") {
-      return {
-        code: AUTH_ACTION_CODE.EMAIL_NOT_VERIFIED,
-        email: parsed.data.email,
-      };
+      redirect(
+        buildEmailVerificationPendingPath({
+          email: parsed.data.email,
+          callbackUrl: formData.get("callbackUrl"),
+          fromUnverifiedLogin: true,
+        }),
+      );
     }
     return { error: "Invalid email or password" };
   }
@@ -308,22 +332,22 @@ export async function verifyEmailOtpAction(
     );
   }
 
+  let verified: { email: string; role: UserRole };
   try {
-    const result = await verifyEmailOtpUseCase(
+    verified = await verifyEmailOtpUseCase(
       parsed.data,
       getEmailVerificationOtpDeps(),
     );
-    return {
-      success: true,
-      code: AUTH_ACTION_CODE.EMAIL_VERIFIED,
-      email: result.email,
-    };
   } catch (error) {
     return echoVerificationEmail(
       mapEmailVerificationActionError(error),
       parsed.data.email,
     );
   }
+
+  redirect(
+    loginHrefAfterEmailVerification(verified.role, formData.get("callbackUrl")),
+  );
 }
 
 function getPasswordResetDeps() {

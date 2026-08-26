@@ -297,6 +297,8 @@ export const ko: Dictionary = {
     verifyResendHint: "새 인증 이메일을 요청하려면 로그인으로 돌아가세요.",
     verifyPendingTitle: "이메일을 확인해 주세요",
     verifyPendingBody: "등록하신 이메일 주소로 6자리 인증 코드를 보냈습니다.",
+    verifyUnverifiedLoginBody:
+      "이메일 주소가 아직 확인되지 않았습니다. 인증 코드를 입력해 주세요.",
     verifyOtpLabel: "인증 코드",
     verifyOtpSubmit: "확인",
     verifyOtpSubmitting: "확인 중…",

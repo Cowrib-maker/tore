@@ -25,12 +25,18 @@ export default async function VerifyEmailPage({
     typeof params.callbackUrl === "string" ? params.callbackUrl : null,
   );
   const sent = params.sent === "1";
+  const fromUnverifiedLogin = params.unverified === "1";
 
   return (
     <AuthPageChrome locale={locale} dict={dict}>
       <EmailVerificationPanel
         copy={dict.auth}
-        model={pendingEmailVerificationPageModel(email, callbackUrl, sent)}
+        model={pendingEmailVerificationPageModel(
+          email,
+          callbackUrl,
+          sent,
+          fromUnverifiedLogin,
+        )}
       />
     </AuthPageChrome>
   );

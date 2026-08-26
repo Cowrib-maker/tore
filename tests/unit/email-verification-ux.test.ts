@@ -88,7 +88,14 @@ describe("email verification UX flow", () => {
       email: "a@b.mn",
       callbackUrl: null,
       sent: false,
+      fromUnverifiedLogin: false,
     });
+    expect(
+      buildEmailVerificationPendingPath({
+        email: "citizen@example.com",
+        fromUnverifiedLogin: true,
+      }),
+    ).toBe("/verify-email?email=citizen%40example.com&unverified=1");
   });
 
   it("does not complete login until email is verified", () => {
@@ -104,19 +111,35 @@ describe("email verification UX flow", () => {
     expect(AUTH_ACTION_CODE.EMAIL_NOT_VERIFIED).toBe("EMAIL_NOT_VERIFIED");
   });
 
-  it("login action signs unverified users out and returns the verification code", () => {
+  it("login action routes unverified users to OTP verification without a session", () => {
     const actions = readFileSync(
       path.join(process.cwd(), "src/application/actions/auth.actions.ts"),
       "utf8",
     );
     const login = actions.slice(
       actions.indexOf("export async function loginAction"),
-      actions.indexOf("export async function resendVerificationEmailAction"),
+      actions.indexOf("function echoVerificationEmail"),
     );
+    expect(login).toContain("verifyCredentials");
+    expect(login).toContain("buildEmailVerificationPendingPath");
+    expect(login).toContain("fromUnverifiedLogin: true");
     expect(login).toContain("resolvePostCredentialLogin");
-    expect(login).toContain("AUTH_ACTION_CODE.EMAIL_NOT_VERIFIED");
     expect(login).toContain("signOut");
+    expect(login).not.toContain("AUTH_ACTION_CODE.EMAIL_NOT_VERIFIED");
     expect(login).not.toContain("Please verify your email");
+
+    const authorize = readFileSync(
+      path.join(process.cwd(), "src/infrastructure/auth/auth.config.ts"),
+      "utf8",
+    );
+    const authorizeFn = authorize.slice(
+      authorize.indexOf("async authorize"),
+      authorize.indexOf("callbacks: nodeAuthCallbacks"),
+    );
+    expect(authorizeFn.indexOf("emailVerified")).toBeGreaterThan(-1);
+    expect(authorizeFn.indexOf("emailVerified")).toBeLessThan(
+      authorizeFn.indexOf("rotateActiveSessionIdHash"),
+    );
   });
 
   it("verified accounts still complete login to the role destination", () => {
@@ -202,13 +225,18 @@ describe("email verification UX flow", () => {
     );
   });
 
-  it("login form shows the verification panel instead of English verify copy", () => {
+  it("login page does not show a universal email-verification link", () => {
     const loginForm = readFileSync(
       path.join(process.cwd(), "src/components/auth/login-form.tsx"),
       "utf8",
     );
-    expect(loginForm).toContain("AUTH_ACTION_CODE.EMAIL_NOT_VERIFIED");
-    expect(loginForm).toContain("EmailVerificationPanel");
+    expect(loginForm).toContain("forgot-password");
+    expect(loginForm).toContain("registerHref");
+    expect(loginForm).toContain("registerLawyerLink");
+    expect(loginForm).not.toContain("verifyNeedsLink");
+    expect(loginForm).not.toContain('href="/verify-email"');
+    expect(loginForm).not.toContain("EmailVerificationPanel");
+    expect(loginForm).not.toContain("AUTH_ACTION_CODE.EMAIL_NOT_VERIFIED");
     expect(loginForm).not.toContain("Please verify your email");
     expect(loginForm).not.toContain("ResendVerificationForm");
   });
@@ -218,6 +246,9 @@ describe("email verification UX flow", () => {
     expect(mn.verifyPendingTitle).toBe("И-мэйлээ баталгаажуулна уу");
     expect(mn.verifyPendingBody).toBe(
       "Таны и-мэйл хаяг руу 6 оронтой баталгаажуулах код илгээлээ.",
+    );
+    expect(mn.verifyUnverifiedLoginBody).toBe(
+      "Таны и-мэйл хаяг баталгаажаагүй байна. Баталгаажуулах кодыг оруулна уу.",
     );
     expect(mn.verifyOtpLabel).toBe("Баталгаажуулах код");
     expect(mn.verifyOtpSubmit).toBe("Баталгаажуулах");
@@ -253,6 +284,7 @@ describe("email verification UX flow", () => {
     );
     expect(page).toContain("EmailVerificationPanel");
     expect(page).toContain("pendingEmailVerificationPageModel");
+    expect(page).toContain('params.unverified === "1"');
     expect(page).not.toContain("verifyEmailTokenUseCase");
     expect(page).not.toContain("params.token");
     expect(page).not.toContain("error.message");
@@ -295,9 +327,16 @@ describe("email verification UX flow", () => {
     expect(otpAction).toContain("verifyEmailOtpUseCase");
     expect(otpAction).toContain("getEmailVerificationOtpDeps");
     expect(otpAction).toContain("VERIFY_EMAIL_OTP_RATE_LIMIT");
-    expect(otpAction).toContain("AUTH_ACTION_CODE.EMAIL_VERIFIED");
+    expect(otpAction).toContain("loginHrefAfterEmailVerification");
+    expect(otpAction).toContain("redirect(");
+    expect(
+      otpAction.lastIndexOf("redirect("),
+    ).toBeGreaterThan(otpAction.lastIndexOf("verifyEmailOtpUseCase"));
+    expect(
+      otpAction.lastIndexOf("redirect("),
+    ).toBeGreaterThan(otpAction.indexOf("mapEmailVerificationActionError"));
     expect(otpAction).toContain("mapEmailVerificationActionError");
-    expect(otpAction).toContain("email: result.email");
+    expect(otpAction).not.toContain("AUTH_ACTION_CODE.EMAIL_VERIFIED");
     expect(otpAction).not.toContain("getEmailVerificationDeps()");
     expect(otpAction).not.toContain("getEmailSender");
     const issue = readFileSync(
@@ -330,6 +369,7 @@ describe("email verification UX flow", () => {
     );
     expect(panel).toContain("EmailVerificationOtpForm");
     expect(panel).toContain("maskEmail");
+    expect(panel).toContain("verifyUnverifiedLoginBody");
 
     const otpForm = readFileSync(
       path.join(
@@ -341,6 +381,7 @@ describe("email verification UX flow", () => {
     expect(otpForm).toContain("verifyEmailOtpAction");
     expect(otpForm).toContain("copy.verifyOtpSubmit");
     expect(otpForm).toContain("requestSubmit");
+    expect(otpForm).toContain("callbackUrl");
 
     const otpInput = readFileSync(
       path.join(process.cwd(), "src/components/auth/otp-input.tsx"),

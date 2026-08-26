@@ -151,6 +151,7 @@ export type Dictionary = {
     verifyResendHint: string;
     verifyPendingTitle: string;
     verifyPendingBody: string;
+    verifyUnverifiedLoginBody: string;
     verifyOtpLabel: string;
     verifyOtpSubmit: string;
     verifyOtpSubmitting: string;

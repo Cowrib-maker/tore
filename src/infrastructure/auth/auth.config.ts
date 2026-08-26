@@ -49,6 +49,10 @@ export const authConfig = {
             { userRepository },
           );
 
+          if (!user.emailVerified) {
+            return null;
+          }
+
           const {
             generateActiveSessionId,
             hashActiveSessionId,

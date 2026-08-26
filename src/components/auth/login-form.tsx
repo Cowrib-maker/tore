@@ -4,12 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 
 import { loginAction } from "@/application/actions/auth.actions";
-import {
-  AUTH_ACTION_CODE,
-  type ActionState,
-} from "@/application/common/action-state";
-import { EmailVerificationPanel } from "@/components/auth/email-verification-panel";
-import { pendingEmailVerificationPageModel } from "@/application/services/email-verification-flow";
+import type { ActionState } from "@/application/common/action-state";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -38,15 +33,6 @@ export function LoginForm({
   const registerHref = callbackUrl
     ? `/register/client?callbackUrl=${encodeURIComponent(callbackUrl)}`
     : "/register/client";
-
-  if (state.code === AUTH_ACTION_CODE.EMAIL_NOT_VERIFIED) {
-    return (
-      <EmailVerificationPanel
-        copy={copy}
-        model={pendingEmailVerificationPageModel(state.email ?? null, callbackUrl ?? null)}
-      />
-    );
-  }
 
   return (
     <div className="flex w-full max-w-md flex-col gap-4">
@@ -116,14 +102,6 @@ export function LoginForm({
                 className="text-primary underline-offset-4 hover:underline"
               >
                 {copy.forgotPassword}
-              </Link>
-            </p>
-            <p className="text-center text-sm text-muted-foreground">
-              <Link
-                href="/verify-email"
-                className="text-primary underline-offset-4 hover:underline"
-              >
-                {copy.verifyNeedsLink}
               </Link>
             </p>
             <p className="text-center text-sm text-muted-foreground">

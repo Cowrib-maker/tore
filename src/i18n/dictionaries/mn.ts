@@ -346,6 +346,8 @@ ctaStart: "Өмгөөлөгч хайх",
     verifyPendingTitle: "И-мэйлээ баталгаажуулна уу",
     verifyPendingBody:
       "Таны и-мэйл хаяг руу 6 оронтой баталгаажуулах код илгээлээ.",
+    verifyUnverifiedLoginBody:
+      "Таны и-мэйл хаяг баталгаажаагүй байна. Баталгаажуулах кодыг оруулна уу.",
     verifyOtpLabel: "Баталгаажуулах код",
     verifyOtpSubmit: "Баталгаажуулах",
     verifyOtpSubmitting: "Баталгаажуулж байна…",

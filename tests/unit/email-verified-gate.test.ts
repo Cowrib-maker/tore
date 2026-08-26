@@ -50,6 +50,23 @@ describe("email verification gate", () => {
     expect(() => assertUserEmailVerified(lawyer())).not.toThrow();
   });
 
+  it("does not issue an Auth.js session for unverified credentials", () => {
+    const authorize = readFileSync(
+      path.join(process.cwd(), "src/infrastructure/auth/auth.config.ts"),
+      "utf8",
+    );
+    const fn = authorize.slice(
+      authorize.indexOf("async authorize"),
+      authorize.indexOf("callbacks: nodeAuthCallbacks"),
+    );
+    expect(fn).toContain("verifyCredentials");
+    expect(fn).toContain("if (!user.emailVerified)");
+    expect(fn).toContain("return null");
+    expect(fn.indexOf("if (!user.emailVerified)")).toBeLessThan(
+      fn.indexOf("rotateActiveSessionIdHash"),
+    );
+  });
+
   it("still allows unverified credentials to be checked", async () => {
     const user = lawyer({ emailVerified: null });
     const passwordHash = await hash("correct-password", 4);

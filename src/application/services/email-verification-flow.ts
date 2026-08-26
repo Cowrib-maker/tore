@@ -17,6 +17,7 @@ export type EmailVerificationPageModel =
       email: string | null;
       callbackUrl: string | null;
       sent: boolean;
+      fromUnverifiedLogin: boolean;
     }
   | {
       status: "success";
@@ -69,6 +70,7 @@ export function buildEmailVerificationPendingPath(params: {
   email: string;
   callbackUrl?: unknown;
   sent?: boolean;
+  fromUnverifiedLogin?: boolean;
 }): string {
   const url = new URL("/verify-email", "https://tore.invalid");
   url.searchParams.set("email", params.email.trim().toLowerCase());
@@ -78,6 +80,9 @@ export function buildEmailVerificationPendingPath(params: {
   }
   if (params.sent) {
     url.searchParams.set("sent", "1");
+  }
+  if (params.fromUnverifiedLogin) {
+    url.searchParams.set("unverified", "1");
   }
   return `${url.pathname}${url.search}`;
 }
@@ -110,8 +115,9 @@ export function pendingEmailVerificationPageModel(
   email: string | null,
   callbackUrl: string | null,
   sent = false,
+  fromUnverifiedLogin = false,
 ): EmailVerificationPageModel {
-  return { status: "pending", email, callbackUrl, sent };
+  return { status: "pending", email, callbackUrl, sent, fromUnverifiedLogin };
 }
 
 export function successEmailVerificationPageModel(

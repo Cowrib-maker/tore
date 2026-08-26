@@ -27,6 +27,7 @@ export function EmailVerificationOtpForm({
   email,
   hideEmailField,
   startCooldown,
+  callbackUrl,
   onOutcome,
   onRetainEmail,
 }: {
@@ -34,6 +35,7 @@ export function EmailVerificationOtpForm({
   email?: string | null;
   hideEmailField?: boolean;
   startCooldown?: boolean;
+  callbackUrl?: string | null;
   onOutcome?: (outcome: "verified" | "already") => void;
   onRetainEmail?: (email: string) => void;
 }) {
@@ -130,6 +132,9 @@ export function EmailVerificationOtpForm({
         ) : (
           <input type="hidden" name="email" value={knownEmail} />
         )}
+        {callbackUrl ? (
+          <input type="hidden" name="callbackUrl" value={callbackUrl} />
+        ) : null}
         <div className="space-y-2">
           <Label id="verify-otp-label" className="block text-center">
             {copy.verifyOtpLabel}

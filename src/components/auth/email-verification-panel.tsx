@@ -87,9 +87,13 @@ export function EmailVerificationPanel({
     ? copy.verifyOtpExpired
     : isUnavailable
       ? copy.verifyTemporaryFailure
-      : copy.verifyPendingBody;
+      : model.status === "pending" && model.fromUnverifiedLogin
+        ? copy.verifyUnverifiedLoginBody
+        : copy.verifyPendingBody;
   const email = identityEmail;
   const startCooldown = model.status === "pending" && model.sent;
+  const callbackUrl =
+    model.status === "pending" ? model.callbackUrl : null;
 
   return (
     <Card className="w-full max-w-md">
@@ -113,6 +117,7 @@ export function EmailVerificationPanel({
           email={email}
           hideEmailField={Boolean(email)}
           startCooldown={startCooldown}
+          callbackUrl={callbackUrl}
           onOutcome={handleOutcome}
           onRetainEmail={handleRetainEmail}
         />
