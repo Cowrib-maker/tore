@@ -13,6 +13,9 @@
 # testing
 /coverage
 
+# E2E temporary files
+scripts/e2e-tmp/
+
 # next.js
 /.next/
 /out/
