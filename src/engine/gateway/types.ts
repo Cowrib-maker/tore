@@ -137,6 +137,12 @@ export type PromptBuildInput = {
   /** Native-text extract from the conversation's attached PDF, if any. */
   documentExtract?: string;
   documentFileName?: string;
+  /** Citizen intake: short clarifying questions instead of a full legal brief. */
+  intakeClarification?: boolean;
+  /** Internal hint for phrasing a clarification (not shown verbatim to users). */
+  issueFamilyHint?: string;
+  /** Prior assistant turn — model must not repeat this text. */
+  priorAssistantSummary?: string;
 };
 
 /** A retrieved statute excerpt that may be cited. */

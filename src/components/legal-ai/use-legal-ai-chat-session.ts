@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { parseSafeCitationsFromUnknown } from "@/application/ai/legal-ai-citation";
 import type { LegalAiSafeCitation } from "@/application/ai/legal-ai-citation";
+import { LEGAL_AI_CHAT_RETRY_MESSAGE } from "@/components/legal-ai/legal-ai-chat-errors";
 import {
   interpretLegalAiChatAccess,
   type LegalAiAccessGate,
@@ -27,9 +28,14 @@ export function useLegalAiChatSession(initial?: {
   const [conversationId, setConversationId] = useState<string | undefined>(
     initial?.conversationId,
   );
+  const conversationIdRef = useRef(conversationId);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [accessGate, setAccessGate] = useState<LegalAiAccessGate | null>(null);
+
+  useEffect(() => {
+    conversationIdRef.current = conversationId;
+  }, [conversationId]);
 
   async function sendMessage(
     text: string,
@@ -45,7 +51,10 @@ export function useLegalAiChatSession(initial?: {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, conversationId }),
+        body: JSON.stringify({
+          message: text,
+          conversationId: conversationIdRef.current,
+        }),
       });
 
       const data = (await response.json()) as {
@@ -83,6 +92,7 @@ export function useLegalAiChatSession(initial?: {
       }
 
       setConversationId(interpreted.conversationId);
+      conversationIdRef.current = interpreted.conversationId;
       setMessages((current) => [
         ...current,
         {
@@ -92,12 +102,8 @@ export function useLegalAiChatSession(initial?: {
         },
       ]);
       return "ok";
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "AI үйлчилгээтэй холбогдоход алдаа гарлаа.",
-      );
+    } catch {
+      setError(LEGAL_AI_CHAT_RETRY_MESSAGE);
       return "error";
     } finally {
       setLoading(false);

@@ -35,12 +35,15 @@ import {
   type IPromptBuilder,
   type IUserTypeService,
 } from "@/engine/gateway";
+import { detectExactCitation } from "@/engine/citation";
 import type { IntentClassification, IntentService } from "@/engine/intent";
 import { IntentType } from "@/engine/intent";
 import type { ReasoningPlan, ReasoningService } from "@/engine/reasoning";
 import {
   LegalRelevance,
-  buildClarificationMessage,
+  analyzeLegalFactContext,
+  hasFirstPersonProblemNarrative,
+  type LegalIssueFamily,
   type LegalRelevanceService,
 } from "@/engine/relevance";
 import { LegalQuestionStatus, UserRole } from "@/domain/enums";
@@ -136,6 +139,7 @@ export class LegalAiService {
         role: item.role,
         content: item.content,
       })),
+      questionStatus: conversationState.questionStatus,
     });
 
     const thread = decideLegalQuestionThreadAction({
@@ -153,7 +157,9 @@ export class LegalAiService {
         : false;
 
     if (
-      (relevance.relevance === LegalRelevance.LEGAL || paidGeneralAccess) &&
+      (relevance.relevance === LegalRelevance.LEGAL ||
+        relevance.relevance === LegalRelevance.POSSIBLY_LEGAL ||
+        paidGeneralAccess) &&
       !this.dependencies.completion.isConfigured()
     ) {
       console.error("OPENAI_API_KEY is not configured.");
@@ -177,10 +183,11 @@ export class LegalAiService {
 
     const afterReply = async <T extends LegalAiCreateTurnResult>(
       result: T,
+      overrides?: { questionStatus?: LegalQuestionStatus },
     ): Promise<T> => {
       await this.dependencies.store.updateQuestionThread({
         conversationId: conversation.id,
-        questionStatus: thread.nextStatus,
+        questionStatus: overrides?.questionStatus ?? thread.nextStatus,
         incrementBilledQuestion: thread.type === "START_NEW",
       });
       if (thread.type === "START_NEW") {
@@ -217,22 +224,25 @@ export class LegalAiService {
 
     if (relevance.relevance === LegalRelevance.POSSIBLY_LEGAL) {
       return afterReply(
-        await this.persistSafeReply({
+        await this.completeClarificationAnswer({
           conversationId: conversation.id,
-          content:
-            relevance.clarificationMessage ??
-            buildClarificationMessage(relevance.issueFamily),
-          turnKind: PromptTurnKind.AMBIGUOUS,
+          message,
+          issueFamily: relevance.issueFamily,
+          userContext: input.userContext,
+          userId: input.userId,
+          actorRole: input.actorRole,
           capability,
         }),
+        { questionStatus: LegalQuestionStatus.CLARIFYING },
       );
     }
 
-    const analysisText = relevance.analysisText || message;
     const history = await this.dependencies.store.listMessages(
       conversation.id,
       HISTORY_LIMIT,
     );
+
+    const analysisText = relevance.analysisText || message;
 
     const userType = this.dependencies.userTypeService.resolve({
       ...input.userContext,
@@ -241,6 +251,51 @@ export class LegalAiService {
     await this.dependencies.domainFilter.classify(analysisText);
     const pipelineDomain = DomainLabel.LEGAL;
     const intent = await this.dependencies.intent.classify(analysisText);
+
+    if (
+      shouldUseCitizenIntake({
+        capability,
+        history,
+        message,
+        relevance: relevance.relevance,
+        intentConfidence: intent.confidence,
+        intentType: intent.intent,
+      })
+    ) {
+      return afterReply(
+        await this.completeClarificationAnswer({
+          conversationId: conversation.id,
+          message,
+          issueFamily: relevance.issueFamily,
+          userContext: input.userContext,
+          userId: input.userId,
+          actorRole: input.actorRole,
+          capability,
+        }),
+        { questionStatus: LegalQuestionStatus.CLARIFYING },
+      );
+    }
+
+    if (
+      capability === LegalAiCapability.CITIZEN &&
+      conversationState.questionStatus === LegalQuestionStatus.CLARIFYING &&
+      relevance.relevance === LegalRelevance.LEGAL &&
+      !isSubstantiveLegalFollowUp(message, history)
+    ) {
+      return afterReply(
+        await this.completeClarificationAnswer({
+          conversationId: conversation.id,
+          message,
+          issueFamily: relevance.issueFamily,
+          userContext: input.userContext,
+          userId: input.userId,
+          actorRole: input.actorRole,
+          capability,
+        }),
+        { questionStatus: LegalQuestionStatus.CLARIFYING },
+      );
+    }
+
     const turnKind = resolveTurnKind(pipelineDomain, intent);
 
     const document =
@@ -512,6 +567,91 @@ export class LegalAiService {
     };
   }
 
+  private async completeClarificationAnswer(input: {
+    conversationId: string;
+    message: string;
+    issueFamily?: LegalIssueFamily;
+    userContext: LegalAiCreateTurnInput["userContext"];
+    userId?: string;
+    actorRole?: LegalAiCreateTurnInput["actorRole"];
+    capability: LegalAiCapability;
+  }): Promise<LegalAiCreateTurnResult> {
+    const history = await this.dependencies.store.listMessages(
+      input.conversationId,
+      HISTORY_LIMIT,
+    );
+    const lastAssistant = [...history]
+      .reverse()
+      .find((item) => item.role === "ASSISTANT");
+
+    const userType = this.dependencies.userTypeService.resolve({
+      ...input.userContext,
+      role: input.actorRole ?? input.userContext?.role,
+    });
+
+    const prompt = this.dependencies.promptBuilder.build({
+      message: input.message,
+      userType,
+      domain: DomainLabel.LEGAL,
+      turnKind: PromptTurnKind.AMBIGUOUS,
+      capability: input.capability,
+      intakeClarification: true,
+      issueFamilyHint: input.issueFamily,
+      corpusAvailable: false,
+      priorAssistantSummary: lastAssistant?.content,
+    });
+
+    const completion = await this.dependencies.completion.complete({
+      systemPrompt: prompt.systemPrompt,
+      messages: toModelHistory(history),
+    });
+
+    let content =
+      completion.content.trim() || "Хариу боловсруулах явцад алдаа гарлаа.";
+    if (
+      lastAssistant?.content &&
+      content.trim() === lastAssistant.content.trim()
+    ) {
+      content =
+        "Ойлголоо. Та нөхцөл байдлаа өөр үгээр бага зэрэг тодруулж өгч болох уу?";
+    }
+
+    const assistantMessage =
+      await this.dependencies.store.createAssistantMessage({
+        conversationId: input.conversationId,
+        content,
+        provider: "OPENAI",
+        model: completion.model,
+        inputTokens: completion.inputTokens,
+        outputTokens: completion.outputTokens,
+      });
+
+    if (input.userId) {
+      await this.dependencies.store.recordUsage({
+        userId: input.userId,
+        provider: "OPENAI",
+        model: completion.model,
+        inputTokens: completion.inputTokens,
+        outputTokens: completion.outputTokens,
+      });
+    }
+
+    return {
+      conversationId: input.conversationId,
+      message: {
+        ...assistantMessage,
+        citations: [],
+      },
+      usage: {
+        inputTokens: completion.inputTokens,
+        outputTokens: completion.outputTokens,
+      },
+      turnKind: PromptTurnKind.AMBIGUOUS,
+      capability: input.capability,
+      retrievalInvoked: false,
+    };
+  }
+
   private async persistSafeReply(input: {
     conversationId: string;
     content: string;
@@ -617,6 +757,105 @@ export function resolveTurnKind(
     return PromptTurnKind.AMBIGUOUS;
   }
   return PromptTurnKind.LEGAL;
+}
+
+function shouldUseCitizenIntake(input: {
+  capability: LegalAiCapability;
+  history: LegalAiStoredMessage[];
+  message: string;
+  relevance: LegalRelevance;
+  intentType?: string;
+  intentConfidence?: number;
+}): boolean {
+  if (input.capability !== LegalAiCapability.CITIZEN) {
+    return false;
+  }
+  if (input.history.some((item) => item.role === "ASSISTANT")) {
+    return false;
+  }
+  if (detectExactCitation(input.message)) {
+    return false;
+  }
+  if (input.relevance !== LegalRelevance.LEGAL) {
+    return false;
+  }
+  if (
+    input.intentType &&
+    input.intentType !== IntentType.UNKNOWN &&
+    (input.intentConfidence ?? 0) >= INTENT_CONFIDENCE_FLOOR
+  ) {
+    return false;
+  }
+
+  const factContext = analyzeLegalFactContext(input.message);
+  if (factContext.situations.length > 0 && factContext.livedInvolvement) {
+    return true;
+  }
+  return hasFirstPersonProblemNarrative(input.message);
+}
+
+function isSubstantiveLegalFollowUp(
+  message: string,
+  history: LegalAiStoredMessage[],
+): boolean {
+  const priorUsers = history
+    .filter((item) => item.role === "USER")
+    .map((item) => item.content.trim())
+    .filter(Boolean);
+  const normalized = message.normalize("NFC").toLowerCase().trim();
+  if (isVagueContinuationMessage(normalized)) {
+    return false;
+  }
+
+  const priorSituationIds = new Set(
+    analyzeLegalFactContext(priorUsers.join("\n")).situations.map((hit) => hit.id),
+  );
+  const combined = analyzeLegalFactContext(
+    [...priorUsers.slice(-3), message].join("\n"),
+  );
+  const addedSituations = combined.situations.filter(
+    (hit) => !priorSituationIds.has(hit.id),
+  );
+  if (addedSituations.length > 0 && combined.livedInvolvement) {
+    return true;
+  }
+
+  if (
+    priorUsers.length >= 1 &&
+    normalized.length >= 32 &&
+    !isVagueContinuationMessage(normalized)
+  ) {
+    return true;
+  }
+
+  if (priorUsers.length >= 2 && normalized.length >= 55) {
+    return true;
+  }
+  return normalized.length >= 100;
+}
+
+function isVagueContinuationMessage(normalized: string): boolean {
+  if (
+    normalized.length < 28 &&
+    /^(тийм|за|ok|yes|яг тэр|зөв|үнэн|тийм ээ)[.!?,]?\s*$/i.test(normalized)
+  ) {
+    return true;
+  }
+  if (
+    normalized.length < 70 &&
+    /^(харин тэр|яг тэр|тэр асуудал|chin bn|asuudal)/i.test(normalized)
+  ) {
+    return true;
+  }
+  if (
+    normalized.length < 55 &&
+    /(асуудал чинь байна|asuudal chin bn|тэр асуудал|харин тэр)/i.test(
+      normalized,
+    )
+  ) {
+    return true;
+  }
+  return false;
 }
 
 function toModelHistory(

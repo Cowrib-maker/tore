@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { LegalQuestionStatus } from "@/domain/enums";
 import { LegalRelevance } from "@/engine/relevance";
 import {
   clarificationContainsForbiddenJargon,
@@ -96,6 +97,24 @@ describe("LegalRelevanceService", () => {
       ],
     });
     expect(switched.relevance).toBe(LegalRelevance.NON_LEGAL);
+  });
+
+  it("promotes a vague clarifying-thread follow-up into LEGAL", async () => {
+    const followUp = await engine.classify({
+      message: "harin naad asuudal chin bn",
+      questionStatus: LegalQuestionStatus.CLARIFYING,
+      conversationContext: [
+        { role: "USER", content: "Манай дарга намайг ажлаас гаргасан" },
+        {
+          role: "ASSISTANT",
+          content:
+            "Ойлголоо. Ажлаас халсан гэж байна. Энэ яг хэзээ болсон бэ?",
+        },
+      ],
+    });
+
+    expect(followUp.relevance).toBe(LegalRelevance.LEGAL);
+    expect(followUp.reasons).toContain("clarifying-thread-continuation");
   });
 });
 

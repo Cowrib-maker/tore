@@ -6,6 +6,7 @@
  * IntentType is also not the full universe of legal issues.
  */
 
+import type { LegalQuestionStatus } from "@/domain/enums";
 import type { IDomainFilter } from "@/engine/gateway";
 import type { IntentService } from "@/engine/intent";
 
@@ -53,6 +54,8 @@ export type LegalRelevanceConversationMessage = {
 export type LegalRelevanceInput = {
   message: string;
   conversationContext?: readonly LegalRelevanceConversationMessage[];
+  /** When the thread is mid-clarification, follow-ups stay in the legal pipeline. */
+  questionStatus?: LegalQuestionStatus;
 };
 
 export type LegalRelevanceResult = {

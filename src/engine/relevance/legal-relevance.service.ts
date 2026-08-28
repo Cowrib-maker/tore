@@ -1,3 +1,4 @@
+import { LegalQuestionStatus } from "@/domain/enums";
 import { detectExactCitation } from "@/engine/citation";
 import { DomainLabel } from "@/engine/gateway";
 import { IntentType } from "@/engine/intent";
@@ -53,6 +54,13 @@ export class LegalRelevanceService {
       Boolean(lastAssistant) &&
       isLegalClarificationMessage(lastAssistant?.content ?? "");
 
+    if (
+      input.questionStatus === LegalQuestionStatus.CLARIFYING &&
+      context.length > 0
+    ) {
+      return this.classifyClarifyingContinuation(message, context);
+    }
+
     const standalone = await this.classifyStandalone(message);
 
     if (followingUp) {
@@ -84,6 +92,40 @@ export class LegalRelevanceService {
     }
 
     return standalone;
+  }
+
+  private async classifyClarifyingContinuation(
+    message: string,
+    context: NonNullable<LegalRelevanceInput["conversationContext"]>,
+  ): Promise<LegalRelevanceResult> {
+    const standalone = await this.classifyStandalone(message);
+    if (
+      standalone.relevance === LegalRelevance.NON_LEGAL &&
+      standalone.reasons.some((reason) => reason.startsWith("non-legal-topic:"))
+    ) {
+      return { ...standalone, analysisText: message };
+    }
+
+    const priorUsers = context
+      .filter((item) => item.role === "USER")
+      .map((item) => item.content.trim())
+      .filter(Boolean);
+    const analysisText = [...priorUsers.slice(-3), message].join("\n");
+    const combined = await this.classifyStandalone(analysisText);
+    if (
+      combined.relevance === LegalRelevance.NON_LEGAL &&
+      combined.reasons.some((reason) => reason.startsWith("non-legal-topic:"))
+    ) {
+      return { ...combined, analysisText };
+    }
+
+    return {
+      relevance: LegalRelevance.LEGAL,
+      confidence: Math.max(combined.confidence, 0.65),
+      reasons: [...combined.reasons, "clarifying-thread-continuation"],
+      issueFamily: combined.issueFamily,
+      analysisText,
+    };
   }
 
   private async classifyStandalone(

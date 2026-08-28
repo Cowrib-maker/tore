@@ -165,9 +165,18 @@ function turnKindBlock(
   }
 
   if (turnKind === PromptTurnKind.AMBIGUOUS) {
+    const intake = input.intakeClarification
+      ? `Энэ бол эхний уулзалтын тодруулга.
+- Хэрэглэгчийн өөрийн үгээр хэлсэн зүйлийг товч давтан ойлгосноо хэл.
+- 1-2 энгийн тодруулах асуулт асуу. Урт хууль зүйн лекц бүү өг.
+- Хуулийн нэр томьёо, салбарын нэр шаардахгүй. Хэрэглэгчийн хэлээр хариул.
+- Өмнөх хариултаа дахин бүү давта. Шинэ асуулт эсвэл өөр өнцгөөс тодруул.
+${input.issueFamilyHint ? `Дотоод чиглэл (хэрэглэгчид шууд хэлэхгүй): ${input.issueFamilyHint}.` : ""}
+${input.priorAssistantSummary ? `Өмнөх хариулт (давтахгүй): ${input.priorAssistantSummary.slice(0, 400)}` : ""}`
+      : "";
     return `Ангилал: тодорхойгүй. Хууль зүйтэй холбоотой байж болох ч зорилго, баримт дутуу.
 Эцсийн хууль зүйн дүгнэлт бүү хий. Юу мэдэгдэж, юу тодорхойгүйг хэлээд тодруулах асуулт асуу.
-Баримтгүйгээр хэрэглэгчийн эрх зүйн байр суурийг баттай бүү хэл.`;
+Баримтгүйгээр хэрэглэгчийн эрх зүйн байр суурийг баттай бүү хэл.${intake ? `\n${intake}` : ""}`;
   }
 
   const task = input.taskType ? ` Task: ${input.taskType}` : "";
@@ -194,6 +203,15 @@ function outputStructureBlock(
 ): string {
   if (input.turnKind === PromptTurnKind.GENERAL) {
     return "";
+  }
+
+  if (
+    capability === "CITIZEN" &&
+    (input.turnKind === PromptTurnKind.AMBIGUOUS || input.intakeClarification)
+  ) {
+    return `CITIZEN OUTPUT (intake / тодруулга)
+2-4 богино өгүүлбэр эсвэл 1-2 энгийн асуулт. Markdown гарчиг (#, ##) бүү ашигла.
+Урт хууль зүйн лекц, 7 хэсгийн бүтэц, олон заалтын тайлбар бүү өг.`;
   }
 
   if (capability === "CITIZEN") {

@@ -41,6 +41,7 @@ import {
   type LegalAiSafeCitation,
 } from "@/application/ai/legal-ai-citation";
 import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-list";
+import { LEGAL_AI_CHAT_RETRY_MESSAGE } from "@/components/legal-ai/legal-ai-chat-errors";
 import { interpretLegalAiChatAccess } from "@/components/legal-ai/interpret-legal-ai-chat-access";
 import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
@@ -154,6 +155,11 @@ export function LegalAiChat({
   const documentInputRef = useRef<HTMLInputElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<{ stop: () => void } | null>(null);
+  const conversationIdRef = useRef(conversationId);
+
+  useEffect(() => {
+    conversationIdRef.current = conversationId;
+  }, [conversationId]);
 
   useEffect(() => {
     transcriptRef.current?.scrollTo({
@@ -352,7 +358,7 @@ export function LegalAiChat({
         },
         body: JSON.stringify({
           message: text,
-          conversationId,
+          conversationId: conversationIdRef.current,
         }),
       });
 
@@ -391,6 +397,7 @@ export function LegalAiChat({
       }
 
       setConversationId(data.conversationId);
+      conversationIdRef.current = data.conversationId;
       setMessages((current) => [
         ...current,
         {
@@ -399,12 +406,8 @@ export function LegalAiChat({
           citations: parseSafeCitationsFromUnknown(data.message?.citations),
         },
       ]);
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "AI үйлчилгээтэй холбогдоход алдаа гарлаа.",
-      );
+    } catch {
+      setError(LEGAL_AI_CHAT_RETRY_MESSAGE);
     } finally {
       setLoading(false);
     }
