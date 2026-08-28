@@ -229,7 +229,7 @@ function retrieveRefusalMessage(
     return AS_OF_UNAVAILABLE_MESSAGE;
   }
   if (retrieved.kind === "unavailable") {
-    return ENGINE_UNAVAILABLE_MESSAGE;
+    return UNVERIFIED_CITATION_MESSAGE;
   }
   return null;
 }

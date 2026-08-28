@@ -8,6 +8,8 @@ import type {
 } from "@/application/ai/legal-corpus";
 import { CitationVerificationStatus } from "@/application/ai/legal-corpus";
 import { detectExactCitation } from "@/engine/citation";
+import { resolveCanonicalLawIdentity } from "@/engine/citation/canonical-law-titles";
+import { extractConstitutionParagraph } from "@/engine/knowledge/repository/constitution-paragraph";
 import type { DetectedExactCitation } from "@/engine/citation";
 import {
   evaluateVersionForTemporalQuery,
@@ -330,7 +332,9 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
       .filter((part) => part?.trim())
       .join(" ");
     const citation =
-      detectExactCitation(temporalText) ?? detectExactCitation(input.query);
+      detectExactCitation(input.query) ??
+      (input.question ? detectExactCitation(input.question) : null) ??
+      detectExactCitation(temporalText);
     if (!citation) {
       return { kind: "hits", hits: [] };
     }
@@ -339,21 +343,41 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
     const nowIsoDate = isoDateFromClock(this.options.now?.() ?? new Date());
     const explicitRelations = input.explicitRelations;
 
+    const identity = resolveCanonicalLawIdentity(citation);
     const collected: KnowledgeArticleHit[] = [];
+
     for (const articleNumber of wantedArticleNumbers(citation)) {
-      const hits = await this.knowledge.searchArticles({
+      const baseQuery = {
         text: citation.titleHint,
         articleNumber,
+        paragraphNumber: citation.paragraph,
         jurisdiction: "MN",
+        titleTerms: identity.titleTerms,
+        excludeTitleTerms: identity.excludeTitleTerms,
         limit: 20,
-      });
-      collected.push(...hits);
+      };
+
+      // Canonical law ids eliminate the global article-number candidate trap.
+      if (identity.preferredLawIds.length === 1) {
+        const scoped = await this.knowledge.searchArticles({
+          ...baseQuery,
+          lawId: identity.preferredLawIds[0],
+        });
+        collected.push(
+          ...(scoped.length > 0
+            ? scoped
+            : await this.knowledge.searchArticles(baseQuery)),
+        );
+      } else {
+        collected.push(...(await this.knowledge.searchArticles(baseQuery)));
+      }
     }
 
     const exact = uniqueByArticleId(collected).filter(
       (hit) =>
         hit.matchKind === KnowledgeMatchKind.ARTICLE_NUMBER &&
-        titleMatchesHint(hit.documentTitle, citation.titleHint),
+        (titleMatchesHint(hit.documentTitle, citation.titleHint) ||
+          identity.preferredLawIds.includes(hit.lawId ?? "")),
     );
     const preferred = preferDottedHits(exact, citation);
 
@@ -370,9 +394,19 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
       if (!versionIsProven(document, intent, nowIsoDate, explicitRelations)) {
         continue;
       }
+      const excerpt =
+        citation.paragraph && hit.lawId === "367" && citation.article === "1"
+          ? extractConstitutionParagraph(hit.articleText, citation.paragraph)
+          : null;
+
       verified.push({
         hit,
-        authority: toLocalAuthority(hit, document, citation),
+        authority: toLocalAuthority(
+          hit,
+          document,
+          citation,
+          excerpt ?? undefined,
+        ),
       });
     }
 
@@ -395,6 +429,7 @@ function toLocalAuthority(
   hit: KnowledgeArticleHit,
   document: StoredKnowledgeDocument,
   citation: DetectedExactCitation,
+  excerptOverride?: string,
 ): LegalCorpusAuthority {
   const dotted = citation.paragraph
     ? `${citation.article}.${citation.paragraph}`
@@ -416,7 +451,7 @@ function toLocalAuthority(
     documentVersionId,
     locator: citation.locator,
     title: hit.documentTitle,
-    excerpt: hit.articleText,
+    excerpt: excerptOverride ?? hit.articleText,
     contentHash: sha,
     sourceContentHash: sha,
     parserId: LOCAL_LEGAL_SOURCE_TYPE,

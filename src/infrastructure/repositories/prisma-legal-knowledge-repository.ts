@@ -278,6 +278,25 @@ function buildDocumentWhere(query: KnowledgeArticleSearchQuery): PrismaWhere {
   if (query.documentType) {
     and.push({ documentType: query.documentType });
   }
+  if (query.lawId) {
+    and.push({ lawId: query.lawId });
+  }
+  if (query.titleTerms?.length) {
+    and.push({
+      OR: query.titleTerms.map((term) => ({
+        title: { contains: term, mode: "insensitive" },
+      })),
+    });
+  }
+  if (query.excludeTitleTerms?.length) {
+    and.push({
+      NOT: {
+        OR: query.excludeTitleTerms.map((term) => ({
+          title: { contains: term, mode: "insensitive" },
+        })),
+      },
+    });
+  }
 
   and.push({
     NOT: {

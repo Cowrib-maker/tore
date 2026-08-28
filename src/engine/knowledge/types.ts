@@ -135,6 +135,13 @@ export type KnowledgeArticleSearchQuery = {
   text?: string;
   /** Exact or normalized article number (e.g. "15", "Зүйл 15"). */
   articleNumber?: string | null;
+  /** Paragraph inside an article when the source stores paragraphs inline. */
+  paragraphNumber?: string | null;
+  /** Canonical source law id; preferred for exact citation retrieval. */
+  lawId?: string | null;
+  /** SQL title constraints used by deterministic exact-citation lookup. */
+  titleTerms?: string[];
+  excludeTitleTerms?: string[];
   /** CRIMINAL | CIVIL | ADMINISTRATIVE — filters via document metadata/title. */
   domain?: string | null;
   issueKind?: string | null;

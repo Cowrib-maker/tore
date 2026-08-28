@@ -31,7 +31,6 @@ import {
 import { IntentType, createIntentEngine } from "@/engine/intent";
 import { createReasoningEngine } from "@/engine/reasoning";
 import {
-  LEGAL_CLARIFICATION_PREFIX,
   clarificationContainsForbiddenJargon,
   createLegalRelevanceEngine,
 } from "@/engine/relevance";
@@ -321,11 +320,11 @@ function sampleVerdict(
 ) {
   if (status === CitationVerificationStatus.VALID) {
     return {
-      query: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
+      query: "Эрүүгийн хуулийн 17.1",
       status,
       nodeId: "node-1",
       documentVersionId: "ver-1",
-      locator: "art-17/p-1",
+      locator: "art-17.1",
       reasons: ["citation_unique"],
     };
   }
@@ -351,7 +350,7 @@ function sampleAuthority(overrides: Partial<{
     nodeId: overrides.nodeId ?? "node-1",
     documentId: "doc-1",
     documentVersionId: overrides.documentVersionId ?? "ver-1",
-    locator: "art-17/p-1",
+    locator: "art-17.1",
     title: "Эрүүгийн хууль",
     excerpt: overrides.excerpt ?? "Гэмт хэрэг гэж хуулиар хориглосон үйлдэл.",
     contentHash: "hash-node",
@@ -802,15 +801,15 @@ describe("LegalAiService", () => {
 
     expect(corpusRetriever.retrieveExactCitation).toHaveBeenCalledWith({
       question: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
-      query: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
-      locator: "art-17/p-1",
+      query: "Эрүүгийн хуулийн 17.1",
+      locator: "art-17.1",
     });
     expect(corpusRetriever.verifyCitation).toHaveBeenCalledWith({
       question: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
-      query: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
+      query: "Эрүүгийн хуулийн 17.1",
       nodeId: "node-1",
       documentId: "doc-1",
-      locator: "art-17/p-1",
+      locator: "art-17.1",
     });
     const systemPrompt = completion.complete.mock.calls[0]?.[0]?.systemPrompt ?? "";
     expect(systemPrompt).toContain("VERIFIED LEGAL SOURCES");
@@ -833,8 +832,8 @@ describe("LegalAiService", () => {
         id: `cite-${result.message.id}-1`,
         sourceType: "legal-data-engine",
         title: "Эрүүгийн хууль",
-        article: "17",
-        paragraph: "1",
+        article: "17.1",
+        paragraph: null,
         sourceUrl: null,
         sourceVersion: null,
         validFrom: "2017-07-01T00:00:00.000Z",
@@ -861,7 +860,7 @@ describe("LegalAiService", () => {
 
     const result = await service.createTurn({
       userId: "user-1",
-      message: "Эрүүгийн хуулийн 17.1",
+      message: "Эрүүгийн хуулийн 17.1 дүгээр зүйл",
     });
 
     expect(corpusRetriever.retrieveExactCitation).toHaveBeenCalledOnce();
@@ -940,7 +939,7 @@ describe("LegalAiService", () => {
     expect(corpusRetriever.verifyCitation).not.toHaveBeenCalled();
     expect(completion.complete).not.toHaveBeenCalled();
     expect(store.citations).toEqual([]);
-    expect(result.message.content).toContain("холбогдож чадсангүй");
+    expect(result.message.content).toContain("баталгаажуулж чадсангүй");
   });
 
   it("returns a safe source-unavailable reply when verify is 401/403/500/timeout", async () => {
@@ -1202,11 +1201,11 @@ describe("LegalAiService", () => {
     });
 
     expect(result.turnKind).toBe(PromptTurnKind.AMBIGUOUS);
-    expect(result.message.content).toContain(LEGAL_CLARIFICATION_PREFIX);
+    expect(result.message.content).toBe("mocked-answer");
     expect(clarificationContainsForbiddenJargon(result.message.content)).toBe(
       false,
     );
-    expect(completion.complete).not.toHaveBeenCalled();
+    expect(completion.complete).toHaveBeenCalledOnce();
     expect(prepare).not.toHaveBeenCalled();
     expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
   });
@@ -1220,10 +1219,11 @@ describe("LegalAiService", () => {
     });
 
     expect(result.message.content).not.toBe(NON_LEGAL_REFUSAL_MESSAGE);
-    expect(result.message.content).toContain(LEGAL_CLARIFICATION_PREFIX);
-    expect(result.message.content).toMatch(/ажлаас|эрх|үүрэг/);
-    expect(result.message.content).not.toMatch(/ямар хууль|иргэний үү|эрүүгийн үү/);
-    expect(completion.complete).not.toHaveBeenCalled();
+    expect(result.turnKind).toBe(PromptTurnKind.AMBIGUOUS);
+    expect(completion.complete).toHaveBeenCalledOnce();
+    const systemPrompt = completion.complete.mock.calls[0]?.[0]?.systemPrompt ?? "";
+    expect(systemPrompt).toContain("intake");
+    expect(systemPrompt).not.toMatch(/ямар хууль|иргэний үү|эрүүгийн үү/);
   });
 
   it("routes unpaid lending as a civil path or clarification, not NON_LEGAL", async () => {
@@ -1236,7 +1236,7 @@ describe("LegalAiService", () => {
 
     expect(result.message.content).not.toBe(NON_LEGAL_REFUSAL_MESSAGE);
     expect(result.turnKind).not.toBe(PromptTurnKind.GENERAL);
-    expect(completion.complete).not.toHaveBeenCalled();
+    expect(completion.complete).toHaveBeenCalledOnce();
   });
 
   it("routes a child-taken story as family-related, not NON_LEGAL", async () => {
@@ -1248,8 +1248,7 @@ describe("LegalAiService", () => {
     });
 
     expect(result.message.content).not.toBe(NON_LEGAL_REFUSAL_MESSAGE);
-    expect(result.message.content).toMatch(/хүүхэд|гэр бүл|хамтран/);
-    expect(completion.complete).not.toHaveBeenCalled();
+    expect(completion.complete).toHaveBeenCalled();
   });
 
   it("still refuses a movie question as NON_LEGAL", async () => {
@@ -1291,34 +1290,88 @@ describe("LegalAiService", () => {
     expect(completion.complete).toHaveBeenCalledOnce();
   });
 
-  it("asks a clarification without OpenAI, then continues the legal pipeline on follow-up", async () => {
+  it("uses LLM clarification on first turn and continues the legal pipeline on follow-up", async () => {
     const store = createStore();
-    const { service } = createService({
-      store,
-      completion: createCompletion(undefined, false),
-    });
+    const completion = createCompletion(async ({ messages }) => ({
+      content:
+        messages.length > 1
+          ? "follow-up-legal-answer"
+          : "clarification-turn-one",
+      model: "gpt-5.6-luna",
+      inputTokens: 11,
+      outputTokens: 7,
+    }));
+    const { service } = createService({ store, completion });
 
     const first = await service.createTurn({
       userId: "user-1",
       message: "Манай дарга намайг гаргачихлаа.",
     });
 
-    expect(first.message.content).toContain(LEGAL_CLARIFICATION_PREFIX);
+    expect(first.message.content).toBe("clarification-turn-one");
     expect(first.turnKind).toBe(PromptTurnKind.AMBIGUOUS);
+    expect(completion.complete).toHaveBeenCalledOnce();
 
-    const { service: nextService, completion } = createService({
-      store,
-    });
-
-    const second = await nextService.createTurn({
+    const second = await service.createTurn({
       userId: "user-1",
       conversationId: first.conversationId,
       message: "Тийм, ажлаасаа халуулсан тухай асууж байна.",
     });
 
-    expect(completion.complete).toHaveBeenCalledOnce();
+    expect(completion.complete).toHaveBeenCalledTimes(2);
+    expect(second.message.content).toBe("follow-up-legal-answer");
+    expect(second.message.content).not.toBe(first.message.content);
     expect(second.turnKind).not.toBe(PromptTurnKind.GENERAL);
     expect(second.message.content).not.toBe(NON_LEGAL_REFUSAL_MESSAGE);
+  });
+
+  it("does not repeat the prior clarification when the clarifying thread continues vaguely", async () => {
+    const store = createStore();
+    const completion = createCompletion(async ({ messages }) => ({
+      content:
+        messages.length > 1 ? "contextual-follow-up" : "first-clarification",
+      model: "gpt-5.6-luna",
+      inputTokens: 11,
+      outputTokens: 7,
+    }));
+    const { service } = createService({ store, completion });
+
+    const first = await service.createTurn({
+      userId: "user-1",
+      message: "Манай дарга намайг гаргачихлаа.",
+    });
+
+    const second = await service.createTurn({
+      userId: "user-1",
+      conversationId: first.conversationId,
+      message: "harin naad asuudal chin bn",
+    });
+
+    expect(second.message.content).not.toBe(first.message.content);
+    expect(second.message.content).toBe("contextual-follow-up");
+    expect(completion.complete.mock.calls[1]?.[0]?.messages?.length).toBeGreaterThan(
+      1,
+    );
+  });
+
+  it("requires OpenAI for a possibly legal first question", async () => {
+    const { service, store, completion } = createService({
+      completion: createCompletion(undefined, false),
+    });
+
+    await expect(
+      service.createTurn({
+        userId: "user-1",
+        message: "Манай дарга намайг гаргачихлаа.",
+      }),
+    ).rejects.toMatchObject({
+      message: "AI үйлчилгээний тохиргоо хийгдээгүй байна.",
+      statusCode: 503,
+      code: "AI_NOT_CONFIGURED",
+    } satisfies Partial<LegalAiError>);
+
+    expect(store.conversations.size).toBe(0);
+    expect(completion.complete).not.toHaveBeenCalled();
   });
 
   it("uses CITIZEN capability even when the client sends PROFESSIONAL mode", async () => {

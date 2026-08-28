@@ -380,11 +380,30 @@ export function filterDocumentsForSearch(
     if (query.sourceId && document.sourceId !== query.sourceId) {
       return false;
     }
-    if (
-      query.documentType &&
-      document.metadata.documentType !== query.documentType
-    ) {
+    if (query.documentType && document.metadata.documentType !== query.documentType) {
       return false;
+    }
+    if (query.lawId) {
+      const documentLawId = document.provenance?.lawId?.trim() ?? "";
+      if (documentLawId !== query.lawId) {
+        return false;
+      }
+    }
+    if (query.titleTerms?.length) {
+      const title = document.title.toLowerCase();
+      if (!query.titleTerms.some((term) => title.includes(term.toLowerCase()))) {
+        return false;
+      }
+    }
+    if (query.excludeTitleTerms?.length) {
+      const title = document.title.toLowerCase();
+      if (
+        query.excludeTitleTerms.some((term) =>
+          title.includes(term.toLowerCase()),
+        )
+      ) {
+        return false;
+      }
     }
     if (!isPositiveLawDocumentType(document.metadata.documentType)) {
       return false;

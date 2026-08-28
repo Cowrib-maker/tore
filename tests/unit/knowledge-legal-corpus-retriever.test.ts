@@ -33,6 +33,7 @@ function goldenDocument(
           archiveId: "arch-criminal-17-1",
           sha256: "sha256-criminal-17-1",
           originalUrl: "https://legalinfo.mn/mn/detail?lawId=fixture-criminal",
+          lawId: "11634",
         });
   return {
     id,
@@ -139,7 +140,7 @@ describe("KnowledgeLegalCorpusRetriever", () => {
     expect(result.authorities[0]?.title).toBe("Монгол Улсын Эрүүгийн хууль");
     expect(result.authorities[0]?.excerpt).toBe(GOLDEN_EXCERPT);
     expect(result.authorities[0]?.article).toBe("17.1");
-    expect(result.authorities[0]?.paragraph).toBe("1");
+    expect(result.authorities[0]?.paragraph).toBeNull();
     expect(result.authorities[0]?.sourceType).toBe("legal-knowledge");
     expect(result.authorities[0]?.sourceUrl).toBe(
       "https://legalinfo.mn/mn/detail?lawId=fixture-criminal",
@@ -209,6 +210,7 @@ describe("KnowledgeLegalCorpusRetriever", () => {
           archiveId: "arch-b",
           sha256: "sha-b",
           originalUrl: "https://legalinfo.mn/mn/detail?lawId=fixture-criminal-b",
+          lawId: "11634",
         },
       }),
     );
