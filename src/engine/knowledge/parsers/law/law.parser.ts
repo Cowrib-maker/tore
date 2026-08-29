@@ -50,6 +50,7 @@ function buildHierarchy(
   prefix: string,
 ): LegalNode[] {
   const root: LegalNode[] = [];
+
   let part: LegalNode | null = null;
   let chapter: LegalNode | null = null;
   let section: LegalNode | null = null;
@@ -71,29 +72,38 @@ function buildHierarchy(
           locator: null,
           heading: null,
         });
+
         root.push(block);
         leaf = block;
       }
+
       continue;
     }
 
     if (unit.role === CanonicalUnitRole.PART) {
       const number = unit.number ?? "1";
+
       part = makeNode({
         kind: LegalNodeKind.PART,
         path: `${prefix}/part-${number}`,
         order: root.length,
         original: unit.text,
         heading: unit.heading,
-        locator: { display: unit.display, part: number },
+        locator: {
+          display: unit.display,
+          part: number,
+        },
       });
+
       root.push(part);
+
       chapter = null;
       section = null;
       article = null;
       paragraph = null;
       subparagraph = null;
       leaf = part;
+
       continue;
     }
 
@@ -101,6 +111,7 @@ function buildHierarchy(
       const parent = part;
       const siblings = parent ? parent.children : root;
       const number = unit.number ?? "1";
+
       chapter = makeNode({
         kind: LegalNodeKind.CHAPTER,
         path: `${parent?.path ?? prefix}/chapter-${number}`,
@@ -113,12 +124,15 @@ function buildHierarchy(
           chapter: number,
         },
       });
+
       siblings.push(chapter);
+
       section = null;
       article = null;
       paragraph = null;
       subparagraph = null;
       leaf = chapter;
+
       continue;
     }
 
@@ -126,6 +140,7 @@ function buildHierarchy(
       const parent = chapter ?? part;
       const siblings = parent ? parent.children : root;
       const number = unit.number ?? "1";
+
       section = makeNode({
         kind: LegalNodeKind.SECTION,
         path: `${parent?.path ?? prefix}/section-${number}`,
@@ -139,11 +154,14 @@ function buildHierarchy(
           section: number,
         },
       });
+
       siblings.push(section);
+
       article = null;
       paragraph = null;
       subparagraph = null;
       leaf = section;
+
       continue;
     }
 
@@ -151,6 +169,7 @@ function buildHierarchy(
       const parent = section ?? chapter ?? part;
       const siblings = parent ? parent.children : root;
       const number = unit.number ?? "1";
+
       article = makeNode({
         kind: LegalNodeKind.ARTICLE,
         path: `${parent?.path ?? prefix}/article-${number}`,
@@ -165,21 +184,27 @@ function buildHierarchy(
           article: number,
         },
       });
+
       siblings.push(article);
+
       paragraph = null;
       subparagraph = null;
       leaf = article;
+
       continue;
     }
 
     if (unit.role === CanonicalUnitRole.PARAGRAPH) {
       const parent = article;
+
       if (!parent) {
         appendOrBlock(root, prefix, unit.text);
         continue;
       }
+
       const siblings = parent.children;
       const paragraphNumber = unit.paragraph ?? unit.number ?? "1";
+
       paragraph = makeNode({
         kind: LegalNodeKind.PARAGRAPH,
         path: `${parent.path}/paragraph-${paragraphNumber}`,
@@ -191,24 +216,31 @@ function buildHierarchy(
           part: part?.locator?.part,
           chapter: chapter?.locator?.chapter,
           section: section?.locator?.section,
-          article: unit.article,
+          article: unit.article ?? article?.locator?.article,
           paragraph: paragraphNumber,
         },
       });
+
       siblings.push(paragraph);
+
       subparagraph = null;
       leaf = paragraph;
+
       continue;
     }
 
     if (unit.role === CanonicalUnitRole.SUBPARAGRAPH) {
       const parent = paragraph ?? article;
+
       if (!parent) {
         appendOrBlock(root, prefix, unit.text);
         continue;
       }
+
       const siblings = parent.children;
-      const subparagraphNumber = unit.subparagraph ?? unit.number ?? "1";
+      const subparagraphNumber =
+        unit.subparagraph ?? unit.number ?? "1";
+
       subparagraph = makeNode({
         kind: LegalNodeKind.SUBPARAGRAPH,
         path: `${parent.path}/subparagraph-${subparagraphNumber}`,
@@ -220,41 +252,58 @@ function buildHierarchy(
           part: part?.locator?.part,
           chapter: chapter?.locator?.chapter,
           section: section?.locator?.section,
-          article: unit.article,
-          paragraph: unit.paragraph,
+          article: unit.article ?? article?.locator?.article,
+          paragraph:
+            unit.paragraph ?? paragraph?.locator?.paragraph,
           subparagraph: subparagraphNumber,
         },
       });
+
       siblings.push(subparagraph);
       leaf = subparagraph;
+
       continue;
     }
 
-    const itemParent = subparagraph ?? paragraph ?? article;
-    if (!itemParent) {
-      appendOrBlock(root, prefix, unit.text);
+    if (unit.role === CanonicalUnitRole.ITEM) {
+      const itemParent = subparagraph ?? paragraph ?? article;
+
+      if (!itemParent) {
+        appendOrBlock(root, prefix, unit.text);
+        continue;
+      }
+
+      const itemNumber = unit.item ?? unit.number ?? "1";
+
+      const item = makeNode({
+        kind: LegalNodeKind.ITEM,
+        path: `${itemParent.path}/item-${itemNumber}`,
+        order: itemParent.children.length,
+        original: unit.text,
+        heading: null,
+        locator: {
+          display: unit.display,
+          part: part?.locator?.part,
+          chapter: chapter?.locator?.chapter,
+          section: section?.locator?.section,
+          article:
+            unit.article ?? article?.locator?.article,
+          paragraph:
+            unit.paragraph ?? paragraph?.locator?.paragraph,
+          subparagraph:
+            unit.subparagraph ??
+            subparagraph?.locator?.subparagraph,
+          item: itemNumber,
+        },
+      });
+
+      itemParent.children.push(item);
+      leaf = item;
+
       continue;
     }
-    const itemNumber = unit.item ?? unit.number ?? "1";
-    const item = makeNode({
-      kind: LegalNodeKind.ITEM,
-      path: `${itemParent.path}/item-${itemNumber}`,
-      order: itemParent.children.length,
-      original: unit.text,
-      heading: null,
-      locator: {
-        display: unit.display,
-        part: part?.locator?.part,
-        chapter: chapter?.locator?.chapter,
-        section: section?.locator?.section,
-        article: unit.article ?? article?.locator?.article,
-        paragraph: unit.paragraph ?? paragraph?.locator?.paragraph,
-        subparagraph: unit.subparagraph ?? subparagraph?.locator?.subparagraph,
-        item: itemNumber,
-      },
-    });
-    itemParent.children.push(item);
-    leaf = item;
+
+    appendOrBlock(root, prefix, unit.text);
   }
 
   return root;
@@ -307,5 +356,5 @@ function joinOriginal(existing: string | null, next: string): string {
   if (!existing) {
     return next;
   }
-  return `${existing}\n${next}`;
+  return `${existing}\n${next}`;				
 }

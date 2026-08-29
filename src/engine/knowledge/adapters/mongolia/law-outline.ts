@@ -61,17 +61,43 @@ type ClassifiedLine =
 /**
  * Mongolian statute line classification (drafting conventions, not a website).
  */
-export function mongolianLawOutline(lines: string[]): CanonicalOutlineUnit[] {
+export function mongolianLawOutline(
+  lines: string[],
+): CanonicalOutlineUnit[] {
   const units: CanonicalOutlineUnit[] = [];
-  for (const line of lines) {
-    if (isBoilerplate(line) || isDocumentTitleLine(line)) {
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const normalized = lines[index]?.trim() ?? "";
+
+    if (!normalized) {
       continue;
     }
-    units.push(toUnit(classifyLine(line)));
+
+    // LegalInfo UI / page chrome
+    if (isBoilerplate(normalized)) {
+      continue;
+    }
+
+    // Document title
+    if (isDocumentTitleLine(normalized)) {
+      continue;
+    }
+
+    // Date / location / enactment header
+    if (isDocumentHeaderLine(normalized)) {
+      continue;
+    }
+
+    // Signing authorities at the end of the document
+    if (isSignatureLine(normalized)) {
+      continue;
+    }
+
+    units.push(toUnit(classifyLine(normalized)));
   }
+
   return units;
 }
-
 export function inferMongolianLawTitle(lines: string[]): string | null {
   const named = lines.find(
     (line) => /ТУХАЙ\s*$/.test(line) && !isBoilerplate(line),
@@ -179,164 +205,339 @@ function toUnit(classified: ClassifiedLine): CanonicalOutlineUnit {
 }
 
 function classifyLine(line: string): ClassifiedLine {
-  const part = line.match(/^([IVXLCDM]+)\s*ХЭСЭГ(?:\s+(.+))?$/i);
+  const normalized = line.trim();
+
+  // ─────────────────────────────────────────────
+  // PART
+  // Example:
+  // I ХЭСЭГ
+  // II ХЭСЭГ ЕРӨНХИЙ ҮНДЭСЛЭЛ
+  // ─────────────────────────────────────────────
+  const part = normalized.match(
+    /^([IVXLCDM]+)\s+ХЭСЭГ(?:\s+(.+))?$/iu,
+  );
+
   if (part) {
     const number = String(romanToInt(part[1] ?? "I"));
+
     return {
       kind: "part",
-      display: line,
+      display: normalized,
       number,
       heading: emptyToNull(part[2]),
-      original: line,
+      original: normalized,
     };
   }
 
-  const subsection = line.match(/^(.+?)\s+ДЭД\s+БҮЛЭГ(?:\s+(.+))?$/i);
+  // ─────────────────────────────────────────────
+  // SECTION
+  // Example:
+  // НЭГДҮГЭЭР ДЭД БҮЛЭГ
+  // ─────────────────────────────────────────────
+  const subsection = normalized.match(
+    /^(.+?)\s+ДЭД\s+БҮЛЭГ(?:\s+(.+))?$/iu,
+  );
+
   if (subsection) {
     const ordinal = subsection[1] ?? "";
+
     return {
       kind: "section",
-      display: line,
+      display: normalized,
       number: mongolianOrdinalToNumber(ordinal) ?? ordinal,
       heading: emptyToNull(subsection[2]),
-      original: line,
+      original: normalized,
     };
   }
 
-  const chapterOrdinal = line.match(/^(.+?)\s+БҮЛЭГ(?:\s+(.+))?$/i);
-  if (chapterOrdinal && !/ДЭД/i.test(chapterOrdinal[1] ?? "")) {
+  // ─────────────────────────────────────────────
+  // CHAPTER
+  // Example:
+  // НЭГДҮГЭЭР БҮЛЭГ
+  // 1 БҮЛЭГ
+  // ─────────────────────────────────────────────
+  const chapterOrdinal = normalized.match(
+    /^(.+?)\s+БҮЛЭГ(?:\s+(.+))?$/iu,
+  );
+
+  if (
+    chapterOrdinal &&
+    !/ДЭД/iu.test(chapterOrdinal[1] ?? "")
+  ) {
     const ordinal = chapterOrdinal[1] ?? "";
     const numeric = ordinal.match(/^(\d+)$/);
+
     return {
       kind: "chapter",
-      display: line,
-      number: numeric?.[1] ?? mongolianOrdinalToNumber(ordinal) ?? ordinal,
+      display: normalized,
+      number:
+        numeric?.[1] ??
+        mongolianOrdinalToNumber(ordinal) ??
+        ordinal,
       heading: emptyToNull(chapterOrdinal[2]),
-      original: line,
+      original: normalized,
     };
   }
 
-  const chapterNumeric = line.match(
-    /^(\d+)\s*(?:дүгээр|дугаар)\s+бүлэг(?:\s*[.:,-]?\s*(.*))?$/i,
+  const chapterNumeric = normalized.match(
+    /^(\d+)\s*(?:дүгээр|дугаар)\s+бүлэг(?:\s*[.:,-]?\s*(.*))?$/iu,
   );
+
   if (chapterNumeric) {
     return {
       kind: "chapter",
-      display: line,
+      display: normalized,
       number: chapterNumeric[1] ?? "1",
       heading: emptyToNull(chapterNumeric[2]),
-      original: line,
+      original: normalized,
     };
   }
 
-  // Dotted article headings (`17.1 дүгээр зүйл`) must not collapse to `17`.
-  const articleDotted = line.match(
-    /^(\d+)\.(\d+)\s*(?:дүгээр|дугаар)\s+зүйл\s*\.?\s*(.*)$/i,
+  // ─────────────────────────────────────────────
+  // ARTICLE
+  //
+  // 17 дугаар зүйл.
+  // 17.1 дүгээр зүйл.
+  // ─────────────────────────────────────────────
+  const articleDotted = normalized.match(
+    /^(\d+)\.(\d+)\s*(?:дүгээр|дугаар)\s+зүйл\s*\.?\s*(.*)$/iu,
   );
+
   if (articleDotted) {
     const number = `${articleDotted[1]}.${articleDotted[2]}`;
+
     return {
       kind: "article",
-      display: line,
+      display: normalized,
       number,
       heading: emptyToNull(articleDotted[3]),
-      original: line,
+      original: normalized,
     };
   }
 
-  const articleNumeric = line.match(
-    /^(\d+)\s*(?:дүгээр|дугаар)\s+зүйл\s*\.?\s*(.*)$/i,
+  const articleNumeric = normalized.match(
+    /^(\d+)\s*(?:дүгээр|дугаар)\s+зүйл\s*\.?\s*(.*)$/iu,
   );
+
   if (articleNumeric) {
-    const number = articleNumeric[1] ?? "1";
     return {
       kind: "article",
-      display: line,
-      number,
+      display: normalized,
+      number: articleNumeric[1] ?? "1",
       heading: emptyToNull(articleNumeric[2]),
-      original: line,
+      original: normalized,
     };
   }
 
-  // Constitution-style headings: "Нэгдүгээр зүйл." / "Арван хоёрдугаар зүйл."
-  const articleOrdinal = line.match(/^(.+?)\s+зүйл\s*\.?\s*(.*)$/iu);
+  // ─────────────────────────────────────────────
+  // ARTICLE BY ORDINAL WORD
+  // Example:
+  // Нэгдүгээр зүйл.
+  // Хорьдугаар зүйл.
+  // ─────────────────────────────────────────────
+  const articleOrdinal = normalized.match(
+    /^(.+?)\s+зүйл\s*\.?\s*(.*)$/iu,
+  );
+
   if (articleOrdinal) {
     const number = mongolianOrdinalToNumber(articleOrdinal[1] ?? "");
+
     if (number) {
       return {
         kind: "article",
-        display: line,
+        display: normalized,
         number,
         heading: emptyToNull(articleOrdinal[2]),
-        original: line,
+        original: normalized,
       };
     }
   }
 
-  const numbered = line.match(/^(\d+(?:\.\d+){1,3})\.(.*)$/);
-  if (numbered && !looksLikeDate(numbered[1] ?? "")) {
-    const parts = (numbered[1] ?? "").split(".");
-    if (parts.length === 2 && parts[0] && parts[1]) {
+  // ─────────────────────────────────────────────
+  // NUMERIC LEGALINFO FORMAT
+  //
+  // 1. ...
+  // 1.1. ...
+  // 1.1.1. ...
+  // 1.1.1.1. ...
+  //
+  // IMPORTANT:
+  // LegalInfo дээр "1." нь ARTICLE,
+  // "1.1." нь PARAGRAPH,
+  // "1.1.1." нь SUBPARAGRAPH,
+  // "1.1.1.1." нь ITEM.
+  // ─────────────────────────────────────────────
+  const numbered = normalized.match(
+  /^(\d+(?:\.\d+){0,3})\s*(?:\.\s*|[\/)]\s*)(.*)$/,
+);
+  if (
+    numbered &&
+    !looksLikeDate(numbered[1] ?? "")
+  ) {
+    const number = numbered[1] ?? "";
+    const original = normalized;
+    const parts = number.split(".");
+
+    // 1. text
+    if (
+      parts.length === 1 &&
+      parts[0]
+    ) {
       return {
-        kind: "paragraph",
-        display: numbered[1] ?? "",
-        article: parts[0],
-        paragraph: parts[1],
-        original: line,
+        kind: "article",
+        display: number,
+        number: parts[0],
+        heading: null,
+        original,
       };
     }
-    if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
+
+    // 1.1. text
+    if (
+      parts.length === 2 &&
+      parts[0] &&
+      parts[1]
+    ) {
+      return {
+        kind: "paragraph",
+        display: number,
+        article: parts[0],
+        paragraph: parts[1],
+        original,
+      };
+    }
+
+    // 1.1.1. text
+    if (
+      parts.length === 3 &&
+      parts[0] &&
+      parts[1] &&
+      parts[2]
+    ) {
       return {
         kind: "subparagraph",
-        display: numbered[1] ?? "",
+        display: number,
         article: parts[0],
         paragraph: parts[1],
         subparagraph: parts[2],
-        original: line,
+        original,
       };
     }
-    if (parts.length === 4 && parts[0] && parts[1] && parts[2] && parts[3]) {
+
+    // 1.1.1.1. text
+    if (
+      parts.length === 4 &&
+      parts[0] &&
+      parts[1] &&
+      parts[2] &&
+      parts[3]
+    ) {
       return {
         kind: "item",
-        display: numbered[1] ?? "",
+        display: number,
         article: parts[0],
         paragraph: parts[1],
         subparagraph: parts[2],
         item: parts[3],
-        original: line,
+        original,
       };
     }
   }
 
-  const letter = line.match(/^(?:\/([а-яёөүэ])\/|([а-яёөүэ])\))\s*(.*)$/iu);
+  // ─────────────────────────────────────────────
+  // LETTER ITEMS
+  //
+  // а/ ...
+  // б/ ...
+  // в/ ...
+  // г/ ...
+  // д/ ...
+  //
+  // мөн:
+  // а) ...
+  // б) ...
+  // ─────────────────────────────────────────────
+  const letter = normalized.match(
+    /^([а-яёөүғқһ])\s*[\/)]\s*(.*)$/iu,
+  );
+
   if (letter) {
-    const item = letter[1] ?? letter[2] ?? "";
+    const item = letter[1] ?? "";
+
     return {
       kind: "item",
       display: item,
       item,
-      original: line,
+      original: normalized,
     };
   }
 
-  return { kind: "text", original: line };
+  return {
+    kind: "text",
+    original: normalized,
+  };
 }
-
 function isBoilerplate(line: string): boolean {
+  const normalized = line.trim();
+
   return (
-    /^МОНГОЛ\s+УЛСЫН\s+ХУУЛЬ$/i.test(line) ||
-    /^\/Шинэчилсэн найруулга\/$/i.test(line) ||
-    /^Pdf$/i.test(line) ||
-    /^Word$/i.test(line) ||
-    /^Хэвлэх$/i.test(line) ||
-    /^Нэмэлт өөрчлөлт/i.test(line)
+    // LegalInfo page chrome
+    /^Хуваалцах$/iu.test(normalized) ||
+    /^Хэвлэх$/iu.test(normalized) ||
+    /^Pdf$/iu.test(normalized) ||
+    /^Word$/iu.test(normalized) ||
+
+    // Generic LegalInfo labels
+    /^МОНГОЛ\s+УЛСЫН\s+ХУУЛЬ$/iu.test(normalized) ||
+    /^\/Шинэчилсэн\s+найруулга\/$/iu.test(normalized) ||
+    /^Нэмэлт\s+өөрчлөлт/iu.test(normalized)
   );
 }
+function isDocumentHeaderLine(line: string): boolean {
+  const normalized = line.trim();
 
-function isDocumentTitleLine(line: string): boolean {
-  return /ТУХАЙ\s*$/.test(line);
+  if (/^Улаанбаатар\s+хот$/iu.test(normalized)) {
+    return true;
+  }
+
+  if (
+    /^\d{4}\s+оны?\s+\d{1,2}\s+(?:дүгээр|дугаар)\s+сарын\s+\d{1,2}(?:-ны|-ний)?\s+өдөр$/iu.test(
+      normalized,
+    )
+  ) {
+    return true;
+  }
+
+  if (
+    /^БҮГД\s+НАЙРАМДАХ\s+МОНГОЛ\s+АРД\s+УЛСЫН\s+ХУУЛЬ$/iu.test(
+      normalized,
+    )
+  ) {
+    return true;
+  }
+
+  return false;
 }
+function isSignatureLine(line: string): boolean {
+  const normalized = line.trim();
 
+  return (
+    /^(?:МОНГОЛ\s+УЛСЫН|БНМАУ-ЫН)\s+(?:ИХ|БАГА)\s+ХУРЛЫН\s+.*\bДАРГА\b/iu.test(
+      normalized,
+    ) ||
+    /^(?:МОНГОЛ\s+УЛСЫН|БНМАУ-ЫН)\s+ИХ\s+ХУРЛЫН\s+ТАМГЫН\s+ГАЗРЫН\s+.*ДАРГА/iu.test(
+      normalized,
+    )
+  );
+}
+function isDocumentTitleLine(line: string): boolean {
+  const normalized = line.trim();
+
+  return (
+    /ТУХАЙ\s*$/iu.test(normalized) ||
+    /ТУХАЙ\s+ХУУЛЬ\s*$/iu.test(normalized)
+  );
+}
 function looksLikeDate(token: string): boolean {
   return /^\d{4}\.\d{1,2}\.\d{1,2}$/.test(token);
 }
