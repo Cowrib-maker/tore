@@ -65,6 +65,7 @@ export function mongolianLawOutline(
   lines: string[],
 ): CanonicalOutlineUnit[] {
   const units: CanonicalOutlineUnit[] = [];
+  let currentArticle: string | null = null;
 
   for (let index = 0; index < lines.length; index += 1) {
     const normalized = lines[index]?.trim() ?? "";
@@ -93,7 +94,52 @@ export function mongolianLawOutline(
       continue;
     }
 
-    units.push(toUnit(classifyLine(normalized)));
+    const classified = classifyLine(normalized);
+
+    // Once an article heading is detected, keep its number as context
+    // so LegalInfo's "1. text", "2. text" lines can be interpreted
+    // as paragraphs belonging to that article.
+    if (classified.kind === "article") {
+      const looksLikeArticleHeading =
+        /(?:дүгээр|дугаар)\s+зүйл/iu.test(normalized) ||
+        /\s+зүйл\s*\.?/iu.test(normalized);
+
+      if (looksLikeArticleHeading) {
+        currentArticle = classified.number;
+        units.push(toUnit(classified));
+        continue;
+      }
+
+      // LegalInfo numeric "1. text" / "2. text" format:
+      // when an article is already open, these are paragraphs,
+      // not new articles.
+      if (
+        currentArticle &&
+        /^\d+\s*[.)]\s*/u.test(normalized)
+      ) {
+        const match = normalized.match(
+          /^(\d+)\s*[.)]\s*(.*)$/u,
+        );
+
+        if (match) {
+          const paragraphNumber = match[1] ?? "1";
+
+          units.push(
+            toUnit({
+              kind: "paragraph",
+              display: paragraphNumber,
+              article: currentArticle,
+              paragraph: paragraphNumber,
+              original: normalized,
+            }),
+          );
+
+          continue;
+        }
+      }
+    }
+
+    units.push(toUnit(classified));
   }
 
   return units;
