@@ -14,7 +14,7 @@ import { getLocale } from "@/i18n/get-locale";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "TORE privacy policy (draft placeholder).",
+  description: "TORE privacy policy.",
 };
 
 export default async function PrivacyPolicyPage() {
@@ -33,6 +33,7 @@ export default async function PrivacyPolicyPage() {
           <p>{copy.privacyData}</p>
           <p>{copy.privacyUse}</p>
           <p>{copy.privacyRetention}</p>
+          <p>{copy.privacyAi}</p>
           <p>{copy.privacyContact}</p>
           <p className="pt-2">
             <Link

@@ -31,7 +31,9 @@ describe("auth consent + password schemas", () => {
   it("publishes terms and privacy dictionary routes", () => {
     expect(en.legal.termsTitle.length).toBeGreaterThan(3);
     expect(en.legal.privacyTitle.length).toBeGreaterThan(3);
-    expect(en.legal.placeholderBanner.toLowerCase()).toContain("placeholder");
+    expect(en.legal.placeholderBanner.toLowerCase()).toContain("effective");
+    expect(en.legal.placeholderBanner.toLowerCase()).not.toContain("placeholder");
+    expect(en.legal.termsLegalAi.toLowerCase()).toContain("legalinfo.mn");
     expect(en.auth.termsOfService).toBeTruthy();
     expect(en.auth.privacyPolicy).toBeTruthy();
   });

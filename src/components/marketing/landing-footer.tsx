@@ -32,6 +32,7 @@ export function LandingFooter({
             <a href="#chat">{home.products.chat.name}</a>
             <a href="#student">{home.products.student.name}</a>
             <a href="#legal-ai">{home.products.legalAi.name}</a>
+            <Link href="/lawyers">{t.footerDirectory}</Link>
             <a href="#intelligence">{home.intelligenceTitle}</a>
           </FooterColumn>
           <FooterColumn title={t.footerCompany}>

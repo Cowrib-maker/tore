@@ -6,6 +6,7 @@ import {
   buildClarificationMessage,
   isLegalClarificationMessage,
 } from "./legal-clarification";
+import { detectForeignLegalScope } from "./foreign-legal-scope";
 import {
   analyzeLegalFactContext,
   hasFirstPersonProblemNarrative,
@@ -58,10 +59,14 @@ export class LegalRelevanceService {
       input.questionStatus === LegalQuestionStatus.CLARIFYING &&
       context.length > 0
     ) {
-      return this.classifyClarifyingContinuation(message, context);
+      return this.classifyClarifyingContinuation(
+        message,
+        context,
+        input.audience,
+      );
     }
 
-    const standalone = await this.classifyStandalone(message);
+    const standalone = await this.classifyStandalone(message, input.audience);
 
     if (followingUp) {
       if (
@@ -78,27 +83,34 @@ export class LegalRelevanceService {
         .map((item) => item.content.trim())
         .filter(Boolean);
       const analysisText = [...priorUsers.slice(-3), message].join("\n");
-      const combined = await this.classifyStandalone(analysisText);
+      const combined = await this.classifyStandalone(
+        analysisText,
+        input.audience,
+      );
       if (combined.relevance === LegalRelevance.NON_LEGAL) {
-        return { ...combined, analysisText };
+        return applyLawyerAudience(input.audience, {
+          ...combined,
+          analysisText,
+        });
       }
-      return {
+      return applyLawyerAudience(input.audience, {
         relevance: LegalRelevance.LEGAL,
         confidence: Math.max(combined.confidence, 0.62),
         reasons: [...combined.reasons, "clarification-follow-up"],
         issueFamily: combined.issueFamily,
         analysisText,
-      };
+      });
     }
 
-    return standalone;
+    return applyLawyerAudience(input.audience, standalone);
   }
 
   private async classifyClarifyingContinuation(
     message: string,
     context: NonNullable<LegalRelevanceInput["conversationContext"]>,
+    audience: LegalRelevanceInput["audience"] = "CITIZEN",
   ): Promise<LegalRelevanceResult> {
-    const standalone = await this.classifyStandalone(message);
+    const standalone = await this.classifyStandalone(message, audience);
     if (
       standalone.relevance === LegalRelevance.NON_LEGAL &&
       standalone.reasons.some((reason) => reason.startsWith("non-legal-topic:"))
@@ -111,7 +123,7 @@ export class LegalRelevanceService {
       .map((item) => item.content.trim())
       .filter(Boolean);
     const analysisText = [...priorUsers.slice(-3), message].join("\n");
-    const combined = await this.classifyStandalone(analysisText);
+    const combined = await this.classifyStandalone(analysisText, audience);
     if (
       combined.relevance === LegalRelevance.NON_LEGAL &&
       combined.reasons.some((reason) => reason.startsWith("non-legal-topic:"))
@@ -119,17 +131,18 @@ export class LegalRelevanceService {
       return { ...combined, analysisText };
     }
 
-    return {
+    return applyLawyerAudience(audience, {
       relevance: LegalRelevance.LEGAL,
       confidence: Math.max(combined.confidence, 0.65),
       reasons: [...combined.reasons, "clarifying-thread-continuation"],
       issueFamily: combined.issueFamily,
       analysisText,
-    };
+    });
   }
 
   private async classifyStandalone(
     message: string,
+    audience: LegalRelevanceInput["audience"] = "CITIZEN",
   ): Promise<LegalRelevanceResult> {
     if (!message.trim()) {
       return {
@@ -154,6 +167,20 @@ export class LegalRelevanceService {
         relevance: LegalRelevance.LEGAL,
         confidence: 0.95,
         reasons: ["exact-citation"],
+        issueFamily: issueFamily ?? LegalIssueFamily.OTHER,
+        analysisText: message,
+      });
+    }
+
+    const foreignScope = detectForeignLegalScope(message);
+    if (foreignScope && !nonLegalTopic) {
+      return finish({
+        relevance: LegalRelevance.LEGAL,
+        confidence: 0.84,
+        reasons: [
+          "foreign-legal-scope",
+          ...foreignScope.labels.map((label) => `foreign:${label}`),
+        ],
         issueFamily: issueFamily ?? LegalIssueFamily.OTHER,
         analysisText: message,
       });
@@ -219,13 +246,52 @@ export class LegalRelevanceService {
       });
     }
 
-    return {
+    return applyLawyerAudience(audience, {
       relevance: LegalRelevance.NON_LEGAL,
       confidence: 0.64,
       reasons: ["no-legal-signal"],
       analysisText: message,
+    });
+  }
+}
+
+function applyLawyerAudience(
+  audience: LegalRelevanceInput["audience"],
+  result: LegalRelevanceResult,
+): LegalRelevanceResult {
+  if (audience !== "LAWYER") {
+    return result;
+  }
+  if (result.reasons.some((reason) => reason.startsWith("non-legal-topic:"))) {
+    return result;
+  }
+  if (result.relevance === LegalRelevance.POSSIBLY_LEGAL) {
+    return {
+      ...result,
+      relevance: LegalRelevance.LEGAL,
+      reasons: [...result.reasons, "lawyer-do-the-work"],
     };
   }
+  if (
+    result.relevance === LegalRelevance.NON_LEGAL &&
+    result.reasons.includes("no-legal-signal") &&
+    looksLikeLawyerAssignment(result.analysisText)
+  ) {
+    return {
+      ...result,
+      relevance: LegalRelevance.LEGAL,
+      confidence: Math.max(result.confidence, 0.7),
+      reasons: [...result.reasons, "lawyer-all-areas"],
+      issueFamily: result.issueFamily ?? LegalIssueFamily.OTHER,
+    };
+  }
+  return result;
+}
+
+function looksLikeLawyerAssignment(text: string): boolean {
+  return /шинжил|ноорог|даалгавар|бэлтгэ|мемо\b|memo\b|draft\b|brief\b|\banaly[sz]e\b|research\b|due diligence|opinion letter|харьцуул|зөвлөмж бэлтгэ|эрх зүйн дүгнэлт/i.test(
+    text,
+  );
 }
 
 function finish(result: LegalRelevanceResult): LegalRelevanceResult {

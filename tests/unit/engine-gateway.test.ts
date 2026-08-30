@@ -70,10 +70,10 @@ describe("RuleBasedDomainFilter", () => {
 
   it("accepts additional rules without mutating the original filter", () => {
     const extended = filter.withRules(
-      createTermRules(["гаалийн маргаан"], DomainLabel.LEGAL),
+      createTermRules(["квантфизик"], DomainLabel.LEGAL),
     );
-    expect(filter.classify("гаалийн маргаан").domain).toBe(DomainLabel.NON_LEGAL);
-    expect(extended.classify("гаалийн маргаан").domain).toBe(DomainLabel.LEGAL);
+    expect(filter.classify("квантфизик").domain).toBe(DomainLabel.NON_LEGAL);
+    expect(extended.classify("квантфизик").domain).toBe(DomainLabel.LEGAL);
   });
 });
 

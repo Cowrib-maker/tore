@@ -4,6 +4,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { ArrowUp } from "lucide-react";
 
 import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
+import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
 import { useLegalAiChatSession } from "@/components/legal-ai/use-legal-ai-chat-session";
 
@@ -108,6 +109,7 @@ export function HeroLegalAiComposer({
           </button>
         </div>
       </form>
+      <LegalAiDutyNotice variant="citizen" className="px-1 text-center" />
     </div>
   );
 }

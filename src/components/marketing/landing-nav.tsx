@@ -28,9 +28,11 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
   const [open, setOpen] = useState(false);
   const home = dict.publicHome;
   const links = [
+    { href: "/lawyers", label: dict.nav.lawyers },
     { href: "#chat", label: home.products.chat.name },
     { href: "#products", label: home.navProducts },
     { href: "#intelligence", label: home.navIntelligence },
+    { href: "#faq", label: dict.nav.faq },
     { href: "#feedback", label: home.navFeedback },
   ];
 

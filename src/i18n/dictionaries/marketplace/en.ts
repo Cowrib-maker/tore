@@ -141,10 +141,10 @@ export const marketplaceEn: MarketplaceDictionary = {
     listed: "Listed",
     notListed: "Not listed",
     listingHelp:
-      "Listing needs approved credentials, an active offering, and admin approval. Clients find you in the",
+      "Listing needs approved credentials, an active offering, and you turning on directory visibility. Clients find you in the",
     listingGateVerification: "Credentials approved",
     listingGateOffering: "Active offering published",
-    listingGateOptIn: "Admin listed in the directory",
+    listingGateOptIn: "You listed yourself in the directory",
     listingGateIncomplete:
       "Complete each step below before clients can find you in the directory.",
     directoryLink: "lawyer directory",
@@ -181,7 +181,7 @@ export const marketplaceEn: MarketplaceDictionary = {
     viewPublic: "View public profile",
     title: "Professional profile",
     description:
-      "Complete your professional details and submit verification. Public directory visibility is enabled by an admin.",
+      "Complete your professional details and submit verification. After approval you can list or unlist your own profile.",
     taxonomyTitle: "Practice areas & languages",
     taxonomyDescription: "Used in directory filters and your public profile.",
   },
@@ -292,10 +292,14 @@ export const marketplaceEn: MarketplaceDictionary = {
   verification: {
     statusTitle: "Verification",
     statusHelp:
-      "Submit your professional license for review. Public directory listing is enabled by an admin only.",
+      "Submit your professional license for review. After approval you can list or unlist yourself in the public directory.",
     approvedOn: "Approved on:",
     listingLabel: "Directory listing:",
-    listingAdminOnly: "Public visibility is managed by an admin.",
+    listingAdminOnly:
+      "Approved lawyers can list or unlist their own profile. Clients also need an active offering to find you.",
+    listingShow: "Show in directory",
+    listingHide: "Hide from directory",
+    listingNeedApproval: "Directory listing is available after your credentials are approved.",
     profileSettings: "Profile settings",
     submitTitle: "Submit credentials",
     submitHelp:
@@ -490,7 +494,7 @@ export const marketplaceEn: MarketplaceDictionary = {
     unlist: "Remove from directory",
     directoryTitle: "Lawyer records and directory",
     directoryHelp:
-      "Review profile, credentials, practice areas, and experience. Only admins can enable public listing.",
+      "Review profile, credentials, practice areas, and experience. Admins can list or unlist; approved lawyers can also list themselves.",
     openDocument: "Open document ({file})",
   },
   adminUsers: {

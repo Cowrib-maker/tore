@@ -1442,6 +1442,8 @@ describe("LegalAiService", () => {
     expect(systemPrompt).toContain("Та бол TORE Chat");
     expect(systemPrompt).toContain("CITIZEN OUTPUT (TORE Chat)");
     expect(systemPrompt).toContain("Товч хариулт");
+    expect(systemPrompt).toContain("мэргэжлийн хуульч, өмгөөлөгчийн зөвлөгөөг орлохгүй");
+    expect(systemPrompt).toContain("баталгаажсан хуульч, өмгөөлөгчтэй холбогдоорой");
     expect(systemPrompt).not.toContain("Та бол TORE Legal AI");
     expect(systemPrompt).not.toContain("LAWYER OUTPUT");
   });
@@ -1461,6 +1463,10 @@ describe("LegalAiService", () => {
     expect(systemPrompt).toContain("LAWYER OUTPUT (TORE Legal AI)");
     expect(systemPrompt).toContain("Асуудлын товч тодорхойлолт");
     expect(systemPrompt).toContain("Баримт → эрх зүйн нөхцөл mapping");
+    expect(systemPrompt).toContain("Бүх эрх зүйн чиглэл");
+    expect(systemPrompt).toContain("цагийг хэмнэх");
+    expect(systemPrompt).toContain("Эх сурвалжийг нягтал");
+    expect(systemPrompt).toContain("Эцсийн мэргэжлийн шийдвэр таных");
     expect(systemPrompt).not.toContain("Та бол TORE Chat");
   });
 
@@ -1585,8 +1591,31 @@ describe("LegalAiService", () => {
     expect(systemPrompt).toContain(
       "Холбогдох эрх зүйн зохицуулалт одоогоор баталгаатай эх сурвалжаас олдсонгүй.",
     );
+    expect(systemPrompt).toContain("Ажлыг бүү зогсоо");
     expect(systemPrompt).not.toContain("LEGAL RULE");
     expect(systemPrompt).toContain("Иш, зүйлийн дугаар, шүүхийн шийдвэр бүү зохио");
+  });
+
+  it("answers a lawyer foreign-law and practice question without MN corpus as the stop condition", async () => {
+    const { service, completion, corpusRetriever } = createService();
+
+    const result = await service.createTurn({
+      userId: "lawyer-1",
+      actorRole: UserRole.LAWYER,
+      message:
+        "Delaware LLC fiduciary duty болон US law firm practice-ийг тайлбарла",
+    });
+
+    expect(result.turnKind).toBe(PromptTurnKind.LEGAL);
+    expect(result.message.content).toBe("mocked-answer");
+    expect(corpusRetriever.retrieveLegalQuestion).not.toHaveBeenCalled();
+    expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
+    const systemPrompt = completion.complete.mock.calls[0]?.[0]?.systemPrompt ?? "";
+    expect(systemPrompt).toContain("FOREIGN LAW / PRACTICE (LAWYER)");
+    expect(systemPrompt).toContain("МЭРГЭЖЛИЙН ТҮВШИНД бүрэн хариул");
+    expect(systemPrompt).toContain("Delaware");
+    expect(systemPrompt).not.toContain("Албан ёсны эх: legalinfo.mn");
+    expect(systemPrompt).toContain("баталгаажаагүй");
   });
 
   it("does not let uploaded document text override system instructions", async () => {
@@ -1650,5 +1679,23 @@ describe("LegalAiService", () => {
     const systemPrompt = completion.complete.mock.calls[0]?.[0]?.systemPrompt ?? "";
     expect(systemPrompt).not.toContain("Confidential opposing-party clause.");
     expect(systemPrompt).not.toContain("secret.pdf");
+  });
+
+  it("completes assigned lawyer work instead of a clarification-only reply", async () => {
+    const { service, completion } = createService();
+
+    const result = await service.createTurn({
+      userId: "lawyer-1",
+      actorRole: UserRole.LAWYER,
+      message:
+        "Энэ даалгаврыг хий: CIF vs FOB эрсдэлийн хуваарилалтыг шинжилж memo бэлтгэ",
+    });
+
+    expect(result.capability).toBe(LegalAiCapability.LAWYER);
+    expect(result.turnKind).toBe(PromptTurnKind.LEGAL);
+    expect(completion.complete).toHaveBeenCalled();
+    const systemPrompt = completion.complete.mock.calls[0]?.[0]?.systemPrompt ?? "";
+    expect(systemPrompt).toContain("LAWYER OUTPUT (TORE Legal AI)");
+    expect(systemPrompt).not.toContain("CITIZEN OUTPUT (intake");
   });
 });

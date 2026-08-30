@@ -48,6 +48,7 @@ import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-lis
 import { LEGAL_AI_CHAT_RETRY_MESSAGE } from "@/components/legal-ai/legal-ai-chat-errors";
 import { interpretLegalAiChatAccess } from "@/components/legal-ai/interpret-legal-ai-chat-access";
 import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
+import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
 import { requestCitizenCheckout } from "@/components/legal-ai/request-citizen-checkout";
 import {
@@ -526,10 +527,7 @@ export function LegalAiChat({
             </Button>
           </div>
         </div>
-        <p className="mt-2 px-1 text-[11px] leading-4 text-[#8A939D]">
-          TORE Chat нь ерөнхий хууль зүйн мэдээлэл, урьдчилсан чиглэл өгнө.
-          Мэргэжлийн зөвлөгөө, төлөөлөл биш.
-        </p>
+        <LegalAiDutyNotice variant="citizen" className="mt-2 px-1" />
       </div>
     </form>
   );
@@ -713,7 +711,9 @@ function LegalAiSidebar({
             LEGAL. AI. CONNECTED.
           </p>
           <p className="mt-1.5 text-xs leading-5 text-white/65">
-            Ерөнхий мэдээлэл өгнө. Таны хуульч, өмгөөлөгч биш.
+            Мэргэжлийн хуульч, өмгөөлөгчийн зөвлөгөөг орлохгүй. Асуудлаа
+            шийдвэрлүүлэхийн тулд баталгаажсан хуульч, өмгөөлөгчтэй
+            холбогдоно уу.
           </p>
         </div>
       </div>

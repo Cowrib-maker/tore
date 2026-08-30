@@ -38,6 +38,7 @@ import { interpretLegalAiChatAccess } from "@/components/legal-ai/interpret-lega
 import type { LegalAiAccessGate } from "@/components/legal-ai/interpret-legal-ai-chat-access";
 import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
 import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-list";
+import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
 import { ToreLogo } from "@/components/brand/tore-logo";
 import { Button } from "@/components/ui/button";
@@ -343,6 +344,7 @@ export function LawyerAiWorkbench({
                   Хэрэг, баримт, хууль зүйн эх сурвалжид тулгуурлан мэргэжлийн
                   түвшний шинжилгээ хийх AI.
                 </p>
+                <LegalAiDutyNotice variant="lawyer" className="mt-1 hidden sm:block" />
                 <p className="mt-1 hidden text-[11px] text-[#8A939D] sm:block">
                   Баримт {caseContext.documentCount}
                   <span className="mx-1.5">·</span>
@@ -363,6 +365,7 @@ export function LawyerAiWorkbench({
                   Хэрэг, баримт, хууль зүйн эх сурвалжид тулгуурлан мэргэжлийн
                   түвшний шинжилгээ хийх AI.
                 </p>
+                <LegalAiDutyNotice variant="lawyer" className="mt-1" />
               </div>
             )}
           </div>
@@ -548,10 +551,7 @@ export function LawyerAiWorkbench({
                   </Button>
                 </div>
               </div>
-              <p className="mt-2 px-1 text-[11px] leading-4 text-[#8A939D]">
-                TORE Legal AI нь ерөнхий хууль зүйн мэдээлэл өгнө. Хуульч,
-                өмгөөлөгчийг орлохгүй.
-              </p>
+              <LegalAiDutyNotice variant="lawyer" className="mt-2 px-1" />
             </form>
           </div>
         </div>

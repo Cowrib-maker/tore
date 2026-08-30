@@ -139,10 +139,10 @@ export const marketplaceKo: MarketplaceDictionary = {
     listed: "등록됨",
     notListed: "미등록",
     listingHelp:
-      "공개 등록에는 승인된 자격, 활성 서비스, 관리자 승인이 필요합니다. 고객이",
+      "공개 등록에는 승인된 자격, 활성 서비스, 그리고 본인이 디렉터리를 켜는 것이 필요합니다. 고객이",
     listingGateVerification: "자격 승인 완료",
     listingGateOffering: "활성 서비스 게시",
-    listingGateOptIn: "관리자가 디렉터리에 등록함",
+    listingGateOptIn: "디렉터리에 직접 등록함",
     listingGateIncomplete:
       "디렉터리에 표시되려면 아래 단계를 모두 완료하세요.",
     directoryLink: "변호사 디렉터리",
@@ -177,7 +177,7 @@ export const marketplaceKo: MarketplaceDictionary = {
     viewPublic: "공개 프로필 보기",
     title: "전문 프로필",
     description:
-      "전문 정보를 작성하고 검증을 제출하세요. 공개 디렉터리는 관리자가 활성화합니다.",
+      "전문 정보를 작성하고 검증을 제출하세요. 승인 후 공개 디렉터리를 직접 켜거나 끌 수 있습니다.",
     taxonomyTitle: "전문 분야 및 언어",
     taxonomyDescription: "디렉터리 필터와 공개 프로필에 사용됩니다.",
   },
@@ -287,10 +287,14 @@ export const marketplaceKo: MarketplaceDictionary = {
   verification: {
     statusTitle: "자격 검증",
     statusHelp:
-      "검토를 위해 전문 면허를 제출하십시오. 공개 디렉터리는 관리자만 활성화합니다.",
+      "검토를 위해 전문 면허를 제출하십시오. 승인 후 공개 디렉터리를 직접 켜거나 끌 수 있습니다.",
     approvedOn: "승인일:",
     listingLabel: "디렉터리 등록:",
-    listingAdminOnly: "공개 노출은 관리자가 관리합니다.",
+    listingAdminOnly:
+      "승인된 변호사는 자신의 프로필을 디렉터리에 올리거나 내릴 수 있습니다. 고객이 찾으려면 활성 서비스도 필요합니다.",
+    listingShow: "디렉터리에 표시",
+    listingHide: "디렉터리에서 숨기기",
+    listingNeedApproval: "자격 승인 후에 디렉터리에 등록할 수 있습니다.",
     profileSettings: "프로필 설정",
     submitTitle: "자격 제출",
     submitHelp:
@@ -484,7 +488,7 @@ export const marketplaceKo: MarketplaceDictionary = {
     unlist: "디렉터리에서 제거",
     directoryTitle: "변호사 기록 및 디렉터리",
     directoryHelp:
-      "프로필, 자격, 전문 분야, 경력을 검토하십시오. 공개 등록은 관리자만 활성화합니다.",
+      "프로필, 자격, 전문 분야, 경력을 검토하십시오. 관리자가 등록을 켜거나 끌 수 있고, 승인된 변호사는 직접 등록할 수도 있습니다.",
     openDocument: "문서 열기 ({file})",
   },
   adminUsers: {

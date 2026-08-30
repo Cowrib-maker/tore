@@ -261,6 +261,9 @@ export type MarketplaceDictionary = {
     approvedOn: string;
     listingLabel: string;
     listingAdminOnly: string;
+    listingShow: string;
+    listingHide: string;
+    listingNeedApproval: string;
     profileSettings: string;
     submitTitle: string;
     submitHelp: string;

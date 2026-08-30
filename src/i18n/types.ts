@@ -218,11 +218,13 @@ export type Dictionary = {
     termsScope: string;
     termsAccounts: string;
     termsMarketplace: string;
+    termsLegalAi: string;
     termsContact: string;
     privacyIntro: string;
     privacyData: string;
     privacyUse: string;
     privacyRetention: string;
+    privacyAi: string;
     privacyContact: string;
     termsLink: string;
     privacyLink: string;

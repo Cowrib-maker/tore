@@ -139,10 +139,10 @@ export const marketplaceZh: MarketplaceDictionary = {
     listed: "已上架",
     notListed: "未上架",
     listingHelp:
-      "公开上架需完成资质核验、至少一项有效服务，以及管理员批准。客户可在",
+      "公开上架需完成资质核验、至少一项有效服务，并由您本人开启目录展示。客户可在",
     listingGateVerification: "资质已通过审核",
     listingGateOffering: "已发布有效服务",
-    listingGateOptIn: "管理员已允许目录展示",
+    listingGateOptIn: "您已开启目录展示",
     listingGateIncomplete: "请完成以下步骤后才会出现在公开目录中。",
     directoryLink: "律师目录",
     offerings: "服务",
@@ -176,7 +176,7 @@ export const marketplaceZh: MarketplaceDictionary = {
     viewPublic: "查看公开档案",
     title: "专业档案",
     description:
-      "请填写专业信息并提交核验。公开目录由管理员启用。",
+      "请填写专业信息并提交核验。通过后您可自行上架或下架公开档案。",
     taxonomyTitle: "执业领域与语言",
     taxonomyDescription: "用于目录筛选及公开档案展示。",
   },
@@ -284,10 +284,14 @@ export const marketplaceZh: MarketplaceDictionary = {
   },
   verification: {
     statusTitle: "资质核验",
-    statusHelp: "请提交执业证照以供审核。公开目录仅由管理员启用。",
+    statusHelp: "请提交执业证照以供审核。通过后您可自行开启或关闭公开目录。",
     approvedOn: "通过日期：",
     listingLabel: "目录展示：",
-    listingAdminOnly: "公开可见性由管理员管理。",
+    listingAdminOnly:
+      "已核验律师可自行上架或下架档案。客户要找到您，还需发布有效服务。",
+    listingShow: "在目录中显示",
+    listingHide: "从目录隐藏",
+    listingNeedApproval: "资质通过后即可上架公开目录。",
     profileSettings: "档案设置",
     submitTitle: "提交资质材料",
     submitHelp: "请填写执业证号、发证机关，并上传证照照片或 PDF。",
@@ -474,7 +478,7 @@ export const marketplaceZh: MarketplaceDictionary = {
     list: "允许公开上架",
     unlist: "从目录移除",
     directoryTitle: "律师档案与目录",
-    directoryHelp: "核验档案、证照、执业领域与经验。仅管理员可启用公开上架。",
+    directoryHelp: "核验档案、证照、执业领域与经验。管理员可上架或下架；已核验律师也可自行上架。",
     openDocument: "打开文件（{file}）",
   },
   adminUsers: {

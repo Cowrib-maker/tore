@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { LawyerListingActions } from "@/components/verification/lawyer-listing-actions";
 import { UserRole } from "@/domain/enums";
 import { isLawyerVerified } from "@/domain/services/lawyer-eligibility";
 import { getDashboardPath } from "@/domain/services/rbac";
@@ -192,7 +193,7 @@ export default async function LawyerDashboardPage() {
               )}
             </CardDescription>
           </CardHeader>
-          <CardFooter>
+          <CardFooter className="flex flex-col items-start gap-3">
             <ul className="w-full space-y-1.5 text-sm text-muted-foreground">
               <li className={verified ? "text-foreground" : undefined}>
                 {verified ? "✓" : "○"} {ld.listingGateVerification}
@@ -204,6 +205,12 @@ export default async function LawyerDashboardPage() {
                 {listed ? "✓" : "○"} {ld.listingGateOptIn}
               </li>
             </ul>
+            <LawyerListingActions
+              lawyerProfileId={data.profile.id}
+              isListed={listed}
+              canList={verified}
+              copy={m.verification}
+            />
           </CardFooter>
         </Card>
         <Card>

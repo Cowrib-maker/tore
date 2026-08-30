@@ -58,6 +58,17 @@ describe("LegalRelevanceService", () => {
     expect(result.relevance).toBe(LegalRelevance.NON_LEGAL);
   });
 
+  it("classifies a foreign-law practice question as LEGAL", async () => {
+    const result = await engine.classify({
+      message:
+        "Delaware LLC fiduciary duty болон US law firm practice-ийг тайлбарла",
+    });
+    expect(result.relevance).toBe(LegalRelevance.LEGAL);
+    expect(result.reasons).toEqual(
+      expect.arrayContaining(["foreign-legal-scope", "foreign:US", "foreign:Delaware"]),
+    );
+  });
+
   it("classifies an exact statute citation as LEGAL", async () => {
     const result = await engine.classify({
       message: "Эрүүгийн хуулийн 17.1 дүгээр зүйл юу гэж заасан бэ?",
@@ -188,5 +199,57 @@ describe("fact-based legal relevance", () => {
       message: "Elon Musk гэж хэн бэ?",
     });
     expect(result.relevance).toBe(LegalRelevance.NON_LEGAL);
+  });
+
+  it("treats lawyer customs and tax questions as LEGAL", async () => {
+    await expect(
+      engine.classify({
+        message: "Гаалийн маргаанд ямар хууль хамаарах вэ?",
+        audience: "LAWYER",
+      }),
+    ).resolves.toMatchObject({ relevance: LegalRelevance.LEGAL });
+    await expect(
+      engine.classify({
+        message: "НӨАТ-ын татварын актыг хэрхэн гомдоллох вэ?",
+        audience: "LAWYER",
+      }),
+    ).resolves.toMatchObject({ relevance: LegalRelevance.LEGAL });
+  });
+
+  it("does the assigned work for a lawyer instead of stopping at POSSIBLY_LEGAL", async () => {
+    const message = "Манай дарга намайг өнөөдөр ажлаас гаргасан";
+    const citizen = await engine.classify({ message, audience: "CITIZEN" });
+    const lawyer = await engine.classify({ message, audience: "LAWYER" });
+    expect(citizen.relevance).not.toBe(LegalRelevance.NON_LEGAL);
+    expect(lawyer.relevance).toBe(LegalRelevance.LEGAL);
+    if (citizen.relevance === LegalRelevance.POSSIBLY_LEGAL) {
+      expect(lawyer.reasons).toContain("lawyer-do-the-work");
+    }
+  });
+
+  it("does a lawyer assignment outside the keyword catalog", async () => {
+    const message =
+      "Энэ даалгаврыг хий: CIF vs FOB эрсдэлийн хуваарилалтыг шинжилж memo бэлтгэ";
+    await expect(
+      engine.classify({ message, audience: "CITIZEN" }),
+    ).resolves.toMatchObject({ relevance: LegalRelevance.NON_LEGAL });
+    const lawyer = await engine.classify({ message, audience: "LAWYER" });
+    expect(lawyer.relevance).toBe(LegalRelevance.LEGAL);
+    expect(lawyer.reasons).toContain("lawyer-all-areas");
+  });
+
+  it("keeps movies and celebrity trivia NON_LEGAL for lawyers", async () => {
+    await expect(
+      engine.classify({
+        message: "Өнөөдөр ямар кино үзэх вэ?",
+        audience: "LAWYER",
+      }),
+    ).resolves.toMatchObject({ relevance: LegalRelevance.NON_LEGAL });
+    await expect(
+      engine.classify({
+        message: "Elon Musk гэж хэн бэ?",
+        audience: "LAWYER",
+      }),
+    ).resolves.toMatchObject({ relevance: LegalRelevance.NON_LEGAL });
   });
 });

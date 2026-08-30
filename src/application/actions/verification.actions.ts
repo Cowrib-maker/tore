@@ -34,6 +34,7 @@ import {
 import {
   CREDENTIAL_REVIEW_RATE_LIMIT,
   CREDENTIAL_SUBMIT_RATE_LIMIT,
+  PROFILE_WRITE_RATE_LIMIT,
 } from "@/infrastructure/security/rate-limiter";
 import { getFileStorage } from "@/infrastructure/storage";
 import { buildAppFilePath } from "@/infrastructure/storage/file-access";
@@ -173,6 +174,44 @@ export async function setLawyerDirectoryListingAction(
     );
 
     revalidatePath("/admin/lawyers");
+    revalidatePath("/lawyer/profile");
+    revalidatePath("/lawyer/dashboard");
+    revalidatePath("/lawyers");
+    revalidatePath(`/lawyers/${updated.slug}`);
+    return { success: true };
+  } catch (error) {
+    return mapActionError(error);
+  }
+}
+
+export async function setOwnLawyerDirectoryListingAction(
+  _prev: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  try {
+    const actor = await requireActor(UserRole.LAWYER);
+    const limited = await enforceRateLimit(
+      `directory:listing:${actor.userId}`,
+      PROFILE_WRITE_RATE_LIMIT,
+    );
+    if (limited) return limited;
+    const parsed = parseWithSchema(setLawyerDirectoryListingSchema, {
+      lawyerProfileId: formData.get("lawyerProfileId") ?? "",
+      isListed: formData.get("isListed") ?? "",
+    });
+    if (!parsed.ok) return parsed.state;
+
+    const ipAddress = await getClientIp();
+    const updated = await setLawyerDirectoryListingUseCase(
+      actor,
+      parsed.data,
+      {
+        lawyerProfileRepository,
+        auditLogRepository,
+      },
+      ipAddress,
+    );
+
     revalidatePath("/lawyer/profile");
     revalidatePath("/lawyer/dashboard");
     revalidatePath("/lawyers");

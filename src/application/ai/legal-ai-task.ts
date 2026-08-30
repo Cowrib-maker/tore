@@ -79,6 +79,7 @@ const TASK_STAGES: Record<LegalAiTaskType, readonly LegalAiReasoningStage[]> = {
     LegalAiReasoningStage.INTENT,
     LegalAiReasoningStage.CASE_CONTEXT,
     LegalAiReasoningStage.DOCUMENT_CONTEXT,
+    LegalAiReasoningStage.LEGAL_RETRIEVAL,
     LegalAiReasoningStage.EVIDENCE_SUPPORT,
     LegalAiReasoningStage.FACT_ELEMENT_MAPPING,
     LegalAiReasoningStage.GAPS_CONTRADICTIONS,
@@ -88,6 +89,7 @@ const TASK_STAGES: Record<LegalAiTaskType, readonly LegalAiReasoningStage[]> = {
   ISSUE_SPOTTING: [
     LegalAiReasoningStage.INTENT,
     LegalAiReasoningStage.CASE_CONTEXT,
+    LegalAiReasoningStage.LEGAL_RETRIEVAL,
     LegalAiReasoningStage.ISSUE_SPOTTING,
     LegalAiReasoningStage.GAPS_CONTRADICTIONS,
     LegalAiReasoningStage.CONCLUSION,
@@ -144,6 +146,7 @@ const TASK_STAGES: Record<LegalAiTaskType, readonly LegalAiReasoningStage[]> = {
     LegalAiReasoningStage.INTENT,
     LegalAiReasoningStage.CASE_CONTEXT,
     LegalAiReasoningStage.DOCUMENT_CONTEXT,
+    LegalAiReasoningStage.LEGAL_RETRIEVAL,
     LegalAiReasoningStage.ISSUE_SPOTTING,
     LegalAiReasoningStage.CONCLUSION,
     LegalAiReasoningStage.CITATIONS,

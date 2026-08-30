@@ -3,6 +3,7 @@
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 
+import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { useLegalAiChatSession } from "@/components/legal-ai/use-legal-ai-chat-session";
 
 export function DashboardLegalAiPanel({
@@ -37,8 +38,8 @@ export function DashboardLegalAiPanel({
       >
         {messages.length === 0 ? (
           <p className="text-[13px] leading-relaxed text-[#5C6570]">
-            Хэргийн талаар асуултаа энд бичээрэй — TORE Legal AI баталгаатай
-            эх сурвалж дээр үндэслэн хариулна.
+            Хэргийн талаар асуултаа энд бичээрэй. TORE Legal AI туслах,
+            цаг хэмнэх зориулалттай — эх сурвалжийг нягтална уу.
           </p>
         ) : (
           messages.map((item, index) =>
@@ -94,6 +95,10 @@ export function DashboardLegalAiPanel({
             <Send className="size-3.5" />
           </button>
         </div>
+        <LegalAiDutyNotice
+          variant={mode === "CITIZEN" ? "citizen" : "lawyer"}
+          className="mt-2 px-1"
+        />
       </form>
     </div>
   );

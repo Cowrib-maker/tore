@@ -21,15 +21,18 @@ export async function setLawyerDirectoryListingUseCase(
   deps: SetLawyerDirectoryListingDeps,
   ipAddress?: string,
 ): Promise<LawyerProfile> {
-  if (actor.role !== UserRole.ADMIN) {
-    throw new ForbiddenError();
-  }
-
   const existing = await deps.lawyerProfileRepository.findById(
     input.lawyerProfileId,
   );
   if (!existing) {
     throw new NotFoundError("LawyerProfile");
+  }
+
+  const isAdmin = actor.role === UserRole.ADMIN;
+  const isOwner =
+    actor.role === UserRole.LAWYER && actor.userId === existing.userId;
+  if (!isAdmin && !isOwner) {
+    throw new ForbiddenError();
   }
 
   if (input.isListed && !isLawyerVerified(existing)) {

@@ -10,6 +10,7 @@ import {
   OPEN_LEGAL_AI_WIDGET_EVENT,
   type OpenLegalAiWidgetDetail,
 } from "@/components/legal-ai/legal-ai-widget-events";
+import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { useLegalAiChatSession } from "@/components/legal-ai/use-legal-ai-chat-session";
 
 const HIDDEN_PATH_PREFIX = "/legal-ai";
@@ -122,7 +123,8 @@ export function FloatingLegalAiWidget() {
             ) : null}
           </div>
 
-          <form onSubmit={handleSubmit} className="border-t border-[#0B1F3A]/8 p-2">
+          <LegalAiDutyNotice variant="citizen" className="border-t border-[#0B1F3A]/8 px-3 py-2" />
+          <form onSubmit={handleSubmit} className="p-2">
             <div className="flex items-center gap-2 rounded-xl border border-[#D9DEE5] bg-[#F8FAFC] px-2 py-1.5">
               <input
                 value={message}

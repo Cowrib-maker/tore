@@ -130,13 +130,52 @@ describe("setLawyerDirectoryListingUseCase", () => {
     }
   });
 
-  it("forbids a lawyer from using the admin listing use-case", async () => {
+  it("rejects an unapproved lawyer listing themselves", async () => {
     await expect(
       setLawyerDirectoryListingUseCase(
         { userId: "u_1", role: UserRole.LAWYER },
         { lawyerProfileId: "lp_1", isListed: true },
         {
-          lawyerProfileRepository: { findById: vi.fn() },
+          lawyerProfileRepository: {
+            findById: vi.fn().mockResolvedValue(
+              profile({ verificationStatus: LawyerVerificationStatus.PENDING }),
+            ),
+          },
+          auditLogRepository: { create: vi.fn() },
+        } as never,
+      ),
+    ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it("lets an approved lawyer list their own profile", async () => {
+    const existing = profile();
+    const updated = profile({ isListed: true });
+    const update = vi.fn().mockResolvedValue(updated);
+    const result = await setLawyerDirectoryListingUseCase(
+      { userId: "u_1", role: UserRole.LAWYER },
+      { lawyerProfileId: "lp_1", isListed: true },
+      {
+        lawyerProfileRepository: {
+          findById: vi.fn().mockResolvedValue(existing),
+          update,
+        },
+        auditLogRepository: { create: vi.fn().mockResolvedValue({}) },
+      } as never,
+    );
+
+    expect(update).toHaveBeenCalledWith("lp_1", { isListed: true });
+    expect(result.isListed).toBe(true);
+  });
+
+  it("forbids a lawyer from listing another lawyer's profile", async () => {
+    await expect(
+      setLawyerDirectoryListingUseCase(
+        { userId: "u_other", role: UserRole.LAWYER },
+        { lawyerProfileId: "lp_1", isListed: true },
+        {
+          lawyerProfileRepository: {
+            findById: vi.fn().mockResolvedValue(profile()),
+          },
           auditLogRepository: { create: vi.fn() },
         } as never,
       ),

@@ -145,6 +145,12 @@ export type PromptBuildInput = {
   issueFamilyHint?: string;
   /** Prior assistant turn — model must not repeat this text. */
   priorAssistantSummary?: string;
+  /** Lawyer asked about non-MN law or foreign professional practice. */
+  foreignLegalScope?: {
+    labels: readonly string[];
+    comparativeWithMn: boolean;
+    includesPractice: boolean;
+  } | null;
 };
 
 /** A retrieved statute excerpt that may be cited. */

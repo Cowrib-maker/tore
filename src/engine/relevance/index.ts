@@ -24,6 +24,10 @@ export type {
 
 export { LegalRelevanceService } from "./legal-relevance.service";
 export {
+  detectForeignLegalScope,
+  type ForeignLegalScope,
+} from "./foreign-legal-scope";
+export {
   buildClarificationMessage,
   clarificationContainsForbiddenJargon,
   isLegalClarificationMessage,

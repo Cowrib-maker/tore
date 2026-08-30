@@ -15,8 +15,8 @@ import { formatLegalAiCaseContextBlock } from "@/application/ai/legal-ai-case-co
 import {
   classifyLegalAiTask,
   stagesForTask,
-  taskRequiresLegalRetrieval,
 } from "@/application/ai/legal-ai-task";
+import { detectForeignLegalScope } from "@/engine/relevance";
 import {
   MISSING_LEGAL_SOURCE_MESSAGE,
   resolveLegalAuthorities,
@@ -141,6 +141,8 @@ export class LegalAiService {
         content: item.content,
       })),
       questionStatus: conversationState.questionStatus,
+      audience:
+        capability === LegalAiCapability.LAWYER ? "LAWYER" : "CITIZEN",
     });
 
     const thread = decideLegalQuestionThreadAction({
@@ -223,7 +225,10 @@ export class LegalAiService {
       );
     }
 
-    if (relevance.relevance === LegalRelevance.POSSIBLY_LEGAL) {
+    if (
+      relevance.relevance === LegalRelevance.POSSIBLY_LEGAL &&
+      capability !== LegalAiCapability.LAWYER
+    ) {
       return afterReply(
         await this.completeClarificationAnswer({
           conversationId: conversation.id,
@@ -297,7 +302,14 @@ export class LegalAiService {
       );
     }
 
-    const turnKind = resolveTurnKind(pipelineDomain, intent);
+    const foreignLegalScope =
+      capability === LegalAiCapability.LAWYER
+        ? detectForeignLegalScope(message)
+        : null;
+    const turnKind =
+      foreignLegalScope || capability === LegalAiCapability.LAWYER
+        ? PromptTurnKind.LEGAL
+        : resolveTurnKind(pipelineDomain, intent);
 
     const documents =
       capability === LegalAiCapability.LAWYER && input.userId
@@ -349,8 +361,7 @@ export class LegalAiService {
       hasDocument: hasDocumentText,
     });
     const requireRetrieval =
-      capability === LegalAiCapability.CITIZEN ||
-      taskRequiresLegalRetrieval(taskType);
+      !foreignLegalScope || foreignLegalScope.comparativeWithMn;
 
     const authorities = await resolveLegalAuthorities({
       question: message,
@@ -374,9 +385,11 @@ export class LegalAiService {
     const verifiedAuthorities =
       authorities.kind === "verified" ? authorities.authorities : undefined;
     const missingLegalSourceMessage =
-      authorities.kind === "empty" && authorities.retrievalInvoked
-        ? MISSING_LEGAL_SOURCE_MESSAGE
-        : undefined;
+      foreignLegalScope && !foreignLegalScope.comparativeWithMn
+        ? undefined
+        : authorities.kind === "empty" && authorities.retrievalInvoked
+          ? MISSING_LEGAL_SOURCE_MESSAGE
+          : undefined;
 
     const reasoningPlan = this.prepareReasoningPlan(message, intent);
 
@@ -398,6 +411,7 @@ export class LegalAiService {
       verifiedAuthorities,
       caseContextBlock,
       documentContextBlock,
+      foreignLegalScope,
     });
 
     const completion = await this.dependencies.completion.complete({

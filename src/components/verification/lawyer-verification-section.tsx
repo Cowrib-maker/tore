@@ -1,3 +1,4 @@
+import { LawyerListingActions } from "@/components/verification/lawyer-listing-actions";
 import { SubmitCredentialForm } from "@/components/verification/submit-credential-form";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -93,9 +94,15 @@ export function LawyerVerificationSection({
               : "—"}
           </p>
           <p>
-            {copy.listingLabel}{" "}
-            {profile.isListed ? copy.yes : copy.no} · {copy.listingAdminOnly}
+            {copy.listingLabel} {profile.isListed ? copy.yes : copy.no}
           </p>
+          <p>{copy.listingAdminOnly}</p>
+          <LawyerListingActions
+            lawyerProfileId={profile.id}
+            isListed={profile.isListed}
+            canList={status === LawyerVerificationStatus.APPROVED}
+            copy={copy}
+          />
         </CardContent>
       </Card>
 

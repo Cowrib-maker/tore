@@ -56,6 +56,8 @@ export type LegalRelevanceInput = {
   conversationContext?: readonly LegalRelevanceConversationMessage[];
   /** When the thread is mid-clarification, follow-ups stay in the legal pipeline. */
   questionStatus?: LegalQuestionStatus;
+  /** Lawyer questions in any practice area should not be refused as off-topic. */
+  audience?: "CITIZEN" | "LAWYER";
 };
 
 export type LegalRelevanceResult = {

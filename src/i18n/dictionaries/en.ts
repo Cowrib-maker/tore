@@ -129,7 +129,7 @@ export const en: Dictionary = {
     workspaceSupport:
       "Manage research, cases, contracts, documents, notes, and client work from one workspace. TORE Legal AI eases repetitive, time-heavy tasks so lawyers spend more time on judgment, strategy, and clients.",
     workspaceDirection:
-      "Live today: profile, credential review, offerings, availability, and bookings. AI research, contract workspace, and case files are on the product roadmap.",
+      "Live today: accounts, lawyer directory, consultation bookings, TORE Chat, and TORE Legal AI. A full enterprise contract workspace is still expanding.",
     workspaceModules: [
       "Case file",
       "Documents",
@@ -188,11 +188,11 @@ export const en: Dictionary = {
     ],
     faqEyebrow: "Resources",
     faqTitle: "What TORE is — and is not",
-    faqSupport: "TORE is a legal operating system. Some layers are live today. Others are shown as product direction.",
+    faqSupport: "TORE is a legal operating system. We distinguish what you can use today from what is still expanding.",
     faqs: [
       { q: "What is TORE?", a: "TORE is the Legal Operating System for modern legal work. It connects citizens, businesses, lawyers, and foreign citizens with legal AI, structured legal knowledge, verified professionals, documents, and enterprise workflows." },
       { q: "Does TORE AI replace lawyers?", a: "No. TORE AI is a legal work assistant and legal information / workflow tool. When the matter requires professional judgment, TORE connects you with a verified lawyer." },
-      { q: "What can I use today?", a: "You can create an account, complete lawyer credential review, publish consultation offerings, browse verified listings, and request bookings. Legal AI, the knowledge engine, and enterprise contract workspaces are on the product roadmap." },
+      { q: "What can I use today?", a: "You can create an account, sign in, find verified lawyers, and request consultations. Lawyers can complete credential review, publish offerings, and list themselves in the directory. Citizens can use TORE Chat; lawyers can use TORE Legal AI. A full enterprise contract workspace is still expanding." },
       { q: "Which languages does TORE support?", a: "The interface is available in Mongolian, English, Chinese, and Korean. Your preferred language is stored on your account." },
     ],
     footerTagline:
@@ -427,25 +427,29 @@ export const en: Dictionary = {
     termsTitle: "Terms of Service",
     privacyTitle: "Privacy Policy",
     placeholderBanner:
-      "Draft placeholder — not finalized legal counsel. These pages will be replaced with reviewed counsel-approved text before general availability.",
+      "Effective 31 August 2026. TORE is not a law firm and does not provide professional legal advice.",
     termsIntro:
-      "TORE operates an online marketplace that connects clients with independent lawyers for consultation booking. TORE is not a law firm and does not provide legal advice.",
+      "TORE operates an online marketplace that connects clients with independent lawyers for consultation booking, and provides TORE Chat and TORE Legal AI as legal-information assistants. TORE is not a law firm and does not provide lawyer representation or professional legal advice.",
     termsScope:
       "By creating an account you agree to use the platform lawfully, provide accurate registration information, and respect booking, payment, and verification rules published in the product.",
     termsAccounts:
-      "You are responsible for safeguarding your credentials. Account roles (client, lawyer, admin) govern which features you may use. Credential-document access and marketplace listing remain subject to verification status.",
+      "You are responsible for safeguarding your credentials. Account roles (client, lawyer, admin) govern which features you may use. Credential-document access and marketplace listing remain subject to verification status. Approved lawyers may list or unlist their own public profiles.",
     termsMarketplace:
-      "Bookings, fees, cancellations, and disputes follow the platform policies in effect at the time of the booking. Lawyers remain responsible for their own professional licenses and client engagements.",
+      "Bookings, fees, cancellations, and disputes follow the platform policies in effect at the time of the booking. Lawyers remain responsible for their own professional licenses and client engagements. TORE may process payments according to published platform rules.",
+    termsLegalAi:
+      "TORE Chat and TORE Legal AI are legal-information and drafting assistants. Output is not professional legal advice. Citations must come from verified official sources (legalinfo.mn, shuukh.mn, parliament.mn). If no verified source is found, the system must not invent provisions, article numbers, or court cases. Uploaded files are user data, not official law. Paid question entitlements and prices are shown in the product.",
     termsContact:
-      "Questions about these draft terms: support@tore.mn.",
+      "Questions about these terms: support@tore.mn.",
     privacyIntro:
-      "This draft privacy notice describes how TORE may process account, booking, verification, and communications data when you use the service.",
+      "This privacy notice describes how TORE may process account, booking, verification, communications, and Legal AI data when you use the service.",
     privacyData:
-      "We may process identity and contact details, profile information, verification documents you upload, booking metadata, and technical logs needed to secure and operate the marketplace.",
+      "We may process identity and contact details, profile information, verification documents you upload, booking metadata, Legal AI conversation and attached-file text, and technical logs needed to secure and operate the marketplace.",
     privacyUse:
-      "Data is used to operate accounts, verify lawyers, facilitate bookings and notifications, prevent abuse, and comply with applicable law. Sensitive verification files are not published publicly.",
+      "Data is used to operate accounts, verify lawyers, facilitate bookings and notifications, generate Legal AI replies, prevent abuse, and comply with applicable law. Sensitive verification files are not published publicly.",
     privacyRetention:
       "We retain data only as long as needed for the purposes above or as required by law, then delete or anonymize it according to operational controls.",
+    privacyAi:
+      "Questions, attached document text, and replies sent to Legal AI are processed to provide the service. They are not published in the public directory. Transfers to model providers are subject to confidentiality controls.",
     privacyContact:
       "Privacy questions: support@tore.mn.",
     termsLink: "Terms of Service",

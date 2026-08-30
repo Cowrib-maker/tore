@@ -14,7 +14,7 @@ import { getLocale } from "@/i18n/get-locale";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "TORE marketplace terms of service (draft placeholder).",
+  description: "TORE marketplace and Legal AI terms of service.",
 };
 
 export default async function TermsOfServicePage() {
@@ -33,6 +33,7 @@ export default async function TermsOfServicePage() {
           <p>{copy.termsScope}</p>
           <p>{copy.termsAccounts}</p>
           <p>{copy.termsMarketplace}</p>
+          <p>{copy.termsLegalAi}</p>
           <p>{copy.termsContact}</p>
           <p className="pt-2">
             <Link
