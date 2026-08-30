@@ -44,14 +44,14 @@ export default async function LegalAiPage({
       : null;
 
   let initialMessages: { role: "USER" | "ASSISTANT"; content: string }[] = [];
-  let initialAttachedDocument: {
+  let initialAttachedDocuments: {
     id: string;
     fileName: string;
     mimeType: string;
     sizeBytes: number;
-    extractStatus: "OK" | "EMPTY" | "FAILED";
+    extractStatus: "OK" | "EMPTY" | "FAILED" | "NEEDS_OCR";
     pageCount: number | null;
-  } | null = null;
+  }[] = [];
   let ownedConversationId: string | undefined;
   if (conversationId && session?.user?.id) {
     try {
@@ -65,8 +65,8 @@ export default async function LegalAiPage({
           role: item.role as "USER" | "ASSISTANT",
           content: item.content,
         }));
-      initialAttachedDocument =
-        await getLegalAiService().getConversationDocumentMeta(
+      initialAttachedDocuments =
+        await getLegalAiService().getConversationDocumentMetas(
           session.user.id,
           conversationId,
         );
@@ -103,7 +103,7 @@ export default async function LegalAiPage({
           initialConversationId={workbench.conversationId}
           initialCaseFileId={workbench.caseFileId}
           initialMessages={initialMessages}
-          initialAttachedDocument={initialAttachedDocument}
+          initialAttachedDocuments={initialAttachedDocuments}
           caseContext={workbench.caseContext}
           history={workbench.history}
         />
@@ -116,7 +116,7 @@ export default async function LegalAiPage({
       initialQuestion={initialQuestion}
       initialConversationId={ownedConversationId}
       initialMessages={initialMessages}
-      initialAttachedDocument={initialAttachedDocument}
+      initialAttachedDocuments={initialAttachedDocuments}
       documentUploadEnabled={session?.user?.role === UserRole.LAWYER}
       dashboardHref={dashboardHref}
       displayName={session?.user?.name?.trim() || session?.user?.email}

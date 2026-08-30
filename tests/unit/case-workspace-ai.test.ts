@@ -179,16 +179,13 @@ function createAiStore(): LegalAiStore & {
     async createCitations() {
       return [];
     },
-    async findOwnedDocumentExtract() {
-      return null;
+    async listOwnedDocumentExtracts() {
+      return [];
     },
-    async findOwnedDocumentMeta() {
-      return null;
+    async listOwnedDocumentMetas() {
+      return [];
     },
     async findDocumentByStorageKey() {
-      return null;
-    },
-    async findDocumentIdByConversationId() {
       return null;
     },
     async createConversationDocument() {

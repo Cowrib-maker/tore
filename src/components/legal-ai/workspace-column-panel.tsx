@@ -10,28 +10,25 @@ import {
 } from "react";
 import { Paperclip, Send } from "lucide-react";
 
-import { LEGAL_AI_DOCUMENT_MAX_BYTES } from "@/application/ai/legal-ai-document.constants";
+import { LEGAL_AI_DOCUMENT_FILE_ACCEPT } from "@/application/ai/legal-ai-document.constants";
+import {
+  clientRejectLegalAiDocument,
+  legalAiExtractStatusHint,
+} from "@/application/ai/legal-ai-document-file";
 import { useLegalAiChatSession } from "@/components/legal-ai/use-legal-ai-chat-session";
 import { cn } from "@/lib/utils";
 
 type AttachedDocument = {
   id: string;
   fileName: string;
-  extractStatus: "OK" | "EMPTY" | "FAILED";
+  extractStatus: "OK" | "EMPTY" | "FAILED" | "NEEDS_OCR";
   pageCount: number | null;
 };
 
-function isNativePdfFile(file: File): boolean {
-  const name = file.name.toLowerCase();
-  const type = file.type.toLowerCase();
-  return type === "application/pdf" || name.endsWith(".pdf");
-}
-
 /**
- * One column of the lawyer workspace: a compact PDF drop zone (drag & drop
+ * One column of the lawyer workspace: a compact document drop zone (drag & drop
  * or browse) feeding straight into a TORE Legal AI conversation scoped to
- * this column. Each column keeps its own conversation, so up to one PDF per
- * column can be attached and analyzed independently.
+ * this column.
  */
 export function WorkspaceColumnPanel({
   title,
@@ -51,8 +48,9 @@ export function WorkspaceColumnPanel({
   } = useLegalAiChatSession();
 
   const [message, setMessage] = useState("");
-  const [attachedDocument, setAttachedDocument] =
-    useState<AttachedDocument | null>(null);
+  const [attachedDocuments, setAttachedDocuments] = useState<AttachedDocument[]>(
+    [],
+  );
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -68,18 +66,9 @@ export function WorkspaceColumnPanel({
   }, [messages, loading]);
 
   async function uploadFile(file: File) {
-    if (attachedDocument) {
-      setUploadError("Энэ баганад аль хэдийн 1 файл хавсаргасан байна.");
-      return;
-    }
-    if (!isNativePdfFile(file)) {
-      setUploadError(
-        "Одоогоор зөвхөн жинхэнэ (скан хийгээгүй) PDF файлыг шинжилнэ.",
-      );
-      return;
-    }
-    if (file.size > LEGAL_AI_DOCUMENT_MAX_BYTES) {
-      setUploadError("Файл 10MB-аас ихгүй байх ёстой.");
+    const rejected = clientRejectLegalAiDocument(file);
+    if (rejected) {
+      setUploadError(rejected);
       return;
     }
 
@@ -112,13 +101,18 @@ export function WorkspaceColumnPanel({
         throw new Error("Файл хавсаргахад алдаа гарлаа.");
       }
 
+      const documentId = data.id;
+      const documentFileName = data.fileName;
       setConversationId(data.conversationId);
-      setAttachedDocument({
-        id: data.id,
-        fileName: data.fileName,
-        extractStatus: data.extractStatus ?? "OK",
-        pageCount: data.pageCount ?? null,
-      });
+      setAttachedDocuments((current) => [
+        ...current,
+        {
+          id: documentId,
+          fileName: documentFileName,
+          extractStatus: data.extractStatus ?? "OK",
+          pageCount: data.pageCount ?? null,
+        },
+      ]);
     } catch (err) {
       setUploadError(
         err instanceof Error ? err.message : "Файл хавсаргахад алдаа гарлаа.",
@@ -162,46 +156,55 @@ export function WorkspaceColumnPanel({
       </div>
 
       <div className="border-b p-2.5">
-        {attachedDocument ? (
-          <div className="flex items-center gap-2 rounded-lg border border-[#0B1F3A]/10 bg-[#F8FAFC] px-2.5 py-2 text-xs">
-            <Paperclip className="size-3.5 shrink-0 text-[#5C6570]" />
-            <span className="min-w-0 flex-1 truncate font-medium text-[#0A0F14]">
-              {attachedDocument.fileName}
-            </span>
-            {attachedDocument.extractStatus !== "OK" ? (
-              <span className="shrink-0 text-[10px] text-amber-700">
-                текст уншигдаагүй
-              </span>
-            ) : null}
+        {attachedDocuments.length ? (
+          <div className="mb-2 space-y-1.5">
+            {attachedDocuments.map((document) => {
+              const hint = legalAiExtractStatusHint(document.extractStatus);
+              return (
+                <div
+                  key={document.id}
+                  className="flex items-center gap-2 rounded-lg border border-[#0B1F3A]/10 bg-[#F8FAFC] px-2.5 py-2 text-xs"
+                >
+                  <Paperclip className="size-3.5 shrink-0 text-[#5C6570]" />
+                  <span className="min-w-0 flex-1 truncate font-medium text-[#0A0F14]">
+                    {document.fileName}
+                  </span>
+                  {hint ? (
+                    <span className="shrink-0 text-[10px] text-amber-700">
+                      {hint}
+                    </span>
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
-        ) : (
-          <div
-            onDragOver={(e) => {
-              e.preventDefault();
-              setDragOver(true);
-            }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={handleDrop}
-            onClick={() => inputRef.current?.click()}
-            className={cn(
-              "flex cursor-pointer flex-col items-center gap-1 rounded-lg border border-dashed px-3 py-4 text-center transition-colors",
-              dragOver ? "border-primary bg-primary/5" : "border-input",
-              uploading && "opacity-60",
-            )}
-          >
-            <Paperclip className="size-4 text-muted-foreground" />
-            <span className="text-[11px] font-medium text-[#0A0F14]">
-              {uploading ? "Байршуулж байна…" : "PDF чирж оруулах эсвэл сонгох"}
-            </span>
-            <span className="text-[10px] text-muted-foreground">
-              Зөвхөн жинхэнэ PDF, 10MB хүртэл
-            </span>
-          </div>
-        )}
+        ) : null}
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+          onClick={() => inputRef.current?.click()}
+          className={cn(
+            "flex cursor-pointer flex-col items-center gap-1 rounded-lg border border-dashed px-3 py-4 text-center transition-colors",
+            dragOver ? "border-primary bg-primary/5" : "border-input",
+            uploading && "opacity-60",
+          )}
+        >
+          <Paperclip className="size-4 text-muted-foreground" />
+          <span className="text-[11px] font-medium text-[#0A0F14]">
+            {uploading ? "Байршуулж байна…" : "Файл чирж оруулах эсвэл сонгох"}
+          </span>
+          <span className="text-[10px] text-muted-foreground">
+            PDF, DOCX, JPG, PNG, WEBP · 10MB хүртэл
+          </span>
+        </div>
         <input
           ref={inputRef}
           type="file"
-          accept="application/pdf,.pdf"
+          accept={LEGAL_AI_DOCUMENT_FILE_ACCEPT}
           className="sr-only"
           onChange={handleInputChange}
         />
@@ -216,7 +219,7 @@ export function WorkspaceColumnPanel({
       >
         {messages.length === 0 ? (
           <p className="text-[12.5px] leading-relaxed text-[#5C6570]">
-            Хэргийн талаар асуултаа энд бичээрэй — хавсаргасан PDF байвал
+            Хэргийн талаар асуултаа энд бичээрэй — хавсаргасан баримт байвал
             TORE Legal AI түүн дээр үндэслэн хариулна.
           </p>
         ) : (

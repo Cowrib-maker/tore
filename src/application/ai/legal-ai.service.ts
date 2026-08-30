@@ -1,4 +1,5 @@
 import { MAX_DOCUMENT_EXTRACT_CHARS } from "@/application/ai/legal-ai-document.constants";
+import { wrapUntrustedDocumentAttachments } from "@/application/ai/untrusted-document-text";
 import {
   nullIfBlank,
   type LegalAiSafeCitation,
@@ -298,13 +299,20 @@ export class LegalAiService {
 
     const turnKind = resolveTurnKind(pipelineDomain, intent);
 
-    const document =
+    const documents =
       capability === LegalAiCapability.LAWYER && input.userId
-        ? await this.dependencies.store.findOwnedDocumentExtract(
+        ? await this.dependencies.store.listOwnedDocumentExtracts(
             conversation.id,
             input.userId,
           )
-        : null;
+        : [];
+    const documentContextBlock = wrapUntrustedDocumentAttachments(
+      documents,
+      MAX_DOCUMENT_EXTRACT_CHARS,
+    );
+    const hasDocumentText = documents.some(
+      (item) => item.extractStatus === "OK" && item.extractedText,
+    );
 
     const ownedCaseFileId =
       capability === LegalAiCapability.LAWYER
@@ -333,12 +341,12 @@ export class LegalAiService {
       capability,
       intent: intent.intent,
       hasCaseContext: Boolean(caseContextBlock),
-      hasDocument: Boolean(document?.extractedText),
+      hasDocument: hasDocumentText,
       message,
     });
     const reasoningStages = stagesForTask(capability, taskType, {
       hasCaseContext: Boolean(caseContextBlock),
-      hasDocument: Boolean(document?.extractedText),
+      hasDocument: hasDocumentText,
     });
     const requireRetrieval =
       capability === LegalAiCapability.CITIZEN ||
@@ -389,11 +397,7 @@ export class LegalAiService {
       corpusAvailable: Boolean(verifiedAuthorities?.length),
       verifiedAuthorities,
       caseContextBlock,
-      documentExtract: document?.extractedText.slice(
-        0,
-        MAX_DOCUMENT_EXTRACT_CHARS,
-      ),
-      documentFileName: document?.fileName,
+      documentContextBlock,
     });
 
     const completion = await this.dependencies.completion.complete({
@@ -477,10 +481,10 @@ export class LegalAiService {
     return this.dependencies.store.listMessages(conversationId, HISTORY_LIMIT);
   }
 
-  async getConversationDocumentMeta(
+  async getConversationDocumentMetas(
     userId: string,
     conversationId: string,
-  ): Promise<LegalAiConversationDocumentMeta | null> {
+  ): Promise<LegalAiConversationDocumentMeta[]> {
     const conversation = await this.dependencies.store.findOwnedConversation(
       conversationId,
       userId,
@@ -488,7 +492,7 @@ export class LegalAiService {
     if (!conversation) {
       throw new LegalAiError("Яриа олдсонгүй.", 404);
     }
-    return this.dependencies.store.findOwnedDocumentMeta(
+    return this.dependencies.store.listOwnedDocumentMetas(
       conversationId,
       userId,
     );
@@ -508,13 +512,13 @@ export class LegalAiService {
     const userType = this.dependencies.userTypeService.resolve(
       input.userContext,
     );
-    const document =
+    const documents =
       input.capability === LegalAiCapability.LAWYER && input.userId
-        ? await this.dependencies.store.findOwnedDocumentExtract(
+        ? await this.dependencies.store.listOwnedDocumentExtracts(
             input.conversationId,
             input.userId,
           )
-        : null;
+        : [];
     const prompt = this.dependencies.promptBuilder.build({
       message: input.message,
       userType,
@@ -522,11 +526,10 @@ export class LegalAiService {
       turnKind: PromptTurnKind.GENERAL,
       capability: input.capability,
       corpusAvailable: false,
-      documentExtract: document?.extractedText.slice(
-        0,
+      documentContextBlock: wrapUntrustedDocumentAttachments(
+        documents,
         MAX_DOCUMENT_EXTRACT_CHARS,
       ),
-      documentFileName: document?.fileName,
     });
     const completion = await this.dependencies.completion.complete({
       systemPrompt: prompt.systemPrompt,

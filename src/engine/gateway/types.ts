@@ -134,9 +134,11 @@ export type PromptBuildInput = {
   reasoningStages?: readonly string[];
   /** Structured owned CaseFile data block (already wrapped). */
   caseContextBlock?: string;
-  /** Native-text extract from the conversation's attached PDF, if any. */
+  /** Native-text extract from attached files, if any. */
   documentExtract?: string;
   documentFileName?: string;
+  /** Already-wrapped untrusted document blocks (preferred over documentExtract). */
+  documentContextBlock?: string;
   /** Citizen intake: short clarifying questions instead of a full legal brief. */
   intakeClarification?: boolean;
   /** Internal hint for phrasing a clarification (not shown verbatim to users). */

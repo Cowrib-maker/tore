@@ -35,7 +35,11 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { LEGAL_AI_DOCUMENT_MAX_BYTES } from "@/application/ai/legal-ai-document.constants";
+import { LEGAL_AI_DOCUMENT_FILE_ACCEPT } from "@/application/ai/legal-ai-document.constants";
+import {
+  clientRejectLegalAiDocument,
+  legalAiExtractStatusHint,
+} from "@/application/ai/legal-ai-document-file";
 import {
   parseSafeCitationsFromUnknown,
   type LegalAiSafeCitation,
@@ -64,7 +68,7 @@ type AttachedDocument = {
   fileName: string;
   mimeType: string;
   sizeBytes: number;
-  extractStatus: "OK" | "EMPTY" | "FAILED";
+  extractStatus: "OK" | "EMPTY" | "FAILED" | "NEEDS_OCR";
   pageCount: number | null;
 };
 
@@ -72,7 +76,7 @@ type LegalAiChatProps = {
   initialQuestion?: string;
   initialConversationId?: string;
   initialMessages?: Message[];
-  initialAttachedDocument?: AttachedDocument | null;
+  initialAttachedDocuments?: AttachedDocument[];
   documentUploadEnabled?: boolean;
   dashboardHref: string | null;
   displayName?: string | null;
@@ -118,7 +122,7 @@ export function LegalAiChat({
   initialQuestion = "",
   initialConversationId,
   initialMessages = [],
-  initialAttachedDocument = null,
+  initialAttachedDocuments = [],
   documentUploadEnabled = false,
   dashboardHref,
   displayName,
@@ -134,8 +138,8 @@ export function LegalAiChat({
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
-  const [attachedDocument, setAttachedDocument] = useState<AttachedDocument | null>(
-    initialAttachedDocument,
+  const [attachedDocuments, setAttachedDocuments] = useState<AttachedDocument[]>(
+    initialAttachedDocuments,
   );
   const [listening, setListening] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -180,29 +184,17 @@ export function LegalAiChat({
     setConversationId(undefined);
     setError("");
     setAccessGate(null);
-    setAttachedDocument(null);
+    setAttachedDocuments([]);
     setMessage("");
     setListening(false);
     setMobileNavOpen(false);
   }, []);
 
-  function handleUnsupportedImage() {
-    setError(
-      "Зураг болон OCR одоогоор дэмжигдэхгүй. Native-text PDF хавсаргана уу.",
-    );
-    toast.message("Зураг одоогоор дэмжигдэхгүй.");
-  }
-
-  async function startCitizenCheckout(): Promise<{
-    view: {
-      qrImage: string | null;
-      shortUrl: string | null;
-      amountMnt: number;
-      planCode: string;
-    } | null;
-    error?: string;
-  }> {
-    return requestCitizenCheckout({ enabled: Boolean(dashboardHref) });
+  function openDocumentPicker() {
+    if (!documentUploadEnabled || uploading) {
+      return;
+    }
+    documentInputRef.current?.click();
   }
 
   async function handleDocumentChange(event: ChangeEvent<HTMLInputElement>) {
@@ -211,26 +203,17 @@ export function LegalAiChat({
     if (!file) {
       return;
     }
-    await uploadPdf(file);
+    await uploadDocument(file);
   }
 
-  async function uploadPdf(file: File) {
+  async function uploadDocument(file: File) {
     if (!documentUploadEnabled) {
-      setError("PDF хавсаргах нь хуульчийн эрхтэй хэрэглэгчид зориулагдсан.");
+      setError("Файл хавсаргах нь хуульчийн эрхтэй хэрэглэгчид зориулагдсан.");
       return;
     }
-    if (attachedDocument) {
-      setError("Энэ ярианд аль хэдийн нэг PDF хавсаргасан байна.");
-      return;
-    }
-    if (!isNativePdfFile(file)) {
-      setError(
-        "Одоогоор зөвхөн PDF файлыг шинжилнэ. DOCX, DOC, зураг, скан хийсэн PDF-ийг дэмжихгүй.",
-      );
-      return;
-    }
-    if (file.size > LEGAL_AI_DOCUMENT_MAX_BYTES) {
-      setError("Файл 10MB-аас ихгүй байх ёстой.");
+    const rejected = clientRejectLegalAiDocument(file);
+    if (rejected) {
+      setError(rejected);
       return;
     }
 
@@ -277,15 +260,20 @@ export function LegalAiChat({
         throw new Error("Баримт хавсаргахад алдаа гарлаа.");
       }
 
+      const documentId = data.id;
+      const documentFileName = data.fileName;
       setConversationId(data.conversationId);
-      setAttachedDocument({
-        id: data.id,
-        fileName: data.fileName,
-        mimeType: data.mimeType ?? "application/pdf",
-        sizeBytes: data.sizeBytes ?? file.size,
-        extractStatus: data.extractStatus ?? "OK",
-        pageCount: data.pageCount ?? null,
-      });
+      setAttachedDocuments((current) => [
+        ...current,
+        {
+          id: documentId,
+          fileName: documentFileName,
+          mimeType: data.mimeType ?? "application/octet-stream",
+          sizeBytes: data.sizeBytes ?? file.size,
+          extractStatus: data.extractStatus ?? "OK",
+          pageCount: data.pageCount ?? null,
+        },
+      ]);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Баримт хавсаргахад алдаа гарлаа.",
@@ -293,6 +281,18 @@ export function LegalAiChat({
     } finally {
       setUploading(false);
     }
+  }
+
+  async function startCitizenCheckout(): Promise<{
+    view: {
+      qrImage: string | null;
+      shortUrl: string | null;
+      amountMnt: number;
+      planCode: string;
+    } | null;
+    error?: string;
+  }> {
+    return requestCitizenCheckout({ enabled: Boolean(dashboardHref) });
   }
 
   function toggleMicrophone() {
@@ -441,19 +441,31 @@ export function LegalAiChat({
       )}
     >
       <div className={cn(isEmpty ? "w-full" : "mx-auto w-full max-w-3xl")}>
-        {attachedDocument || uploading ? (
+        {attachedDocuments.length || uploading ? (
           <ul className="mb-2 flex flex-wrap gap-2">
-            {attachedDocument ? (
+            {attachedDocuments.map((document) => {
+              const hint = legalAiExtractStatusHint(document.extractStatus);
+              return (
+                <li
+                  key={document.id}
+                  className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-[#F8FAFC] py-1 pr-2.5 pl-2.5 text-xs text-[#3F4852]"
+                >
+                  <Paperclip className="size-3.5 shrink-0" />
+                  <span className="truncate">{document.fileName}</span>
+                  {hint ? (
+                    <span className="shrink-0 text-[10px] text-amber-700">
+                      {hint}
+                    </span>
+                  ) : null}
+                </li>
+              );
+            })}
+            {uploading ? (
               <li className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-[#F8FAFC] py-1 pr-2.5 pl-2.5 text-xs text-[#3F4852]">
                 <Paperclip className="size-3.5 shrink-0" />
-                <span className="truncate">{attachedDocument.fileName}</span>
+                <span>Файл хавсаргаж байна...</span>
               </li>
-            ) : (
-              <li className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-[#F8FAFC] py-1 pr-2.5 pl-2.5 text-xs text-[#3F4852]">
-                <Paperclip className="size-3.5 shrink-0" />
-                <span>PDF хавсаргаж байна...</span>
-              </li>
-            )}
+            ) : null}
           </ul>
         ) : null}
 
@@ -477,24 +489,20 @@ export function LegalAiChat({
               <input
                 ref={documentInputRef}
                 type="file"
-                accept="application/pdf,.pdf"
+                accept={LEGAL_AI_DOCUMENT_FILE_ACCEPT}
                 className="sr-only"
                 onChange={handleDocumentChange}
               />
               <ComposerIconButton
                 label="Зураг хавсаргах"
-                onClick={handleUnsupportedImage}
+                onClick={openDocumentPicker}
               >
                 <ImagePlus className="size-4" />
               </ComposerIconButton>
               {documentUploadEnabled ? (
               <ComposerIconButton
-                label="PDF хавсаргах"
-                onClick={() => {
-                  if (!uploading && !attachedDocument) {
-                    documentInputRef.current?.click();
-                  }
-                }}
+                label="Баримт хавсаргах"
+                onClick={openDocumentPicker}
               >
                 <Paperclip className="size-4" />
               </ComposerIconButton>
@@ -857,18 +865,6 @@ type SpeechRecognitionLike = {
 };
 
 type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
-
-function isNativePdfFile(file: File): boolean {
-  const name = file.name.toLowerCase();
-  const type = file.type.toLowerCase();
-  if (name.endsWith(".doc") || name.endsWith(".docx")) {
-    return false;
-  }
-  if (type.startsWith("image/")) {
-    return false;
-  }
-  return type === "application/pdf" || name.endsWith(".pdf");
-}
 
 function getSpeechRecognitionCtor(): SpeechRecognitionCtor | undefined {
   if (typeof window === "undefined") {

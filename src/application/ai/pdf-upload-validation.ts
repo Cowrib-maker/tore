@@ -19,8 +19,9 @@ export function hasPdfMagicBytes(body: Uint8Array): boolean {
 }
 
 /**
- * Server-side PDF gate. Client MIME is never sufficient on its own.
- * Does not parse or execute PDF content.
+ * Server-side PDF gate for Case Review. Client MIME is never sufficient on its own.
+ * Does not parse or execute PDF content. Legal AI attachments use
+ * assertValidLegalAiDocumentUpload instead.
  */
 export function assertValidPdfUpload(input: PdfUploadBytes): void {
   if (!input.body.byteLength) {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { LegalAiError } from "@/application/ai/legal-ai.errors";
+import { LEGAL_AI_UNSUPPORTED_FORMAT_MESSAGE } from "@/application/ai/legal-ai-document.constants";
 import {
   guardLawyerAiHttp,
   recordLawyerFeatureUsage,
@@ -8,11 +9,11 @@ import {
 import { rateLimitHttpResponse } from "@/application/common/rate-limit-http";
 import { requireActor } from "@/application/common/require-actor";
 import { assertEmailVerified } from "@/application/common/require-verified-email";
-import { attachConversationPdfUseCase } from "@/application/use-cases/ai/attach-conversation-pdf";
+import { attachConversationDocumentUseCase } from "@/application/use-cases/ai/attach-conversation-document";
 import { EntitlementFeature, UserRole } from "@/domain/enums";
 import { DomainError } from "@/domain/errors/domain-error";
+import { getLegalAiDocumentExtractor } from "@/infrastructure/ai/document-text-extractor";
 import { PrismaLegalAiStore } from "@/infrastructure/ai/prisma-legal-ai-store";
-import { getPdfTextExtractor } from "@/infrastructure/ai/pdf-text-extractor";
 import {
   consumeRateLimit,
   LEGAL_AI_DOCUMENT_RATE_LIMIT,
@@ -51,24 +52,24 @@ export async function POST(request: Request) {
 
     if (!(file instanceof File) || file.size === 0) {
       return NextResponse.json(
-        { error: "PDF файл шаардлагатай.", code: "VALIDATION_ERROR" },
+        { error: LEGAL_AI_UNSUPPORTED_FORMAT_MESSAGE, code: "VALIDATION_ERROR" },
         { status: 400 },
       );
     }
 
     const body = new Uint8Array(await file.arrayBuffer());
-    const result = await attachConversationPdfUseCase(
+    const result = await attachConversationDocumentUseCase(
       {
         userId: actor.userId,
         conversationId,
-        fileName: file.name || "document.pdf",
+        fileName: file.name || "document",
         contentType: file.type,
         body,
       },
       {
         store,
         fileStorage: getFileStorage(),
-        extractor: getPdfTextExtractor(),
+        extractor: getLegalAiDocumentExtractor(),
       },
     );
 

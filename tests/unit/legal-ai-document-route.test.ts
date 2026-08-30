@@ -21,11 +21,11 @@ describe("legal AI document upload route contracts", () => {
     expect(route).toContain("EntitlementFeature.DOCUMENT_ANALYSIS");
     expect(route).toContain("recordLawyerFeatureUsage");
     expect(route).toContain("legalAiDocumentRateLimitKey");
-    expect(route).toContain("attachConversationPdfUseCase");
+    expect(route).toContain("attachConversationDocumentUseCase");
   });
 
   it("increments DOCUMENT_ANALYSIS only after a successful attachment", () => {
-    const attachCall = route.indexOf("await attachConversationPdfUseCase");
+    const attachCall = route.indexOf("await attachConversationDocumentUseCase");
     const usageCall = route.indexOf("await recordLawyerFeatureUsage");
     expect(attachCall).toBeGreaterThan(0);
     expect(usageCall).toBeGreaterThan(attachCall);
@@ -51,5 +51,12 @@ describe("legal AI document upload route contracts", () => {
   it("marks legal-ai-document keys as sensitive authenticated downloads", () => {
     expect(isSensitiveStorageKey("legal-ai-document/u1/uuid-a.pdf")).toBe(true);
     expect(isSensitiveStorageKey("profile-photo/u1/a.jpg")).toBe(false);
+  });
+
+  it("does not accept client-supplied storage keys or file URLs", () => {
+    expect(route).toContain('formData.get("file")');
+    expect(route).toContain('formData.get("conversationId")');
+    expect(route).not.toMatch(/formData\.get\(["']storageKey["']\)/);
+    expect(route).not.toMatch(/formData\.get\(["'](?:url|key|path)["']\)/);
   });
 });

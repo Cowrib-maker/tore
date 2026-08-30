@@ -34,7 +34,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
-  serverExternalPackages: ["unpdf"],
+  serverExternalPackages: ["unpdf", "mammoth", "tesseract.js", "tesseract.js-core"],
   async headers() {
     return [
       {

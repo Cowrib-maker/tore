@@ -21,7 +21,11 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { LEGAL_AI_DOCUMENT_MAX_BYTES } from "@/application/ai/legal-ai-document.constants";
+import { LEGAL_AI_DOCUMENT_FILE_ACCEPT } from "@/application/ai/legal-ai-document.constants";
+import {
+  clientRejectLegalAiDocument,
+  legalAiExtractStatusHint,
+} from "@/application/ai/legal-ai-document-file";
 import {
   parseSafeCitationsFromUnknown,
   type LegalAiSafeCitation,
@@ -57,7 +61,7 @@ type AttachedDocument = {
   fileName: string;
   mimeType: string;
   sizeBytes: number;
-  extractStatus: "OK" | "EMPTY" | "FAILED";
+  extractStatus: "OK" | "EMPTY" | "FAILED" | "NEEDS_OCR";
   pageCount: number | null;
 };
 
@@ -65,7 +69,7 @@ type Props = {
   initialConversationId?: string;
   initialCaseFileId?: string;
   initialMessages?: Message[];
-  initialAttachedDocument?: AttachedDocument | null;
+  initialAttachedDocuments?: AttachedDocument[];
   caseContext: LawyerAiCaseContext | null;
   history: LawyerAiHistoryItem[];
 };
@@ -128,7 +132,7 @@ export function LawyerAiWorkbench({
   initialConversationId,
   initialCaseFileId,
   initialMessages = [],
-  initialAttachedDocument = null,
+  initialAttachedDocuments = [],
   caseContext,
   history,
 }: Props) {
@@ -139,8 +143,8 @@ export function LawyerAiWorkbench({
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
-  const [attachedDocument, setAttachedDocument] =
-    useState<AttachedDocument | null>(initialAttachedDocument);
+  const [attachedDocuments, setAttachedDocuments] =
+    useState<AttachedDocument[]>(initialAttachedDocuments);
   const [accessGate, setAccessGate] = useState<LegalAiAccessGate | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
@@ -153,7 +157,7 @@ export function LawyerAiWorkbench({
     messages.length > 0 ||
     draft.trim().length > 0 ||
     loading ||
-    Boolean(attachedDocument);
+    Boolean(attachedDocuments.length);
 
   useEffect(() => {
     transcriptRef.current?.scrollTo({
@@ -174,18 +178,9 @@ export function LawyerAiWorkbench({
   }, [conversationId, caseFileId]);
 
   async function uploadPdf(file: File) {
-    if (attachedDocument) {
-      setError("Энэ ярианд аль хэдийн нэг PDF хавсаргасан байна.");
-      return;
-    }
-    if (!isNativePdfFile(file)) {
-      setError(
-        "Одоогоор зөвхөн PDF файлыг шинжилнэ. DOCX, DOC, зураг, скан хийсэн PDF-ийг дэмжихгүй.",
-      );
-      return;
-    }
-    if (file.size > LEGAL_AI_DOCUMENT_MAX_BYTES) {
-      setError("Файл 10MB-аас ихгүй байх ёстой.");
+    const rejected = clientRejectLegalAiDocument(file);
+    if (rejected) {
+      setError(rejected);
       return;
     }
 
@@ -226,15 +221,20 @@ export function LawyerAiWorkbench({
       if (!data.id || !data.fileName || !data.conversationId) {
         throw new Error("Баримт хавсаргахад алдаа гарлаа.");
       }
+      const documentId = data.id;
+      const documentFileName = data.fileName;
       setConversationId(data.conversationId);
-      setAttachedDocument({
-        id: data.id,
-        fileName: data.fileName,
-        mimeType: data.mimeType ?? "application/pdf",
-        sizeBytes: data.sizeBytes ?? file.size,
-        extractStatus: data.extractStatus ?? "OK",
-        pageCount: data.pageCount ?? null,
-      });
+      setAttachedDocuments((current) => [
+        ...current,
+        {
+          id: documentId,
+          fileName: documentFileName,
+          mimeType: data.mimeType ?? "application/pdf",
+          sizeBytes: data.sizeBytes ?? file.size,
+          extractStatus: data.extractStatus ?? "OK",
+          pageCount: data.pageCount ?? null,
+        },
+      ]);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Баримт хавсаргахад алдаа гарлаа.",
@@ -468,16 +468,31 @@ export function LawyerAiWorkbench({
                   <LegalAiEntitlementBanner />
                 </div>
               ) : null}
-              {attachedDocument || uploading ? (
+              {attachedDocuments.length || uploading ? (
                 <ul className="mb-2 flex flex-wrap gap-2">
-                  <li className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-xs text-[#3F4852] ring-1 ring-[#0B1F3A]/10">
-                    <Paperclip className="size-3.5" />
-                    <span className="truncate">
-                      {attachedDocument
-                        ? attachedDocument.fileName
-                        : "PDF хавсаргаж байна..."}
-                    </span>
-                  </li>
+                  {attachedDocuments.map((document) => {
+                    const hint = legalAiExtractStatusHint(document.extractStatus);
+                    return (
+                      <li
+                        key={document.id}
+                        className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-xs text-[#3F4852] ring-1 ring-[#0B1F3A]/10"
+                      >
+                        <Paperclip className="size-3.5" />
+                        <span className="truncate">{document.fileName}</span>
+                        {hint ? (
+                          <span className="shrink-0 text-[10px] text-amber-700">
+                            {hint}
+                          </span>
+                        ) : null}
+                      </li>
+                    );
+                  })}
+                  {uploading ? (
+                    <li className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-xs text-[#3F4852] ring-1 ring-[#0B1F3A]/10">
+                      <Paperclip className="size-3.5" />
+                      <span>Файл хавсаргаж байна...</span>
+                    </li>
+                  ) : null}
                 </ul>
               ) : null}
               <div className="rounded-2xl border border-[#0B1F3A]/10 bg-white p-2 shadow-[0_16px_40px_-28px_rgba(11,31,58,0.45)] focus-within:border-[#0F3D33]/40">
@@ -505,15 +520,15 @@ export function LawyerAiWorkbench({
                     <input
                       ref={documentInputRef}
                       type="file"
-                      accept="application/pdf,.pdf"
+                      accept={LEGAL_AI_DOCUMENT_FILE_ACCEPT}
                       className="sr-only"
                       onChange={handleDocumentChange}
                     />
                     <button
                       type="button"
-                      aria-label="PDF хавсаргах"
+                      aria-label="Баримт хавсаргах"
                       onClick={() => {
-                        if (!uploading && !attachedDocument) {
+                        if (!uploading) {
                           documentInputRef.current?.click();
                         }
                       }}
@@ -730,7 +745,7 @@ function ContextPanel({
               Баримт бичиг
             </h3>
             {caseContext.documents.length === 0 ? (
-              <p className="mt-2 text-sm text-[#5C6570]">Хавсаргасан PDF алга.</p>
+              <p className="mt-2 text-sm text-[#5C6570]">Хавсаргасан баримт алга.</p>
             ) : (
               <ul className="mt-2 space-y-1">
                 {caseContext.documents.map((item) => (
@@ -806,12 +821,4 @@ function IconToggle({
       {children}
     </button>
   );
-}
-
-function isNativePdfFile(file: File): boolean {
-  const name = file.name.toLowerCase();
-  const type = file.type.toLowerCase();
-  if (name.endsWith(".doc") || name.endsWith(".docx")) return false;
-  if (type.startsWith("image/")) return false;
-  return type === "application/pdf" || name.endsWith(".pdf");
 }

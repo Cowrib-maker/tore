@@ -10,7 +10,11 @@ import {
 } from "react";
 import { Paperclip, Send, Sparkles } from "lucide-react";
 
-import { LEGAL_AI_DOCUMENT_MAX_BYTES } from "@/application/ai/legal-ai-document.constants";
+import { LEGAL_AI_DOCUMENT_FILE_ACCEPT } from "@/application/ai/legal-ai-document.constants";
+import {
+  clientRejectLegalAiDocument,
+  legalAiExtractStatusHint,
+} from "@/application/ai/legal-ai-document-file";
 import {
   useLegalAiChatSession,
   type ChatMessage,
@@ -22,7 +26,7 @@ type SectionKey = "case-file" | "documents" | "ai" | "research" | "notes";
 type AttachedDocument = {
   id: string;
   fileName: string;
-  extractStatus: "OK" | "EMPTY" | "FAILED";
+  extractStatus: "OK" | "EMPTY" | "FAILED" | "NEEDS_OCR";
   pageCount: number | null;
 };
 
@@ -33,12 +37,6 @@ const SECTIONS: Array<{ key: SectionKey; label: string }> = [
   { key: "research", label: "Судалгаа" },
   { key: "notes", label: "Тэмдэглэл" },
 ];
-
-function isNativePdfFile(file: File): boolean {
-  const name = file.name.toLowerCase();
-  const type = file.type.toLowerCase();
-  return type === "application/pdf" || name.endsWith(".pdf");
-}
 
 export function WorkspaceShell() {
   const [active, setActive] = useState<SectionKey>("case-file");
@@ -57,8 +55,9 @@ export function WorkspaceShell() {
   } = useLegalAiChatSession();
 
   const [message, setMessage] = useState("");
-  const [attachedDocument, setAttachedDocument] =
-    useState<AttachedDocument | null>(null);
+  const [attachedDocuments, setAttachedDocuments] = useState<AttachedDocument[]>(
+    [],
+  );
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -66,18 +65,9 @@ export function WorkspaceShell() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function uploadFile(file: File) {
-    if (attachedDocument) {
-      setUploadError("Энэ хэрэгт аль хэдийн 1 файл хавсаргасан байна.");
-      return;
-    }
-    if (!isNativePdfFile(file)) {
-      setUploadError(
-        "Одоогоор зөвхөн жинхэнэ (скан хийгээгүй) PDF файлыг шинжилнэ.",
-      );
-      return;
-    }
-    if (file.size > LEGAL_AI_DOCUMENT_MAX_BYTES) {
-      setUploadError("Файл 10MB-аас ихгүй байх ёстой.");
+    const rejected = clientRejectLegalAiDocument(file);
+    if (rejected) {
+      setUploadError(rejected);
       return;
     }
 
@@ -110,13 +100,18 @@ export function WorkspaceShell() {
         throw new Error("Файл хавсаргахад алдаа гарлаа.");
       }
 
+      const documentId = data.id;
+      const documentFileName = data.fileName;
       setConversationId(data.conversationId);
-      setAttachedDocument({
-        id: data.id,
-        fileName: data.fileName,
-        extractStatus: data.extractStatus ?? "OK",
-        pageCount: data.pageCount ?? null,
-      });
+      setAttachedDocuments((current) => [
+        ...current,
+        {
+          id: documentId,
+          fileName: documentFileName,
+          extractStatus: data.extractStatus ?? "OK",
+          pageCount: data.pageCount ?? null,
+        },
+      ]);
     } catch (err) {
       setUploadError(
         err instanceof Error ? err.message : "Файл хавсаргахад алдаа гарлаа.",
@@ -184,57 +179,67 @@ export function WorkspaceShell() {
             <div>
               <h2 className="text-sm font-semibold">Баримт бичиг</h2>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                PDF хавсаргах — TORE Legal AI үүн дээр үндэслэн шинжилгээ
-                хийж, баруун талын AI туслахаар дамжуулж хариулна.
+                PDF, DOCX, JPG, PNG, WEBP хавсаргах — TORE Legal AI үүн дээр
+                үндэслэн шинжилгээ хийж, баруун талын AI туслахаар дамжуулж
+                хариулна.
               </p>
             </div>
 
-            {attachedDocument ? (
-              <div className="flex items-center gap-2 rounded-lg border border-[#0B1F3A]/10 bg-[#F8FAFC] px-3 py-2.5 text-sm">
-                <Paperclip className="size-4 shrink-0 text-[#5C6570]" />
-                <span className="min-w-0 flex-1 truncate font-medium text-[#0A0F14]">
-                  {attachedDocument.fileName}
-                </span>
-                {attachedDocument.extractStatus !== "OK" ? (
-                  <span className="shrink-0 text-[11px] text-amber-700">
-                    текст уншигдаагүй
-                  </span>
-                ) : (
-                  <span className="shrink-0 text-[11px] text-emerald-700">
-                    хавсаргасан
-                  </span>
-                )}
+            {attachedDocuments.length ? (
+              <div className="grid gap-2">
+                {attachedDocuments.map((document) => {
+                  const hint = legalAiExtractStatusHint(document.extractStatus);
+                  return (
+                    <div
+                      key={document.id}
+                      className="flex items-center gap-2 rounded-lg border border-[#0B1F3A]/10 bg-[#F8FAFC] px-3 py-2.5 text-sm"
+                    >
+                      <Paperclip className="size-4 shrink-0 text-[#5C6570]" />
+                      <span className="min-w-0 flex-1 truncate font-medium text-[#0A0F14]">
+                        {document.fileName}
+                      </span>
+                      {hint ? (
+                        <span className="shrink-0 text-[11px] text-amber-700">
+                          {hint}
+                        </span>
+                      ) : (
+                        <span className="shrink-0 text-[11px] text-emerald-700">
+                          хавсаргасан
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-            ) : (
-              <div
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOver(true);
-                }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={handleDrop}
-                onClick={() => inputRef.current?.click()}
-                className={cn(
-                  "flex cursor-pointer flex-col items-center gap-1.5 rounded-lg border border-dashed px-4 py-8 text-center transition-colors",
-                  dragOver ? "border-primary bg-primary/5" : "border-input",
-                  uploading && "opacity-60",
-                )}
-              >
-                <Paperclip className="size-5 text-muted-foreground" />
-                <span className="text-[13px] font-medium text-[#0A0F14]">
-                  {uploading
-                    ? "Байршуулж байна…"
-                    : "PDF файлаа чирж оруулах эсвэл дарж сонгох"}
-                </span>
-                <span className="text-[11px] text-muted-foreground">
-                  Зөвхөн жинхэнэ (скан хийгээгүй) PDF, 10MB хүртэл
-                </span>
-              </div>
-            )}
+            ) : null}
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={handleDrop}
+              onClick={() => inputRef.current?.click()}
+              className={cn(
+                "flex cursor-pointer flex-col items-center gap-1.5 rounded-lg border border-dashed px-4 py-8 text-center transition-colors",
+                dragOver ? "border-primary bg-primary/5" : "border-input",
+                uploading && "opacity-60",
+              )}
+            >
+              <Paperclip className="size-5 text-muted-foreground" />
+              <span className="text-[13px] font-medium text-[#0A0F14]">
+                {uploading
+                  ? "Байршуулж байна…"
+                  : "Файлаа чирж оруулах эсвэл дарж сонгох"}
+              </span>
+              <span className="text-[11px] text-muted-foreground">
+                PDF, DOCX, JPG, PNG, WEBP · 10MB хүртэл
+              </span>
+            </div>
             <input
               ref={inputRef}
               type="file"
-              accept="application/pdf,.pdf"
+              accept={LEGAL_AI_DOCUMENT_FILE_ACCEPT}
               className="sr-only"
               onChange={handleInputChange}
             />

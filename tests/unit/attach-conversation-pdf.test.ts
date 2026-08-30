@@ -1,14 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { LEGAL_AI_DOCUMENT_MAX_BYTES } from "@/application/ai/legal-ai-document.constants";
-import { attachConversationPdfUseCase } from "@/application/use-cases/ai/attach-conversation-pdf";
+import { attachConversationDocumentUseCase } from "@/application/use-cases/ai/attach-conversation-document";
 import { UserRole, LegalQuestionStatus } from "@/domain/enums";
-import { ConflictError, ForbiddenError, ValidationError } from "@/domain/errors/domain-error";
+import { ForbiddenError, ValidationError } from "@/domain/errors/domain-error";
 import type { FileStorage } from "@/domain/ports/file-storage";
 import type { LegalAiStore } from "@/application/ai/legal-ai.types";
 import { LegalAiError } from "@/application/ai/legal-ai.errors";
 import { assertCanAccessStoredFile } from "@/application/services/assert-can-access-stored-file";
-import type { PdfTextExtractor } from "@/infrastructure/ai/pdf-text-extractor";
+import type { LegalAiDocumentExtractor } from "@/infrastructure/ai/document-text-extractor";
 
 import { buildMinimalPdf } from "./helpers/minimal-pdf";
 
@@ -69,11 +69,11 @@ function createStore(): LegalAiStore & {
     async createCitations() {
       return [];
     },
-    async findOwnedDocumentExtract() {
-      return null;
+    async listOwnedDocumentExtracts() {
+      return [];
     },
-    async findOwnedDocumentMeta() {
-      return null;
+    async listOwnedDocumentMetas() {
+      return [];
     },
     async findDocumentByStorageKey(storageKey) {
       for (const row of documents.values()) {
@@ -81,11 +81,8 @@ function createStore(): LegalAiStore & {
       }
       return null;
     },
-    async findDocumentIdByConversationId(conversationId) {
-      return documents.has(conversationId) ? "existing" : null;
-    },
     async createConversationDocument(input) {
-      documents.set(input.conversationId, {
+      documents.set(`${input.conversationId}:${input.storageKey}`, {
         userId: input.userId,
         storageKey: input.storageKey,
       });
@@ -94,7 +91,7 @@ function createStore(): LegalAiStore & {
         fileName: input.fileName,
         mimeType: input.mimeType,
         sizeBytes: input.sizeBytes,
-        extractStatus: "OK",
+        extractStatus: input.extractStatus,
         pageCount: input.pageCount,
       };
     },
@@ -129,7 +126,7 @@ function createStorage(): FileStorage & { keys: string[]; deleted: string[] } {
   };
 }
 
-function okExtractor(): PdfTextExtractor {
+function okExtractor(): LegalAiDocumentExtractor {
   return {
     async extract() {
       return { status: "OK", text: "Extracted clause", pageCount: 1 };
@@ -137,11 +134,11 @@ function okExtractor(): PdfTextExtractor {
   };
 }
 
-describe("attachConversationPdfUseCase", () => {
+describe("attachConversationDocumentUseCase", () => {
   it("stores an opaque key and returns safe metadata only", async () => {
     const store = createStore();
     const fileStorage = createStorage();
-    const result = await attachConversationPdfUseCase(
+    const result = await attachConversationDocumentUseCase(
       {
         userId: "lawyer-1",
         conversationId: "conv-owner",
@@ -170,7 +167,7 @@ describe("attachConversationPdfUseCase", () => {
     const store = createStore();
     const fileStorage = createStorage();
     await expect(
-      attachConversationPdfUseCase(
+      attachConversationDocumentUseCase(
         {
           userId: "lawyer-1",
           conversationId: "conv-owner",
@@ -185,22 +182,47 @@ describe("attachConversationPdfUseCase", () => {
     expect(store.documents.size).toBe(0);
   });
 
-  it("does not store or persist EMPTY extracts and does not call a completion port", async () => {
+  it("persists empty/scanned PDFs as NEEDS_OCR, not OK", async () => {
+    const store = createStore();
+    const fileStorage = createStorage();
+    const extract = vi.fn(async () => ({
+      status: "NEEDS_OCR" as const,
+      text: "",
+      pageCount: 1,
+    }));
+    const result = await attachConversationDocumentUseCase(
+      {
+        userId: "lawyer-1",
+        conversationId: "conv-owner",
+        fileName: "scan.pdf",
+        contentType: "application/pdf",
+        body: buildMinimalPdf("ignored"),
+      },
+      { store, fileStorage, extractor: { extract } },
+    );
+    expect(result.extractStatus).toBe("NEEDS_OCR");
+    expect(result.extractStatus).not.toBe("OK");
+    expect(fileStorage.keys).toHaveLength(1);
+    expect(store.documents.size).toBe(1);
+  });
+
+  it("does not store empty DOCX extracts as successful", async () => {
     const store = createStore();
     const fileStorage = createStorage();
     const extract = vi.fn(async () => ({
       status: "EMPTY" as const,
       text: "",
-      pageCount: 1,
+      pageCount: null,
     }));
     await expect(
-      attachConversationPdfUseCase(
+      attachConversationDocumentUseCase(
         {
           userId: "lawyer-1",
           conversationId: "conv-owner",
-          fileName: "scan.pdf",
-          contentType: "application/pdf",
-          body: buildMinimalPdf("ignored"),
+          fileName: "empty.docx",
+          contentType:
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          body: new Uint8Array([0x50, 0x4b, 0x03, 0x04]),
         },
         { store, fileStorage, extractor: { extract } },
       ),
@@ -211,33 +233,319 @@ describe("attachConversationPdfUseCase", () => {
     expect(store.documents.size).toBe(0);
   });
 
-  it("rejects a second PDF on the same conversation without uploading", async () => {
+  it("does not store FAILED extracts", async () => {
     const store = createStore();
-    store.documents.set("conv-owner", {
-      userId: "lawyer-1",
-      storageKey: "legal-ai-document/lawyer-1/existing.pdf",
-    });
     const fileStorage = createStorage();
+    const extract = vi.fn(async () => ({
+      status: "FAILED" as const,
+      text: "",
+      pageCount: null,
+    }));
     await expect(
-      attachConversationPdfUseCase(
+      attachConversationDocumentUseCase(
         {
           userId: "lawyer-1",
           conversationId: "conv-owner",
-          fileName: "second.pdf",
+          fileName: "broken.pdf",
           contentType: "application/pdf",
-          body: buildMinimalPdf("second"),
+          body: buildMinimalPdf("ignored"),
         },
-        { store, fileStorage, extractor: okExtractor() },
+        { store, fileStorage, extractor: { extract } },
       ),
-    ).rejects.toBeInstanceOf(ConflictError);
+    ).rejects.toBeInstanceOf(ValidationError);
     expect(fileStorage.keys).toEqual([]);
+    expect(store.documents.size).toBe(0);
+  });
+
+  it("persists NEEDS_OCR images without treating them as successful extracts", async () => {
+    const store = createStore();
+    const fileStorage = createStorage();
+    const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    const result = await attachConversationDocumentUseCase(
+      {
+        userId: "lawyer-1",
+        conversationId: "conv-owner",
+        fileName: "scan.png",
+        contentType: "image/png",
+        body: png,
+      },
+      {
+        store,
+        fileStorage,
+        extractor: {
+          async extract() {
+            return { status: "NEEDS_OCR", text: "", pageCount: null };
+          },
+        },
+      },
+    );
+    expect(result.extractStatus).toBe("NEEDS_OCR");
+    expect(result.mimeType).toBe("image/png");
+    expect(fileStorage.keys).toHaveLength(1);
+    expect(store.documents.size).toBe(1);
+    expect(JSON.stringify(result)).not.toMatch(/legal-ai-document\/|AKIA|secret/i);
+  });
+
+  it("persists successful OCR for JPG, JPEG, PNG, and WEBP as OK", async () => {
+    const files = [
+      {
+        fileName: "scan.jpg",
+        contentType: "image/jpeg",
+        body: new Uint8Array([0xff, 0xd8, 0xff, 0xe0]),
+      },
+      {
+        fileName: "scan.jpeg",
+        contentType: "image/jpeg",
+        body: new Uint8Array([0xff, 0xd8, 0xff, 0xe0]),
+      },
+      {
+        fileName: "scan.png",
+        contentType: "image/png",
+        body: new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+      },
+      {
+        fileName: "scan.webp",
+        contentType: "image/webp",
+        body: new Uint8Array([
+          0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x45, 0x42, 0x50,
+        ]),
+      },
+    ];
+    const store = createStore();
+    const fileStorage = createStorage();
+    for (const file of files) {
+      const result = await attachConversationDocumentUseCase(
+        {
+          userId: "lawyer-1",
+          conversationId: "conv-owner",
+          ...file,
+        },
+        {
+          store,
+          fileStorage,
+          extractor: {
+            async extract() {
+              return { status: "OK", text: "OCR clause from image", pageCount: null };
+            },
+          },
+        },
+      );
+      expect(result.extractStatus).toBe("OK");
+      expect(JSON.stringify(result)).not.toMatch(/legal-ai-document\/|storageKey/i);
+    }
+    expect(store.documents.size).toBe(files.length);
+  });
+
+  it("persists successful scanned-PDF OCR as OK", async () => {
+    const store = createStore();
+    const fileStorage = createStorage();
+    const result = await attachConversationDocumentUseCase(
+      {
+        userId: "lawyer-1",
+        conversationId: "conv-owner",
+        fileName: "scan.pdf",
+        contentType: "application/pdf",
+        body: buildMinimalPdf(""),
+      },
+      {
+        store,
+        fileStorage,
+        extractor: {
+          async extract() {
+            return {
+              status: "OK",
+              text: "--- Page 1 ---\nScanned clause",
+              pageCount: 1,
+            };
+          },
+        },
+      },
+    );
+    expect(result.extractStatus).toBe("OK");
+    expect(store.documents.size).toBe(1);
+  });
+
+  it("does not store empty or failed OCR results", async () => {
+    const store = createStore();
+    const fileStorage = createStorage();
+    const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    await expect(
+      attachConversationDocumentUseCase(
+        {
+          userId: "lawyer-1",
+          conversationId: "conv-owner",
+          fileName: "blank.png",
+          contentType: "image/png",
+          body: png,
+        },
+        {
+          store,
+          fileStorage,
+          extractor: {
+            async extract() {
+              return { status: "EMPTY", text: "", pageCount: null };
+            },
+          },
+        },
+      ),
+    ).rejects.toMatchObject({ message: expect.stringMatching(/OCR-оос/) });
+    await expect(
+      attachConversationDocumentUseCase(
+        {
+          userId: "lawyer-1",
+          conversationId: "conv-owner",
+          fileName: "bad.png",
+          contentType: "image/png",
+          body: png,
+        },
+        {
+          store,
+          fileStorage,
+          extractor: {
+            async extract() {
+              return { status: "FAILED", text: "", pageCount: null, timedOut: true };
+            },
+          },
+        },
+      ),
+    ).rejects.toMatchObject({ message: expect.stringMatching(/хугацаа хэтэрлээ/) });
+    expect(fileStorage.keys).toEqual([]);
+    expect(store.documents.size).toBe(0);
+  });
+
+  it("allows multiple documents on the same conversation", async () => {
+    const store = createStore();
+    const fileStorage = createStorage();
+    await attachConversationDocumentUseCase(
+      {
+        userId: "lawyer-1",
+        conversationId: "conv-owner",
+        fileName: "first.pdf",
+        contentType: "application/pdf",
+        body: buildMinimalPdf("first"),
+      },
+      { store, fileStorage, extractor: okExtractor() },
+    );
+    const second = await attachConversationDocumentUseCase(
+      {
+        userId: "lawyer-1",
+        conversationId: "conv-owner",
+        fileName: "second.pdf",
+        contentType: "application/pdf",
+        body: buildMinimalPdf("second"),
+      },
+      { store, fileStorage, extractor: okExtractor() },
+    );
+    expect(second.extractStatus).toBe("OK");
+    expect(fileStorage.keys).toHaveLength(2);
+    expect(store.documents.size).toBe(2);
+  });
+
+  it("stores a successful DOCX extract and rejects malformed DOCX without persisting", async () => {
+    const store = createStore();
+    const fileStorage = createStorage();
+    const zip = new Uint8Array([0x50, 0x4b, 0x03, 0x04]);
+    const ok = await attachConversationDocumentUseCase(
+      {
+        userId: "lawyer-1",
+        conversationId: "conv-owner",
+        fileName: "brief.docx",
+        contentType:
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        body: zip,
+      },
+      {
+        store,
+        fileStorage,
+        extractor: {
+          async extract() {
+            return { status: "OK", text: "1. Numbered clause\n\nParagraph two.", pageCount: null };
+          },
+        },
+      },
+    );
+    expect(ok.extractStatus).toBe("OK");
+    expect(ok.mimeType).toContain("wordprocessingml");
+    expect(JSON.stringify(ok)).not.toMatch(/legal-ai-document\/|storageKey|AKIA/i);
+
+    await expect(
+      attachConversationDocumentUseCase(
+        {
+          userId: "lawyer-1",
+          conversationId: "conv-owner",
+          fileName: "broken.docx",
+          contentType:
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          body: zip,
+        },
+        {
+          store,
+          fileStorage,
+          extractor: {
+            async extract() {
+              return { status: "FAILED", text: "should-not-save", pageCount: null };
+            },
+          },
+        },
+      ),
+    ).rejects.toBeInstanceOf(ValidationError);
+    expect(store.documents.size).toBe(1);
+  });
+
+  it("allows mixed PDF, DOCX, and image attachments on one conversation", async () => {
+    const store = createStore();
+    const fileStorage = createStorage();
+    const zip = new Uint8Array([0x50, 0x4b, 0x03, 0x04]);
+    const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    await attachConversationDocumentUseCase(
+      {
+        userId: "lawyer-1",
+        conversationId: "conv-owner",
+        fileName: "a.pdf",
+        contentType: "application/pdf",
+        body: buildMinimalPdf("pdf"),
+      },
+      { store, fileStorage, extractor: okExtractor() },
+    );
+    await attachConversationDocumentUseCase(
+      {
+        userId: "lawyer-1",
+        conversationId: "conv-owner",
+        fileName: "b.docx",
+        contentType:
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        body: zip,
+      },
+      { store, fileStorage, extractor: okExtractor() },
+    );
+    const image = await attachConversationDocumentUseCase(
+      {
+        userId: "lawyer-1",
+        conversationId: "conv-owner",
+        fileName: "c.png",
+        contentType: "image/png",
+        body: png,
+      },
+      {
+        store,
+        fileStorage,
+        extractor: {
+          async extract() {
+            return { status: "NEEDS_OCR", text: "fake-ocr", pageCount: null };
+          },
+        },
+      },
+    );
+    expect(image.extractStatus).toBe("NEEDS_OCR");
+    expect(fileStorage.keys).toHaveLength(3);
+    expect(store.documents.size).toBe(3);
   });
 
   it("returns 404 for another user's conversation", async () => {
     const store = createStore();
     const fileStorage = createStorage();
     await expect(
-      attachConversationPdfUseCase(
+      attachConversationDocumentUseCase(
         {
           userId: "lawyer-1",
           conversationId: "conv-other",
@@ -261,7 +569,7 @@ describe("attachConversationPdfUseCase", () => {
     const body = new Uint8Array(LEGAL_AI_DOCUMENT_MAX_BYTES + 1);
     body.set([0x25, 0x50, 0x44, 0x46]);
     await expect(
-      attachConversationPdfUseCase(
+      attachConversationDocumentUseCase(
         {
           userId: "lawyer-1",
           conversationId: "conv-owner",

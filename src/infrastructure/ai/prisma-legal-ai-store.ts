@@ -263,23 +263,24 @@ export class PrismaLegalAiStore implements LegalAiStore {
     return created;
   }
 
-  async findOwnedDocumentExtract(
+  async listOwnedDocumentExtracts(
     conversationId: string,
     userId: string,
-  ): Promise<LegalAiConversationDocumentExtract | null> {
-    const row = await prisma.aIConversationDocument.findFirst({
-      where: { conversationId, userId, extractStatus: "OK" },
-      select: { fileName: true, extractedText: true },
+  ): Promise<LegalAiConversationDocumentExtract[]> {
+    return prisma.aIConversationDocument.findMany({
+      where: { conversationId, userId },
+      orderBy: { createdAt: "asc" },
+      select: { fileName: true, extractedText: true, extractStatus: true },
     });
-    return row;
   }
 
-  async findOwnedDocumentMeta(
+  async listOwnedDocumentMetas(
     conversationId: string,
     userId: string,
-  ): Promise<LegalAiConversationDocumentMeta | null> {
-    const row = await prisma.aIConversationDocument.findFirst({
+  ): Promise<LegalAiConversationDocumentMeta[]> {
+    return prisma.aIConversationDocument.findMany({
       where: { conversationId, userId },
+      orderBy: { createdAt: "asc" },
       select: {
         id: true,
         fileName: true,
@@ -289,7 +290,6 @@ export class PrismaLegalAiStore implements LegalAiStore {
         pageCount: true,
       },
     });
-    return row;
   }
 
   async findDocumentByStorageKey(
@@ -301,16 +301,6 @@ export class PrismaLegalAiStore implements LegalAiStore {
     });
   }
 
-  async findDocumentIdByConversationId(
-    conversationId: string,
-  ): Promise<string | null> {
-    const row = await prisma.aIConversationDocument.findFirst({
-      where: { conversationId },
-      select: { id: true },
-    });
-    return row?.id ?? null;
-  }
-
   async createConversationDocument(input: {
     conversationId: string;
     userId: string;
@@ -320,7 +310,7 @@ export class PrismaLegalAiStore implements LegalAiStore {
     sizeBytes: number;
     extractedText: string;
     pageCount: number | null;
-    extractStatus: "OK";
+    extractStatus: LegalAiConversationDocumentMeta["extractStatus"];
   }): Promise<LegalAiConversationDocumentMeta> {
     const row = await prisma.aIConversationDocument.create({
       data: {

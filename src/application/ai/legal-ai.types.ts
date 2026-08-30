@@ -62,9 +62,16 @@ export type LegalAiCreateTurnResult = {
   retrievalInvoked?: boolean;
 };
 
+export type LegalAiDocumentExtractStatus =
+  | "OK"
+  | "EMPTY"
+  | "FAILED"
+  | "NEEDS_OCR";
+
 export type LegalAiConversationDocumentExtract = {
   fileName: string;
   extractedText: string;
+  extractStatus: LegalAiDocumentExtractStatus;
 };
 
 export type LegalAiConversationDocumentMeta = {
@@ -72,7 +79,7 @@ export type LegalAiConversationDocumentMeta = {
   fileName: string;
   mimeType: string;
   sizeBytes: number;
-  extractStatus: "OK" | "EMPTY" | "FAILED";
+  extractStatus: LegalAiDocumentExtractStatus;
   pageCount: number | null;
 };
 
@@ -151,20 +158,17 @@ export type LegalAiStore = {
     messageId: string;
     citations: LegalAiCitationPersistInput[];
   }): Promise<LegalAiSafeCitation[]>;
-  findOwnedDocumentExtract(
+  listOwnedDocumentExtracts(
     conversationId: string,
     userId: string,
-  ): Promise<LegalAiConversationDocumentExtract | null>;
-  findOwnedDocumentMeta(
+  ): Promise<LegalAiConversationDocumentExtract[]>;
+  listOwnedDocumentMetas(
     conversationId: string,
     userId: string,
-  ): Promise<LegalAiConversationDocumentMeta | null>;
+  ): Promise<LegalAiConversationDocumentMeta[]>;
   findDocumentByStorageKey(
     storageKey: string,
   ): Promise<{ userId: string } | null>;
-  findDocumentIdByConversationId(
-    conversationId: string,
-  ): Promise<string | null>;
   createConversationDocument(input: {
     conversationId: string;
     userId: string;
@@ -174,7 +178,7 @@ export type LegalAiStore = {
     sizeBytes: number;
     extractedText: string;
     pageCount: number | null;
-    extractStatus: "OK";
+    extractStatus: LegalAiDocumentExtractStatus;
   }): Promise<LegalAiConversationDocumentMeta>;
 };
 
