@@ -8,6 +8,7 @@ import {
   type PromptTurnKind as PromptTurnKindValue,
 } from "./types";
 import { wrapUntrustedDocumentBlock } from "./untrusted-document";
+import { orthographyCoachBlock } from "@/domain/mongolian-orthography";
 
 /**
  * Builds model prompts from domain + audience + server-derived capability.
@@ -31,6 +32,8 @@ export class PromptBuilderService implements IPromptBuilder {
         audienceBlock(input.userType, capability),
         turnKindBlock(turnKind, input, capability),
         outputStructureBlock(capability, input),
+        caseMethodBlock(capability, input, turnKind),
+        turnKind === PromptTurnKind.GENERAL ? "" : orthographyCoachBlock(),
         safetyBlock(capability, input.foreignLegalScope),
         injectionDefenseBlock(),
         corpusBlock(
@@ -281,6 +284,53 @@ function intentSuffix(input: PromptBuildInput): string {
       ? ` (${input.intentConfidence.toFixed(2)})`
       : "";
   return `. Intent: ${input.intentType}${confidence}`;
+}
+
+/**
+ * When the user asks to solve a case / walk through methodology, force
+ * Gutachten-style stepwise analysis. Lawyer legal turns always get the
+ * branch methods so exam-style work is consistent.
+ */
+function caseMethodBlock(
+  capability: "CITIZEN" | "LAWYER",
+  input: PromptBuildInput,
+  turnKind: PromptTurnKindValue,
+): string {
+  if (
+    turnKind === PromptTurnKind.GENERAL ||
+    turnKind === PromptTurnKind.AMBIGUOUS
+  ) {
+    return "";
+  }
+
+  const message = input.message ?? "";
+  const wantsWalkthrough =
+    /бодлого|кейс|аргачлал|алхам\s*алхмаар|задла|gutachten|anspruch|verwaltungsakt|шинжил|exam|case\s*method/i.test(
+      message,
+    );
+
+  if (capability === "CITIZEN" && !wantsWalkthrough) {
+    return "";
+  }
+
+  return `CASE / БОДЛОГО БОДОХ АРГАЧЛАЛ (алхам алхмаар)
+Хэрэглэгч бодлого, кейс, аргачлал, алхам алхмаар задлахыг хүсвэл (өмгөөлөгчийн горимд хууль зүйн шинжилгээнд) дараах салбарын схемийг ашигла. Үр дүнгээс бүү эхэл. Баримтгүйгээр бүү нөх. Зүйл, заалтын дугаарыг зөвхөн VERIFIED LEGAL SOURCES-оос ишлэ; байхгүй бол "баталгаатай эхээс нягтлах шаардлагатай" гэж хэл — Google/санах ойн дугаар бүү зохио.
+
+ЭРҮҮ (Gutachtenstil + Монголын бүрэлдэхүүн):
+1) Баримт цэгцлэх → 2) Бүрэлдэхүүн (объект, объектив, субъект, субъектив) → 3) Хууль бус байдал → 4) Буруутай байдал → 5) Дүгнэлт.
+Жижиг алхам: дээд өгүүлбэр → тодорхойлолт → баримтад оруулалт (Subsumtion) → үр дүн.
+
+ИРГЭН (Anspruchsmethode):
+1) Шаардлагыг тодруул → 2) Эрх үүссэн үү → 3) Дуусгавар болсон уу → 4) Хэрэгжүүлэх боломжтой юу → 5) Дүгнэлт.
+Гэрээ / гэм хор / үндэслэлгүй хөрөнгөжих замыг салга.
+
+ЗАХИРГАА (ЗЕХ + ЗХШХШТХ гурван үе + Verwaltungsakt):
+0) Захиргааны акт мөн эсэх (гадаад үйлчлэл, эрх/үүргийн үр дагавар).
+1) Нэхэмжлэлийн урьдчилсан нөхцөл: чадвар/чадамж, урьдчилан шийдвэрлэх ажиллагаа, хөөн хэлэлцэх хугацаа, харьяалал.
+2А) Хэлбэр тал: эрх хэмжээ, журам (сонсох, нөхцөл байдал тогтоох), хэлбэр/бүтэц.
+2Б) Бодит тал: хуулийн үндэслэл, фактийн үндэслэл, зохистой байдал, үзэмж (дискрец).
+3) Үр дагавар: илэрхий хууль бус / хүчингүй болгох / үйл ажиллагаа явуулахыг даалгах.
+Иргэний яг ямар эрх зөрчигдсөнийг дурд. Хоосон шатыг алгасаж бүү дүгнэ — дутуу баримтыг "нотолгооны цоорхой" гэж тэмдэглэ.`;
 }
 
 function safetyBlock(

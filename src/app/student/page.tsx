@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { StudentOrthographyDraft } from "@/components/student/student-orthography-draft";
 import { StudentShell } from "@/components/student/student-shell";
 import { STUDENT_TRACK_IDS } from "@/domain/student";
 import { getDictionary } from "@/i18n/get-dictionary";
@@ -78,6 +79,10 @@ export default async function StudentHubPage() {
           ))}
         </ol>
       </section>
+
+      <div className="mt-10">
+        <StudentOrthographyDraft billingHref="/#chat" />
+      </div>
 
       <p className="mt-8 text-[13px] leading-6 text-[#7B8490]">
         {student.disclaimer}

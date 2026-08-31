@@ -223,7 +223,7 @@ export const ko: Dictionary = {
         criminal: "Gutachtenstil + 몽골 구성요건: 구성요건 → 위법성 → 책임.",
         civil: "Anspruchsmethode + 몽골 청구: 발생 → 소멸 → 행사 가능.",
         administrative:
-          "Verwaltungsakt + 몽골 도식: 처분 → 권한 → 절차 → 실체 → 불복.",
+          "몽골 3단계: 접수요건 → 적법성 → 효과(취소·이행명령).",
       },
       openLesson: "읽기",
       startQuiz: "시작",

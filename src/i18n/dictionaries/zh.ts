@@ -221,7 +221,7 @@ export const zh: Dictionary = {
         criminal: "Gutachtenstil + 蒙古构成：构成要件 → 违法性 → 责任。",
         civil: "Anspruchsmethode + 蒙古请求：成立 → 消灭 → 可行使。",
         administrative:
-          "Verwaltungsakt + 蒙古图式：行为 → 权限 → 程序 → 实体 → 救济。",
+          "蒙古三阶段：受理要件 → 合法性 → 效果（撤销·责令行为）。",
       },
       openLesson: "阅读",
       startQuiz: "开始",

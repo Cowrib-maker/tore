@@ -54,6 +54,11 @@ import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gat
 import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
 import {
+  OrthographyCheckButton,
+  OrthographyResults,
+  useOrthographyCheck,
+} from "@/components/orthography/orthography-checker";
+import {
   LEGAL_AI_PATH,
   loginHrefForLegalAi,
   registerClientHrefForLegalAi,
@@ -147,6 +152,17 @@ export function LegalAiChat({
   const [listening, setListening] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [accessGate, setAccessGate] = useState<LegalAiAccessGate | null>(null);
+  const {
+    loading: orthographyLoading,
+    result: orthographyResult,
+    gateMessage: orthographyGate,
+    needsBilling: orthographyNeedsBilling,
+    open: orthographyOpen,
+    includeLatinToCyrillic,
+    setIncludeLatinToCyrillic,
+    check: checkOrthography,
+    clear: clearOrthography,
+  } = useOrthographyCheck();
 
   const documentInputRef = useRef<HTMLInputElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
@@ -180,7 +196,8 @@ export function LegalAiChat({
     setMessage("");
     setListening(false);
     setMobileNavOpen(false);
-  }, []);
+    clearOrthography();
+  }, [clearOrthography]);
 
   function openDocumentPicker() {
     if (!documentUploadEnabled || uploading) {
@@ -500,6 +517,12 @@ export function LegalAiChat({
               >
                 <Mic className="size-4" />
               </ComposerIconButton>
+              <OrthographyCheckButton
+                loading={orthographyLoading}
+                disabled={loading || uploading}
+                pressed={orthographyOpen}
+                onClick={() => void checkOrthography(message)}
+              />
             </div>
             <Button
               type="submit"
@@ -512,6 +535,25 @@ export function LegalAiChat({
             </Button>
           </div>
         </div>
+        {orthographyOpen ? (
+          <OrthographyResults
+            className="mt-2"
+            loading={orthographyLoading}
+            result={orthographyResult}
+            gateMessage={orthographyGate}
+            needsBilling={orthographyNeedsBilling}
+            text={message}
+            includeLatinToCyrillic={includeLatinToCyrillic}
+            onIncludeLatinChange={(value) => {
+              setIncludeLatinToCyrillic(value);
+              void checkOrthography(message, { includeLatinToCyrillic: value });
+            }}
+            billingHref="/#chat"
+            onApplySuggestion={setMessage}
+            onRecheck={(next) => void checkOrthography(next)}
+            onClose={clearOrthography}
+          />
+        ) : null}
         <LegalAiDutyNotice variant="citizen" className="mt-2 px-1" />
       </div>
     </form>

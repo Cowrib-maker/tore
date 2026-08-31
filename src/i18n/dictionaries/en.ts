@@ -279,7 +279,7 @@ export const en: Dictionary = {
         civil:
           "Anspruchsmethode + Mongolian claims: arisen → extinguished → enforceable.",
         administrative:
-          "Verwaltungsakt + Mongolian schema: act → competence → procedure → merits → remedies.",
+          "MN three stages: admissibility → legality (form + merits) → remedies.",
       },
       openLesson: "Read",
       startQuiz: "Start",
