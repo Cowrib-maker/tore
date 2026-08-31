@@ -31,7 +31,8 @@ export class InMemoryInvoiceRepository implements InvoiceRepository {
       id: input.id ?? randomUUID(),
       userId: input.userId,
       subscriptionId: input.subscriptionId ?? null,
-      planCode: input.planCode,
+      bookingId: input.bookingId ?? null,
+      planCode: input.planCode ?? null,
       amountMnt: input.amountMnt,
       currency: input.currency,
       provider: input.provider,
@@ -63,6 +64,13 @@ export class InMemoryInvoiceRepository implements InvoiceRepository {
     return record ? clone(record) : null;
   }
 
+  async findByBookingId(bookingId: string): Promise<Invoice | null> {
+    const record = [...this.invoices.values()].find(
+      (item) => item.bookingId === bookingId,
+    );
+    return record ? clone(record) : null;
+  }
+
   async findLatestPendingForUser(
     userId: string,
     now: Date,
@@ -73,7 +81,8 @@ export class InMemoryInvoiceRepository implements InvoiceRepository {
           item.userId === userId &&
           item.status === InvoiceStatus.PENDING &&
           item.expiresAt.getTime() > now.getTime() &&
-          Boolean(item.providerInvoiceId),
+          Boolean(item.providerInvoiceId) &&
+          !item.bookingId,
       )
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0];
     return record ? clone(record) : null;

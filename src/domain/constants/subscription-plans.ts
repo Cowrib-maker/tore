@@ -8,6 +8,11 @@ import { SubscriptionPlanCode } from "@/domain/enums";
  * and feature quotas. Clients must never supply these values.
  *
  * Token ceilings are backend safety limits and must not be shown to users.
+ *
+ * Quotas are sized so 49,000₮ SOLO stays profitable against TORE AI cost:
+ * ~300 questions ≈ 10–20k ₮, ~700 ≈ 25–50k ₮. File/contract analysis is
+ * counted separately because OCR + long context costs more than a chat turn.
+ * documentAnalysis covers Legal AI attachments and case-review documents.
  */
 export type SubscriptionPlanDefinition = {
   code: SubscriptionPlanCode;
@@ -31,13 +36,13 @@ export const SOLO_PLAN: SubscriptionPlanDefinition = {
   priceMnt: 49_000,
   seatLimit: 1,
   quotas: {
-    caseAnalysis: 30,
-    documentAnalysis: 100,
-    legalAiQueries: 500,
+    caseAnalysis: 15,
+    documentAnalysis: 25,
+    legalAiQueries: 200,
   },
   tokenCeilings: {
-    inputTokens: 1_000_000,
-    outputTokens: 200_000,
+    inputTokens: 600_000,
+    outputTokens: 120_000,
   },
 };
 
@@ -48,13 +53,13 @@ export const TEAM_PLAN: SubscriptionPlanDefinition = {
   priceMnt: 0,
   seatLimit: 5,
   quotas: {
-    caseAnalysis: 150,
-    documentAnalysis: 500,
-    legalAiQueries: 2_500,
+    caseAnalysis: 75,
+    documentAnalysis: 125,
+    legalAiQueries: 1_000,
   },
   tokenCeilings: {
-    inputTokens: 5_000_000,
-    outputTokens: 1_000_000,
+    inputTokens: 3_000_000,
+    outputTokens: 600_000,
   },
 };
 
@@ -69,12 +74,12 @@ export const CITIZEN_BASIC_PLAN: SubscriptionPlanDefinition = {
   seatLimit: 1,
   quotas: {
     caseAnalysis: 0,
-    documentAnalysis: 0,
+    documentAnalysis: 5,
     legalAiQueries: 20,
   },
   tokenCeilings: {
-    inputTokens: 500_000,
-    outputTokens: 100_000,
+    inputTokens: 200_000,
+    outputTokens: 40_000,
   },
 };
 
@@ -85,12 +90,12 @@ export const CITIZEN_PLUS_PLAN: SubscriptionPlanDefinition = {
   seatLimit: 1,
   quotas: {
     caseAnalysis: 0,
-    documentAnalysis: 0,
-    legalAiQueries: 80,
+    documentAnalysis: 15,
+    legalAiQueries: 60,
   },
   tokenCeilings: {
-    inputTokens: 2_000_000,
-    outputTokens: 400_000,
+    inputTokens: 500_000,
+    outputTokens: 100_000,
   },
 };
 
@@ -98,6 +103,8 @@ export const CITIZEN_PLUS_PLAN: SubscriptionPlanDefinition = {
 export const UNPAID_CITIZEN_FREE_LEGAL_QUESTIONS = 1;
 export const GUEST_FREE_LEGAL_QUESTIONS = 1;
 export const GUEST_FREE_LEGAL_QUESTION_LIMIT = GUEST_FREE_LEGAL_QUESTIONS;
+/** Warn in Legal AI when the paid period ends within this window. */
+export const SUBSCRIPTION_EXPIRY_WARNING_MS = 3 * 24 * 60 * 60 * 1000;
 
 export const CITIZEN_PLANS: readonly SubscriptionPlanCode[] = [
   SubscriptionPlanCode.CITIZEN_BASIC,
@@ -136,11 +143,11 @@ export const FEATURE_QUOTA_EXCEEDED_MESSAGES: Record<
   string
 > = {
   CASE_ANALYSIS:
-    "Та энэ сарын нарийн хэрэг шинжилгээний хязгаарт хүрсэн байна. Багцаа сунгана уу эсвэл TORE Team-д шилжинэ үү.",
+    "Та энэ сарын нарийн хэрэг шинжилгээний хязгаарт хүрсэн байна. Багцаа сунгана уу.",
   DOCUMENT_ANALYSIS:
-    "Та энэ сарын баримт бичгийн шинжилгээний хязгаарт хүрсэн байна. Багцаа сунгана уу эсвэл TORE Team-д шилжинэ үү.",
+    "Та энэ сарын баримт бичгийн шинжилгээний хязгаарт хүрсэн байна. Багцаа сунгана уу.",
   LEGAL_AI_QUERY:
-    "Та энэ сарын хууль зүйн AI асуултын хязгаарт хүрсэн байна. Багцаа сунгана уу эсвэл TORE Team-д шилжинэ үү.",
+    "Та энэ сарын хууль зүйн AI асуултын хязгаарт хүрсэн байна. Багцаа сунгана уу.",
 };
 
 export const TOKEN_CEILING_USER_MESSAGE =

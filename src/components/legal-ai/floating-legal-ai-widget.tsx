@@ -10,6 +10,7 @@ import {
   OPEN_LEGAL_AI_WIDGET_EVENT,
   type OpenLegalAiWidgetDetail,
 } from "@/components/legal-ai/legal-ai-widget-events";
+import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
 import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { useLegalAiChatSession } from "@/components/legal-ai/use-legal-ai-chat-session";
 
@@ -19,7 +20,7 @@ export function FloatingLegalAiWidget() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const { messages, conversationId, loading, error, sendMessage } =
+  const { messages, conversationId, loading, error, accessGate, sendMessage } =
     useLegalAiChatSession();
   const sendMessageRef = useRef(sendMessage);
   sendMessageRef.current = sendMessage;
@@ -120,6 +121,16 @@ export function FloatingLegalAiWidget() {
               <p role="alert" className="text-xs text-red-600">
                 {error}
               </p>
+            ) : null}
+            {accessGate ? (
+              <LegalAiAccessGateCard
+                gate={accessGate}
+                onPaid={() =>
+                  void sendMessage(accessGate.question, undefined, {
+                    resume: true,
+                  })
+                }
+              />
             ) : null}
           </div>
 

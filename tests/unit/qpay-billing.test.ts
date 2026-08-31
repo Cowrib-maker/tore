@@ -436,7 +436,9 @@ describe("QPay-activated SOLO subscriptions", () => {
       },
       aiDeps(),
     );
-    expect(result.entitlement.quotas.legalAiQueries).toBe(500);
+    expect(result.entitlement.quotas.legalAiQueries).toBe(
+      SOLO_PLAN.quotas.legalAiQueries,
+    );
     await expect(
       requireActiveLawyerEntitlement(lawyer, aiDeps(), now),
     ).resolves.toMatchObject({
@@ -492,7 +494,9 @@ describe("QPay-activated SOLO subscriptions", () => {
     expect(snapshot.subscriptionStatus).toBe("NONE");
     expect(snapshot.planName).toBe("TORE SOLO");
     expect(snapshot.priceMnt).toBe(49_000);
-    expect(snapshot.usage.legalAiQueries.limit).toBe(500);
+    expect(snapshot.usage.legalAiQueries.limit).toBe(
+      SOLO_PLAN.quotas.legalAiQueries,
+    );
     expect(await subscriptions.findLatestOwnedByUserId(lawyer.userId)).toBeNull();
   });
 

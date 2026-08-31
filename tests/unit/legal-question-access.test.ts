@@ -258,5 +258,38 @@ describe("createLegalQuestionAccess", () => {
     expect(snapshot.remainingLegalQuestions).toBe(1);
     expect(snapshot.exhaustedNextStep).toBe("login");
     expect(snapshot.remainingLabel).toContain("1");
+    expect(snapshot.expiresSoon).toBe(false);
+    expect(snapshot.currentPeriodEnd).toBeNull();
+  });
+
+  it("warns when a paid plan ends within three days", async () => {
+    const subscriptions = new InMemorySubscriptionRepository();
+    const created = await subscriptions.create({
+      ownerUserId: "lawyer-1",
+      planCode: SubscriptionPlanCode.SOLO,
+      status: SubscriptionStatus.ACTIVE,
+      seatLimit: 1,
+      currentPeriodStart: new Date(),
+      currentPeriodEnd: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+    });
+    await subscriptions.createSeat({
+      subscriptionId: created.id,
+      userId: "lawyer-1",
+      status: SeatStatus.ACTIVE,
+    });
+    const snapshot = await getLegalQuestionEntitlementSnapshot(
+      { kind: "user", userId: "lawyer-1", role: UserRole.LAWYER },
+      {
+        guestSessions: {
+          getById: async () => null,
+          incrementFreeLegalQuestionsUsed: async () => {},
+        },
+        conversations: { countBilledQuestionsForUser: async () => 0 },
+        subscriptionRepository: subscriptions,
+        entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+      },
+    );
+    expect(snapshot.expiresSoon).toBe(true);
+    expect(snapshot.expiryWarningLabel).toContain("3 хоног");
   });
 });

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createBookingRequestUseCase, respondToBookingRequestUseCase } from "@/application/use-cases/bookings/booking-requests";
 import { BookingStatus, NotificationType, UserRole } from "@/domain/enums";
+import { InMemoryInvoiceRepository } from "@/infrastructure/repositories/in-memory-invoice-repository";
 
 const lawyerProfile = {
   id: "lp1",
@@ -57,7 +58,7 @@ describe("booking-requests", () => {
       lawyerProfileId: "lp1",
       offeringId: "off1",
       practiceAreaId: null,
-      status: BookingStatus.PENDING_ACCEPTANCE,
+      status: BookingStatus.PENDING_PAYMENT,
       issueSummary: "Need help with employment contract review this month.",
       scheduledStartAt: startAt,
       scheduledEndAt: endAt,
@@ -112,12 +113,27 @@ describe("booking-requests", () => {
         findById: vi.fn(),
         accept: vi.fn(),
         decline: vi.fn(),
+        cancel: vi.fn().mockResolvedValue({}),
       } as never,
       notificationRepository: { create: notifyCreate } as never,
       auditLogRepository: { create: vi.fn().mockResolvedValue({}) } as never,
       platformSettingRepository: {
         findByKey: vi.fn().mockResolvedValue(null),
       } as never,
+      consultationCheckout: {
+        invoiceRepository: new InMemoryInvoiceRepository(),
+        qpayGateway: {
+          createInvoice: vi.fn().mockResolvedValue({
+            providerInvoiceId: "qpay-consult-1",
+            qrText: "qr",
+            qrImage: "img",
+            shortUrl: "https://qpay.mn/pay",
+            urls: [],
+          }),
+          checkPayment: vi.fn(),
+        },
+        qpayCallbackUrl: "https://tore.mn/api/billing/qpay/callback",
+      },
       unitOfWork: {
         runInTransaction: async (work) =>
           work({
@@ -139,7 +155,7 @@ describe("booking-requests", () => {
     };
   });
 
-  it("creates PENDING_ACCEPTANCE booking and notifies lawyer", async () => {
+  it("creates PENDING_PAYMENT booking and holds lawyer notice until QPay", async () => {
     const booking = await createBookingRequestUseCase(
       { userId: "client1", role: UserRole.CLIENT },
       {
@@ -152,14 +168,9 @@ describe("booking-requests", () => {
       deps,
     );
 
-    expect(booking.status).toBe(BookingStatus.PENDING_ACCEPTANCE);
+    expect(booking.status).toBe(BookingStatus.PENDING_PAYMENT);
     expect(bookingCreate).toHaveBeenCalled();
-    expect(notifyCreate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        userId: "lawyer1",
-        type: NotificationType.BOOKING_CREATED,
-      }),
-    );
+    expect(notifyCreate).not.toHaveBeenCalled();
   });
 
   it("accepts pending request and notifies client", async () => {

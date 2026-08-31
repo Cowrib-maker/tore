@@ -5,6 +5,7 @@ import { getSessionUser } from "@/application/common/session";
 import { getClientProfileForSession } from "@/application/actions/profile.actions";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
+import { ConsultationPaymentCard } from "@/components/marketplace/consultation-payment-card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -14,11 +15,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { UserRole } from "@/domain/enums";
+import { BookingStatus, UserRole } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 import {
   bookingRepository,
+  invoiceRepository,
   lawyerProfileRepository,
 } from "@/infrastructure/repositories";
 import {
@@ -35,6 +37,8 @@ function statusVariant(
       return "default";
     case "PENDING_ACCEPTANCE":
       return "secondary";
+    case "PENDING_PAYMENT":
+      return "outline";
     case "CANCELLED":
       return "destructive";
     default:
@@ -75,6 +79,17 @@ export default async function ClientBookingsPage() {
 
   const { items: bookings } = await bookingRepository.findByClientUserId(
     session.user.id,
+  );
+  const invoices = await Promise.all(
+    bookings
+      .filter((booking) => booking.status === BookingStatus.PENDING_PAYMENT)
+      .map(async (booking) => {
+        const invoice = await invoiceRepository.findByBookingId(booking.id);
+        return [booking.id, invoice] as const;
+      }),
+  );
+  const invoiceByBookingId = new Map(
+    invoices.filter((entry) => entry[1]).map(([id, invoice]) => [id, invoice!]),
   );
   const uniqueLawyerIds = [
     ...new Set(bookings.map((booking) => booking.lawyerProfileId)),
@@ -143,6 +158,19 @@ export default async function ClientBookingsPage() {
                       {b.declined} {booking.declineReason}
                     </p>
                   )}
+                  {booking.status === BookingStatus.PENDING_PAYMENT
+                    ? (() => {
+                        const invoice = invoiceByBookingId.get(booking.id);
+                        return invoice ? (
+                          <ConsultationPaymentCard
+                            invoiceId={invoice.id}
+                            amountMnt={invoice.amountMnt}
+                            qrImage={invoice.qrImage}
+                            shortUrl={invoice.shortUrl}
+                          />
+                        ) : null;
+                      })()
+                    : null}
                 </CardContent>
               </Card>
             );

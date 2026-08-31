@@ -5,7 +5,7 @@
  * would dominate the model context and burn the monthly ceiling quickly.
  *
  * MAX_DOCUMENT_EXTRACT_CHARS is a per-request prompt ceiling, not the monthly
- * token quota. SOLO's monthly input ceiling is 1_000_000 tokens
+ * token quota. SOLO's monthly input ceiling is 600_000 tokens
  * (`SOLO_PLAN.tokenCeilings.inputTokens`).
  *
  * 48_000 characters is roughly 12–16k tokens of mixed Mongolian/English,

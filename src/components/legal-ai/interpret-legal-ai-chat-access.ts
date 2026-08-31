@@ -1,13 +1,10 @@
+import type { LegalAiCheckoutView } from "@/components/legal-ai/legal-ai-checkout";
+
 export type LegalAiAccessGate = {
   kind: "auth" | "billing";
   question: string;
   message: string;
-  checkout?: {
-    qrImage: string | null;
-    shortUrl: string | null;
-    amountMnt: number;
-    planCode: string;
-  } | null;
+  checkout?: LegalAiCheckoutView | null;
   checkoutError?: string;
 };
 

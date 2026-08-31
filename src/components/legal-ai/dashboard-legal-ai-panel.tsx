@@ -3,6 +3,7 @@
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 
+import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
 import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { useLegalAiChatSession } from "@/components/legal-ai/use-legal-ai-chat-session";
 
@@ -12,7 +13,10 @@ export function DashboardLegalAiPanel({
   mode?: "CITIZEN" | "PROFESSIONAL";
 }) {
   const [message, setMessage] = useState("");
-  const { messages, loading, error, sendMessage } = useLegalAiChatSession();
+  const { messages, loading, error, accessGate, sendMessage } =
+    useLegalAiChatSession({
+      billingAudience: mode === "PROFESSIONAL" ? "lawyer" : "citizen",
+    });
   const transcriptRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -71,6 +75,14 @@ export function DashboardLegalAiPanel({
           <p role="alert" className="text-[12px] text-red-600">
             {error}
           </p>
+        ) : null}
+        {accessGate ? (
+          <LegalAiAccessGateCard
+            gate={accessGate}
+            onPaid={() =>
+              void sendMessage(accessGate.question, mode, { resume: true })
+            }
+          />
         ) : null}
       </div>
 

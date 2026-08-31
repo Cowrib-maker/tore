@@ -39,6 +39,7 @@ import {
   availabilityRepository,
   bookingRepository,
   consultationOfferingRepository,
+  invoiceRepository,
   languageRepository,
   lawyerProfileRepository,
   lawyerTaxonomyRepository,
@@ -46,6 +47,11 @@ import {
   platformSettingRepository,
   practiceAreaRepository,
 } from "@/infrastructure/repositories";
+import {
+  createQpayGateway,
+  isQpayConfigured,
+  qpayCallbackUrl,
+} from "@/infrastructure/billing/create-qpay-gateway";
 import {
   AVAILABILITY_WRITE_RATE_LIMIT,
   BOOKING_CREATE_RATE_LIMIT,
@@ -75,6 +81,13 @@ const bookingDeps = {
   auditLogRepository,
   platformSettingRepository,
   unitOfWork,
+  consultationCheckout: isQpayConfigured()
+    ? {
+        invoiceRepository,
+        qpayGateway: createQpayGateway(),
+        qpayCallbackUrl: qpayCallbackUrl(),
+      }
+    : undefined,
 };
 
 export async function createOfferingAction(

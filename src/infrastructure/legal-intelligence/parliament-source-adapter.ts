@@ -3,10 +3,10 @@ import {
   type LegalIntelligenceSourceRow,
 } from "@/domain/legal-intelligence";
 import type { LegalIntelligenceSourceAdapter } from "@/domain/ports/legal-intelligence-source";
+import type { LegalIntelligenceRepository } from "@/domain/repositories/legal-intelligence-repository";
 
 /**
- * Монгол Улсын Их Хурал — bills / discussion stages.
- * Not integrated yet: returns empty rather than fabricating records.
+ * Монгол Улсын Их Хурал — ingested official parliament.mn URLs only.
  */
 export class ParliamentIntelligenceAdapter
   implements LegalIntelligenceSourceAdapter
@@ -14,13 +14,15 @@ export class ParliamentIntelligenceAdapter
   readonly id = "mn.parliament";
   readonly authority = LegalIntelligenceAuthority.PARLIAMENT;
   readonly displayName = "Монгол Улсын Их Хурал";
-  readonly ready = false;
+  readonly ready = true;
 
-  async listRecords(_limit: number): Promise<LegalIntelligenceSourceRow[]> {
-    return [];
+  constructor(private readonly repository: LegalIntelligenceRepository) {}
+
+  listRecords(limit: number): Promise<LegalIntelligenceSourceRow[]> {
+    return this.repository.listPublicSummariesByHost("parliament.mn", limit);
   }
 
-  async findById(_id: string): Promise<LegalIntelligenceSourceRow | null> {
-    return null;
+  findById(id: string): Promise<LegalIntelligenceSourceRow | null> {
+    return this.repository.findById(id);
   }
 }

@@ -30,6 +30,11 @@ import {
 } from "@/domain/services/booking-number";
 import { canClientBookLawyer } from "@/domain/services/lawyer-eligibility";
 import { isSlotAvailable } from "@/domain/services/slot-availability";
+import {
+  createConsultationCheckout,
+  type CreateConsultationCheckoutDeps,
+} from "@/application/use-cases/billing/create-consultation-checkout";
+import { QPAY_UNAVAILABLE_MESSAGE } from "@/application/common/public-service-errors";
 
 export type BookingRequestDeps = {
   lawyerProfileRepository: LawyerProfileRepository;
@@ -40,6 +45,7 @@ export type BookingRequestDeps = {
   auditLogRepository: AuditLogRepository;
   platformSettingRepository: PlatformSettingRepository;
   unitOfWork: UnitOfWork;
+  consultationCheckout?: CreateConsultationCheckoutDeps;
 };
 
 export async function createBookingRequestUseCase(
@@ -93,6 +99,10 @@ export async function createBookingRequestUseCase(
       to,
     );
 
+  if (offering.priceMnt > 0 && !deps.consultationCheckout) {
+    throw new ValidationError(QPAY_UNAVAILABLE_MESSAGE);
+  }
+
   const prefixSetting = await deps.platformSettingRepository.findByKey(
     "booking_number_prefix",
   );
@@ -106,7 +116,7 @@ export async function createBookingRequestUseCase(
     }
   }
 
-  return deps.unitOfWork.runInTransaction(async (tx) => {
+  const booking = await deps.unitOfWork.runInTransaction(async (tx) => {
     const overlapping = await tx.bookingRepository.findOverlappingForLawyer(
       profile.id,
       { startAt, endAt },
@@ -132,27 +142,35 @@ export async function createBookingRequestUseCase(
       scheduledStartAt: startAt,
       scheduledEndAt: endAt,
       bookingNumber,
-      status: BookingStatus.PENDING_ACCEPTANCE,
+      status:
+        offering.priceMnt > 0
+          ? BookingStatus.PENDING_PAYMENT
+          : BookingStatus.PENDING_ACCEPTANCE,
     });
 
     await tx.bookingRepository.recordStatusChange({
       bookingId: booking.id,
       fromStatus: null,
-      toStatus: BookingStatus.PENDING_ACCEPTANCE,
+      toStatus: booking.status,
       changedByUserId: actor.userId,
-      reason: "Client booking request",
+      reason:
+        offering.priceMnt > 0
+          ? "Client booking request — awaiting payment"
+          : "Client booking request",
     });
 
-    await tx.notificationRepository.create({
-      userId: profile.userId,
-      type: NotificationType.BOOKING_CREATED,
-      title: "New booking request",
-      body: `Request ${booking.bookingNumber} is awaiting your response.`,
-      metadata: {
-        bookingId: booking.id,
-        bookingNumber: booking.bookingNumber,
-      },
-    });
+    if (offering.priceMnt <= 0) {
+      await tx.notificationRepository.create({
+        userId: profile.userId,
+        type: NotificationType.BOOKING_CREATED,
+        title: "New booking request",
+        body: `Request ${booking.bookingNumber} is awaiting your response.`,
+        metadata: {
+          bookingId: booking.id,
+          bookingNumber: booking.bookingNumber,
+        },
+      });
+    }
 
     await tx.auditLogRepository.create({
       actorUserId: actor.userId,
@@ -165,6 +183,35 @@ export async function createBookingRequestUseCase(
 
     return booking;
   });
+
+  if (offering.priceMnt > 0) {
+    if (!deps.consultationCheckout) {
+      await deps.bookingRepository.cancel(booking.id, {
+        cancellationReason: "Payment unavailable",
+        cancelledByUserId: actor.userId,
+      });
+      throw new ValidationError(QPAY_UNAVAILABLE_MESSAGE);
+    }
+    try {
+      await createConsultationCheckout(
+        actor,
+        {
+          bookingId: booking.id,
+          amountMnt: offering.priceMnt,
+          description: `TORE consultation ${booking.bookingNumber}`,
+        },
+        deps.consultationCheckout,
+      );
+    } catch (error) {
+      await deps.bookingRepository.cancel(booking.id, {
+        cancellationReason: "Payment invoice failed",
+        cancelledByUserId: actor.userId,
+      });
+      throw error;
+    }
+  }
+
+  return booking;
 }
 
 export async function respondToBookingRequestUseCase(

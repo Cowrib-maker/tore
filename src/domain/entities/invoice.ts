@@ -15,7 +15,8 @@ export type Invoice = {
   id: string;
   userId: string;
   subscriptionId: string | null;
-  planCode: SubscriptionPlanCode;
+  bookingId: string | null;
+  planCode: SubscriptionPlanCode | null;
   amountMnt: number;
   currency: string;
   provider: string;
@@ -48,7 +49,8 @@ export type CreateInvoiceInput = {
   id?: string;
   userId: string;
   subscriptionId?: string | null;
-  planCode: SubscriptionPlanCode;
+  bookingId?: string | null;
+  planCode?: SubscriptionPlanCode | null;
   amountMnt: number;
   currency: string;
   provider: string;

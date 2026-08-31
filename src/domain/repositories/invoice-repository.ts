@@ -18,6 +18,7 @@ export interface InvoiceRepository {
   create(input: CreateInvoiceInput): Promise<Invoice>;
   findById(id: string): Promise<Invoice | null>;
   findByProviderInvoiceId(providerInvoiceId: string): Promise<Invoice | null>;
+  findByBookingId(bookingId: string): Promise<Invoice | null>;
   findLatestPendingForUser(
     userId: string,
     now: Date,

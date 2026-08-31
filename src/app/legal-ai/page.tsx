@@ -117,7 +117,7 @@ export default async function LegalAiPage({
       initialConversationId={ownedConversationId}
       initialMessages={initialMessages}
       initialAttachedDocuments={initialAttachedDocuments}
-      documentUploadEnabled={session?.user?.role === UserRole.LAWYER}
+      documentUploadEnabled={session?.user?.role === UserRole.CLIENT}
       dashboardHref={dashboardHref}
       displayName={session?.user?.name?.trim() || session?.user?.email}
       signInLabel={dict.common.signIn}

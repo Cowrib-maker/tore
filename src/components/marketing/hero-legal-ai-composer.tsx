@@ -78,7 +78,14 @@ export function HeroLegalAiComposer({
           ) : null}
         </div>
       ) : null}
-      {accessGate ? <LegalAiAccessGateCard gate={accessGate} /> : null}
+      {accessGate ? (
+        <LegalAiAccessGateCard
+          gate={accessGate}
+          onPaid={() =>
+            void sendMessage(accessGate.question, undefined, { resume: true })
+          }
+        />
+      ) : null}
 
       <form
         onSubmit={handleSubmit}

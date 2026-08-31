@@ -1,48 +1,56 @@
 import type { ActorContext } from "@/application/common/actor-context";
-import { assertLawyerEntitlementActor } from "@/application/use-cases/entitlements/ensure-lawyer-solo-subscription";
+import { QPAY_UNAVAILABLE_MESSAGE } from "@/application/common/public-service-errors";
 import {
-  SOLO_INVOICE_DESCRIPTION,
   SOLO_INVOICE_TTL_MS,
   toSoloCheckoutView,
   type SoloCheckoutView,
 } from "@/application/use-cases/billing/checkout-view";
-import { SOLO_PLAN } from "@/domain/constants/subscription-plans";
-import { BILLING_PROVIDER_QPAY, InvoiceStatus } from "@/domain/enums";
+import { BILLING_PROVIDER_QPAY, InvoiceStatus, UserRole } from "@/domain/enums";
+import { ForbiddenError, ValidationError } from "@/domain/errors/domain-error";
 import { PaymentVerificationError } from "@/domain/errors/payment-verification-error";
 import type { QpayGateway } from "@/domain/ports/qpay-gateway";
 import type { InvoiceRepository } from "@/domain/repositories/invoice-repository";
 import { SOLO_INVOICE_CURRENCY } from "@/domain/services/qpay-payment-verification";
 
-export type CreateSoloCheckoutDeps = {
+export type CreateConsultationCheckoutDeps = {
   invoiceRepository: InvoiceRepository;
   qpayGateway: QpayGateway;
   qpayCallbackUrl: string;
 };
 
-export async function createSoloCheckout(
+export async function createConsultationCheckout(
   actor: ActorContext,
-  deps: CreateSoloCheckoutDeps,
+  input: {
+    bookingId: string;
+    amountMnt: number;
+    description: string;
+  },
+  deps: CreateConsultationCheckoutDeps,
   now: Date = new Date(),
 ): Promise<SoloCheckoutView> {
-  assertLawyerEntitlementActor(actor);
+  if (actor.role !== UserRole.CLIENT) {
+    throw new ForbiddenError();
+  }
+  if (!Number.isFinite(input.amountMnt) || input.amountMnt <= 0) {
+    throw new ValidationError("Consultation fee must be a positive amount.");
+  }
 
-  const existing = await deps.invoiceRepository.findLatestPendingForUser(
-    actor.userId,
-    now,
-  );
+  const existing = await deps.invoiceRepository.findByBookingId(input.bookingId);
   if (
-    existing?.providerInvoiceId &&
-    existing.qrText &&
-    existing.planCode === SOLO_PLAN.code &&
-    !existing.bookingId
+    existing &&
+    existing.status === InvoiceStatus.PENDING &&
+    existing.expiresAt.getTime() > now.getTime() &&
+    existing.providerInvoiceId &&
+    existing.qrText
   ) {
     return toSoloCheckoutView(existing);
   }
 
   const invoice = await deps.invoiceRepository.create({
     userId: actor.userId,
-    planCode: SOLO_PLAN.code,
-    amountMnt: SOLO_PLAN.priceMnt,
+    bookingId: input.bookingId,
+    planCode: null,
+    amountMnt: input.amountMnt,
     currency: SOLO_INVOICE_CURRENCY,
     provider: BILLING_PROVIDER_QPAY,
     status: InvoiceStatus.PENDING,
@@ -52,8 +60,8 @@ export async function createSoloCheckout(
   try {
     const created = await deps.qpayGateway.createInvoice({
       senderInvoiceNo: invoice.id,
-      amountMnt: SOLO_PLAN.priceMnt,
-      description: SOLO_INVOICE_DESCRIPTION,
+      amountMnt: input.amountMnt,
+      description: input.description.slice(0, 240),
       callbackUrl: deps.qpayCallbackUrl,
     });
     const attached = await deps.invoiceRepository.attachProviderInvoice(
@@ -75,7 +83,7 @@ export async function createSoloCheckout(
       throw error;
     }
     throw new PaymentVerificationError(
-      "QPay request failed",
+      QPAY_UNAVAILABLE_MESSAGE,
       "QPAY_UNAVAILABLE",
       503,
     );

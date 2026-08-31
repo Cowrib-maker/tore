@@ -75,8 +75,11 @@ export default async function LawyerBookingsPage() {
   const { items: bookings } = await bookingRepository.findByLawyerProfileId(
     data.profile.id,
   );
+  const visibleBookings = bookings.filter(
+    (booking) => booking.status !== "PENDING_PAYMENT",
+  );
 
-  const uniqueClientIds = [...new Set(bookings.map((b) => b.clientUserId))];
+  const uniqueClientIds = [...new Set(visibleBookings.map((b) => b.clientUserId))];
   const clients = await userRepository.findByIds(uniqueClientIds);
   const clientNames = new Map(
     clients.map((user) => [
@@ -103,7 +106,7 @@ export default async function LawyerBookingsPage() {
         </Link>
       </p>
       <div className="space-y-4">
-        {bookings.length === 0 ? (
+        {visibleBookings.length === 0 ? (
           <Card>
             <CardHeader>
               <CardTitle>{b.emptyTitle}</CardTitle>
@@ -111,7 +114,7 @@ export default async function LawyerBookingsPage() {
             </CardHeader>
           </Card>
         ) : (
-          bookings.map((booking) => (
+          visibleBookings.map((booking) => (
             <Card key={booking.id}>
               <CardHeader>
                 <div className="flex flex-wrap items-center justify-between gap-2">

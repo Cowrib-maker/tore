@@ -39,7 +39,8 @@ function mapInvoice(record: {
   id: string;
   userId: string;
   subscriptionId: string | null;
-  planCode: string;
+  bookingId: string | null;
+  planCode: string | null;
   amountMnt: number;
   currency: string;
   provider: string;
@@ -57,6 +58,7 @@ function mapInvoice(record: {
     id: record.id,
     userId: record.userId,
     subscriptionId: record.subscriptionId,
+    bookingId: record.bookingId,
     planCode: record.planCode as Invoice["planCode"],
     amountMnt: record.amountMnt,
     currency: record.currency,
@@ -82,7 +84,8 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
         ...(input.id ? { id: input.id } : {}),
         userId: input.userId,
         subscriptionId: input.subscriptionId ?? null,
-        planCode: input.planCode,
+        bookingId: input.bookingId ?? null,
+        planCode: input.planCode ?? null,
         amountMnt: input.amountMnt,
         currency: input.currency,
         provider: input.provider,
@@ -107,6 +110,13 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
     return record ? mapInvoice(record) : null;
   }
 
+  async findByBookingId(bookingId: string): Promise<Invoice | null> {
+    const record = await this.db.invoice.findUnique({
+      where: { bookingId },
+    });
+    return record ? mapInvoice(record) : null;
+  }
+
   async findLatestPendingForUser(
     userId: string,
     now: Date,
@@ -117,6 +127,7 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
         status: InvoiceStatus.PENDING,
         expiresAt: { gt: now },
         providerInvoiceId: { not: null },
+        bookingId: null,
       },
       orderBy: { createdAt: "desc" },
     });

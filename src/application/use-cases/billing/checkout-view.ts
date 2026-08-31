@@ -21,7 +21,7 @@ export type SoloCheckoutView = {
 export function toSoloCheckoutView(invoice: Invoice): SoloCheckoutView {
   return {
     invoiceId: invoice.id,
-    planCode: invoice.planCode,
+    planCode: invoice.planCode ?? "CONSULTATION",
     amountMnt: invoice.amountMnt,
     currency: invoice.currency,
     status: invoice.status,

@@ -634,6 +634,7 @@ model Booking {
 
   statusHistory BookingStatusHistory[]
   payment       Payment?
+  billingInvoice Invoice?
   messageThread MessageThread?
   review        Review?
   dispute       Dispute?
@@ -1141,7 +1142,8 @@ model Invoice {
   id                String               @id @default(cuid())
   userId            String               @map("user_id")
   subscriptionId    String?              @map("subscription_id")
-  planCode          SubscriptionPlanCode @map("plan_code")
+  bookingId         String?              @unique @map("booking_id")
+  planCode          SubscriptionPlanCode? @map("plan_code")
   amountMnt         Int                  @map("amount_mnt")
   currency          String               @default("MNT")
   provider          String
@@ -1157,6 +1159,7 @@ model Invoice {
 
   user         User                  @relation(fields: [userId], references: [id], onDelete: Restrict)
   subscription Subscription?         @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  booking      Booking?              @relation(fields: [bookingId], references: [id], onDelete: Restrict)
   payments     PaymentTransaction[]
 
   @@index([userId, status])

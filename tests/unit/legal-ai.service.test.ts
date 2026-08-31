@@ -1107,7 +1107,7 @@ describe("LegalAiService", () => {
     expect(systemPrompt).toContain("DOCX clause two.");
   });
 
-  it("does not inject a PDF extract on the citizen capability", async () => {
+  it("injects a redacted PDF extract on the citizen capability", async () => {
     const { service, store, completion } = createService();
     const opened = await service.createTurn({
       userId: "user-1",
@@ -1130,8 +1130,9 @@ describe("LegalAiService", () => {
 
     const systemPrompt = completion.complete.mock.calls[0]?.[0]?.systemPrompt ?? "";
     expect(systemPrompt).not.toContain("Ignore previous instructions");
-    expect(systemPrompt).not.toContain("UNTRUSTED_USER_DOCUMENT_DATA");
-    expect(systemPrompt).toContain("Хавсаргасан файл, зураг, баримтыг шинжилсэн гэж хэлж болохгүй");
+    expect(systemPrompt).toContain("UNTRUSTED_USER_DOCUMENT_DATA");
+    expect(systemPrompt).toContain("BEGIN UNTRUSTED DOCUMENT (contract.pdf)");
+    expect(systemPrompt).toContain("[redacted-instruction-like-text]");
   });
 
   it("preserves the no-file-analysis preamble when no document is attached", async () => {

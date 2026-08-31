@@ -60,3 +60,26 @@ describe("legal AI document upload route contracts", () => {
     expect(route).not.toMatch(/formData\.get\(["'](?:url|key|path)["']\)/);
   });
 });
+
+describe("citizen legal AI document upload route contracts", () => {
+  const route = readFileSync(
+    path.join(process.cwd(), "src/app/api/ai/documents/route.ts"),
+    "utf8",
+  );
+
+  it("is client-only, email-verified, billed, and rate-limited", () => {
+    expect(route).toContain("requireActor(UserRole.CLIENT)");
+    expect(route).toContain("assertEmailVerified");
+    expect(route).toContain("EntitlementFeature.DOCUMENT_ANALYSIS");
+    expect(route).toContain("recordCitizenFeatureUsage");
+    expect(route).toContain("assertCitizenAiOperation");
+    expect(route).toContain("attachConversationDocumentUseCase");
+  });
+
+  it("increments DOCUMENT_ANALYSIS only after a successful attachment", () => {
+    const attachCall = route.indexOf("await attachConversationDocumentUseCase");
+    const usageCall = route.indexOf("await recordCitizenFeatureUsage");
+    expect(attachCall).toBeGreaterThan(0);
+    expect(usageCall).toBeGreaterThan(attachCall);
+  });
+});

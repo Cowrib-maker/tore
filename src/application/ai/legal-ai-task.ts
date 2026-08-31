@@ -163,6 +163,7 @@ const TASK_STAGES: Record<LegalAiTaskType, readonly LegalAiReasoningStage[]> = {
 
 const CITIZEN_STAGES: readonly LegalAiReasoningStage[] = [
   LegalAiReasoningStage.INTENT,
+  LegalAiReasoningStage.DOCUMENT_CONTEXT,
   LegalAiReasoningStage.LEGAL_RETRIEVAL,
   LegalAiReasoningStage.APPLICABLE_LAW,
   LegalAiReasoningStage.CONCLUSION,

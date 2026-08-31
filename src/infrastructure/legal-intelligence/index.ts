@@ -6,13 +6,13 @@ import { legalIntelligenceRepository } from "@/infrastructure/repositories/prism
 
 /**
  * Authoritative source registry for Legal Intelligence.
- * Only LegalInfo is ready; parliament/court adapters are stubs that return [].
+ * Adapters return ingested official records only; empty means none ingested yet.
  */
 export function createLegalIntelligenceAdapters(): LegalIntelligenceSourceAdapter[] {
   return [
     new LegalInfoIntelligenceAdapter(legalIntelligenceRepository),
-    new ParliamentIntelligenceAdapter(),
-    new CourtIntelligenceAdapter(),
+    new ParliamentIntelligenceAdapter(legalIntelligenceRepository),
+    new CourtIntelligenceAdapter(legalIntelligenceRepository),
   ];
 }
 

@@ -37,6 +37,7 @@ import type {
 import { interpretLegalAiChatAccess } from "@/components/legal-ai/interpret-legal-ai-chat-access";
 import type { LegalAiAccessGate } from "@/components/legal-ai/interpret-legal-ai-chat-access";
 import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
+import { requestLawyerCheckout } from "@/components/legal-ai/request-lawyer-checkout";
 import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-list";
 import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
@@ -251,12 +252,14 @@ export function LawyerAiWorkbench({
     if (file) await uploadPdf(file);
   }
 
-  async function sendMessage(text: string) {
+  async function sendMessage(text: string, options?: { resume?: boolean }) {
     if (!text || loading) return;
     setError("");
     setAccessGate(null);
-    setDraft("");
-    setMessages((current) => [...current, { role: "USER", content: text }]);
+    if (!options?.resume) {
+      setDraft("");
+      setMessages((current) => [...current, { role: "USER", content: text }]);
+    }
     setLoading(true);
     try {
       const response = await fetch("/api/ai/chat", {
@@ -286,8 +289,15 @@ export function LawyerAiWorkbench({
         return;
       }
       if (interpreted.type === "billing") {
-        setAccessGate(interpreted.gate);
-        setDraft(text);
+        const checkout = await requestLawyerCheckout();
+        setAccessGate({
+          ...interpreted.gate,
+          checkout: checkout.view,
+          checkoutError: checkout.error,
+        });
+        if (!options?.resume) {
+          setDraft(text);
+        }
         return;
       }
       if (interpreted.type === "error") {
@@ -456,7 +466,14 @@ export function LawyerAiWorkbench({
                   {error}
                 </div>
               ) : null}
-              {accessGate ? <LegalAiAccessGateCard gate={accessGate} /> : null}
+              {accessGate ? (
+                <LegalAiAccessGateCard
+                  gate={accessGate}
+                  onPaid={() =>
+                    void sendMessage(accessGate.question, { resume: true })
+                  }
+                />
+              ) : null}
             </div>
           </div>
 

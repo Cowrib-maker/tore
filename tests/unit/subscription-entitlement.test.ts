@@ -38,18 +38,18 @@ describe("subscription entitlements", () => {
   it("keeps the current SOLO commercial plan", () => {
     expect(SOLO_PLAN.priceMnt).toBe(49_000);
     expect(SOLO_PLAN.seatLimit).toBe(1);
-    expect(SOLO_PLAN.quotas.caseAnalysis).toBe(30);
-    expect(SOLO_PLAN.quotas.documentAnalysis).toBe(100);
-    expect(SOLO_PLAN.quotas.legalAiQueries).toBe(500);
-    expect(SOLO_PLAN.tokenCeilings.inputTokens).toBe(1_000_000);
-    expect(SOLO_PLAN.tokenCeilings.outputTokens).toBe(200_000);
+    expect(SOLO_PLAN.quotas.caseAnalysis).toBe(15);
+    expect(SOLO_PLAN.quotas.documentAnalysis).toBe(25);
+    expect(SOLO_PLAN.quotas.legalAiQueries).toBe(200);
+    expect(SOLO_PLAN.tokenCeilings.inputTokens).toBe(600_000);
+    expect(SOLO_PLAN.tokenCeilings.outputTokens).toBe(120_000);
   });
 
   it("resolves SOLO seatLimit = 1 from the server-side catalog", () => {
     const entitlement = resolveLawyerEntitlement(subscription(), now);
     expect(entitlement.planCode).toBe(SubscriptionPlanCode.SOLO);
     expect(entitlement.seatLimit).toBe(1);
-    expect(entitlement.quotas.legalAiQueries).toBe(500);
+    expect(entitlement.quotas.legalAiQueries).toBe(SOLO_PLAN.quotas.legalAiQueries);
   });
 
   it("allows a future TEAM subscription to have seatLimit greater than 1", () => {
@@ -101,9 +101,9 @@ describe("subscription entitlements", () => {
       usage,
     );
     expect(snapshot).toEqual({
-      caseAnalysis: { used: 2, limit: 30 },
-      documentAnalysis: { used: 4, limit: 100 },
-      legalAiQueries: { used: 9, limit: 500 },
+      caseAnalysis: { used: 2, limit: SOLO_PLAN.quotas.caseAnalysis },
+      documentAnalysis: { used: 4, limit: SOLO_PLAN.quotas.documentAnalysis },
+      legalAiQueries: { used: 9, limit: SOLO_PLAN.quotas.legalAiQueries },
     });
     expect(JSON.stringify(snapshot)).not.toMatch(/token/i);
   });
@@ -116,7 +116,7 @@ describe("subscription entitlements", () => {
         caseAnalysisCount: 0,
         documentAnalysisCount: 0,
         legalAiQueryCount: 0,
-        inputTokens: 1_000_000,
+        inputTokens: SOLO_PLAN.tokenCeilings.inputTokens,
         outputTokens: 0,
       },
     });
@@ -134,7 +134,7 @@ describe("subscription entitlements", () => {
       usage: {
         caseAnalysisCount: 0,
         documentAnalysisCount: 0,
-        legalAiQueryCount: 500,
+        legalAiQueryCount: SOLO_PLAN.quotas.legalAiQueries,
         inputTokens: 0,
         outputTokens: 0,
       },
@@ -142,6 +142,6 @@ describe("subscription entitlements", () => {
     expect(decision.ok).toBe(false);
     if (decision.ok) return;
     expect(decision.kind).toBe("FEATURE");
-    expect(decision.message).toContain("TORE Team");
+    expect(decision.message).toContain("хязгаарт хүрсэн");
   });
 });

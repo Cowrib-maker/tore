@@ -104,6 +104,19 @@ describe("booking-request guards", () => {
       platformSettingRepository: {
         findByKey: vi.fn().mockResolvedValue(null),
       } as never,
+      consultationCheckout: {
+        invoiceRepository: {
+          findByBookingId: vi.fn(),
+          create: vi.fn(),
+          attachProviderInvoice: vi.fn(),
+          updateStatus: vi.fn(),
+        },
+        qpayGateway: {
+          createInvoice: vi.fn(),
+          checkPayment: vi.fn(),
+        },
+        qpayCallbackUrl: "https://tore.mn/api/billing/qpay/callback",
+      } as never,
       unitOfWork: {
         runInTransaction: async (work) =>
           work({

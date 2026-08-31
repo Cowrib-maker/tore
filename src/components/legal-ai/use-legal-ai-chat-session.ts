@@ -9,7 +9,7 @@ import {
   interpretLegalAiChatAccess,
   type LegalAiAccessGate,
 } from "@/components/legal-ai/interpret-legal-ai-chat-access";
-import { requestCitizenCheckout } from "@/components/legal-ai/request-citizen-checkout";
+import { requestLawyerCheckout } from "@/components/legal-ai/request-lawyer-checkout";
 
 export type ChatMessage = {
   role: "USER" | "ASSISTANT";
@@ -21,6 +21,7 @@ export function useLegalAiChatSession(initial?: {
   messages?: ChatMessage[];
   conversationId?: string;
   checkoutEnabled?: boolean;
+  billingAudience?: "citizen" | "lawyer";
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>(
     initial?.messages ?? [],
@@ -40,10 +41,13 @@ export function useLegalAiChatSession(initial?: {
   async function sendMessage(
     text: string,
     _mode?: "CITIZEN" | "PROFESSIONAL",
+    options?: { resume?: boolean },
   ): Promise<"ok" | "gated" | "error"> {
     setError("");
     setAccessGate(null);
-    setMessages((current) => [...current, { role: "USER", content: text }]);
+    if (!options?.resume) {
+      setMessages((current) => [...current, { role: "USER", content: text }]);
+    }
     setLoading(true);
 
     try {
@@ -76,9 +80,10 @@ export function useLegalAiChatSession(initial?: {
       }
 
       if (interpreted.type === "billing") {
-        const checkout = await requestCitizenCheckout({
-          enabled: initial?.checkoutEnabled,
-        });
+        const checkout =
+          initial?.billingAudience === "lawyer"
+            ? await requestLawyerCheckout()
+            : { view: null, error: undefined };
         setAccessGate({
           ...interpreted.gate,
           checkout: checkout.view,

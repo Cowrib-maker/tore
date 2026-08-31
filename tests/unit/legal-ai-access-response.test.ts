@@ -2,6 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import { interpretLegalAiChatAccess } from "@/components/legal-ai/interpret-legal-ai-chat-access";
 import {
+  isEntitlementReadyToContinue,
+  isLawyerInvoicePaid,
+  qrImageSrc,
+} from "@/components/legal-ai/legal-ai-checkout";
+import {
   legalAiHref,
   loginHrefForLegalAi,
   registerClientHrefForLegalAi,
@@ -49,5 +54,32 @@ describe("homepage and /legal-ai shared access interpretation", () => {
     expect(registerClientHrefForLegalAi(question)).toBe(
       `/register/client?callbackUrl=${encodeURIComponent(href)}`,
     );
+  });
+});
+
+describe("in-place paywall helpers", () => {
+  it("treats a paid lawyer invoice as ready to continue", () => {
+    expect(isLawyerInvoicePaid({ paid: true })).toBe(true);
+    expect(isLawyerInvoicePaid({ subscriptionStatus: "ACTIVE" })).toBe(true);
+    expect(isLawyerInvoicePaid({ paid: false, subscriptionStatus: "PENDING" })).toBe(
+      false,
+    );
+  });
+
+  it("continues only when remaining legal questions are available", () => {
+    expect(isEntitlementReadyToContinue({ remainingLegalQuestions: 0 })).toBe(
+      false,
+    );
+    expect(isEntitlementReadyToContinue({ remainingLegalQuestions: 12 })).toBe(
+      true,
+    );
+  });
+
+  it("prefixes raw QR payloads as data URLs", () => {
+    expect(qrImageSrc("abc")).toBe("data:image/png;base64,abc");
+    expect(qrImageSrc("data:image/png;base64,abc")).toBe(
+      "data:image/png;base64,abc",
+    );
+    expect(qrImageSrc(null)).toBeNull();
   });
 });

@@ -427,7 +427,8 @@ export const marketplaceMn: MarketplaceDictionary = {
   },
   bookingRequest: {
     success: "Зөвлөгөөний хүсэлт илгээгдлээ",
-    successTrack: "Төлөвийг Захиалга хэсгээс хянана уу.",
+    successTrack:
+      "Хэрэв төлбөр шаардлагатай бол Захиалга хэсэгт QPay QR гарна. Төлсний дараа өмгөөлөгч хүсэлтийг харна.",
     offering: "Үйлчилгээ",
     time: "Уулзалтын цаг",
     practiceArea: "Үйл ажиллагааны чиглэл (заавал биш)",

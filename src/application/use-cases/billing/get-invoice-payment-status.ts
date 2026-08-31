@@ -1,9 +1,9 @@
 import type { ActorContext } from "@/application/common/actor-context";
-import { assertLawyerEntitlementActor } from "@/application/use-cases/entitlements/ensure-lawyer-solo-subscription";
 import {
   toSoloCheckoutView,
   type SoloCheckoutView,
 } from "@/application/use-cases/billing/checkout-view";
+import { completePaidConsultationBooking } from "@/application/use-cases/billing/complete-paid-consultation";
 import {
   processQpayInvoicePayment,
   type ProcessQpayPaymentDeps,
@@ -41,8 +41,6 @@ export async function getOwnInvoicePaymentStatus(
   deps: InvoicePaymentStatusDeps,
   now: Date = new Date(),
 ): Promise<InvoicePaymentStatusView> {
-  assertLawyerEntitlementActor(actor);
-
   const invoice = await deps.invoiceRepository.findById(invoiceId);
   if (!invoice) {
     throw new NotFoundError("Invoice");
@@ -51,10 +49,7 @@ export async function getOwnInvoicePaymentStatus(
     throw new ForbiddenError();
   }
 
-  if (
-    invoice.status === InvoiceStatus.PENDING &&
-    invoice.providerInvoiceId
-  ) {
+  if (invoice.status === InvoiceStatus.PENDING && invoice.providerInvoiceId) {
     try {
       const processed = await processQpayInvoicePayment(
         invoice.providerInvoiceId,
@@ -76,9 +71,24 @@ export async function getOwnInvoicePaymentStatus(
     }
   }
 
+  if (
+    invoice.bookingId &&
+    invoice.status === InvoiceStatus.PAID &&
+    deps.bookingRepository
+  ) {
+    await completePaidConsultationBooking(invoice, {
+      bookingRepository: deps.bookingRepository,
+      lawyerProfileRepository: deps.lawyerProfileRepository,
+      notificationRepository: deps.notificationRepository,
+      auditLogRepository: deps.auditLogRepository,
+    });
+  }
+
   const subscription = invoice.subscriptionId
     ? await deps.subscriptionRepository.findById(invoice.subscriptionId)
-    : await deps.subscriptionRepository.findLatestOwnedByUserId(actor.userId);
+    : invoice.planCode
+      ? await deps.subscriptionRepository.findLatestOwnedByUserId(actor.userId)
+      : null;
 
   return toStatusView(invoice, subscription, now);
 }
@@ -88,10 +98,11 @@ function toStatusView(
   subscription: Subscription | null,
   now: Date,
 ): InvoicePaymentStatusView {
-  const paid = invoice.status === InvoiceStatus.PAID;
+  const invoicePaid = invoice.status === InvoiceStatus.PAID;
   const active = subscription
     ? isSubscriptionActive(subscription, now)
     : false;
+  const paid = invoice.bookingId ? invoicePaid : invoicePaid && active;
   return {
     invoice: toSoloCheckoutView(invoice),
     invoiceStatus: invoice.status,
@@ -102,6 +113,6 @@ function toStatusView(
     }),
     subscriptionId: subscription?.id ?? null,
     expiresAt: subscription?.currentPeriodEnd.toISOString() ?? null,
-    paid: paid && active,
+    paid,
   };
 }

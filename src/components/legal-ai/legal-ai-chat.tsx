@@ -46,11 +46,13 @@ import {
 } from "@/application/ai/legal-ai-citation";
 import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-list";
 import { LEGAL_AI_CHAT_RETRY_MESSAGE } from "@/components/legal-ai/legal-ai-chat-errors";
-import { interpretLegalAiChatAccess } from "@/components/legal-ai/interpret-legal-ai-chat-access";
+import {
+  interpretLegalAiChatAccess,
+  type LegalAiAccessGate,
+} from "@/components/legal-ai/interpret-legal-ai-chat-access";
 import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
 import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
-import { requestCitizenCheckout } from "@/components/legal-ai/request-citizen-checkout";
 import {
   LEGAL_AI_PATH,
   loginHrefForLegalAi,
@@ -144,18 +146,7 @@ export function LegalAiChat({
   );
   const [listening, setListening] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [accessGate, setAccessGate] = useState<null | {
-    kind: "auth" | "billing";
-    question: string;
-    message: string;
-    checkout?: {
-      qrImage: string | null;
-      shortUrl: string | null;
-      amountMnt: number;
-      planCode: string;
-    } | null;
-    checkoutError?: string;
-  }>(null);
+  const [accessGate, setAccessGate] = useState<LegalAiAccessGate | null>(null);
 
   const documentInputRef = useRef<HTMLInputElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
@@ -209,7 +200,7 @@ export function LegalAiChat({
 
   async function uploadDocument(file: File) {
     if (!documentUploadEnabled) {
-      setError("Файл хавсаргах нь хуульчийн эрхтэй хэрэглэгчид зориулагдсан.");
+      setError("Файл хавсаргахын тулд нэвтэрнэ үү.");
       return;
     }
     const rejected = clientRejectLegalAiDocument(file);
@@ -227,7 +218,7 @@ export function LegalAiChat({
         formData.append("conversationId", conversationId);
       }
 
-      const response = await fetch("/api/lawyer/ai/documents", {
+      const response = await fetch("/api/ai/documents", {
         method: "POST",
         body: formData,
       });
@@ -246,6 +237,15 @@ export function LegalAiChat({
 
       if (response.status === 401) {
         window.location.assign(loginHrefForLegalAi());
+        return;
+      }
+
+      if (response.status === 402) {
+        setAccessGate({
+          kind: "billing",
+          question: "",
+          message: data.error ?? "Баримт хавсаргахад төлбөртэй багц хэрэгтэй.",
+        });
         return;
       }
 
@@ -282,18 +282,6 @@ export function LegalAiChat({
     } finally {
       setUploading(false);
     }
-  }
-
-  async function startCitizenCheckout(): Promise<{
-    view: {
-      qrImage: string | null;
-      shortUrl: string | null;
-      amountMnt: number;
-      planCode: string;
-    } | null;
-    error?: string;
-  }> {
-    return requestCitizenCheckout({ enabled: Boolean(dashboardHref) });
   }
 
   function toggleMicrophone() {
@@ -339,7 +327,7 @@ export function LegalAiChat({
     }
   }
 
-  async function sendMessage(text: string) {
+  async function sendMessage(text: string, options?: { resume?: boolean }) {
     if (!text || loading) {
       return;
     }
@@ -347,7 +335,9 @@ export function LegalAiChat({
     setError("");
     setAccessGate(null);
     setMessage("");
-    setMessages((current) => [...current, { role: "USER", content: text }]);
+    if (!options?.resume) {
+      setMessages((current) => [...current, { role: "USER", content: text }]);
+    }
     setLoading(true);
 
     try {
@@ -383,12 +373,7 @@ export function LegalAiChat({
       }
 
       if (interpreted.type === "billing") {
-        const checkout = await startCitizenCheckout();
-        setAccessGate({
-          ...interpreted.gate,
-          checkout: checkout.view,
-          checkoutError: checkout.error,
-        });
+        setAccessGate(interpreted.gate);
         setMessage(text);
         return;
       }
@@ -622,7 +607,14 @@ export function LegalAiChat({
                   {error}
                 </div>
               ) : null}
-              {accessGate ? <LegalAiAccessGateCard gate={accessGate} /> : null}
+              {accessGate ? (
+                <LegalAiAccessGateCard
+                  gate={accessGate}
+                  onPaid={() =>
+                    void sendMessage(accessGate.question, { resume: true })
+                  }
+                />
+              ) : null}
               {composer}
             </div>
           </div>
@@ -653,7 +645,14 @@ export function LegalAiChat({
                   </div>
                 ) : null}
                 <LegalAiEntitlementBanner />
-                {accessGate ? <LegalAiAccessGateCard gate={accessGate} /> : null}
+                {accessGate ? (
+                  <LegalAiAccessGateCard
+                    gate={accessGate}
+                    onPaid={() =>
+                      void sendMessage(accessGate.question, { resume: true })
+                    }
+                  />
+                ) : null}
               </div>
             </div>
             {composer}

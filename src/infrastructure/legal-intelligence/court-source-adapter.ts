@@ -3,10 +3,11 @@ import {
   type LegalIntelligenceSourceRow,
 } from "@/domain/legal-intelligence";
 import type { LegalIntelligenceSourceAdapter } from "@/domain/ports/legal-intelligence-source";
+import type { LegalIntelligenceRepository } from "@/domain/repositories/legal-intelligence-repository";
 
 /**
- * Official court sources (shuukh / supreme court).
- * Not integrated yet: returns empty rather than fabricating records.
+ * Official court sources (shuukh.mn). Returns ingested official URLs only —
+ * never fabricates judgments.
  */
 export class CourtIntelligenceAdapter
   implements LegalIntelligenceSourceAdapter
@@ -14,13 +15,15 @@ export class CourtIntelligenceAdapter
   readonly id = "mn.court";
   readonly authority = LegalIntelligenceAuthority.COURT;
   readonly displayName = "Монгол Улсын шүүх";
-  readonly ready = false;
+  readonly ready = true;
 
-  async listRecords(_limit: number): Promise<LegalIntelligenceSourceRow[]> {
-    return [];
+  constructor(private readonly repository: LegalIntelligenceRepository) {}
+
+  listRecords(limit: number): Promise<LegalIntelligenceSourceRow[]> {
+    return this.repository.listPublicSummariesByHost("shuukh.mn", limit);
   }
 
-  async findById(_id: string): Promise<LegalIntelligenceSourceRow | null> {
-    return null;
+  findById(id: string): Promise<LegalIntelligenceSourceRow | null> {
+    return this.repository.findById(id);
   }
 }

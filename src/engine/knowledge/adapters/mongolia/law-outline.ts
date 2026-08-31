@@ -503,8 +503,9 @@ function classifyLine(line: string): ClassifiedLine {
   // а) ...
   // б) ...
   // ─────────────────────────────────────────────
+  // а/ ...   б) ...   /б/ ...
   const letter = normalized.match(
-    /^([а-яёөүғқһ])\s*[\/)]\s*(.*)$/iu,
+    /^\/?([а-яёөүғқһ])\s*[\/)]\s*(.*)$/iu,
   );
 
   if (letter) {

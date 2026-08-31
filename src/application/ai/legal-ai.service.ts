@@ -311,13 +311,12 @@ export class LegalAiService {
         ? PromptTurnKind.LEGAL
         : resolveTurnKind(pipelineDomain, intent);
 
-    const documents =
-      capability === LegalAiCapability.LAWYER && input.userId
-        ? await this.dependencies.store.listOwnedDocumentExtracts(
-            conversation.id,
-            input.userId,
-          )
-        : [];
+    const documents = input.userId
+      ? await this.dependencies.store.listOwnedDocumentExtracts(
+          conversation.id,
+          input.userId,
+        )
+      : [];
     const documentContextBlock = wrapUntrustedDocumentAttachments(
       documents,
       MAX_DOCUMENT_EXTRACT_CHARS,
@@ -526,13 +525,12 @@ export class LegalAiService {
     const userType = this.dependencies.userTypeService.resolve(
       input.userContext,
     );
-    const documents =
-      input.capability === LegalAiCapability.LAWYER && input.userId
-        ? await this.dependencies.store.listOwnedDocumentExtracts(
-            input.conversationId,
-            input.userId,
-          )
-        : [];
+    const documents = input.userId
+      ? await this.dependencies.store.listOwnedDocumentExtracts(
+          input.conversationId,
+          input.userId,
+        )
+      : [];
     const prompt = this.dependencies.promptBuilder.build({
       message: input.message,
       userType,

@@ -20,12 +20,17 @@ import {
   DuplicateActiveSoloError,
   type SubscriptionRepository,
 } from "@/domain/repositories/subscription-repository";
+import type { BookingRepository } from "@/domain/repositories/booking-repository";
+import type { LawyerProfileRepository } from "@/domain/repositories/profile-repository";
+import type { NotificationRepository } from "@/domain/repositories/trust-repository";
+import type { AuditLogRepository } from "@/domain/repositories/audit-log-repository";
 import {
   getPlanDefinition,
   getPricedPlanDefinition,
 } from "@/domain/constants/subscription-plans";
 import { decideSoloSubscriptionPeriod } from "@/domain/services/subscription-period";
 import { verifyQpayCatalogPayment } from "@/domain/services/qpay-payment-verification";
+import { completePaidConsultationBooking } from "@/application/use-cases/billing/complete-paid-consultation";
 
 export type ProcessQpayPaymentDeps = {
   qpayGateway: QpayGateway;
@@ -33,6 +38,10 @@ export type ProcessQpayPaymentDeps = {
   paymentTransactionRepository: PaymentTransactionRepository;
   subscriptionRepository: SubscriptionRepository;
   billingUnitOfWork: BillingUnitOfWork;
+  bookingRepository?: BookingRepository;
+  lawyerProfileRepository?: LawyerProfileRepository;
+  notificationRepository?: NotificationRepository;
+  auditLogRepository?: AuditLogRepository;
 };
 
 export type ProcessQpayPaymentResult = {
@@ -56,7 +65,22 @@ export async function processQpayInvoicePayment(
     throw new PaymentVerificationError("Invoice was not found", "WRONG_INVOICE");
   }
 
-  const plan = getPricedPlanDefinition(invoice.planCode);
+  if (invoice.bookingId) {
+    return processBookingQpayPayment(invoice, deps, now);
+  }
+
+  const planCode = invoice.planCode;
+  if (!planCode) {
+    await deps.invoiceRepository
+      .updateStatus(invoice.id, InvoiceStatus.FAILED)
+      .catch(() => undefined);
+    throw new PaymentVerificationError(
+      "Plan is not priced for payment",
+      "UNPRICED_PLAN",
+    );
+  }
+
+  const plan = getPricedPlanDefinition(planCode);
   if (!plan) {
     await deps.invoiceRepository
       .updateStatus(invoice.id, InvoiceStatus.FAILED)
@@ -133,7 +157,7 @@ export async function processQpayInvoicePayment(
     );
     const subscription = await activateOrRenewPaidSubscription({
       userId: current.userId,
-      planCode: current.planCode,
+      planCode,
       providerInvoiceId: current.providerInvoiceId!,
       now,
       repos,
@@ -154,6 +178,9 @@ async function alreadyProcessedResult(
   invoice: Invoice,
   subscriptionRepository: SubscriptionRepository,
 ): Promise<ProcessQpayPaymentResult> {
+  if (invoice.bookingId || !invoice.planCode) {
+    return { alreadyProcessed: true, invoice, subscription: null };
+  }
   const subscription = invoice.subscriptionId
     ? await subscriptionRepository.findById(invoice.subscriptionId)
     : await subscriptionRepository.findLatestOwnedByUserId(
@@ -161,6 +188,103 @@ async function alreadyProcessedResult(
         invoice.planCode,
       );
   return { alreadyProcessed: true, invoice, subscription };
+}
+
+async function processBookingQpayPayment(
+  invoice: Invoice,
+  deps: ProcessQpayPaymentDeps,
+  now: Date,
+): Promise<ProcessQpayPaymentResult> {
+  if (!invoice.providerInvoiceId || !invoice.bookingId) {
+    throw new PaymentVerificationError("Invoice was not found", "WRONG_INVOICE");
+  }
+  if (!deps.bookingRepository) {
+    throw new PaymentVerificationError(
+      "QPay request failed",
+      "QPAY_UNAVAILABLE",
+      503,
+    );
+  }
+
+  const checked = await deps.qpayGateway.checkPayment(invoice.providerInvoiceId);
+  let verified;
+  try {
+    verified = verifyQpayCatalogPayment({
+      expectedProviderInvoiceId: invoice.providerInvoiceId,
+      expectedAmountMnt: invoice.amountMnt,
+      checked,
+    });
+  } catch (error) {
+    if (
+      error instanceof PaymentVerificationError &&
+      (error.code === "WRONG_AMOUNT" || error.code === "UNPRICED_PLAN")
+    ) {
+      await deps.invoiceRepository
+        .updateStatus(invoice.id, InvoiceStatus.FAILED)
+        .catch(() => undefined);
+    }
+    throw error;
+  }
+
+  const result = await deps.billingUnitOfWork.runInTransaction(async (repos) => {
+    const current = await repos.invoiceRepository.findById(invoice.id);
+    if (!current) {
+      throw new PaymentVerificationError(
+        "Invoice was not found",
+        "WRONG_INVOICE",
+      );
+    }
+
+    const existingPayment =
+      await repos.paymentTransactionRepository.findByInvoiceId(current.id);
+    if (
+      current.status === InvoiceStatus.PAID &&
+      existingPayment?.status === PaymentTransactionStatus.PAID
+    ) {
+      return { alreadyProcessed: true, invoice: current };
+    }
+
+    try {
+      await repos.paymentTransactionRepository.create({
+        invoiceId: current.id,
+        provider: BILLING_PROVIDER_QPAY,
+        providerPaymentId: verified.paymentId,
+        amountMnt: verified.amountMnt,
+        currency: verified.currency,
+        status: PaymentTransactionStatus.PAID,
+        paidAt: now,
+        metadata: verified.safeMetadata,
+      });
+    } catch (error) {
+      if (error instanceof DuplicatePaymentError) {
+        const paid = await repos.invoiceRepository.findById(current.id);
+        return {
+          alreadyProcessed: true,
+          invoice: paid ?? current,
+        };
+      }
+      throw error;
+    }
+
+    const paidInvoice = await repos.invoiceRepository.updateStatus(
+      current.id,
+      InvoiceStatus.PAID,
+    );
+    return { alreadyProcessed: false, invoice: paidInvoice };
+  });
+
+  await completePaidConsultationBooking(result.invoice, {
+    bookingRepository: deps.bookingRepository,
+    lawyerProfileRepository: deps.lawyerProfileRepository,
+    notificationRepository: deps.notificationRepository,
+    auditLogRepository: deps.auditLogRepository,
+  });
+
+  return {
+    alreadyProcessed: result.alreadyProcessed,
+    invoice: result.invoice,
+    subscription: null,
+  };
 }
 
 async function activateOrRenewPaidSubscription(input: {

@@ -5,6 +5,7 @@ import {
   LegalAiReasoningStage,
   LegalAiTaskType,
   classifyLegalAiTask,
+  stagesForTask,
   taskRequiresLegalRetrieval,
 } from "@/application/ai/legal-ai-task";
 import { IntentType } from "@/engine/intent";
@@ -40,5 +41,20 @@ describe("legal AI task retrieval", () => {
       taskRequiresLegalRetrieval(LegalAiTaskType.ISSUE_SPOTTING),
     ).toBe(true);
     expect(LegalAiReasoningStage.LEGAL_RETRIEVAL).toBe("LEGAL_RETRIEVAL");
+  });
+
+  it("includes document context for citizen turns when a file is attached", () => {
+    expect(
+      stagesForTask(LegalAiCapability.CITIZEN, LegalAiTaskType.GENERAL_LEGAL, {
+        hasCaseContext: false,
+        hasDocument: true,
+      }),
+    ).toContain(LegalAiReasoningStage.DOCUMENT_CONTEXT);
+    expect(
+      stagesForTask(LegalAiCapability.CITIZEN, LegalAiTaskType.GENERAL_LEGAL, {
+        hasCaseContext: false,
+        hasDocument: false,
+      }),
+    ).not.toContain(LegalAiReasoningStage.DOCUMENT_CONTEXT);
   });
 });

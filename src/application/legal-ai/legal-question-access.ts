@@ -4,6 +4,7 @@ import {
   GUEST_FREE_LEGAL_QUESTIONS,
   LEGAL_AI_AUTHENTICATION_REQUIRED_MESSAGE,
   BILLING_REQUIRED_MESSAGE,
+  SUBSCRIPTION_EXPIRY_WARNING_MS,
   UNPAID_CITIZEN_FREE_LEGAL_QUESTIONS,
   getPlanDefinition,
 } from "@/domain/constants/subscription-plans";
@@ -268,6 +269,9 @@ export type LegalQuestionEntitlementSnapshot = {
   statusLabel: string;
   remainingLabel: string;
   exhaustedLabel: string;
+  currentPeriodEnd: string | null;
+  expiresSoon: boolean;
+  expiryWarningLabel: string | null;
 };
 
 export async function getLegalQuestionEntitlementSnapshot(
@@ -381,6 +385,9 @@ async function paidPlanSnapshot(
     entitlement.quotas.legalAiQueries - (usage.legalAiQueryCount ?? 0),
   );
   const plan = getPlanDefinition(owned.planCode);
+  const remainingMs = owned.currentPeriodEnd.getTime() - at.getTime();
+  const expiresSoon =
+    remainingMs > 0 && remainingMs <= SUBSCRIPTION_EXPIRY_WARNING_MS;
   return copySnapshot({
     audience,
     planName: plan.name,
@@ -391,11 +398,28 @@ async function paidPlanSnapshot(
     remainingLabel: `Энэ сард үлдсэн хууль зүйн AI асуулт: ${remaining}`,
     exhaustedLabel:
       "Хязгаар дуусмагц дараагийн төлбөрийн үе хүртэл шинэ хууль зүйн асуулт асуух боломжгүй.",
+    currentPeriodEnd: owned.currentPeriodEnd.toISOString(),
+    expiresSoon,
+    expiryWarningLabel: expiresSoon
+      ? "Багц 3 хоногийн дотор дуусна. Сунгахын тулд төлбөр төлнө үү."
+      : null,
   });
 }
 
-function copySnapshot(
-  snapshot: LegalQuestionEntitlementSnapshot,
-): LegalQuestionEntitlementSnapshot {
-  return snapshot;
+type SnapshotInput = Omit<
+  LegalQuestionEntitlementSnapshot,
+  "currentPeriodEnd" | "expiresSoon" | "expiryWarningLabel"
+> & {
+  currentPeriodEnd?: string | null;
+  expiresSoon?: boolean;
+  expiryWarningLabel?: string | null;
+};
+
+function copySnapshot(snapshot: SnapshotInput): LegalQuestionEntitlementSnapshot {
+  return {
+    ...snapshot,
+    currentPeriodEnd: snapshot.currentPeriodEnd ?? null,
+    expiresSoon: snapshot.expiresSoon ?? false,
+    expiryWarningLabel: snapshot.expiryWarningLabel ?? null,
+  };
 }
