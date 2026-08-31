@@ -380,11 +380,7 @@ function scoreHit(input: {
     }
   }
 
-  if (
-    matchKind !== KnowledgeMatchKind.ARTICLE_NUMBER &&
-    (articleNum === "1" || articleNum === "1.1") &&
-    score < 0.85
-  ) {
+  if ((articleNum === "1" || articleNum === "1.1") && score < 0.85) {
     score *= 0.82;
   }
 

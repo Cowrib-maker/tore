@@ -159,6 +159,7 @@ describe("open-question citation relevance", () => {
     const result = await retriever.retrieveLegalQuestion({
       question,
       query: question,
+      locator: null,
     });
     expect(result.kind).toBe("retrieved");
     if (result.kind === "retrieved") {
