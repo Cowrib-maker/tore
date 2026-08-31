@@ -106,14 +106,19 @@ describe("identifyPriorityLawsFromDocuments", () => {
     );
     expect(classifyPriorityLawTitle("Үндсэн хуулийн цэцийн тухай")).toBeNull();
     expect(classifyPriorityLawTitle("Эрүүгийн хууль")).toBe("criminal_code");
+    expect(
+      classifyPriorityLawTitle(
+        "ЭРҮҮГИЙН ХУУЛИЙГ ДАГАЖ МӨРДӨХ ЖУРМЫН ТУХАЙ",
+      ),
+    ).toBe("related_regulation");
     expect(classifyPriorityLawTitle("Иргэний хууль")).toBe("civil_code");
     expect(classifyPriorityLawTitle("Захиргааны ерөнхий хууль")).toBe(
       "admin_general",
     );
     expect(
       classifyPriorityLawTitle(
-        "ЗАХИРГААНЫ ХЭРЭГ ШҮҮХЭД ХЯНАН ШИЙДВЭРЛЭХ ТУХАЙ /Шинэчилсэн найруулга/",
+        "ЭРҮҮГИЙН ХЭРЭГ ХЯНАН ШИЙДВЭРЛЭХ ТУХАЙ /Шинэчилсэн найруулга/",
       ),
-    ).toBe("admin_procedure");
+    ).toBe("criminal_procedure");
   });
 });

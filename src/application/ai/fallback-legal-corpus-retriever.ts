@@ -59,6 +59,11 @@ export class FallbackLegalCorpusRetriever implements LegalCorpusRetriever {
       return local;
     }
 
+    // Local Prisma corpus was queried — do not wait on remote engine timeouts.
+    if (local.kind === "unavailable") {
+      return local;
+    }
+
     return this.remote.retrieveLegalQuestion(input);
   }
   async verifyCitation(

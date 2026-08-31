@@ -351,6 +351,30 @@ describe("FallbackLegalCorpusRetriever", () => {
     expect(remote.verifyCitation).toHaveBeenCalledOnce();
   });
 
+  it("does not fall back to remote engine for open questions when local corpus is empty", async () => {
+    const remote = createRemote(
+      async () => ({
+        kind: "retrieved",
+        status: "ok",
+        authorities: [engineAuthority()],
+        retrievedAt: "2026-08-17T00:00:00.000Z",
+      }),
+    );
+    const retriever = new FallbackLegalCorpusRetriever(
+      new KnowledgeLegalCorpusRetriever(new InMemoryKnowledgeRepository()),
+      remote,
+    );
+
+    const result = await retriever.retrieveLegalQuestion({
+      question: "Намайг цагдаад дуудсан",
+      query: "Намайг цагдаад дуудсан",
+      locator: null,
+    });
+
+    expect(result.kind).toBe("unavailable");
+    expect(remote.retrieveLegalQuestion).not.toHaveBeenCalled();
+  });
+
   it("preserves the safe engine-unavailable result when local and remote are empty", async () => {
     const remote = createRemote();
     const retriever = new FallbackLegalCorpusRetriever(

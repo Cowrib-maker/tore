@@ -243,10 +243,10 @@ export class LegalAiService {
       );
     }
 
-    const history = await this.dependencies.store.listMessages(
-      conversation.id,
-      HISTORY_LIMIT,
-    );
+    const history: LegalAiStoredMessage[] = [
+      ...priorMessages,
+      { role: "USER", content: message },
+    ];
 
     const analysisText = relevance.analysisText || message;
 
@@ -311,12 +311,37 @@ export class LegalAiService {
         ? PromptTurnKind.LEGAL
         : resolveTurnKind(pipelineDomain, intent);
 
-    const documents = input.userId
-      ? await this.dependencies.store.listOwnedDocumentExtracts(
-          conversation.id,
-          input.userId,
-        )
-      : [];
+    const ownedCaseFileId =
+      capability === LegalAiCapability.LAWYER
+        ? (conversation.caseFileId ??
+          conversationState.caseFileId ??
+          input.caseFileId)
+        : undefined;
+
+    const [documents, authorities, loadedCase] = await Promise.all([
+      input.userId
+        ? this.dependencies.store.listOwnedDocumentExtracts(
+            conversation.id,
+            input.userId,
+          )
+        : Promise.resolve([]),
+      resolveLegalAuthorities({
+        question: message,
+        retriever: this.dependencies.corpusRetriever,
+        requireRetrieval:
+          !foreignLegalScope || foreignLegalScope.comparativeWithMn,
+      }),
+      capability === LegalAiCapability.LAWYER &&
+      ownedCaseFileId &&
+      input.userId &&
+      this.dependencies.caseContextLoader
+        ? this.dependencies.caseContextLoader.loadOwned({
+            userId: input.userId,
+            caseFileId: ownedCaseFileId,
+          })
+        : Promise.resolve(null),
+    ]);
+
     const documentContextBlock = wrapUntrustedDocumentAttachments(
       documents,
       MAX_DOCUMENT_EXTRACT_CHARS,
@@ -325,27 +350,9 @@ export class LegalAiService {
       (item) => item.extractStatus === "OK" && item.extractedText,
     );
 
-    const ownedCaseFileId =
-      capability === LegalAiCapability.LAWYER
-        ? (conversation.caseFileId ??
-          conversationState.caseFileId ??
-          input.caseFileId)
-        : undefined;
-
     let caseContextBlock: string | undefined;
-    if (
-      capability === LegalAiCapability.LAWYER &&
-      ownedCaseFileId &&
-      input.userId &&
-      this.dependencies.caseContextLoader
-    ) {
-      const loaded = await this.dependencies.caseContextLoader.loadOwned({
-        userId: input.userId,
-        caseFileId: ownedCaseFileId,
-      });
-      if (loaded) {
-        caseContextBlock = formatLegalAiCaseContextBlock(loaded);
-      }
+    if (loadedCase) {
+      caseContextBlock = formatLegalAiCaseContextBlock(loadedCase);
     }
 
     const taskType = classifyLegalAiTask({
@@ -358,14 +365,6 @@ export class LegalAiService {
     const reasoningStages = stagesForTask(capability, taskType, {
       hasCaseContext: Boolean(caseContextBlock),
       hasDocument: hasDocumentText,
-    });
-    const requireRetrieval =
-      !foreignLegalScope || foreignLegalScope.comparativeWithMn;
-
-    const authorities = await resolveLegalAuthorities({
-      question: message,
-      retriever: this.dependencies.corpusRetriever,
-      requireRetrieval,
     });
 
     if (authorities.kind === "refused") {

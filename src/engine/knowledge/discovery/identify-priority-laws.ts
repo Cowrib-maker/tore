@@ -6,6 +6,7 @@
 export type PriorityLawKey =
   | "constitution"
   | "criminal_code"
+  | "criminal_procedure"
   | "civil_code"
   | "admin_procedure"
   | "admin_general"
@@ -47,10 +48,24 @@ const RULES: ReadonlyArray<{
   },
   {
     key: "criminal_code",
-    match: (title) =>
-      /эрүүгийн\s+хууль/i.test(title) &&
-      !/байцаан\s+шийтгэх/i.test(title) &&
-      !AMENDMENT.test(title),
+    match: (title) => {
+      if (AMENDMENT.test(title)) return false;
+      if (/дагаж\s+мөрдөх/i.test(title)) return false;
+      if (/(дүрэм|журам|журмын|дүрмийн)/i.test(title)) return false;
+      return (
+        /эрүүгийн\s+хууль/i.test(title) &&
+        !/байцаан\s+шийтгэх/i.test(title) &&
+        !/хэрэг\s+хянан\s+шийдвэрлэх/i.test(title)
+      );
+    },
+  },
+  {
+    key: "criminal_procedure",
+    match: (title) => {
+      if (AMENDMENT.test(title)) return false;
+      if (/эхшх|эххш/i.test(title)) return true;
+      return /эрүүгийн\s+хэрэг\s+хянан\s+шийдвэрлэх\s+тухай/i.test(title);
+    },
   },
   {
     key: "civil_code",
@@ -85,8 +100,8 @@ const RULES: ReadonlyArray<{
   {
     key: "related_regulation",
     match: (title) => {
-      if (!/(дүрэм|журам)/i.test(title)) return false;
       if (AMENDMENT.test(title)) return false;
+      if (!/(дүрэм|журам|журмын|дүрмийн)/i.test(title)) return false;
       // Only regulations clearly tied to core domains — avoid flooding.
       return /(эрүүгийн|иргэний|захиргааны|үндсэн\s+хууль)/i.test(title);
     },
@@ -127,20 +142,23 @@ export function identifyPriorityLawsFromDocuments(
   }
 
   // Cap related_regulation noise: keep at most 5 shortest-title hits.
-  if (byKey.related_regulation.length > 5) {
+  if (byKey.related_regulation.length > 10) {
     byKey.related_regulation = byKey.related_regulation
       .slice()
       .sort(
         (a, b) =>
+          Number(/эрүүгийн/i.test(b.title ?? "")) -
+            Number(/эрүүгийн/i.test(a.title ?? "")) ||
           (a.title?.length ?? 999) - (b.title?.length ?? 999) ||
           a.lawId.localeCompare(b.lawId, "en", { numeric: true }),
       )
-      .slice(0, 5);
+      .slice(0, 10);
   }
 
   // Prefer current consolidated texts when discovery lists multiple editions.
   for (const key of [
     "criminal_code",
+    "criminal_procedure",
     "civil_code",
     "admin_procedure",
     "admin_general",

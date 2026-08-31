@@ -194,6 +194,17 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
       (hit) => hit.score >= minScore,
     );
 
+    const documents = await Promise.all(
+      uniqueHits.map((hit) => this.knowledge.findById(hit.documentId)),
+    );
+    const documentById = new Map(
+      documents
+        .filter((document): document is StoredKnowledgeDocument =>
+          Boolean(document),
+        )
+        .map((document) => [document.id, document] as const),
+    );
+
     const verified: LegalCorpusAuthority[] = [];
 
     for (const hit of uniqueHits) {
@@ -201,9 +212,9 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
         break;
       }
 
-      const document = await this.knowledge.findById(hit.documentId);
+      const document = documentById.get(hit.documentId);
 
-      if (!hasVerifiedProvenance(document)) {
+      if (!document || !hasVerifiedProvenance(document)) {
         continue;
       }
 
