@@ -41,6 +41,12 @@ import { requestLawyerCheckout } from "@/components/legal-ai/request-lawyer-chec
 import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-list";
 import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
+import {
+  OrthographyCheckButton,
+  OrthographyResults,
+  useOrthographyAutoCheck,
+  useOrthographyCheck,
+} from "@/components/orthography/orthography-checker";
 import { ToreLogo } from "@/components/brand/tore-logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -154,6 +160,22 @@ export function LawyerAiWorkbench({
   const documentInputRef = useRef<HTMLInputElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const {
+    loading: orthographyLoading,
+    result: orthographyResult,
+    gateMessage: orthographyGate,
+    needsBilling: orthographyNeedsBilling,
+    open: orthographyOpen,
+    includeLatinToCyrillic,
+    setIncludeLatinToCyrillic,
+    check: checkOrthography,
+    clear: clearOrthography,
+  } = useOrthographyCheck();
+
+  useOrthographyAutoCheck(draft, checkOrthography, {
+    enabled: !loading && !uploading,
+    minLength: 10,
+  });
 
   const conversationMode =
     messages.length > 0 ||
@@ -258,6 +280,7 @@ export function LawyerAiWorkbench({
     setAccessGate(null);
     if (!options?.resume) {
       setDraft("");
+      clearOrthography();
       setMessages((current) => [...current, { role: "USER", content: text }]);
     }
     setLoading(true);
@@ -536,7 +559,7 @@ export function LawyerAiWorkbench({
                   disabled={loading || uploading}
                 />
                 <div className="flex items-center justify-between gap-2 px-1 pb-1">
-                  <div>
+                  <div className="flex items-center gap-0.5">
                     <input
                       ref={documentInputRef}
                       type="file"
@@ -556,6 +579,14 @@ export function LawyerAiWorkbench({
                     >
                       <Paperclip className="size-4" />
                     </button>
+                    <OrthographyCheckButton
+                      loading={orthographyLoading}
+                      disabled={loading || uploading}
+                      pressed={orthographyOpen}
+                      onClick={() =>
+                        void checkOrthography(draft, { mode: "manual" })
+                      }
+                    />
                   </div>
                   <Button
                     type="submit"
@@ -568,6 +599,30 @@ export function LawyerAiWorkbench({
                   </Button>
                 </div>
               </div>
+              {orthographyOpen || orthographyLoading ? (
+                <OrthographyResults
+                  className="mt-2"
+                  loading={orthographyLoading}
+                  result={orthographyResult}
+                  gateMessage={orthographyGate}
+                  needsBilling={orthographyNeedsBilling}
+                  text={draft}
+                  includeLatinToCyrillic={includeLatinToCyrillic}
+                  onIncludeLatinChange={(value) => {
+                    setIncludeLatinToCyrillic(value);
+                    void checkOrthography(draft, {
+                      includeLatinToCyrillic: value,
+                      mode: "manual",
+                    });
+                  }}
+                  billingHref="/legal-ai"
+                  onApplySuggestion={setDraft}
+                  onRecheck={(next) =>
+                    void checkOrthography(next, { mode: "manual" })
+                  }
+                  onClose={clearOrthography}
+                />
+              ) : null}
               <LegalAiDutyNotice variant="lawyer" className="mt-2 px-1" />
             </form>
           </div>
