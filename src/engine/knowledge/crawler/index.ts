@@ -8,6 +8,10 @@ export {
   type HttpKnowledgeCrawlerOptions,
 } from "./http-knowledge-crawler";
 export {
+  HttpShuukhCrawler,
+  type HttpShuukhCrawlerOptions,
+} from "./http-shuukh-crawler";
+export {
   KnowledgeCrawlError,
   LEGALINFO_CONSTITUTION_CATEGORY_ID,
   LEGALINFO_CONSTITUTION_LAW_ID,
@@ -43,7 +47,9 @@ export {
   isShuukhHostname,
   parseShuukhJudgmentHtml,
   parseShuukhListHtml,
+  parseShuukhCaseAjaxPayload,
   shuukhCaseListUrl,
+  shuukhCaseAjaxUrl,
   shuukhJudgmentUrl,
 } from "./shuukh-url";
 export type { ShuukhCaseList, ShuukhJudgment, ShuukhListItem } from "./shuukh-url";

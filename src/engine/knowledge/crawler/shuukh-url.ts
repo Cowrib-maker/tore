@@ -2,6 +2,7 @@
  * Official shuukh.mn judgment URLs.
  *
  * List pages: https://shuukh.mn/cases/{caseType}/{instance}
+ * List AJAX: https://shuukh.mn/site/case_ajax?id={caseType}&court_cat={instance}&…
  * Detail pages: https://shuukh.mn/single_case/{id}
  * Do not scrape legaldata.mn.
  */
@@ -54,6 +55,33 @@ export function shuukhCaseListUrl(caseType: number, instance: number): string {
   return `https://${SHUUKH_HOST}/cases/${caseType}/${instance}`;
 }
 
+/**
+ * Official list fragment endpoint used by shuukh.mn after the shell HTML loads.
+ * Static `/cases/{type}/{instance}` HTML no longer embeds judgment rows.
+ */
+export function shuukhCaseAjaxUrl(options: {
+  caseType: number;
+  instance: number;
+  page?: number;
+  dateRange?: string;
+}): string {
+  const url = new URL(`https://${SHUUKH_HOST}/site/case_ajax`);
+  url.searchParams.set("id", String(options.caseType));
+  url.searchParams.set("court_cat", String(options.instance));
+  url.searchParams.set("bb", "1");
+  url.searchParams.set("page", String(options.page ?? 1));
+  url.searchParams.set(
+    "daterange",
+    options.dateRange ?? "2015/01/01 - 2026/12/31",
+  );
+  url.searchParams.set("keyword", "");
+  url.searchParams.set("court", "");
+  url.searchParams.set("index_number", "");
+  url.searchParams.set("number", "");
+  url.searchParams.set("is_active", "");
+  return url.toString();
+}
+
 export function shuukhJudgmentUrl(caseId: string): string {
   const id = caseId.trim();
   if (!id) {
@@ -96,7 +124,8 @@ export function assertHttpsShuukhUrl(url: string): URL {
 
 /**
  * Extract official judgment links from a shuukh.mn `/cases/{type}/{instance}`
- * HTML table. Does not invent case ids.
+ * HTML table (or the HTML fragment inside case_ajax JSON `view`).
+ * Does not invent case ids.
  */
 export function parseShuukhListHtml(html: string): ShuukhListItem[] {
   const items: ShuukhListItem[] = [];
@@ -106,29 +135,61 @@ export function parseShuukhListHtml(html: string): ShuukhListItem[] {
   let match: RegExpExecArray | null;
   while ((match = named.exec(html))) {
     const attrs = match[1] ?? "";
-    const href = attrs.match(/href=["']\/single_case\/(\d+)/i)?.[1];
-    if (!href || seen.has(href)) continue;
-    seen.add(href);
+    const href = attrs.match(/href=["'](\/single_case\/\d+[^"']*)["']/i)?.[1];
+    if (!href) continue;
+    const caseId = href.match(/\/single_case\/(\d+)/i)?.[1];
+    if (!caseId || seen.has(caseId)) continue;
+    seen.add(caseId);
     items.push({
-      caseId: href,
-      officialUrl: shuukhJudgmentUrl(href),
+      caseId,
+      officialUrl: absolutizeShuukhHref(href),
       courtName: decodeHtml(stripTags(match[2] ?? "")).trim() || null,
     });
   }
   if (items.length === 0) {
-    const loose = /href=["']\/single_case\/(\d+)/gi;
+    const loose = /href=["'](\/single_case\/\d+[^"']*)["']/gi;
     while ((match = loose.exec(html))) {
-      const caseId = match[1]!;
-      if (seen.has(caseId)) continue;
+      const href = match[1]!;
+      const caseId = href.match(/\/single_case\/(\d+)/i)?.[1];
+      if (!caseId || seen.has(caseId)) continue;
       seen.add(caseId);
       items.push({
         caseId,
-        officialUrl: shuukhJudgmentUrl(caseId),
+        officialUrl: absolutizeShuukhHref(href),
         courtName: null,
       });
     }
   }
   return items;
+}
+
+/** Detail pages require id/court_cat/bb query params; bare /single_case/{id} returns 500. */
+function absolutizeShuukhHref(href: string): string {
+  try {
+    return new URL(href, `https://${SHUUKH_HOST}`).toString();
+  } catch {
+    return shuukhJudgmentUrl(href.match(/\/single_case\/(\d+)/i)?.[1] ?? "");
+  }
+}
+
+/**
+ * Parse `/site/case_ajax` JSON payloads (`{ view, pagination_link, count }`).
+ * Falls back to treating the body as HTML if it is not JSON.
+ */
+export function parseShuukhCaseAjaxPayload(body: string): ShuukhListItem[] {
+  const trimmed = body.trim();
+  if (!trimmed) return [];
+  if (trimmed.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(trimmed) as { view?: unknown };
+      if (typeof parsed.view === "string") {
+        return parseShuukhListHtml(parsed.view);
+      }
+    } catch {
+      // fall through to HTML parse
+    }
+  }
+  return parseShuukhListHtml(trimmed);
 }
 
 /**
@@ -140,20 +201,33 @@ export function parseShuukhJudgmentHtml(
   officialUrl: string,
 ): ShuukhJudgment {
   const caseId = caseIdFromShuukhUrl(officialUrl) ?? "";
+  // Drop head/meta so site chrome is not mistaken for the court name.
+  const bodyHtml = html.replace(/<head[\s\S]*?<\/head>/i, " ");
   const caseNumber =
-    firstMatch(html, /Дугаар\s*<\/[^>]+>\s*([^<]+)/i)?.trim() ??
-    firstMatch(html, /Дугаар\s+([0-9A-Za-zА-Яа-яЁёҮүӨө/]+)/)?.trim() ??
+    firstMatch(bodyHtml, /Дугаар\s*<\/[^>]+>\s*([^<]+)/i)?.trim() ??
+    firstMatch(bodyHtml, /Дугаар\s+([0-9A-Za-zА-Яа-яЁёҮүӨө/]+)/)?.trim() ??
     null;
   const courtName =
     firstMatch(
-      html,
-      /([А-Яа-яЁёҮүӨөA-Za-z0-9\s./-]+шүүх[^<]{0,80})/i,
-    )?.replace(/\s+/g, " ").trim() ?? null;
-  const decidedOn =
-    firstMatch(html, /(\d{4}\s*оны\s*\d{1,2}\s*сарын\s*\d{1,2}\s*өдөр)/)?.trim() ??
+      bodyHtml,
+      /Шийдвэрийн\s+мэдээлэл[\s\S]{0,400}?<p[^>]*>\s*([^<]*шүүх[^<]*)/i,
+    )
+      ?.replace(/\s+/g, " ")
+      .trim() ??
+    firstMatch(
+      bodyHtml,
+      /<(?:h1|h2|h3|h4|h5|h6)[^>]*>\s*([^<]*шүүх[^<]*)/i,
+    )
+      ?.replace(/\s+/g, " ")
+      .trim() ??
     null;
+  const decidedOn =
+    firstMatch(
+      bodyHtml,
+      /(\d{4}\s*оны\s*\d{1,2}\s*сарын\s*\d{1,2}\s*өдөр)/,
+    )?.trim() ?? null;
 
-  const body = extractJudgmentBody(html);
+  const body = extractJudgmentBody(bodyHtml);
   const titleParts = [courtName, caseNumber].filter(Boolean);
   const title =
     titleParts.length > 0

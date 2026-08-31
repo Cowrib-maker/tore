@@ -29,7 +29,7 @@ const ENGINE_UNAVAILABLE_MESSAGE =
   "Баталгаатай эрх зүйн эх сурвалжид одоогоор холбогдож чадсангүй. Тиймээс заалтын агуулгыг таамгаар тайлбарлахгүй.";
 
 const VERIFIED_SOURCE_TYPE = "legal-data-engine";
-const MAX_QUESTION_HITS = 6;
+const MAX_QUESTION_HITS = 3;
 
 export type ResolvedLegalAuthority = {
   title: string;

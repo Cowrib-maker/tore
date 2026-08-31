@@ -17,6 +17,11 @@ import {
   type LegalTemporalExplicitRelation,
   type LegalTemporalQueryIntent,
 } from "@/engine/knowledge";
+import {
+  inferLegalDomainFromText,
+  MIN_OPEN_QUESTION_CITATION_SCORE,
+  stripLegalHtmlTags,
+} from "@/engine/knowledge/repository/article-search";
 import { KnowledgeMatchKind } from "@/engine/knowledge/types";
 import type {
   IKnowledgeRepository,
@@ -25,6 +30,7 @@ import type {
 } from "@/engine/knowledge/types";
 
 export const LOCAL_LEGAL_SOURCE_TYPE = "legal-knowledge";
+const MAX_OPEN_QUESTION_AUTHORITIES = 3;
 
 function unavailableNotFound(): LegalCorpusRetrieveResult {
   return {
@@ -163,24 +169,38 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
     const temporalText = [input.question, input.query]
       .filter((part) => part?.trim())
       .join(" ");
+    const questionText = (input.question || input.query || "").trim();
+    const domain = inferLegalDomainFromText(questionText);
 
     const intent = parseLegalTemporalQueryIntent(temporalText);
     const nowIsoDate = isoDateFromClock(
       this.options.now?.() ?? new Date(),
     );
 
+    // Prefer no citations over unrelated Article-1 noise from weak OR search.
+    const minScore = domain
+      ? MIN_OPEN_QUESTION_CITATION_SCORE
+      : Math.max(MIN_OPEN_QUESTION_CITATION_SCORE, 0.8);
+
     const hits = await this.knowledge.searchArticles({
-      text: input.question || input.query,
+      text: questionText,
+      domain,
       jurisdiction: "MN",
       officialSourceKinds: "all",
-      limit: 8,
+      limit: 12,
     });
 
-    const uniqueHits = uniqueByArticleId(hits);
+    const uniqueHits = uniqueByArticleId(hits).filter(
+      (hit) => hit.score >= minScore,
+    );
 
     const verified: LegalCorpusAuthority[] = [];
 
     for (const hit of uniqueHits) {
+      if (verified.length >= MAX_OPEN_QUESTION_AUTHORITIES) {
+        break;
+      }
+
       const document = await this.knowledge.findById(hit.documentId);
 
       if (!hasVerifiedProvenance(document)) {
@@ -452,7 +472,7 @@ function toLocalAuthority(
     documentId: hit.documentId,
     documentVersionId,
     locator: citation.locator,
-    title: hit.documentTitle,
+    title: stripLegalHtmlTags(hit.documentTitle),
     excerpt: excerptOverride ?? hit.articleText,
     contentHash: sha,
     sourceContentHash: sha,

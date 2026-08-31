@@ -46,3 +46,12 @@ export {
   type CriminalCodeTitleClass,
   type IdentifyCriminalCodeResult,
 } from "./identify-criminal-code";
+export {
+  classifyPriorityLawTitle,
+  identifyPriorityLawsFromDocuments,
+  priorityLawIdsForIngest,
+  type IdentifyPriorityLawsResult,
+  type PriorityLawDiscoveryDocument,
+  type PriorityLawKey,
+  type PriorityLawMatch,
+} from "./identify-priority-laws";

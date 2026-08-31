@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   caseIdFromShuukhUrl,
+  parseShuukhCaseAjaxPayload,
   parseShuukhJudgmentHtml,
   parseShuukhListHtml,
   shuukhJudgmentUrl,
@@ -40,12 +41,24 @@ describe("shuukh.mn list and judgment parsers", () => {
   it("extracts official single_case ids without inventing numbers", () => {
     const items = parseShuukhListHtml(LIST_HTML);
     expect(items).toHaveLength(2);
-    expect(items[0]).toEqual({
-      caseId: "260600",
-      officialUrl: shuukhJudgmentUrl("260600"),
-      courtName: "Дундговь аймаг дахь сум дундын анхан шатны шүүх /Иргэний хэрэг/",
-    });
+    expect(items[0]?.caseId).toBe("260600");
+    expect(items[0]?.officialUrl).toContain("single_case/260600");
+    expect(items[0]?.officialUrl).toContain("court_cat=1");
+    expect(items[0]?.courtName).toBe(
+      "Дундговь аймаг дахь сум дундын анхан шатны шүүх /Иргэний хэрэг/",
+    );
     expect(caseIdFromShuukhUrl(items[1]!.officialUrl)).toBe("260599");
+  });
+
+  it("parses case_ajax JSON view fragments", () => {
+    const payload = JSON.stringify({
+      pagination_link: "<ul></ul>",
+      count: "2",
+      view: LIST_HTML,
+    });
+    const items = parseShuukhCaseAjaxPayload(payload);
+    expect(items).toHaveLength(2);
+    expect(items[0]?.caseId).toBe("260600");
   });
 
   it("keeps printed case number and holding text", async () => {

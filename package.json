@@ -26,11 +26,14 @@
     "discover:legalinfo": "tsx scripts/discover-legalinfo.ts",
     "discover:shuukh": "tsx scripts/discover-shuukh.ts",
     "identify:legalinfo:criminal-code": "tsx scripts/identify-legalinfo-criminal-code.ts",
+    "identify:legalinfo:priority": "tsx scripts/identify-legalinfo-priority.ts",
     "ingest:legalinfo:dry-run": "tsx scripts/ingest-legalinfo-dry-run.ts",
     "ingest:legalinfo:batch-10": "tsx scripts/ingest-legalinfo-batch-10.ts",
     "ingest:legalinfo:canary-10": "tsx scripts/ingest-legalinfo-cloud-canary-10.ts",
     "ingest:legalinfo:staging-canary": "tsx scripts/ingest-legalinfo-staging-canary.ts",
     "ingest:legalinfo:cloud": "tsx scripts/ingest-legalinfo-cloud.ts",
+    "ingest:legalinfo:local-prisma": "tsx scripts/ingest-legalinfo-local-prisma.ts",
+    "ingest:shuukh:canary": "tsx scripts/ingest-shuukh-canary.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {

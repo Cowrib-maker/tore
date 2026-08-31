@@ -11,15 +11,29 @@ import {
   type StoredKnowledgeDocument,
 } from "../types";
 
+/**
+ * Cyrillic titles must not rely on `\b` (JS word boundaries are ASCII-only
+ * without the `u` flag), or domain filters silently fail and open search
+ * falls back to unrelated Article-1 rows.
+ */
 const DOMAIN_TITLE_HINTS: Record<string, RegExp> = {
-  CRIMINAL: /\b(criminal|эрүүгийн|offense|offence|prosecut)\b/i,
-  CIVIL: /\b(civil|иргэний|contract|гэрээ|obligation|tort|property)\b/i,
+  CRIMINAL:
+    /(criminal|эрүүгийн|гэмт\s*хэрэг|цагдаа|хорих|ял\s*ших|offense|offence|prosecut)/i,
+  CIVIL:
+    /(civil|иргэний|contract|гэрээ|obligation|tort|өмчийн|family|гэр\s*бүл)/i,
   ADMINISTRATIVE:
-    /\b(administrative|захиргааны|agency|permit|licence|license|regulatory)\b/i,
+    /(administrative|захиргааны|agency|permit|licence|license|regulatory|тусгай\s*зөвшөөрөл)/i,
 };
 
 const DOMAIN_TITLE_TERMS: Record<string, readonly string[]> = {
-  CRIMINAL: ["criminal", "эрүүгийн", "offense", "offence"],
+  CRIMINAL: [
+    "criminal",
+    "эрүүгийн",
+    "гэмт хэрэг",
+    "цагдаа",
+    "offense",
+    "offence",
+  ],
   CIVIL: ["civil", "иргэний", "contract", "гэрээ", "obligation"],
   ADMINISTRATIVE: [
     "administrative",
@@ -37,6 +51,69 @@ const DOMAIN_DOCUMENT_TYPES: Record<string, readonly string[]> = {
   CIVIL: ["CONTRACT", "LABOR_LAW"],
   ADMINISTRATIVE: [],
 };
+
+/** Open-question citations below this score are treated as noise (prefer empty). */
+export const MIN_OPEN_QUESTION_CITATION_SCORE = 0.72;
+
+const SEARCH_STOPWORDS = new Set(
+  [
+    "байх",
+    "байгаа",
+    "байна",
+    "болно",
+    "болох",
+    "хэрэгтэй",
+    "хэрэгтэйюу",
+    "юу",
+    "хэрхэн",
+    "яаж",
+    "яагаад",
+    "надад",
+    "намайг",
+    "миний",
+    "би",
+    "чи",
+    "тэр",
+    "энэ",
+    "тэд",
+    "тухай",
+    "тухайд",
+    "тухайгаа",
+    "хэлэх",
+    "асуух",
+    "асуулт",
+    "тусламж",
+    "зөвлөгөө",
+    "боломжтой",
+    "боломж",
+    "мөн",
+    "бас",
+    "гэсэн",
+    "гэж",
+    "гэхдээ",
+    "эсвэл",
+    "бөгөөд",
+    "нь",
+    "ийм",
+    "тийм",
+    "маш",
+    "их",
+    "бага",
+    "the",
+    "and",
+    "for",
+    "with",
+    "what",
+    "how",
+    "can",
+    "please",
+    "help",
+    "about",
+    "tore",
+    "legal",
+    "ai",
+  ].map((w) => w.toLowerCase()),
+);
 
 const UNOFFICIAL_TOKENS = ["COMMENTARY", "DOCTRINE", "OPINION", "LLM"] as const;
 const NON_STATUTE_TOKENS = [
@@ -245,7 +322,12 @@ function scoreHit(input: {
 
   // 2. Legal concept terms in article text.
   const conceptTerms = tokenizeConcepts(qText);
-  if (conceptTerms.some((t) => articleBody.toLowerCase().includes(t))) {
+  const bodyLower = articleBody.toLowerCase();
+  const conceptHits = conceptTerms.filter((t) => bodyLower.includes(t));
+  if (conceptHits.length >= 2) {
+    score = Math.max(score, 0.78);
+    matchKind = KnowledgeMatchKind.CONCEPT;
+  } else if (conceptHits.length === 1 && (conceptHits[0]?.length ?? 0) >= 5) {
     score = Math.max(score, 0.72);
     matchKind = KnowledgeMatchKind.CONCEPT;
   }
@@ -270,7 +352,10 @@ function scoreHit(input: {
   } else if (score === 0 && conceptTerms.length > 0) {
     const titleLower = titleHay.toLowerCase();
     const hits = conceptTerms.filter((t) => titleLower.includes(t)).length;
-    if (hits > 0) {
+    if (hits >= 2) {
+      score = 0.7;
+      matchKind = KnowledgeMatchKind.TITLE;
+    } else if (hits === 1) {
       score = 0.58;
       matchKind = KnowledgeMatchKind.TITLE;
     }
@@ -286,26 +371,93 @@ function scoreHit(input: {
     }
   }
 
-  if (score <= 0) return null;
+  // Domain-aligned statute titles are far more trustworthy than bare Article 1
+  // matches from generic conversational tokens.
+  if (query.domain && documentMatchesDomain(document, query.domain)) {
+    const hint = DOMAIN_TITLE_HINTS[query.domain.toUpperCase()];
+    if (hint?.test(document.title)) {
+      score = Math.min(1, score + 0.12);
+    }
+  }
+
+  if (
+    matchKind !== KnowledgeMatchKind.ARTICLE_NUMBER &&
+    (articleNum === "1" || articleNum === "1.1") &&
+    score < 0.85
+  ) {
+    score *= 0.82;
+  }
+
+  if (score < 0.55) return null;
   return { score, matchKind };
 }
 
 function tokenizeConcepts(text: string): string[] {
-  return text
-    .toLowerCase()
-    .split(/[^\p{L}\p{N}]+/u)
-    .map((t) => t.trim())
-    .filter((t) => t.length >= 3)
-    .slice(0, 12);
+  return tokenizeSearchTerms(text, 12);
+}
+
+/**
+ * Infer a coarse legal domain from free-text questions.
+ * Returns null when the domain is ambiguous — callers should then require
+ * higher confidence rather than citing unrelated statutes.
+ */
+export function inferLegalDomainFromText(text: string): string | null {
+  const hay = text.toLowerCase();
+  if (
+    /(эрүү|гэмт\s*хэрэг|цагдаа|хорих|ял\s*ших|сэжигл|баривчил|хэрэгтэн|хохирогч|гэрч|criminal|prosecut|offense|offence)/i.test(
+      hay,
+    )
+  ) {
+    return "CRIMINAL";
+  }
+  if (
+    /(захиргаа|тусгай\s*зөвшөөрөл|лиценз|зөвшөөрөл|administrative|permit|licence|license)/i.test(
+      hay,
+    )
+  ) {
+    return "ADMINISTRATIVE";
+  }
+  if (
+    /(иргэний\s*хууль|гэрээ|нэхэмжлэл|өр\b|зээл|гэрлэлт|тэтгэмж|өмч|civil|contract|tort)/i.test(
+      hay,
+    )
+  ) {
+    return "CIVIL";
+  }
+  return null;
+}
+
+/** Strip residual HTML chrome from scraped statute / judgment titles. */
+export function stripLegalHtmlTags(value: string): string {
+  return value
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export function tokenizeSearchTerms(text: string, limit = 6): string[] {
-  return text
+  const raw = text
     .toLowerCase()
     .split(/[^\p{L}\p{N}]+/u)
     .map((t) => t.trim())
-    .filter((t) => t.length >= 3)
-    .slice(0, limit);
+    .filter((t) => t.length >= 3 && !SEARCH_STOPWORDS.has(t));
+
+  // Prefer longer, more distinctive tokens (reduces Article-1 OR noise).
+  const unique: string[] = [];
+  const seen = new Set<string>();
+  for (const token of [...raw].sort((a, b) => b.length - a.length || a.localeCompare(b))) {
+    if (seen.has(token)) continue;
+    seen.add(token);
+    unique.push(token);
+    if (unique.length >= limit) break;
+  }
+  return unique;
 }
 
 export function rankDocumentsToHits(

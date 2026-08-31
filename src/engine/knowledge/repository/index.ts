@@ -5,10 +5,13 @@ export {
   domainFilterHints,
   extractArticleNumberFromText,
   filterDocumentsForSearch,
+  inferLegalDomainFromText,
   isCitableOfficialDocumentType,
   isKnowledgeApplicableAt,
   isPositiveLawDocumentType,
+  MIN_OPEN_QUESTION_CITATION_SCORE,
   normalizeArticleNumber,
   rankDocumentsToHits,
+  stripLegalHtmlTags,
   tokenizeSearchTerms,
 } from "./article-search";

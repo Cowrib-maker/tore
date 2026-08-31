@@ -3,6 +3,8 @@
  * Never includes archive hashes, engine tokens, storage keys, or node internals.
  */
 
+import { stripLegalHtmlTags } from "@/engine/knowledge/repository/article-search";
+
 export type LegalAiSafeCitation = {
   id: string;
   sourceType: string;
@@ -50,6 +52,10 @@ export function nullIfBlank(value: string | null | undefined): string | null {
   return trimmed ? trimmed : null;
 }
 
+function stripCitationHtml(value: string): string {
+  return stripLegalHtmlTags(value);
+}
+
 export function toSafeLegalAiCitation(
   id: string,
   input: LegalAiCitationPersistInput,
@@ -60,7 +66,7 @@ export function toSafeLegalAiCitation(
   return {
     id,
     sourceType: input.sourceType,
-    title: input.title,
+    title: stripCitationHtml(input.title),
     article: nullIfBlank(input.article) ?? pinpoint.article,
     paragraph: nullIfBlank(input.paragraph) ?? pinpoint.paragraph,
     sourceUrl: nullIfBlank(input.sourceUrl),
@@ -88,7 +94,7 @@ export function parseSafeCitationsFromUnknown(
     citations.push({
       id: row.id,
       sourceType: typeof row.sourceType === "string" ? row.sourceType : "legal-source",
-      title: row.title,
+      title: stripCitationHtml(row.title),
       article: typeof row.article === "string" ? nullIfBlank(row.article) : null,
       paragraph:
         typeof row.paragraph === "string" ? nullIfBlank(row.paragraph) : null,

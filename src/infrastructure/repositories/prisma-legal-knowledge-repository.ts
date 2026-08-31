@@ -386,30 +386,63 @@ function buildArticleWhere(
   };
 }
 
+function tokenFieldContains(token: string): PrismaWhere[] {
+  return [
+    { articleNumber: { contains: token, mode: "insensitive" as const } },
+    { title: { contains: token, mode: "insensitive" as const } },
+    { text: { contains: token, mode: "insensitive" as const } },
+  ];
+}
+
+/**
+ * Open text search: require the strongest tokens (AND) rather than OR-ing
+ * every conversational fragment — that previously matched random Article 1s.
+ */
 function buildTextContainsWhere(text: string): PrismaWhere {
-  const tokens = tokenizeSearchTerms(text, 6);
+  const tokens = tokenizeSearchTerms(text, 8);
   if (tokens.length === 0) {
-    return {};
+    // Match nothing — empty OR would otherwise scan the whole corpus.
+    return { id: "__no_search_tokens__" };
+  }
+  const strong = tokens.filter((t) => t.length >= 4).slice(0, 2);
+  const useTokens = strong.length > 0 ? strong : tokens.slice(0, 1);
+  if (useTokens.length === 1) {
+    return { OR: tokenFieldContains(useTokens[0]!) };
   }
   return {
-    OR: tokens.flatMap((token) => [
-      { articleNumber: { contains: token, mode: "insensitive" as const } },
-      { title: { contains: token, mode: "insensitive" as const } },
-      { text: { contains: token, mode: "insensitive" as const } },
-    ]),
+    AND: useTokens.map((token) => ({ OR: tokenFieldContains(token) })),
   };
 }
 
 function buildChunkTextWhere(text: string): PrismaWhere {
-  const tokens = tokenizeSearchTerms(text, 6);
+  const tokens = tokenizeSearchTerms(text, 8);
   if (tokens.length === 0) {
-    return {};
+    return { id: "__no_search_tokens__" };
+  }
+  const strong = tokens.filter((t) => t.length >= 4).slice(0, 2);
+  const useTokens = strong.length > 0 ? strong : tokens.slice(0, 1);
+  if (useTokens.length === 1) {
+    return {
+      OR: [
+        {
+          articleNumber: {
+            contains: useTokens[0]!,
+            mode: "insensitive" as const,
+          },
+        },
+        { text: { contains: useTokens[0]!, mode: "insensitive" as const } },
+      ],
+    };
   }
   return {
-    OR: tokens.flatMap((token) => [
-      { articleNumber: { contains: token, mode: "insensitive" as const } },
-      { text: { contains: token, mode: "insensitive" as const } },
-    ]),
+    AND: useTokens.map((token) => ({
+      OR: [
+        {
+          articleNumber: { contains: token, mode: "insensitive" as const },
+        },
+        { text: { contains: token, mode: "insensitive" as const } },
+      ],
+    })),
   };
 }
 

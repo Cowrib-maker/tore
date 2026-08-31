@@ -88,6 +88,7 @@ export type {
 
 export {
   HttpKnowledgeCrawler,
+  HttpShuukhCrawler,
   InMemoryKnowledgeCrawler,
   KnowledgeCrawlError,
   LEGALINFO_CONSTITUTION_CATEGORY_ID,
@@ -114,7 +115,9 @@ export {
   lawIdFromLegalInfoUrl,
   parseShuukhJudgmentHtml,
   parseShuukhListHtml,
+  parseShuukhCaseAjaxPayload,
   shuukhCaseListUrl,
+  shuukhCaseAjaxUrl,
   shuukhJudgmentUrl,
   sourceTypeForLegalInfoCategory,
   rawTextDocument,
@@ -122,6 +125,7 @@ export {
 export type {
   FetchLike,
   HttpKnowledgeCrawlerOptions,
+  HttpShuukhCrawlerOptions,
   KnowledgeCrawlErrorCode,
   LegalInfoActTypeCategory,
   LegalInfoSourceType as LegalInfoActSourceType,
@@ -147,6 +151,9 @@ export {
   selectQueue,
   classifyCriminalCodeTitle,
   identifyCriminalCodeFromDocuments,
+  classifyPriorityLawTitle,
+  identifyPriorityLawsFromDocuments,
+  priorityLawIdsForIngest,
 } from "./discovery";
 export type {
   DryRunPlanItem,
@@ -168,6 +175,10 @@ export type {
   CriminalCodeDiscoverySkip,
   CriminalCodeTitleClass,
   IdentifyCriminalCodeResult,
+  IdentifyPriorityLawsResult,
+  PriorityLawDiscoveryDocument,
+  PriorityLawKey,
+  PriorityLawMatch,
 } from "./discovery";
 export {
   LegalInfoKnowledgeParser,
@@ -188,11 +199,14 @@ export {
   documentMatchesDomain,
   domainFilterHints,
   extractArticleNumberFromText,
+  inferLegalDomainFromText,
   isCitableOfficialDocumentType,
   isKnowledgeApplicableAt,
   isPositiveLawDocumentType,
+  MIN_OPEN_QUESTION_CITATION_SCORE,
   normalizeArticleNumber,
   rankDocumentsToHits,
+  stripLegalHtmlTags,
   tokenizeSearchTerms,
 } from "./repository";
 export {
