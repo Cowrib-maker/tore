@@ -56,6 +56,7 @@ import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitle
 import {
   OrthographyCheckButton,
   OrthographyResults,
+  useOrthographyAutoCheck,
   useOrthographyCheck,
 } from "@/components/orthography/orthography-checker";
 import {
@@ -163,6 +164,11 @@ export function LegalAiChat({
     check: checkOrthography,
     clear: clearOrthography,
   } = useOrthographyCheck();
+
+  useOrthographyAutoCheck(message, checkOrthography, {
+    enabled: !loading && !uploading,
+    minLength: 10,
+  });
 
   const documentInputRef = useRef<HTMLInputElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
@@ -521,7 +527,7 @@ export function LegalAiChat({
                 loading={orthographyLoading}
                 disabled={loading || uploading}
                 pressed={orthographyOpen}
-                onClick={() => void checkOrthography(message)}
+                onClick={() => void checkOrthography(message, { mode: "manual" })}
               />
             </div>
             <Button
@@ -535,7 +541,7 @@ export function LegalAiChat({
             </Button>
           </div>
         </div>
-        {orthographyOpen ? (
+        {orthographyOpen || orthographyLoading ? (
           <OrthographyResults
             className="mt-2"
             loading={orthographyLoading}
@@ -546,11 +552,16 @@ export function LegalAiChat({
             includeLatinToCyrillic={includeLatinToCyrillic}
             onIncludeLatinChange={(value) => {
               setIncludeLatinToCyrillic(value);
-              void checkOrthography(message, { includeLatinToCyrillic: value });
+              void checkOrthography(message, {
+                includeLatinToCyrillic: value,
+                mode: "manual",
+              });
             }}
             billingHref="/#chat"
             onApplySuggestion={setMessage}
-            onRecheck={(next) => void checkOrthography(next)}
+            onRecheck={(next) =>
+              void checkOrthography(next, { mode: "manual" })
+            }
             onClose={clearOrthography}
           />
         ) : null}

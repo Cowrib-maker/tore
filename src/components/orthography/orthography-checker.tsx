@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Check, SpellCheck2 } from "lucide-react";
 import { toast } from "sonner";
@@ -25,6 +25,8 @@ export type OrthographyCheckApiResult = {
   premium: true;
 };
 
+export type OrthographyCheckMode = "manual" | "auto";
+
 export function useOrthographyCheck() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<OrthographyCheckApiResult | null>(null);
@@ -32,26 +34,45 @@ export function useOrthographyCheck() {
   const [needsBilling, setNeedsBilling] = useState(false);
   const [open, setOpen] = useState(false);
   const [includeLatinToCyrillic, setIncludeLatinToCyrillic] = useState(false);
+  const lastCheckedTextRef = useRef<string | null>(null);
 
   const clear = useCallback(() => {
     setResult(null);
     setGateMessage(null);
     setNeedsBilling(false);
     setOpen(false);
+    lastCheckedTextRef.current = null;
   }, []);
 
   const check = useCallback(
-    async (text: string, options?: { includeLatinToCyrillic?: boolean }) => {
+    async (
+      text: string,
+      options?: {
+        includeLatinToCyrillic?: boolean;
+        mode?: OrthographyCheckMode;
+      },
+    ) => {
+      const mode = options?.mode ?? "manual";
       const trimmed = text.trim();
       if (!trimmed) {
-        toast.message("Шалгах текст оруулна уу.");
+        if (mode === "manual") {
+          toast.message("Шалгах текст оруулна уу.");
+        } else {
+          clear();
+        }
         return;
       }
+      if (mode === "auto" && trimmed === lastCheckedTextRef.current) {
+        return;
+      }
+
       const latin = options?.includeLatinToCyrillic ?? includeLatinToCyrillic;
       setLoading(true);
       setGateMessage(null);
       setNeedsBilling(false);
-      setOpen(true);
+      if (mode === "manual") {
+        setOpen(true);
+      }
       try {
         const response = await fetch("/api/orthography/check", {
           method: "POST",
@@ -80,22 +101,40 @@ export function useOrthographyCheck() {
                 "code" in payload &&
                 payload.code === "BILLING_REQUIRED"),
           );
-          if (response.status === 401) {
-            toast.error(message);
+          if (mode === "manual") {
+            setOpen(true);
+            if (response.status === 401) {
+              toast.error(message);
+            }
+          } else {
+            // Auto mode: stay quiet for guests / billing; manual button still works.
+            setOpen(false);
           }
           return;
         }
 
-        setResult(payload as OrthographyCheckApiResult);
+        lastCheckedTextRef.current = trimmed;
+        const typed = payload as OrthographyCheckApiResult;
+        setResult(typed);
+        if (mode === "auto") {
+          setOpen(typed.suggestionCount > 0);
+        } else {
+          setOpen(true);
+        }
       } catch {
         setResult(null);
         setGateMessage("Сүлжээний алдаа. Дахин оролдоно уу.");
-        toast.error("Алдаа шалгагч түр ажиллахгүй байна.");
+        if (mode === "manual") {
+          setOpen(true);
+          toast.error("Алдаа шалгагч түр ажиллахгүй байна.");
+        } else {
+          setOpen(false);
+        }
       } finally {
         setLoading(false);
       }
     },
-    [includeLatinToCyrillic],
+    [clear, includeLatinToCyrillic],
   );
 
   return {
@@ -111,6 +150,36 @@ export function useOrthographyCheck() {
     clear,
     setResult,
   };
+}
+
+/** Debounced orthography pass while the user types (Legal AI composer, student pad). */
+export function useOrthographyAutoCheck(
+  text: string,
+  check: (
+    value: string,
+    options?: { mode?: OrthographyCheckMode },
+  ) => void | Promise<void>,
+  options?: {
+    debounceMs?: number;
+    minLength?: number;
+    enabled?: boolean;
+  },
+) {
+  const { debounceMs = 750, minLength = 10, enabled = true } = options ?? {};
+
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+    const trimmed = text.trim();
+    if (trimmed.length < minLength) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      void check(trimmed, { mode: "auto" });
+    }, debounceMs);
+    return () => window.clearTimeout(timer);
+  }, [check, debounceMs, enabled, minLength, text]);
 }
 
 type OrthographyResultsProps = {
@@ -164,7 +233,7 @@ export function OrthographyResults({
         <div>
           <p className="font-medium text-[#0A0F14]">Зөв бичгийн алдаа шалгагч</p>
           <p className="mt-0.5 text-xs text-[#66717D]">
-            Зөвхөн санал · автоматаар засаагүй · төлбөртэй багц
+            Бичих явцад автоматаар шалгана · зөвхөн санал · төлбөртэй багц
             {loading ? " · шалгаж байна…" : null}
           </p>
         </div>
@@ -273,8 +342,8 @@ export function OrthographyCheckButton({
   return (
     <button
       type="button"
-      aria-label="Зөв бичгийн алдаа шалгах"
-      title="Зөв бичгийн алдаа шалгах"
+      aria-label="Зөв бичгийн алдаа шалгах (одоо шалгах)"
+      title="Зөв бичгийн алдаа шалгах (одоо шалгах)"
       disabled={disabled || loading}
       aria-pressed={pressed}
       onClick={onClick}
@@ -289,7 +358,7 @@ export function OrthographyCheckButton({
   );
 }
 
-/** Standalone panel with its own check button (Student draft pad). */
+/** Standalone panel with auto-check while typing (Student draft pad). */
 export function OrthographyChecker({
   text,
   onApplySuggestion,
@@ -305,18 +374,24 @@ export function OrthographyChecker({
 }) {
   const ortho = useOrthographyCheck();
 
+  useOrthographyAutoCheck(text, ortho.check, {
+    enabled: !disabled,
+    minLength: 10,
+  });
+
   return (
     <div className={cn("mt-3", className)}>
       <Button
         type="button"
         size="sm"
-        className="bg-[#0B1F3A] text-white hover:bg-[#173A66]"
+        variant="outline"
+        className="border-[#0B1F3A]/15 text-[#0B1F3A] hover:bg-[#0B1F3A]/5"
         disabled={disabled || ortho.loading || !text.trim()}
-        onClick={() => void ortho.check(text)}
+        onClick={() => void ortho.check(text, { mode: "manual" })}
       >
-        {ortho.loading ? "Шалгаж байна…" : "Алдаа шалгах"}
+        {ortho.loading ? "Шалгаж байна…" : "Одоо шалгах"}
       </Button>
-      {ortho.open ? (
+      {ortho.open || ortho.loading ? (
         <OrthographyResults
           className="mt-3"
           loading={ortho.loading}
@@ -327,11 +402,14 @@ export function OrthographyChecker({
           includeLatinToCyrillic={ortho.includeLatinToCyrillic}
           onIncludeLatinChange={(value) => {
             ortho.setIncludeLatinToCyrillic(value);
-            void ortho.check(text, { includeLatinToCyrillic: value });
+            void ortho.check(text, {
+              includeLatinToCyrillic: value,
+              mode: "manual",
+            });
           }}
           billingHref={billingHref}
           onApplySuggestion={onApplySuggestion}
-          onRecheck={(next) => void ortho.check(next)}
+          onRecheck={(next) => void ortho.check(next, { mode: "manual" })}
           onClose={ortho.clear}
         />
       ) : null}
