@@ -3,7 +3,7 @@ import { UserRole } from "@/domain/enums";
 /** Citizen-facing chat lives on the public homepage. */
 export const TORE_CHAT_HREF = "/#chat";
 
-/** Student product page — coming-soon foundation, not a fake app. */
+/** Student academy — theory, method, tests, and problem exams. */
 export const TORE_STUDENT_HREF = "/student";
 
 export const LAWYER_WORKSPACE_PATH = "/lawyer/workspace";

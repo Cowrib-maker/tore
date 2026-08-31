@@ -151,6 +151,11 @@ export type KnowledgeArticleSearchQuery = {
   documentType?: string | null;
   /** When set, callers should discard hits outside validity; repo may pre-filter. */
   applicableAt?: string | null;
+  /**
+   * `statute` (default): laws/constitution only — used by doctrine mapping.
+   * `all`: laws, resolutions, orders, and official court acts. Never commentary/AI.
+   */
+  officialSourceKinds?: "statute" | "all";
   limit?: number;
 };
 

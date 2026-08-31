@@ -14,14 +14,46 @@ export type PublicHomeStudentPageCopy = {
   modulesTitle: string;
   modules: {
     theory: string;
+    method: string;
     library: string;
     lawLibrary: string;
     courtLibrary: string;
     problems: string;
     exams: string;
+    tests: string;
     aiTutor: string;
     progress: string;
   };
+  tracksTitle: string;
+  tracks: {
+    criminal: string;
+    civil: string;
+    administrative: string;
+  };
+  trackLeads: {
+    criminal: string;
+    civil: string;
+    administrative: string;
+  };
+  openLesson: string;
+  startQuiz: string;
+  submitQuiz: string;
+  retryQuiz: string;
+  yourAnswer: string;
+  correctAnswer: string;
+  missedHeading: string;
+  allCorrect: string;
+  unanswered: string;
+  scoreLabel: string;
+  gradeLabel: string;
+  grades: {
+    excellent: string;
+    good: string;
+    average: string;
+    pass: string;
+    fail: string;
+  };
+  studyDisclaimer: string;
   planBasic: string;
   planPlus: string;
   priceBasic: string;
@@ -31,6 +63,7 @@ export type PublicHomeStudentPageCopy = {
   ctaFeedback: string;
   ctaChat: string;
   backHome: string;
+  backTrack: string;
 };
 
 export type PublicHomeCopy = {

@@ -30,7 +30,7 @@ describe("public homepage role routing", () => {
     );
   });
 
-  it("routes the student product to the coming-soon surface", () => {
+  it("routes the student product to the academy hub", () => {
     expect(TORE_STUDENT_HREF).toBe("/student");
     expect(getHomepageProductHref("student", null)).toBe(TORE_STUDENT_HREF);
     expect(getHomepageProductHref("student", UserRole.CLIENT)).toBe(

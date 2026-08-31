@@ -8,6 +8,7 @@ import { ForbiddenError } from "@/domain/errors/domain-error";
 import { EntitlementError } from "@/domain/errors/entitlement-error";
 import type { EntitlementUsageRepository } from "@/domain/repositories/entitlement-usage-repository";
 import type { SubscriptionRepository } from "@/domain/repositories/subscription-repository";
+import type { UserRepository } from "@/domain/repositories/user-repository";
 import {
   emptyUsageCounts,
   evaluateFeatureQuota,
@@ -15,10 +16,15 @@ import {
   resolveLawyerEntitlement,
 } from "@/domain/services/entitlement";
 import { consumeLawyerFeatureUsage } from "@/application/use-cases/entitlements/assert-lawyer-ai-operation";
+import {
+  ensurePlatformDemoSubscription,
+  isPlatformDemoUserId,
+} from "@/application/use-cases/entitlements/ensure-platform-demo-subscription";
 
 export type CitizenAiGuardDeps = {
   subscriptionRepository: SubscriptionRepository;
   entitlementUsageRepository: EntitlementUsageRepository;
+  userRepository?: Pick<UserRepository, "findById">;
 };
 
 export type CitizenAiGuardResult = {
@@ -33,6 +39,13 @@ export async function assertCitizenAiOperation(
 ): Promise<CitizenAiGuardResult> {
   if (actor.role !== UserRole.CLIENT) {
     throw new ForbiddenError();
+  }
+
+  if (deps.userRepository) {
+    await ensurePlatformDemoSubscription(actor, {
+      userRepository: deps.userRepository,
+      subscriptionRepository: deps.subscriptionRepository,
+    }, now);
   }
 
   const seated = await deps.subscriptionRepository.findActiveSeatForUser(
@@ -59,16 +72,25 @@ export async function assertCitizenAiOperation(
     subscriptionId: owned.id,
     periodStart: entitlement.periodStart,
   });
-  const decision = evaluateFeatureQuota({
-    feature,
-    entitlement,
-    usage: usage ?? emptyUsageCounts(),
-  });
-  if (!decision.ok) {
-    throw new EntitlementError(
-      decision.message,
-      decision.kind === "TOKEN" ? "TOKEN_CEILING_REACHED" : "FEATURE_QUOTA_EXCEEDED",
-    );
+
+  const demoUser =
+    deps.userRepository != null &&
+    (await isPlatformDemoUserId(actor.userId, {
+      userRepository: deps.userRepository,
+    }));
+
+  if (!demoUser) {
+    const decision = evaluateFeatureQuota({
+      feature,
+      entitlement,
+      usage: usage ?? emptyUsageCounts(),
+    });
+    if (!decision.ok) {
+      throw new EntitlementError(
+        decision.message,
+        decision.kind === "TOKEN" ? "TOKEN_CEILING_REACHED" : "FEATURE_QUOTA_EXCEEDED",
+      );
+    }
   }
 
   return { usageId: usage.id };

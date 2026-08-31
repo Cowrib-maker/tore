@@ -1,3 +1,5 @@
+import type { LegalInfoSourceType } from "../crawler/legalinfo-categories";
+
 export const LEGALINFO_MANIFEST_VERSION = 1 as const;
 
 export const LegalInfoDocumentStatus = {
@@ -11,7 +13,7 @@ export const LegalInfoDocumentStatus = {
 export type LegalInfoDocumentStatus =
   (typeof LegalInfoDocumentStatus)[keyof typeof LegalInfoDocumentStatus];
 
-export type LegalInfoSourceType = "law" | "constitution" | "other";
+export type { LegalInfoSourceType };
 
 export type LegalInfoManifestDocument = {
   lawId: string;

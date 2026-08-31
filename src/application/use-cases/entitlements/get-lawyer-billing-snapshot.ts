@@ -1,5 +1,6 @@
 import type { ActorContext } from "@/application/common/actor-context";
 import { assertLawyerEntitlementActor } from "@/application/use-cases/entitlements/ensure-lawyer-solo-subscription";
+import { ensurePlatformDemoSubscription } from "@/application/use-cases/entitlements/ensure-platform-demo-subscription";
 import { toSoloCheckoutView, type SoloCheckoutView } from "@/application/use-cases/billing/checkout-view";
 import {
   listOwnDeviceSessions,
@@ -16,6 +17,7 @@ import type { DeviceSessionRepository } from "@/domain/repositories/device-sessi
 import type { EntitlementUsageRepository } from "@/domain/repositories/entitlement-usage-repository";
 import type { PlatformSettingRepository } from "@/domain/repositories/platform-setting-repository";
 import type { SubscriptionRepository } from "@/domain/repositories/subscription-repository";
+import type { UserRepository } from "@/domain/repositories/user-repository";
 import {
   evaluateAccountSharingRisk,
   type AccountSharingRiskResult,
@@ -40,6 +42,7 @@ export type BillingSnapshotDeps = {
   entitlementUsageRepository: EntitlementUsageRepository;
   platformSettingRepository: PlatformSettingRepository;
   invoiceRepository: InvoiceRepository;
+  userRepository?: Pick<UserRepository, "findById">;
 };
 
 export type LawyerBillingSnapshot = {
@@ -79,6 +82,13 @@ export async function getLawyerBillingSnapshot(
   assertLawyerEntitlementActor(actor);
   const now = input.now ?? new Date();
   const policy = await loadSessionProtectionPolicy(deps.platformSettingRepository);
+
+  if (deps.userRepository) {
+    await ensurePlatformDemoSubscription(actor, {
+      userRepository: deps.userRepository,
+      subscriptionRepository: deps.subscriptionRepository,
+    }, now);
+  }
 
   let subscription = await deps.subscriptionRepository.findLatestOwnedByUserId(
     actor.userId,

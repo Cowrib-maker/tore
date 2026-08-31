@@ -8,14 +8,17 @@ import { SubscriptionStatus, UserRole } from "@/domain/enums";
 import { ForbiddenError } from "@/domain/errors/domain-error";
 import { EntitlementError } from "@/domain/errors/entitlement-error";
 import type { SubscriptionRepository } from "@/domain/repositories/subscription-repository";
+import type { UserRepository } from "@/domain/repositories/user-repository";
 import {
   isSubscriptionActive,
   resolveLawyerEntitlement,
   type LawyerEntitlement,
 } from "@/domain/services/entitlement";
+import { ensurePlatformDemoSubscription } from "@/application/use-cases/entitlements/ensure-platform-demo-subscription";
 
 export type EntitlementDeps = {
   subscriptionRepository: SubscriptionRepository;
+  userRepository?: Pick<UserRepository, "findById">;
 };
 
 export function assertLawyerEntitlementActor(actor: ActorContext): void {
@@ -53,6 +56,19 @@ export async function requireActiveLawyerEntitlement(
       subscription: owned,
       entitlement: resolveLawyerEntitlement(owned, now),
     };
+  }
+
+  if (deps.userRepository) {
+    const demo = await ensurePlatformDemoSubscription(actor, {
+      userRepository: deps.userRepository,
+      subscriptionRepository: deps.subscriptionRepository,
+    }, now);
+    if (demo) {
+      return {
+        subscription: demo,
+        entitlement: resolveLawyerEntitlement(demo, now),
+      };
+    }
   }
 
   const latest = await deps.subscriptionRepository.findLatestOwnedByUserId(

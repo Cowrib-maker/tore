@@ -28,6 +28,7 @@ import {
   caseFileRepository,
   entitlementUsageRepository,
   subscriptionRepository,
+  userRepository,
 } from "@/infrastructure/repositories";
 import { env } from "@/lib/env";
 
@@ -76,6 +77,7 @@ export function createLegalAiService(): LegalAiService {
       conversations: prismaConversationBillingStore,
       subscriptionRepository,
       entitlementUsageRepository,
+      userRepository,
     }),
     caseContextLoader: createOwnedCaseContextLoader(caseFileRepository),
   });

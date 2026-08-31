@@ -172,6 +172,7 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
     const hits = await this.knowledge.searchArticles({
       text: input.question || input.query,
       jurisdiction: "MN",
+      officialSourceKinds: "all",
       limit: 8,
     });
 
@@ -351,9 +352,10 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
         text: citation.titleHint,
         articleNumber,
         paragraphNumber: citation.paragraph,
-        jurisdiction: "MN",
+        jurisdiction: "MN" as const,
         titleTerms: identity.titleTerms,
         excludeTitleTerms: identity.excludeTitleTerms,
+        officialSourceKinds: "all" as const,
         limit: 20,
       };
 

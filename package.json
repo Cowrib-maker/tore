@@ -24,6 +24,7 @@
     "verify:legalinfo-5": "tsx scripts/verify-legalinfo-5.ts",
     "verify:legalinfo-50": "tsx scripts/verify-legalinfo-50.ts",
     "discover:legalinfo": "tsx scripts/discover-legalinfo.ts",
+    "discover:shuukh": "tsx scripts/discover-shuukh.ts",
     "identify:legalinfo:criminal-code": "tsx scripts/identify-legalinfo-criminal-code.ts",
     "ingest:legalinfo:dry-run": "tsx scripts/ingest-legalinfo-dry-run.ts",
     "ingest:legalinfo:batch-10": "tsx scripts/ingest-legalinfo-batch-10.ts",

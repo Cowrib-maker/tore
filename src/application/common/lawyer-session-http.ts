@@ -9,11 +9,13 @@ import type { EntitlementUsageRepository } from "@/domain/repositories/entitleme
 import type { InvoiceRepository } from "@/domain/repositories/invoice-repository";
 import type { PlatformSettingRepository } from "@/domain/repositories/platform-setting-repository";
 import type { SubscriptionRepository } from "@/domain/repositories/subscription-repository";
+import type { UserRepository } from "@/domain/repositories/user-repository";
 import { deviceSessionRepository } from "@/infrastructure/repositories/prisma-device-session-repository";
 import { entitlementUsageRepository } from "@/infrastructure/repositories/prisma-entitlement-usage-repository";
 import { invoiceRepository } from "@/infrastructure/repositories/prisma-invoice-repository";
 import { platformSettingRepository } from "@/infrastructure/repositories/prisma-platform-setting-repository";
 import { subscriptionRepository } from "@/infrastructure/repositories/prisma-subscription-repository";
+import { userRepository } from "@/infrastructure/repositories/prisma-user-repository";
 import { env } from "@/lib/env";
 import { cookies, headers } from "next/headers";
 
@@ -29,6 +31,7 @@ export function lawyerEntitlementDeps(): {
   entitlementUsageRepository: EntitlementUsageRepository;
   platformSettingRepository: PlatformSettingRepository;
   invoiceRepository: InvoiceRepository;
+  userRepository: Pick<UserRepository, "findById">;
 } {
   return {
     subscriptionRepository,
@@ -36,6 +39,7 @@ export function lawyerEntitlementDeps(): {
     entitlementUsageRepository,
     platformSettingRepository,
     invoiceRepository,
+    userRepository,
   };
 }
 

@@ -23,6 +23,7 @@ import { LegalInfoKnowledgeParser } from "../parser/legalinfo-knowledge.parser";
 import { StructuralKnowledgeParser } from "../parser";
 import { InMemoryKnowledgeRepository } from "../repository";
 import { KnowledgeEngine } from "../services";
+import { documentTypeForLegalInfoCategory } from "../crawler/legalinfo-categories";
 import type {
   IKnowledgeRepository,
   RawKnowledgeDocument,
@@ -414,6 +415,12 @@ export class LegalInfoIngestionQueue {
       try {
         await this.knowledgeRepository.save({
           ...stored,
+          metadata: {
+            ...stored.metadata,
+            documentType:
+              documentTypeForLegalInfoCategory(doc.categoryId) ??
+              stored.metadata.documentType,
+          },
           provenance: {
             archiveId: archiveRecord.archiveId,
             sha256: archiveRecord.sha256,

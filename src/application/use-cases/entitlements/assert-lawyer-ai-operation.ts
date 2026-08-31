@@ -9,6 +9,7 @@ import { EntitlementError } from "@/domain/errors/entitlement-error";
 import type { DeviceSessionRepository } from "@/domain/repositories/device-session-repository";
 import type { EntitlementUsageRepository } from "@/domain/repositories/entitlement-usage-repository";
 import type { SubscriptionRepository } from "@/domain/repositories/subscription-repository";
+import type { UserRepository } from "@/domain/repositories/user-repository";
 import {
   evaluateAccountSharingRisk,
   shouldRestrictExpensiveOps,
@@ -20,12 +21,14 @@ import {
   type LawyerEntitlement,
 } from "@/domain/services/entitlement";
 import { requireActiveLawyerEntitlement } from "@/application/use-cases/entitlements/ensure-lawyer-solo-subscription";
+import { isPlatformDemoUserId } from "@/application/use-cases/entitlements/ensure-platform-demo-subscription";
 import { touchDeviceSession } from "@/application/use-cases/sessions/touch-device-session";
 
 export type LawyerAiGuardDeps = {
   subscriptionRepository: SubscriptionRepository;
   deviceSessionRepository: DeviceSessionRepository;
   entitlementUsageRepository: EntitlementUsageRepository;
+  userRepository?: Pick<UserRepository, "findById">;
 };
 
 export type LawyerAiGuardContext = {
@@ -79,7 +82,13 @@ export async function assertLawyerAiOperation(
     sessions: activeSessions,
   });
 
-  if (shouldRestrictExpensiveOps(risk, input.policy)) {
+  const demoUser =
+    deps.userRepository != null &&
+    (await isPlatformDemoUserId(input.actor.userId, {
+      userRepository: deps.userRepository,
+    }));
+
+  if (!demoUser && shouldRestrictExpensiveOps(risk, input.policy)) {
     throw new EntitlementError(
       ACCOUNT_SHARING_RESTRICTED_MESSAGE,
       "ACCOUNT_SHARING_RESTRICTED",
@@ -91,7 +100,7 @@ export async function assertLawyerAiOperation(
     subscriptionId: subscription.id,
     periodStart: entitlement.periodStart,
   });
-  if (input.checkQuota !== false) {
+  if (input.checkQuota !== false && !demoUser) {
     const decision = evaluateFeatureQuota({
       feature: input.feature,
       entitlement,

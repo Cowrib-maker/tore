@@ -2,6 +2,7 @@ import {
   LEGALINFO_CONSTITUTION_CATEGORY_ID,
   LEGALINFO_STATUTE_CATEGORY_ID,
 } from "../crawler/legalinfo-url";
+import { sourceTypeForLegalInfoCategory } from "../crawler/legalinfo-categories";
 import type { FetchLike } from "../crawler/http-knowledge-crawler";
 import {
   LegalInfoListClient,
@@ -167,13 +168,7 @@ function toPendingDocument(
 }
 
 function sourceTypeForCategory(categoryId: string): LegalInfoSourceType {
-  if (categoryId === LEGALINFO_CONSTITUTION_CATEGORY_ID) {
-    return "constitution";
-  }
-  if (categoryId === LEGALINFO_STATUTE_CATEGORY_ID) {
-    return "law";
-  }
-  return "other";
+  return sourceTypeForLegalInfoCategory(categoryId);
 }
 
 function sleep(ms: number): Promise<void> {

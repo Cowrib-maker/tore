@@ -18,6 +18,7 @@ import { PrismaLegalAiStore } from "@/infrastructure/ai/prisma-legal-ai-store";
 import {
   entitlementUsageRepository,
   subscriptionRepository,
+  userRepository,
 } from "@/infrastructure/repositories";
 import {
   consumeRateLimit,
@@ -48,6 +49,7 @@ export async function POST(request: Request) {
       {
         subscriptionRepository,
         entitlementUsageRepository,
+        userRepository,
       },
     );
 

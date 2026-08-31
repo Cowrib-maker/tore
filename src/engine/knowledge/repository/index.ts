@@ -5,6 +5,7 @@ export {
   domainFilterHints,
   extractArticleNumberFromText,
   filterDocumentsForSearch,
+  isCitableOfficialDocumentType,
   isKnowledgeApplicableAt,
   isPositiveLawDocumentType,
   normalizeArticleNumber,

@@ -24,3 +24,26 @@ export {
   lawIdFromLegalInfoUrl,
   type KnowledgeCrawlErrorCode,
 } from "./legalinfo-url";
+export {
+  LEGALINFO_ACT_TYPE_CATEGORIES,
+  LEGALINFO_ACT_TYPE_CATEGORY_IDS,
+  documentTypeForLegalInfoCategory,
+  legalInfoActTypeCategory,
+  sourceTypeForLegalInfoCategory,
+} from "./legalinfo-categories";
+export type {
+  LegalInfoActTypeCategory,
+  LegalInfoSourceType,
+} from "./legalinfo-categories";
+export {
+  SHUUKH_CASE_LISTS,
+  SHUUKH_HOST,
+  assertHttpsShuukhUrl,
+  caseIdFromShuukhUrl,
+  isShuukhHostname,
+  parseShuukhJudgmentHtml,
+  parseShuukhListHtml,
+  shuukhCaseListUrl,
+  shuukhJudgmentUrl,
+} from "./shuukh-url";
+export type { ShuukhCaseList, ShuukhJudgment, ShuukhListItem } from "./shuukh-url";

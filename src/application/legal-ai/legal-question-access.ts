@@ -8,16 +8,25 @@ import {
   UNPAID_CITIZEN_FREE_LEGAL_QUESTIONS,
   getPlanDefinition,
 } from "@/domain/constants/subscription-plans";
+import {
+  PLATFORM_DEMO_PLAN_NAME,
+  PLATFORM_DEMO_UNLIMITED_REMAINING,
+  isPlatformDemoEmail,
+} from "@/domain/constants/platform-demo-accounts";
 import { EntitlementFeature, UserRole } from "@/domain/enums";
 import { EntitlementError } from "@/domain/errors/entitlement-error";
 import type { EntitlementUsageRepository } from "@/domain/repositories/entitlement-usage-repository";
 import type { SubscriptionRepository } from "@/domain/repositories/subscription-repository";
+import type { UserRepository } from "@/domain/repositories/user-repository";
 import {
   emptyUsageCounts,
   evaluateFeatureQuota,
   isSubscriptionActive,
   resolveLawyerEntitlement,
 } from "@/domain/services/entitlement";
+import {
+  ensurePlatformDemoSubscription,
+} from "@/application/use-cases/entitlements/ensure-platform-demo-subscription";
 
 export type LegalQuestionSubject =
   | { kind: "guest"; guestSessionId: string }
@@ -44,6 +53,15 @@ export type ConversationBillingStore = {
   countBilledQuestionsForUser(userId: string): Promise<number>;
 };
 
+type LegalQuestionAccessDeps = {
+  guestSessions: GuestSessionStore;
+  conversations: ConversationBillingStore;
+  subscriptionRepository: SubscriptionRepository;
+  entitlementUsageRepository: EntitlementUsageRepository;
+  userRepository?: Pick<UserRepository, "findById">;
+  now?: () => Date;
+};
+
 export function allowAllLegalQuestionAccess(): LegalQuestionAccessPort {
   return {
     async assertCanStartNewLegalQuestion() {},
@@ -54,13 +72,9 @@ export function allowAllLegalQuestionAccess(): LegalQuestionAccessPort {
   };
 }
 
-export function createLegalQuestionAccess(deps: {
-  guestSessions: GuestSessionStore;
-  conversations: ConversationBillingStore;
-  subscriptionRepository: SubscriptionRepository;
-  entitlementUsageRepository: EntitlementUsageRepository;
-  now?: () => Date;
-}): LegalQuestionAccessPort {
+export function createLegalQuestionAccess(
+  deps: LegalQuestionAccessDeps,
+): LegalQuestionAccessPort {
   const now = deps.now ?? (() => new Date());
 
   return {
@@ -77,6 +91,10 @@ export function createLegalQuestionAccess(deps: {
             401,
           );
         }
+        return;
+      }
+
+      if (await isDemoSubject(subject, deps, now())) {
         return;
       }
 
@@ -120,6 +138,10 @@ export function createLegalQuestionAccess(deps: {
         return;
       }
 
+      if (await isDemoSubject(subject, deps, now())) {
+        return;
+      }
+
       const paidLawyer = subject.role === UserRole.LAWYER;
       const paidCitizen = paidLawyer
         ? null
@@ -136,6 +158,9 @@ export function createLegalQuestionAccess(deps: {
     async hasPaidLegalAiAccess(subject) {
       if (subject.kind === "guest") {
         return false;
+      }
+      if (await isDemoSubject(subject, deps, now())) {
+        return true;
       }
       if (subject.role === UserRole.LAWYER) {
         const seated =
@@ -158,6 +183,25 @@ export function createLegalQuestionAccess(deps: {
       );
     },
   };
+}
+
+async function isDemoSubject(
+  subject: Extract<LegalQuestionSubject, { kind: "user" }>,
+  deps: LegalQuestionAccessDeps,
+  at: Date,
+): Promise<boolean> {
+  if (!deps.userRepository) {
+    return false;
+  }
+  const user = await deps.userRepository.findById(subject.userId);
+  if (!isPlatformDemoEmail(user?.email)) {
+    return false;
+  }
+  await ensurePlatformDemoSubscription(subject, {
+    userRepository: deps.userRepository,
+    subscriptionRepository: deps.subscriptionRepository,
+  }, at);
+  return true;
 }
 
 async function requireLiveGuest(
@@ -284,6 +328,7 @@ export async function getLegalQuestionEntitlementSnapshot(
     conversations: ConversationBillingStore;
     subscriptionRepository: SubscriptionRepository;
     entitlementUsageRepository: EntitlementUsageRepository;
+    userRepository?: Pick<UserRepository, "findById">;
     now?: () => Date;
   },
 ): Promise<LegalQuestionEntitlementSnapshot> {
@@ -310,6 +355,27 @@ export async function getLegalQuestionEntitlementSnapshot(
       exhaustedLabel:
         "Үнэгүй асуулт дуусмагц нэвтэрч, бүртгүүлнэ үү. Шинэ хууль зүйн асуулт автоматаар илгээгдэхгүй.",
     });
+  }
+
+  if (deps.userRepository) {
+    const user = await deps.userRepository.findById(subject.userId);
+    if (isPlatformDemoEmail(user?.email)) {
+      await ensurePlatformDemoSubscription(subject, {
+        userRepository: deps.userRepository,
+        subscriptionRepository: deps.subscriptionRepository,
+      }, now());
+      return copySnapshot({
+        audience: subject.role === UserRole.LAWYER ? "lawyer" : "paid_citizen",
+        planName: PLATFORM_DEMO_PLAN_NAME,
+        remainingLegalQuestions: PLATFORM_DEMO_UNLIMITED_REMAINING,
+        remainingKind: "plan_quota",
+        exhaustedNextStep: "wait_period",
+        statusLabel: PLATFORM_DEMO_PLAN_NAME,
+        remainingLabel: `Энэ сард үлдсэн хууль зүйн AI асуулт: ${PLATFORM_DEMO_UNLIMITED_REMAINING}+`,
+        exhaustedLabel:
+          "Founder demo эрх — төлбөртэй багц шаардлагагүй.",
+      });
+    }
   }
 
   if (subject.role === UserRole.LAWYER) {

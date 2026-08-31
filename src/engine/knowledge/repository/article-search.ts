@@ -38,17 +38,68 @@ const DOMAIN_DOCUMENT_TYPES: Record<string, readonly string[]> = {
   ADMINISTRATIVE: [],
 };
 
+const UNOFFICIAL_TOKENS = ["COMMENTARY", "DOCTRINE", "OPINION", "LLM"] as const;
+const NON_STATUTE_TOKENS = [
+  ...UNOFFICIAL_TOKENS,
+  "COURT",
+  "DECISION",
+  "JUDGMENT",
+  "REGULATION",
+  "RESOLUTION",
+  "ORDER",
+  "DECREE",
+  "TREATY",
+] as const;
+
+function typeContainsToken(
+  documentType: string,
+  tokens: readonly string[],
+): boolean {
+  const upper = documentType.toUpperCase();
+  return tokens.some((token) => upper.includes(token));
+}
+
 /**
- * Document types that must never become an authoritative legal-rule hit.
- * Court reasoning, commentary, doctrine notes, regulations, and AI output
- * are distinct from positive law.
+ * Document types that must never become an official citation hit.
+ * Commentary, doctrine notes, and model output are distinct from verified sources.
  *
- * REGULATION exclusion is an existing product policy, isolated here.
- * Historical retrieval v0.2 does not change it; review separately before
- * grounding regulations, orders, or resolutions as positive law.
+ * Regulations, orders, resolutions, and court judgments ARE citable when
+ * `officialSourceKinds` is `"all"`. Statute-only search still uses
+ * {@link isPositiveLawDocumentType}.
  */
-const NON_POSITIVE_LAW =
-  /\b(court|decision|judgment|commentary|doctrine|opinion|regulation|ai|llm)\b/i;
+export function isCitableOfficialDocumentType(
+  documentType: string | null,
+): boolean {
+  if (!documentType) return true;
+  const upper = documentType.toUpperCase();
+  if (upper === "AI" || upper.startsWith("AI_") || upper.endsWith("_AI")) {
+    return false;
+  }
+  return !typeContainsToken(documentType, UNOFFICIAL_TOKENS);
+}
+
+/**
+ * Court reasoning, commentary, regulations, and AI output are distinct from
+ * positive law (codes and statutes). Used by doctrine rule mapping.
+ */
+export function isPositiveLawDocumentType(documentType: string | null): boolean {
+  if (!documentType) return true;
+  const upper = documentType.toUpperCase();
+  if (upper === "AI" || upper.startsWith("AI_") || upper.endsWith("_AI")) {
+    return false;
+  }
+  return !typeContainsToken(documentType, NON_STATUTE_TOKENS);
+}
+
+function allowsDocumentType(
+  documentType: string | null,
+  query: KnowledgeArticleSearchQuery,
+): boolean {
+  if (query.officialSourceKinds === "all") {
+    return isCitableOfficialDocumentType(documentType);
+  }
+  return isPositiveLawDocumentType(documentType);
+}
 
 const ISSUE_KIND_TERMS: Record<string, RegExp> = {
   elements_of_offense: /\b(element|offense|offence|actus|charge)\b/i,
@@ -84,11 +135,6 @@ export function extractArticleNumberFromText(text: string): string | null {
       /([0-9]+(?:\.[0-9]+)*)\s*(?:дүгээр|дугаар|дэх)?\s*зүйл/i,
     );
   return match?.[1]?.toLowerCase() ?? null;
-}
-
-export function isPositiveLawDocumentType(documentType: string | null): boolean {
-  if (!documentType) return true;
-  return !NON_POSITIVE_LAW.test(documentType);
 }
 
 export function domainFilterHints(domain: string | null | undefined): {
@@ -165,7 +211,7 @@ function scoreHit(input: {
   chunk: KnowledgeChunk | null;
 }): { score: number; matchKind: KnowledgeMatchKind } | null {
   const { query, document, article, chunk } = input;
-  if (!isPositiveLawDocumentType(document.metadata.documentType)) {
+  if (!allowsDocumentType(document.metadata.documentType, query)) {
     return null;
   }
   if (!documentMatchesDomain(document, query.domain)) {
@@ -405,7 +451,7 @@ export function filterDocumentsForSearch(
         return false;
       }
     }
-    if (!isPositiveLawDocumentType(document.metadata.documentType)) {
+    if (!allowsDocumentType(document.metadata.documentType, query)) {
       return false;
     }
     if (!documentMatchesDomain(document, query.domain)) {

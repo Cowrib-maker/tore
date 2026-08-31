@@ -13,8 +13,7 @@ import { join } from "node:path";
 
 import {
   FileLegalInfoManifestStore,
-  LEGALINFO_CONSTITUTION_CATEGORY_ID,
-  LEGALINFO_STATUTE_CATEGORY_ID,
+  LEGALINFO_ACT_TYPE_CATEGORY_IDS,
   LegalInfoDiscoverer,
   LegalInfoDocumentStatus,
 } from "../src/engine/knowledge";
@@ -29,17 +28,14 @@ async function main() {
   const existing = await store.load();
 
   const discoverer = new LegalInfoDiscoverer({
-    categoryIds: [
-      LEGALINFO_CONSTITUTION_CATEGORY_ID,
-      LEGALINFO_STATUTE_CATEGORY_ID,
-    ],
+    categoryIds: LEGALINFO_ACT_TYPE_CATEGORY_IDS,
     requestDelayMs: 300,
   });
 
   console.log("LegalInfo discovery");
   console.log("===================");
   console.log(
-    `categories: ${LEGALINFO_CONSTITUTION_CATEGORY_ID}, ${LEGALINFO_STATUTE_CATEGORY_ID}`,
+    `categories: ${LEGALINFO_ACT_TYPE_CATEGORY_IDS.join(", ")}`,
   );
   console.log(`manifest: ${manifestPath}`);
   console.log(

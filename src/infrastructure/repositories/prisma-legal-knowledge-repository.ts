@@ -9,6 +9,7 @@ import type { ArchiveService } from "@/engine/data/archive";
 import {
   domainFilterHints,
   extractArticleNumberFromText,
+  isCitableOfficialDocumentType,
   isPositiveLawDocumentType,
   normalizeArticleNumber,
   rankDocumentsToHits,
@@ -258,7 +259,7 @@ export class PrismaKnowledgeRepository implements IKnowledgeRepository {
             },
           });
 
-    const miniDocs = assembleCandidateDocuments(articleRows, chunkRows);
+    const miniDocs = assembleCandidateDocuments(articleRows, chunkRows, query);
     return rankDocumentsToHits(miniDocs, { ...query, limit });
   }
 }
@@ -298,20 +299,32 @@ function buildDocumentWhere(query: KnowledgeArticleSearchQuery): PrismaWhere {
     });
   }
 
-  and.push({
-    NOT: {
-      OR: [
-        { documentType: { contains: "COURT", mode: "insensitive" } },
-        { documentType: { contains: "DECISION", mode: "insensitive" } },
-        { documentType: { contains: "JUDGMENT", mode: "insensitive" } },
-        { documentType: { contains: "COMMENTARY", mode: "insensitive" } },
-        { documentType: { contains: "DOCTRINE", mode: "insensitive" } },
-        { documentType: { contains: "REGULATION", mode: "insensitive" } },
-        { documentType: { contains: "AI", mode: "insensitive" } },
-        { documentType: { contains: "LLM", mode: "insensitive" } },
-      ],
-    },
-  });
+  if (query.officialSourceKinds === "all") {
+    and.push({
+      NOT: {
+        OR: [
+          { documentType: { contains: "COMMENTARY", mode: "insensitive" } },
+          { documentType: { contains: "DOCTRINE", mode: "insensitive" } },
+          { documentType: { contains: "LLM", mode: "insensitive" } },
+        ],
+      },
+    });
+  } else {
+    and.push({
+      NOT: {
+        OR: [
+          { documentType: { contains: "COURT", mode: "insensitive" } },
+          { documentType: { contains: "DECISION", mode: "insensitive" } },
+          { documentType: { contains: "JUDGMENT", mode: "insensitive" } },
+          { documentType: { contains: "COMMENTARY", mode: "insensitive" } },
+          { documentType: { contains: "DOCTRINE", mode: "insensitive" } },
+          { documentType: { contains: "REGULATION", mode: "insensitive" } },
+          { documentType: { contains: "AI", mode: "insensitive" } },
+          { documentType: { contains: "LLM", mode: "insensitive" } },
+        ],
+      },
+    });
+  }
 
   const hints = domainFilterHints(query.domain);
   const or: PrismaWhere[] = [];
@@ -423,11 +436,16 @@ type ChunkSearchRow = {
 function assembleCandidateDocuments(
   articleRows: ArticleSearchRow[],
   chunkRows: ChunkSearchRow[],
+  query: KnowledgeArticleSearchQuery,
 ): StoredKnowledgeDocument[] {
   const byId = new Map<string, StoredKnowledgeDocument>();
+  const typeOk = (documentType: string | null) =>
+    query.officialSourceKinds === "all"
+      ? isCitableOfficialDocumentType(documentType)
+      : isPositiveLawDocumentType(documentType);
 
   for (const row of articleRows) {
-    if (!isPositiveLawDocumentType(row.document.documentType)) continue;
+    if (!typeOk(row.document.documentType)) continue;
     const mini = fromRow({
       ...row.document,
       articles: [
@@ -445,7 +463,7 @@ function assembleCandidateDocuments(
   }
 
   for (const row of chunkRows) {
-    if (!isPositiveLawDocumentType(row.document.documentType)) continue;
+    if (!typeOk(row.document.documentType)) continue;
     const matchingArticles = (row.document.articles ?? []).filter(
       (article) =>
         normalizeArticleNumber(article.articleNumber) ===

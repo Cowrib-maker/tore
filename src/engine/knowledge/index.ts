@@ -95,20 +95,39 @@ export {
   LEGALINFO_DEFAULT_LOCALE,
   LEGALINFO_HOST,
   LEGALINFO_STATUTE_CATEGORY_ID,
+  LEGALINFO_ACT_TYPE_CATEGORIES,
+  LEGALINFO_ACT_TYPE_CATEGORY_IDS,
   LEGALINFO_VERIFY_LAW_IDS,
   LEGALINFO_VERIFY_50_LAW_IDS,
+  SHUUKH_CASE_LISTS,
+  SHUUKH_HOST,
   assertHttpsLegalInfoUrl,
+  assertHttpsShuukhUrl,
+  caseIdFromShuukhUrl,
+  documentTypeForLegalInfoCategory,
   isLegalInfoHostname,
+  isShuukhHostname,
+  legalInfoActTypeCategory,
   legalInfoAjaxListUrl,
   legalInfoCategoryUrl,
   legalInfoDetailUrl,
   lawIdFromLegalInfoUrl,
+  parseShuukhJudgmentHtml,
+  parseShuukhListHtml,
+  shuukhCaseListUrl,
+  shuukhJudgmentUrl,
+  sourceTypeForLegalInfoCategory,
   rawTextDocument,
 } from "./crawler";
 export type {
   FetchLike,
   HttpKnowledgeCrawlerOptions,
   KnowledgeCrawlErrorCode,
+  LegalInfoActTypeCategory,
+  LegalInfoSourceType as LegalInfoActSourceType,
+  ShuukhCaseList,
+  ShuukhJudgment,
+  ShuukhListItem,
 } from "./crawler";
 export {
   FileLegalInfoManifestStore,
@@ -158,6 +177,7 @@ export {
 export type { LegalInfoLawParserOptions } from "./parser";
 export { LegalInfoSourceAdapter } from "./adapters";
 export { LawParser } from "./parsers";
+export { ShuukhJudgmentParser } from "./parsers/court";
 
 export { UnicodeKnowledgeNormalizer } from "./normalizer";
 export { RuleBasedKnowledgeMetadataExtractor } from "./metadata";
@@ -168,6 +188,7 @@ export {
   documentMatchesDomain,
   domainFilterHints,
   extractArticleNumberFromText,
+  isCitableOfficialDocumentType,
   isKnowledgeApplicableAt,
   isPositiveLawDocumentType,
   normalizeArticleNumber,
