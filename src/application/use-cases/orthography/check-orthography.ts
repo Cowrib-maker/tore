@@ -84,6 +84,9 @@ export async function checkOrthographyForPaidUser(
       suggestionCount: 0,
       orthographyCount: 0,
       latinCount: 0,
+      spellingCount: 0,
+      wordCount: 0,
+      characterCount: 0,
       premium: true,
     };
   }

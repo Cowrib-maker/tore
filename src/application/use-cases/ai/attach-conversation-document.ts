@@ -15,6 +15,7 @@ import type { LegalAiDocumentExtractor } from "@/infrastructure/ai/document-text
 export type AttachConversationDocumentInput = {
   userId: string;
   conversationId?: string;
+  caseFileId?: string;
   fileName: string;
   contentType: string;
   body: Uint8Array;
@@ -86,6 +87,7 @@ export async function attachConversationDocumentUseCase(
   const conversation = await resolveOwnedConversation(
     input.userId,
     input.conversationId,
+    input.caseFileId,
     input.fileName,
     deps.store,
   );
@@ -163,6 +165,7 @@ function normalizeExtract(
 async function resolveOwnedConversation(
   userId: string,
   conversationId: string | undefined,
+  caseFileId: string | undefined,
   fileName: string,
   store: LegalAiStore,
 ) {
@@ -170,6 +173,7 @@ async function resolveOwnedConversation(
     return store.createConversation({
       userId,
       title: fileName.slice(0, 80),
+      caseFileId,
     });
   }
 

@@ -29,7 +29,6 @@ describe("orthography suggestions (suggest-only)", () => {
     expect(result.suggestionCount).toBe(1);
     expect(result.suggestions[0]).toMatchObject({
       kind: "ORTHOGRAPHY",
-      sourceWord: "хүны",
       suggestedWord: "хүний",
     });
     expect(

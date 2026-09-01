@@ -12,6 +12,11 @@ import type { Dictionary } from "@/i18n/types";
 
 type StudentCopy = Dictionary["publicHome"]["studentPage"];
 
+const QUIZ_ERROR_MESSAGES: Record<string, string> = {
+  invalid: "Хариултын мэдээлэл буруу байна. Дахин оролдоно уу.",
+  not_found: "Тест олдсонгүй эсвэл хугацаа дууссан байна.",
+};
+
 export function StudentQuizForm({
   quiz,
   copy,
@@ -25,6 +30,18 @@ export function StudentQuizForm({
   const [pending, startTransition] = useTransition();
 
   function submit() {
+    const unanswered = quiz.questions.filter(
+      (question) => !answers[question.id],
+    ).length;
+    if (
+      unanswered > 0 &&
+      !window.confirm(
+        `${unanswered} асуултад хариулаагүй байна. Үргэлжлүүлж илгээх үү?`,
+      )
+    ) {
+      return;
+    }
+
     setError(null);
     startTransition(async () => {
       const graded = await gradeStudentQuizAction({
@@ -32,7 +49,7 @@ export function StudentQuizForm({
         answers,
       });
       if ("error" in graded) {
-        setError(graded.error);
+        setError(QUIZ_ERROR_MESSAGES[graded.error] ?? "Шалгалт илгээхэд алдаа гарлаа.");
         return;
       }
       setResult(graded);
@@ -117,10 +134,11 @@ export function StudentQuizForm({
       <button
         type="button"
         disabled={pending}
+        aria-busy={pending}
         onClick={submit}
         className="inline-flex h-11 items-center justify-center rounded-full bg-[#0B1F3A] px-5 text-[13px] font-semibold text-white transition hover:bg-[#16365F] disabled:opacity-60"
       >
-        {pending ? "…" : copy.submitQuiz}
+        {pending ? "Илгээж байна…" : copy.submitQuiz}
       </button>
     </div>
   );

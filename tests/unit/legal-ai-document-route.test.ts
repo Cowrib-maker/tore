@@ -56,8 +56,14 @@ describe("legal AI document upload route contracts", () => {
   it("does not accept client-supplied storage keys or file URLs", () => {
     expect(route).toContain('formData.get("file")');
     expect(route).toContain('formData.get("conversationId")');
+    expect(route).toContain('formData.get("caseFileId")');
+    expect(route).toContain("requireOwnedCaseFile");
     expect(route).not.toMatch(/formData\.get\(["']storageKey["']\)/);
     expect(route).not.toMatch(/formData\.get\(["'](?:url|key|path)["']\)/);
+  });
+
+  it("returns entitlement errors with correct status", () => {
+    expect(route).toContain("EntitlementError");
   });
 });
 

@@ -36,8 +36,17 @@ export {
   type LatinToCyrillicSuggestion,
 } from "./latin-to-cyrillic";
 export {
+  isKnownMongolianWord,
+  suggestDictionaryWords,
+  dictionarySizeForTests,
+} from "./dictionary";
+export {
+  levenshteinDistance,
+} from "./levenshtein";
+export {
   applyFeminineYiFix,
   buildOrthographySuggestions,
+  replaceAtSpan,
   replaceSuggestedWord,
   type OrthographyCheckResult,
   type OrthographySuggestion,

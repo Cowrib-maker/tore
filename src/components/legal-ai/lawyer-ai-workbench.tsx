@@ -2,6 +2,7 @@
 
 import {
   type ChangeEvent,
+  type DragEvent,
   type FormEvent,
   useEffect,
   useRef,
@@ -19,6 +20,7 @@ import {
   Plus,
   Send,
   Sparkles,
+  X,
 } from "lucide-react";
 
 import { LEGAL_AI_DOCUMENT_FILE_ACCEPT } from "@/application/ai/legal-ai-document.constants";
@@ -43,7 +45,7 @@ import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
 import {
   OrthographyCheckButton,
-  OrthographyResults,
+  OrthographySpellPanel,
   useOrthographyAutoCheck,
   useOrthographyCheck,
 } from "@/components/orthography/orthography-checker";
@@ -136,6 +138,9 @@ const OPEN_SUGGESTIONS = [
   },
 ] as const;
 
+const ATTACHMENT_ANALYSIS_PROMPT =
+  "Хавсаргасан баримт бичгийг тоймлон, гол агуулга, эрсдэл, дараагийн алхмыг шинжил.";
+
 export function LawyerAiWorkbench({
   initialConversationId,
   initialCaseFileId,
@@ -157,6 +162,7 @@ export function LawyerAiWorkbench({
   const [historyOpen, setHistoryOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
   const documentInputRef = useRef<HTMLInputElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -166,6 +172,7 @@ export function LawyerAiWorkbench({
     gateMessage: orthographyGate,
     needsBilling: orthographyNeedsBilling,
     open: orthographyOpen,
+    checkedText: orthographyCheckedText,
     includeLatinToCyrillic,
     setIncludeLatinToCyrillic,
     check: checkOrthography,
@@ -175,6 +182,7 @@ export function LawyerAiWorkbench({
   useOrthographyAutoCheck(draft, checkOrthography, {
     enabled: !loading && !uploading,
     minLength: 10,
+    clear: clearOrthography,
   });
 
   const conversationMode =
@@ -201,7 +209,7 @@ export function LawyerAiWorkbench({
     }
   }, [conversationId, caseFileId]);
 
-  async function uploadPdf(file: File) {
+  async function uploadDocument(file: File) {
     const rejected = clientRejectLegalAiDocument(file);
     if (rejected) {
       setError(rejected);
@@ -209,19 +217,24 @@ export function LawyerAiWorkbench({
     }
 
     setError("");
+    setAccessGate(null);
     setUploading(true);
     try {
       const formData = new FormData();
       formData.append("file", file);
       if (conversationId) {
         formData.append("conversationId", conversationId);
+      } else if (caseFileId) {
+        formData.append("caseFileId", caseFileId);
       }
       const response = await fetch("/api/lawyer/ai/documents", {
         method: "POST",
+        credentials: "include",
         body: formData,
       });
       const data = (await response.json()) as {
         error?: string;
+        code?: string;
         id?: string;
         conversationId?: string;
         fileName?: string;
@@ -234,6 +247,24 @@ export function LawyerAiWorkbench({
       };
       if (response.status === 401) {
         window.location.assign(loginHrefForLegalAi());
+        return;
+      }
+      if (
+        response.status === 402 ||
+        (response.status === 403 &&
+          (data.code === "BILLING_REQUIRED" ||
+            data.code === "FEATURE_QUOTA_EXCEEDED" ||
+            data.code === "TOKEN_CEILING_REACHED" ||
+            data.code === "SUBSCRIPTION_INACTIVE"))
+      ) {
+        const checkout = await requestLawyerCheckout();
+        setAccessGate({
+          kind: "billing",
+          question: draft.trim() || ATTACHMENT_ANALYSIS_PROMPT,
+          message: data.error ?? "Баримт хавсаргахад төлбөртэй багц хэрэгтэй.",
+          checkout: checkout.view,
+          checkoutError: checkout.error,
+        });
         return;
       }
       if (!response.ok) {
@@ -271,7 +302,21 @@ export function LawyerAiWorkbench({
   async function handleDocumentChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     event.target.value = "";
-    if (file) await uploadPdf(file);
+    if (file) await uploadDocument(file);
+  }
+
+  function handleComposerDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    setDragOver(false);
+    if (uploading || loading) return;
+    const file = event.dataTransfer.files?.[0];
+    if (file) void uploadDocument(file);
+  }
+
+  function removeAttachedDocument(documentId: string) {
+    setAttachedDocuments((current) =>
+      current.filter((document) => document.id !== documentId),
+    );
   }
 
   async function sendMessage(text: string, options?: { resume?: boolean }) {
@@ -349,8 +394,19 @@ export function LawyerAiWorkbench({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const text = draft.trim();
-    if (text) await sendMessage(text);
+    if (text) {
+      await sendMessage(text);
+      return;
+    }
+    if (attachedDocuments.length > 0 && !loading && !uploading) {
+      await sendMessage(ATTACHMENT_ANALYSIS_PROMPT);
+    }
   }
+
+  const canSend =
+    !loading &&
+    !uploading &&
+    (draft.trim().length > 0 || attachedDocuments.length > 0);
 
   const suggestions = caseContext ? CASE_SUGGESTIONS : OPEN_SUGGESTIONS;
   const caseHref = caseContext
@@ -377,7 +433,7 @@ export function LawyerAiWorkbench({
                   Хэрэг, баримт, хууль зүйн эх сурвалжид тулгуурлан мэргэжлийн
                   түвшний шинжилгээ хийх AI.
                 </p>
-                <LegalAiDutyNotice variant="lawyer" className="mt-1 hidden sm:block" />
+                <LegalAiDutyNotice variant="lawyer" className="mt-1" />
                 <p className="mt-1 hidden text-[11px] text-[#8A939D] sm:block">
                   Баримт {caseContext.documentCount}
                   <span className="mx-1.5">·</span>
@@ -518,7 +574,7 @@ export function LawyerAiWorkbench({
                     return (
                       <li
                         key={document.id}
-                        className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-xs text-[#3F4852] ring-1 ring-[#0B1F3A]/10"
+                        className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white py-1 pr-1.5 pl-2.5 text-xs text-[#3F4852] ring-1 ring-[#0B1F3A]/10"
                       >
                         <Paperclip className="size-3.5" />
                         <span className="truncate">{document.fileName}</span>
@@ -527,6 +583,14 @@ export function LawyerAiWorkbench({
                             {hint}
                           </span>
                         ) : null}
+                        <button
+                          type="button"
+                          aria-label={`${document.fileName} хасах`}
+                          className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[#66717D] hover:bg-[#0B1F3A]/8 hover:text-[#0B1F3A]"
+                          onClick={() => removeAttachedDocument(document.id)}
+                        >
+                          <X className="size-3" />
+                        </button>
                       </li>
                     );
                   })}
@@ -538,7 +602,18 @@ export function LawyerAiWorkbench({
                   ) : null}
                 </ul>
               ) : null}
-              <div className="rounded-2xl border border-[#0B1F3A]/10 bg-white p-2 shadow-[0_16px_40px_-28px_rgba(11,31,58,0.45)] focus-within:border-[#0F3D33]/40">
+              <div
+                className={cn(
+                  "rounded-2xl border border-[#0B1F3A]/10 bg-white p-2 shadow-[0_16px_40px_-28px_rgba(11,31,58,0.45)] focus-within:border-[#0F3D33]/40",
+                  dragOver && "border-[#0F3D33]/40 bg-[#F4FAF7]",
+                )}
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  if (!uploading && !loading) setDragOver(true);
+                }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={handleComposerDrop}
+              >
                 <textarea
                   ref={textareaRef}
                   value={draft}
@@ -591,7 +666,7 @@ export function LawyerAiWorkbench({
                   <Button
                     type="submit"
                     size="sm"
-                    disabled={!draft.trim() || loading || uploading}
+                    disabled={!canSend}
                     className="gap-1.5 bg-[#0F3D33] text-white hover:bg-[#145244]"
                   >
                     <Send className="size-3.5" />
@@ -600,13 +675,14 @@ export function LawyerAiWorkbench({
                 </div>
               </div>
               {orthographyOpen || orthographyLoading ? (
-                <OrthographyResults
-                  className="mt-2"
+                <OrthographySpellPanel
+                  className="mt-3"
+                  text={orthographyCheckedText || draft.trim()}
                   loading={orthographyLoading}
                   result={orthographyResult}
                   gateMessage={orthographyGate}
                   needsBilling={orthographyNeedsBilling}
-                  text={draft}
+                  billingHref="/legal-ai"
                   includeLatinToCyrillic={includeLatinToCyrillic}
                   onIncludeLatinChange={(value) => {
                     setIncludeLatinToCyrillic(value);
@@ -615,15 +691,14 @@ export function LawyerAiWorkbench({
                       mode: "manual",
                     });
                   }}
-                  billingHref="/legal-ai"
                   onApplySuggestion={setDraft}
                   onRecheck={(next) =>
                     void checkOrthography(next, { mode: "manual" })
                   }
                   onClose={clearOrthography}
+                  onCheck={() => void checkOrthography(draft, { mode: "manual" })}
                 />
               ) : null}
-              <LegalAiDutyNotice variant="lawyer" className="mt-2 px-1" />
             </form>
           </div>
         </div>

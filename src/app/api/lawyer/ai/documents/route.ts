@@ -10,10 +10,13 @@ import { rateLimitHttpResponse } from "@/application/common/rate-limit-http";
 import { requireActor } from "@/application/common/require-actor";
 import { assertEmailVerified } from "@/application/common/require-verified-email";
 import { attachConversationDocumentUseCase } from "@/application/use-cases/ai/attach-conversation-document";
+import { requireOwnedCaseFile } from "@/application/use-cases/case-review/assert-access";
 import { EntitlementFeature, UserRole } from "@/domain/enums";
 import { DomainError } from "@/domain/errors/domain-error";
+import { EntitlementError } from "@/domain/errors/entitlement-error";
 import { getLegalAiDocumentExtractor } from "@/infrastructure/ai/document-text-extractor";
 import { PrismaLegalAiStore } from "@/infrastructure/ai/prisma-legal-ai-store";
+import { caseFileRepository } from "@/infrastructure/repositories/prisma-case-file-repository";
 import {
   consumeRateLimit,
   LEGAL_AI_DOCUMENT_RATE_LIMIT,
@@ -49,6 +52,17 @@ export async function POST(request: Request) {
       typeof conversationIdRaw === "string" && conversationIdRaw.trim()
         ? conversationIdRaw.trim()
         : undefined;
+    const caseFileIdRaw = formData.get("caseFileId");
+    let caseFileId =
+      typeof caseFileIdRaw === "string" && caseFileIdRaw.trim()
+        ? caseFileIdRaw.trim()
+        : undefined;
+
+    if (caseFileId && !conversationId) {
+      await requireOwnedCaseFile(actor, caseFileId, caseFileRepository);
+    } else if (caseFileId && conversationId) {
+      caseFileId = undefined;
+    }
 
     if (!(file instanceof File) || file.size === 0) {
       return NextResponse.json(
@@ -62,6 +76,7 @@ export async function POST(request: Request) {
       {
         userId: actor.userId,
         conversationId,
+        caseFileId,
         fileName: file.name || "document",
         contentType: file.type,
         body,
@@ -91,6 +106,12 @@ export async function POST(request: Request) {
       { status: 201 },
     );
   } catch (error) {
+    if (error instanceof EntitlementError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.statusCode },
+      );
+    }
     if (error instanceof LegalAiError) {
       return NextResponse.json(
         {

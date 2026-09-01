@@ -12,7 +12,6 @@ import {
 import Link from "next/link";
 import {
   FileText,
-  ImagePlus,
   Menu,
   Mic,
   Paperclip,
@@ -22,6 +21,7 @@ import {
   Shield,
   SquarePen,
   Users,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -55,7 +55,7 @@ import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
 import {
   OrthographyCheckButton,
-  OrthographyResults,
+  OrthographySpellPanel,
   useOrthographyAutoCheck,
   useOrthographyCheck,
 } from "@/components/orthography/orthography-checker";
@@ -159,6 +159,7 @@ export function LegalAiChat({
     gateMessage: orthographyGate,
     needsBilling: orthographyNeedsBilling,
     open: orthographyOpen,
+    checkedText: orthographyCheckedText,
     includeLatinToCyrillic,
     setIncludeLatinToCyrillic,
     check: checkOrthography,
@@ -168,9 +169,11 @@ export function LegalAiChat({
   useOrthographyAutoCheck(message, checkOrthography, {
     enabled: !loading && !uploading,
     minLength: 10,
+    clear: clearOrthography,
   });
 
   const documentInputRef = useRef<HTMLInputElement>(null);
+  const pendingUploadRef = useRef<File | null>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<{ stop: () => void } | null>(null);
   const conversationIdRef = useRef(conversationId);
@@ -206,10 +209,32 @@ export function LegalAiChat({
   }, [clearOrthography]);
 
   function openDocumentPicker() {
-    if (!documentUploadEnabled || uploading) {
+    if (!documentUploadEnabled) {
+      toast.message("Файл хавсаргахын тулд нэвтэрнэ үү.");
+      return;
+    }
+    if (uploading) {
       return;
     }
     documentInputRef.current?.click();
+  }
+
+  function removeAttachedDocument(documentId: string) {
+    setAttachedDocuments((current) =>
+      current.filter((document) => document.id !== documentId),
+    );
+  }
+
+  function resumeAfterAccessGate() {
+    if (pendingUploadRef.current) {
+      const file = pendingUploadRef.current;
+      pendingUploadRef.current = null;
+      void uploadDocument(file);
+      return;
+    }
+    if (accessGate?.question) {
+      void sendMessage(accessGate.question, { resume: true });
+    }
   }
 
   async function handleDocumentChange(event: ChangeEvent<HTMLInputElement>) {
@@ -264,6 +289,7 @@ export function LegalAiChat({
       }
 
       if (response.status === 402) {
+        pendingUploadRef.current = file;
         setAccessGate({
           kind: "billing",
           question: "",
@@ -358,6 +384,7 @@ export function LegalAiChat({
     setError("");
     setAccessGate(null);
     setMessage("");
+    clearOrthography();
     if (!options?.resume) {
       setMessages((current) => [...current, { role: "USER", content: text }]);
     }
@@ -457,7 +484,7 @@ export function LegalAiChat({
               return (
                 <li
                   key={document.id}
-                  className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-[#F8FAFC] py-1 pr-2.5 pl-2.5 text-xs text-[#3F4852]"
+                  className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-[#F8FAFC] py-1 pr-1.5 pl-2.5 text-xs text-[#3F4852]"
                 >
                   <Paperclip className="size-3.5 shrink-0" />
                   <span className="truncate">{document.fileName}</span>
@@ -466,6 +493,14 @@ export function LegalAiChat({
                       {hint}
                     </span>
                   ) : null}
+                  <button
+                    type="button"
+                    aria-label={`${document.fileName} хасах`}
+                    className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[#66717D] hover:bg-[#0B1F3A]/8 hover:text-[#0B1F3A]"
+                    onClick={() => removeAttachedDocument(document.id)}
+                  >
+                    <X className="size-3" />
+                  </button>
                 </li>
               );
             })}
@@ -502,19 +537,13 @@ export function LegalAiChat({
                 className="sr-only"
                 onChange={handleDocumentChange}
               />
-              <ComposerIconButton
-                label="Зураг хавсаргах"
-                onClick={openDocumentPicker}
-              >
-                <ImagePlus className="size-4" />
-              </ComposerIconButton>
               {documentUploadEnabled ? (
-              <ComposerIconButton
-                label="Баримт хавсаргах"
-                onClick={openDocumentPicker}
-              >
-                <Paperclip className="size-4" />
-              </ComposerIconButton>
+                <ComposerIconButton
+                  label="Баримт хавсаргах"
+                  onClick={openDocumentPicker}
+                >
+                  <Paperclip className="size-4" />
+                </ComposerIconButton>
               ) : null}
               <ComposerIconButton
                 label={listening ? "Бичлэгийг зогсоох" : "Микрофон"}
@@ -542,13 +571,14 @@ export function LegalAiChat({
           </div>
         </div>
         {orthographyOpen || orthographyLoading ? (
-          <OrthographyResults
+          <OrthographySpellPanel
             className="mt-2"
+            text={orthographyCheckedText || message.trim()}
             loading={orthographyLoading}
             result={orthographyResult}
             gateMessage={orthographyGate}
             needsBilling={orthographyNeedsBilling}
-            text={message}
+            billingHref="/#chat"
             includeLatinToCyrillic={includeLatinToCyrillic}
             onIncludeLatinChange={(value) => {
               setIncludeLatinToCyrillic(value);
@@ -557,12 +587,12 @@ export function LegalAiChat({
                 mode: "manual",
               });
             }}
-            billingHref="/#chat"
             onApplySuggestion={setMessage}
             onRecheck={(next) =>
               void checkOrthography(next, { mode: "manual" })
             }
             onClose={clearOrthography}
+            onCheck={() => void checkOrthography(message, { mode: "manual" })}
           />
         ) : null}
         <LegalAiDutyNotice variant="citizen" className="mt-2 px-1" />
@@ -663,9 +693,7 @@ export function LegalAiChat({
               {accessGate ? (
                 <LegalAiAccessGateCard
                   gate={accessGate}
-                  onPaid={() =>
-                    void sendMessage(accessGate.question, { resume: true })
-                  }
+                  onPaid={resumeAfterAccessGate}
                 />
               ) : null}
               {composer}
@@ -701,9 +729,7 @@ export function LegalAiChat({
                 {accessGate ? (
                   <LegalAiAccessGateCard
                     gate={accessGate}
-                    onPaid={() =>
-                      void sendMessage(accessGate.question, { resume: true })
-                    }
+                    onPaid={resumeAfterAccessGate}
                   />
                 ) : null}
               </div>

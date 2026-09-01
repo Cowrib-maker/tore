@@ -5,16 +5,22 @@ import Link from "next/link";
 import { Check, SpellCheck2 } from "lucide-react";
 import { toast } from "sonner";
 
+import { OrthographySpellPanel } from "@/components/orthography/orthography-spell-panel";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { buildOrthographySuggestions } from "@/domain/mongolian-orthography/suggestions";
 import { cn } from "@/lib/utils";
 
+export { OrthographySpellPanel } from "@/components/orthography/orthography-spell-panel";
+
 export type OrthographySuggestionView = {
-  kind: "ORTHOGRAPHY" | "LATIN_TO_CYRILLIC";
+  kind: "ORTHOGRAPHY" | "LATIN_TO_CYRILLIC" | "SPELLING";
   sourceWord: string;
   suggestedWord: string;
   suggestionLabel: string;
   ruleIds: readonly string[];
   ruleTitle: string | null;
+  start: number;
+  end: number;
 };
 
 export type OrthographyCheckApiResult = {
@@ -22,10 +28,23 @@ export type OrthographyCheckApiResult = {
   suggestionCount: number;
   orthographyCount: number;
   latinCount: number;
+  spellingCount: number;
+  wordCount: number;
+  characterCount: number;
   premium: true;
 };
 
 export type OrthographyCheckMode = "manual" | "auto";
+
+function localOrthographyResult(
+  text: string,
+  includeLatinToCyrillic: boolean,
+): OrthographyCheckApiResult {
+  return {
+    ...buildOrthographySuggestions(text, { includeLatinToCyrillic }),
+    premium: true,
+  };
+}
 
 export function useOrthographyCheck() {
   const [loading, setLoading] = useState(false);
@@ -34,6 +53,7 @@ export function useOrthographyCheck() {
   const [needsBilling, setNeedsBilling] = useState(false);
   const [open, setOpen] = useState(false);
   const [includeLatinToCyrillic, setIncludeLatinToCyrillic] = useState(false);
+  const [checkedText, setCheckedText] = useState("");
   const lastCheckedTextRef = useRef<string | null>(null);
 
   const clear = useCallback(() => {
@@ -41,6 +61,7 @@ export function useOrthographyCheck() {
     setGateMessage(null);
     setNeedsBilling(false);
     setOpen(false);
+    setCheckedText("");
     lastCheckedTextRef.current = null;
   }, []);
 
@@ -73,6 +94,14 @@ export function useOrthographyCheck() {
       if (mode === "manual") {
         setOpen(true);
       }
+
+      setCheckedText(trimmed);
+      const local = localOrthographyResult(trimmed, latin);
+      setResult(local);
+      if (mode === "auto") {
+        setOpen(local.suggestionCount > 0 || local.spellingCount > 0);
+      }
+
       try {
         const response = await fetch("/api/orthography/check", {
           method: "POST",
@@ -93,7 +122,6 @@ export function useOrthographyCheck() {
             payload && "error" in payload && payload.error
               ? payload.error
               : "Алдаа шалгах үед алдаа гарлаа.";
-          setResult(null);
           setGateMessage(message);
           setNeedsBilling(
             response.status === 402 ||
@@ -105,10 +133,11 @@ export function useOrthographyCheck() {
             setOpen(true);
             if (response.status === 401) {
               toast.error(message);
+              setResult(null);
             }
-          } else {
-            // Auto mode: stay quiet for guests / billing; manual button still works.
+          } else if (response.status === 401) {
             setOpen(false);
+            setResult(null);
           }
           return;
         }
@@ -117,18 +146,17 @@ export function useOrthographyCheck() {
         const typed = payload as OrthographyCheckApiResult;
         setResult(typed);
         if (mode === "auto") {
-          setOpen(typed.suggestionCount > 0);
+          setOpen(typed.suggestionCount > 0 || typed.spellingCount > 0);
         } else {
           setOpen(true);
         }
       } catch {
-        setResult(null);
         setGateMessage("Сүлжээний алдаа. Дахин оролдоно уу.");
         if (mode === "manual") {
           setOpen(true);
-          toast.error("Алдаа шалгагч түр ажиллахгүй байна.");
+          toast.error("Сүлжээний алдаа — локал шалгалтын үр дүн харагдаж байна.");
         } else {
-          setOpen(false);
+          setOpen(local.suggestionCount > 0 || local.spellingCount > 0);
         }
       } finally {
         setLoading(false);
@@ -144,6 +172,7 @@ export function useOrthographyCheck() {
     needsBilling,
     open,
     setOpen,
+    checkedText,
     includeLatinToCyrillic,
     setIncludeLatinToCyrillic,
     check,
@@ -163,9 +192,11 @@ export function useOrthographyAutoCheck(
     debounceMs?: number;
     minLength?: number;
     enabled?: boolean;
+    clear?: () => void;
   },
 ) {
-  const { debounceMs = 750, minLength = 10, enabled = true } = options ?? {};
+  const { debounceMs = 750, minLength = 10, enabled = true, clear } =
+    options ?? {};
 
   useEffect(() => {
     if (!enabled) {
@@ -173,13 +204,14 @@ export function useOrthographyAutoCheck(
     }
     const trimmed = text.trim();
     if (trimmed.length < minLength) {
+      clear?.();
       return;
     }
     const timer = window.setTimeout(() => {
       void check(trimmed, { mode: "auto" });
     }, debounceMs);
     return () => window.clearTimeout(timer);
-  }, [check, debounceMs, enabled, minLength, text]);
+  }, [check, clear, debounceMs, enabled, minLength, text]);
 }
 
 type OrthographyResultsProps = {
@@ -212,7 +244,10 @@ export function OrthographyResults({
   className,
 }: OrthographyResultsProps) {
   function applyOne(item: OrthographySuggestionView) {
-    const next = replaceWordInText(text, item.sourceWord, item.suggestedWord);
+    const next =
+      item.start >= 0 && item.end > item.start
+        ? `${text.slice(0, item.start)}${item.suggestedWord}${text.slice(item.end)}`
+        : replaceWordInText(text, item.sourceWord, item.suggestedWord);
     if (next === text) {
       toast.message("Энэ үг текстээс олдсонгүй.");
       return;
@@ -377,6 +412,7 @@ export function OrthographyChecker({
   useOrthographyAutoCheck(text, ortho.check, {
     enabled: !disabled,
     minLength: 10,
+    clear: ortho.clear,
   });
 
   return (
@@ -392,13 +428,14 @@ export function OrthographyChecker({
         {ortho.loading ? "Шалгаж байна…" : "Одоо шалгах"}
       </Button>
       {ortho.open || ortho.loading ? (
-        <OrthographyResults
+        <OrthographySpellPanel
           className="mt-3"
+          text={ortho.checkedText || text.trim()}
           loading={ortho.loading}
           result={ortho.result}
           gateMessage={ortho.gateMessage}
           needsBilling={ortho.needsBilling}
-          text={text}
+          billingHref={billingHref}
           includeLatinToCyrillic={ortho.includeLatinToCyrillic}
           onIncludeLatinChange={(value) => {
             ortho.setIncludeLatinToCyrillic(value);
@@ -407,10 +444,10 @@ export function OrthographyChecker({
               mode: "manual",
             });
           }}
-          billingHref={billingHref}
           onApplySuggestion={onApplySuggestion}
           onRecheck={(next) => void ortho.check(next, { mode: "manual" })}
           onClose={ortho.clear}
+          onCheck={() => void ortho.check(text, { mode: "manual" })}
         />
       ) : null}
     </div>
