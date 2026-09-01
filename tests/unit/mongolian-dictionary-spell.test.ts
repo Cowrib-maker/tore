@@ -31,4 +31,16 @@ describe("mongolian dictionary spell-check", () => {
     expect(result.wordCount).toBeGreaterThan(0);
     expect(result.characterCount).toBe(sample.length);
   });
+
+  it("stays silent for criminal law statute paste (no fuzzy false positives)", () => {
+    const sample =
+      "Шүүх гэмт хэрэг үйлдсэн нь тогтоогдсон, гэм буруугаа хүлээн зөвшөөрсөн өсвөр насны хүний гэмт хэрэг үйлдсэн нөхцөл байдал, учруулсан хохирол, хор уршгийн шинж чанар, хувийн байдал, мөрдөн шалгах ажиллагааг шуурхай явуулж гэмт хэргийг нотлоход дэмжлэг үзүүлсэн байдлыг харгалзан дараах байдлаар эрүүгийн хариуцлагыг хөнгөрүүлж, эсхүл эрүүгийн хариуцлагаас чөлөөлж болно.";
+    const result = buildOrthographySuggestions(sample);
+    expect(result.spellingCount).toBe(0);
+    expect(isKnownMongolianWord("нөхөн")).toBe(true);
+    expect(isKnownMongolianWord("эсхүл")).toBe(true);
+    expect(isKnownMongolianWord("хэсэг")).toBe(true);
+    expect(isKnownMongolianWord("заалтад")).toBe(true);
+    expect(suggestDictionaryWords("нөхөн")).toEqual([]);
+  });
 });
