@@ -55,6 +55,26 @@ export class PrismaEntitlementUsageRepository
     });
     return mapEntitlementUsage(record);
   }
+
+  async incrementWithinTokenCeilings(
+    id: string,
+    usage: { inputTokens: number; outputTokens: number },
+    inputTokenCeiling: number,
+    outputTokenCeiling: number,
+  ): Promise<boolean> {
+    const result = await this.db.entitlementUsage.updateMany({
+      where: {
+        id,
+        inputTokens: { lte: inputTokenCeiling - usage.inputTokens },
+        outputTokens: { lte: outputTokenCeiling - usage.outputTokens },
+      },
+      data: {
+        inputTokens: { increment: usage.inputTokens },
+        outputTokens: { increment: usage.outputTokens },
+      },
+    });
+    return result.count === 1;
+  }
 }
 
 export const entitlementUsageRepository = new PrismaEntitlementUsageRepository();

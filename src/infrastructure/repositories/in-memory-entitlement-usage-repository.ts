@@ -67,4 +67,22 @@ export class InMemoryEntitlementUsageRepository
     this.rows.set(periodKey(next.userId, next.periodStart), next);
     return clone(next);
   }
+
+  async incrementWithinTokenCeilings(
+    id: string,
+    usage: { inputTokens: number; outputTokens: number },
+    inputTokenCeiling: number,
+    outputTokenCeiling: number,
+  ): Promise<boolean> {
+    const current = [...this.rows.values()].find((row) => row.id === id);
+    if (
+      !current ||
+      current.inputTokens + usage.inputTokens > inputTokenCeiling ||
+      current.outputTokens + usage.outputTokens > outputTokenCeiling
+    ) {
+      return false;
+    }
+    await this.increment(id, usage);
+    return true;
+  }
 }

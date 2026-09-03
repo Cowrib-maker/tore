@@ -35,6 +35,10 @@ export type LegalQuestionSubject =
 export type LegalQuestionAccessPort = {
   assertCanStartNewLegalQuestion(subject: LegalQuestionSubject): Promise<void>;
   consumeNewLegalQuestion(subject: LegalQuestionSubject): Promise<void>;
+  recordTokenUsage?(
+    subject: LegalQuestionSubject,
+    usage: { inputTokens: number; outputTokens: number },
+  ): Promise<void>;
   hasPaidLegalAiAccess(subject: LegalQuestionSubject): Promise<boolean>;
 };
 
@@ -46,7 +50,9 @@ export type GuestSessionRecord = {
 
 export type GuestSessionStore = {
   getById(id: string): Promise<GuestSessionRecord | null>;
-  incrementFreeLegalQuestionsUsed(id: string): Promise<void>;
+  consumeFreeLegalQuestion?(id: string): Promise<boolean>;
+  /** @deprecated Test-double compatibility; production uses atomic consumption. */
+  incrementFreeLegalQuestionsUsed?(id: string): Promise<void>;
 };
 
 export type ConversationBillingStore = {
@@ -66,6 +72,7 @@ export function allowAllLegalQuestionAccess(): LegalQuestionAccessPort {
   return {
     async assertCanStartNewLegalQuestion() {},
     async consumeNewLegalQuestion() {},
+    async recordTokenUsage() {},
     async hasPaidLegalAiAccess() {
       return false;
     },
@@ -132,9 +139,19 @@ export function createLegalQuestionAccess(
 
     async consumeNewLegalQuestion(subject) {
       if (subject.kind === "guest") {
-        await deps.guestSessions.incrementFreeLegalQuestionsUsed(
-          subject.guestSessionId,
-        );
+        const consumed = deps.guestSessions.consumeFreeLegalQuestion
+          ? await deps.guestSessions.consumeFreeLegalQuestion(subject.guestSessionId)
+          : await consumeLegacyGuestQuestion(
+              deps.guestSessions,
+              subject.guestSessionId,
+            );
+        if (!consumed) {
+          throw new EntitlementError(
+            LEGAL_AI_AUTHENTICATION_REQUIRED_MESSAGE,
+            "AUTHENTICATION_REQUIRED",
+            401,
+          );
+        }
         return;
       }
 
@@ -152,6 +169,43 @@ export function createLegalQuestionAccess(
           );
       if (paidLawyer || paidCitizen) {
         await incrementLegalAiQuery(subject.userId, deps, now());
+      }
+    },
+
+    async recordTokenUsage(subject, usage) {
+      if (subject.kind === "guest" || (await isDemoSubject(subject, deps, now()))) {
+        return;
+      }
+      if (usage.inputTokens < 0 || usage.outputTokens < 0) {
+        throw new Error("AI provider returned invalid token usage");
+      }
+      if (usage.inputTokens === 0 && usage.outputTokens === 0) {
+        return;
+      }
+      const subscription = await findActiveSubscriptionForUser(
+        subject.userId,
+        deps.subscriptionRepository,
+        now(),
+      );
+      if (!subscription) return;
+      const entitlement = resolveLawyerEntitlement(subscription, now());
+      const usageRecord = await deps.entitlementUsageRepository.getOrCreate({
+        userId: subject.userId,
+        subscriptionId: subscription.id,
+        periodStart: entitlement.periodStart,
+      });
+      const accepted = await deps.entitlementUsageRepository.incrementWithinTokenCeilings?.(
+        usageRecord.id,
+        usage,
+        entitlement.tokenCeilings.inputTokens,
+        entitlement.tokenCeilings.outputTokens,
+      );
+      if (accepted !== true) {
+        throw new EntitlementError(
+          BILLING_REQUIRED_MESSAGE,
+          "TOKEN_CEILING_REACHED",
+          402,
+        );
       }
     },
 
@@ -252,13 +306,11 @@ async function assertPaidLegalAiQuota(
   at: Date,
   billingMessage: string,
 ) {
-  const seated = await deps.subscriptionRepository.findActiveSeatForUser(userId);
-  const owned =
-    seated?.subscription ??
-    (await deps.subscriptionRepository.findActiveOwnedByUserId(userId));
+  const owned = await findActiveSubscriptionForUser(userId, deps.subscriptionRepository, at);
   if (!owned || !isSubscriptionActive(owned, at)) {
     throw new EntitlementError(billingMessage, "BILLING_REQUIRED", 402);
   }
+
   const entitlement = resolveLawyerEntitlement(owned, at);
   const usage = await deps.entitlementUsageRepository.getOrCreate({
     userId,
@@ -276,6 +328,27 @@ async function assertPaidLegalAiQuota(
       decision.kind === "TOKEN" ? "TOKEN_CEILING_REACHED" : "FEATURE_QUOTA_EXCEEDED",
     );
   }
+
+}
+
+async function findActiveSubscriptionForUser(
+  userId: string,
+  subscriptions: SubscriptionRepository,
+  at: Date,
+) {
+  const seated = await subscriptions.findActiveSeatForUser(userId);
+  const owned =
+    seated?.subscription ?? (await subscriptions.findActiveOwnedByUserId(userId));
+  return owned && isSubscriptionActive(owned, at) ? owned : null;
+}
+
+async function consumeLegacyGuestQuestion(
+  store: GuestSessionStore,
+  id: string,
+): Promise<boolean> {
+  if (!store.incrementFreeLegalQuestionsUsed) return false;
+  await store.incrementFreeLegalQuestionsUsed(id);
+  return true;
 }
 
 async function incrementLegalAiQuery(

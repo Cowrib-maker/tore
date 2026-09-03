@@ -220,6 +220,7 @@ export class LegalAiService {
           message,
           userContext: input.userContext,
           userId: input.userId,
+          subject,
           capability,
         }),
       );
@@ -237,6 +238,7 @@ export class LegalAiService {
           userContext: input.userContext,
           userId: input.userId,
           actorRole: input.actorRole,
+          subject,
           capability,
         }),
         { questionStatus: LegalQuestionStatus.CLARIFYING },
@@ -276,6 +278,7 @@ export class LegalAiService {
           userContext: input.userContext,
           userId: input.userId,
           actorRole: input.actorRole,
+          subject,
           capability,
         }),
         { questionStatus: LegalQuestionStatus.CLARIFYING },
@@ -296,6 +299,7 @@ export class LegalAiService {
           userContext: input.userContext,
           userId: input.userId,
           actorRole: input.actorRole,
+          subject,
           capability,
         }),
         { questionStatus: LegalQuestionStatus.CLARIFYING },
@@ -417,8 +421,13 @@ export class LegalAiService {
       messages: toModelHistory(history),
     });
 
-    const assistantMessage =
-      await this.dependencies.store.createAssistantMessage({
+    if (input.userId) {
+      await this.legalQuestionAccess.recordTokenUsage?.(subject, {
+        inputTokens: completion.inputTokens,
+        outputTokens: completion.outputTokens,
+      });
+    }
+    const assistantMessage = await this.dependencies.store.createAssistantMessage({
         conversationId: conversation.id,
         content:
           completion.content.trim() || "Хариу боловсруулах явцад алдаа гарлаа.",
@@ -515,6 +524,7 @@ export class LegalAiService {
     message: string;
     userContext: LegalAiCreateTurnInput["userContext"];
     userId?: string;
+    subject: LegalQuestionSubject;
     capability: LegalAiCapability;
   }): Promise<LegalAiCreateTurnResult> {
     const history = await this.dependencies.store.listMessages(
@@ -546,6 +556,12 @@ export class LegalAiService {
       systemPrompt: prompt.systemPrompt,
       messages: toModelHistory(history),
     });
+    if (input.userId) {
+      await this.legalQuestionAccess.recordTokenUsage?.(input.subject, {
+        inputTokens: completion.inputTokens,
+        outputTokens: completion.outputTokens,
+      });
+    }
     const assistantMessage =
       await this.dependencies.store.createAssistantMessage({
         conversationId: input.conversationId,
@@ -588,6 +604,7 @@ export class LegalAiService {
     userContext: LegalAiCreateTurnInput["userContext"];
     userId?: string;
     actorRole?: LegalAiCreateTurnInput["actorRole"];
+    subject: LegalQuestionSubject;
     capability: LegalAiCapability;
   }): Promise<LegalAiCreateTurnResult> {
     const history = await this.dependencies.store.listMessages(
@@ -619,6 +636,12 @@ export class LegalAiService {
       systemPrompt: prompt.systemPrompt,
       messages: toModelHistory(history),
     });
+    if (input.userId) {
+      await this.legalQuestionAccess.recordTokenUsage?.(input.subject, {
+        inputTokens: completion.inputTokens,
+        outputTokens: completion.outputTokens,
+      });
+    }
 
     let content =
       completion.content.trim() || "Хариу боловсруулах явцад алдаа гарлаа.";

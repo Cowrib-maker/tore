@@ -926,6 +926,8 @@ enum AIDocumentExtractStatus {
 model GuestSession {
   id                     String   @id @default(cuid())
   tokenHash              String   @unique @map("token_hash")
+  /// HMAC-derived, short-lived abuse identity. Raw IP and user agent are never stored.
+  trialIdentityHash      String?  @unique @map("trial_identity_hash")
   expiresAt              DateTime @map("expires_at")
   freeLegalQuestionsUsed Int      @default(0) @map("free_legal_questions_used")
   claimedByUserId        String?  @map("claimed_by_user_id")
@@ -1393,4 +1395,3 @@ model LegalKnowledgeChunk {
   @@index([documentId, articleNumber])
   @@map("legal_knowledge_chunks")
 }
-

@@ -10,4 +10,10 @@ export interface EntitlementUsageRepository {
     id: string,
     increment: EntitlementUsageIncrement,
   ): Promise<EntitlementUsage>;
+  incrementWithinTokenCeilings?(
+    id: string,
+    usage: { inputTokens: number; outputTokens: number },
+    inputTokenCeiling: number,
+    outputTokenCeiling: number,
+  ): Promise<boolean>;
 }

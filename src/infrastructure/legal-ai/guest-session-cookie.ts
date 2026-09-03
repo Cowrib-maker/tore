@@ -9,6 +9,20 @@ export function hashGuestToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
 
+/**
+ * Server-derived, privacy-preserving guest trial identity. The caller supplies
+ * an already keyed IP hash; user agent only narrows shared-NAT collisions.
+ */
+export function hashGuestTrialIdentity(
+  ipHash: string | null,
+  userAgent: string | null,
+): string | null {
+  if (!ipHash) return null;
+  return createHmac("sha256", env.AUTH_SECRET)
+    .update(`${ipHash}:${userAgent?.slice(0, 512) ?? ""}`)
+    .digest("hex");
+}
+
 export function signGuestCookieValue(sessionId: string, token: string): string {
   const payload = `${sessionId}.${token}`;
   const signature = createHmac("sha256", env.AUTH_SECRET)

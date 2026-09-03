@@ -79,6 +79,73 @@ describe("createLegalQuestionAccess", () => {
       code: "AUTHENTICATION_REQUIRED",
       statusCode: 401,
     });
+
+  });
+
+  it("atomically allows only one concurrent guest trial consumption", async () => {
+    let used = 0;
+    const access = createLegalQuestionAccess({
+      guestSessions: {
+        getById: async () => ({
+          id: "g1",
+          freeLegalQuestionsUsed: used,
+          expiresAt: futureDate(),
+        }),
+        consumeFreeLegalQuestion: async () => {
+          if (used >= 1) return false;
+          used += 1;
+          return true;
+        },
+      },
+      conversations: { countBilledQuestionsForUser: async () => 0 },
+      subscriptionRepository: new InMemorySubscriptionRepository(),
+      entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+    });
+    const results = await Promise.allSettled(Array.from({ length: 2 }, () =>
+      access.consumeNewLegalQuestion({ kind: "guest", guestSessionId: "g1" }),
+    ));
+    expect(results.filter((result) => result.status === "fulfilled")).toHaveLength(1);
+    expect(used).toBe(1);
+  });
+
+  it("enforces the SOLO 600k input and 120k output token ceilings", async () => {
+    const subscriptions = new InMemorySubscriptionRepository();
+    const usage = new InMemoryEntitlementUsageRepository();
+    const subscription = await subscriptions.create({
+      ownerUserId: "lawyer-1",
+      planCode: SubscriptionPlanCode.SOLO,
+      status: SubscriptionStatus.ACTIVE,
+      seatLimit: 1,
+      currentPeriodStart: new Date(),
+      currentPeriodEnd: futureDate(),
+    });
+    await subscriptions.createSeat({
+      subscriptionId: subscription.id,
+      userId: "lawyer-1",
+      status: SeatStatus.ACTIVE,
+    });
+    const access = createLegalQuestionAccess({
+      guestSessions: { getById: async () => null },
+      conversations: { countBilledQuestionsForUser: async () => 0 },
+      subscriptionRepository: subscriptions,
+      entitlementUsageRepository: usage,
+    });
+    const subject = {
+      kind: "user" as const,
+      userId: "lawyer-1",
+      role: UserRole.LAWYER,
+    };
+
+    await access.recordTokenUsage?.(subject, {
+      inputTokens: SOLO_PLAN.tokenCeilings.inputTokens,
+      outputTokens: SOLO_PLAN.tokenCeilings.outputTokens,
+    });
+    await expect(
+      access.recordTokenUsage?.(subject, { inputTokens: 1, outputTokens: 0 }),
+    ).rejects.toMatchObject({ code: "TOKEN_CEILING_REACHED" });
+    await expect(
+      access.recordTokenUsage?.(subject, { inputTokens: 0, outputTokens: 1 }),
+    ).rejects.toMatchObject({ code: "TOKEN_CEILING_REACHED" });
   });
 
   it("allows one unpaid citizen thread then requires billing", async () => {

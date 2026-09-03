@@ -7,6 +7,8 @@ import { rateLimitHttpResponse } from "@/application/common/rate-limit-http";
 import { requireActor } from "@/application/common/require-actor";
 import { lookupAuthSession } from "@/application/common/session";
 import { assertEmailVerified } from "@/application/common/require-verified-email";
+import { getClientIp } from "@/application/common/client-ip";
+import { hashIpAddress } from "@/application/common/hash-ip";
 import { resolveGuestSession } from "@/application/legal-ai/resolve-guest-session";
 import { assertOwnedCaseFileForAi } from "@/application/use-cases/case-review";
 import {
@@ -18,7 +20,9 @@ import { EntitlementFeature, UserRole } from "@/domain/enums";
 import {
   GUEST_SESSION_COOKIE,
   guestCookieOptions,
+  hashGuestTrialIdentity,
 } from "@/infrastructure/legal-ai/guest-session-cookie";
+import { env } from "@/lib/env";
 import {
   consumeRateLimit,
   LEGAL_AI_CHAT_RATE_LIMIT,
@@ -54,12 +58,18 @@ export async function POST(request: Request) {
       });
     }
 
+    const trialIdentityHash = actor
+      ? null
+      : hashGuestTrialIdentity(
+          hashIpAddress(await getClientIp(), env.AUTH_SECRET),
+          request.headers.get("user-agent"),
+        );
     const guest = actor
       ? await resolveGuestSession({
           claimForUserId: actor.userId,
           createIfMissing: false,
         })
-      : await resolveGuestSession();
+      : await resolveGuestSession({ trialIdentityHash });
 
     if (!actor && !guest) {
       throw new EntitlementError(

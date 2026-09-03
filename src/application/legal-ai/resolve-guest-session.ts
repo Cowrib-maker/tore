@@ -10,6 +10,7 @@ import {
 } from "@/infrastructure/legal-ai/guest-session-cookie";
 import {
   claimGuestConversationsForUser,
+  createOrRefreshGuestSessionByTrialIdentity,
   createGuestSessionRecord,
   findGuestSessionByTokenHash,
   touchGuestSession,
@@ -18,6 +19,7 @@ import {
 export async function resolveGuestSession(options?: {
   claimForUserId?: string;
   createIfMissing?: boolean;
+  trialIdentityHash?: string | null;
 }): Promise<{ id: string; cookieValue: string; expiresAt: Date } | null> {
   const jar = await cookies();
   const parsed = parseGuestCookieValue(jar.get(GUEST_SESSION_COOKIE)?.value);
@@ -47,7 +49,14 @@ export async function resolveGuestSession(options?: {
   }
 
   const token = newGuestToken();
-  const created = await createGuestSessionRecord(token, now);
+  const created =
+    options?.trialIdentityHash
+      ? await createOrRefreshGuestSessionByTrialIdentity(
+          token,
+          options.trialIdentityHash,
+          now,
+        )
+      : await createGuestSessionRecord(token, null, now);
   const cookieValue = signGuestCookieValue(created.id, token);
   jar.set(GUEST_SESSION_COOKIE, cookieValue, guestCookieOptions(created.expiresAt));
   return { id: created.id, cookieValue, expiresAt: created.expiresAt };
