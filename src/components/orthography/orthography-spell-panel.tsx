@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Check, X } from "lucide-react";
 
 import type { OrthographyCheckApiResult } from "@/components/orthography/orthography-checker";
@@ -39,23 +39,26 @@ export function OrthographySpellPanel({
   className?: string;
 }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [ignoredKeys, setIgnoredKeys] = useState<Set<string>>(() => new Set());
-
-  useEffect(() => {
-    setIgnoredKeys(new Set());
-    setActiveIndex(null);
-  }, [result]);
+  const [ignoredByResult, setIgnoredByResult] = useState<{
+    result: OrthographyCheckApiResult | null;
+    keys: Set<string>;
+  }>({ result: null, keys: new Set() });
 
   const allSuggestions = useMemo(
     () => result?.suggestions ?? [],
     [result?.suggestions],
   );
   const suggestions = useMemo(
-    () =>
-      allSuggestions.filter(
+    () => {
+      const ignoredKeys =
+        ignoredByResult.result === result
+          ? ignoredByResult.keys
+          : new Set<string>();
+      return allSuggestions.filter(
         (item) => !ignoredKeys.has(`${item.start}:${item.end}`),
-      ),
-    [allSuggestions, ignoredKeys],
+      );
+    },
+    [allSuggestions, ignoredByResult, result],
   );
   const errorCount = suggestions.length;
 
@@ -81,10 +84,12 @@ export function OrthographySpellPanel({
   }
 
   function ignoreWord(item: Suggestion) {
-    setIgnoredKeys((current) => {
-      const next = new Set(current);
+    setIgnoredByResult((current) => {
+      const next = new Set(
+        current.result === result ? current.keys : undefined,
+      );
       next.add(`${item.start}:${item.end}`);
-      return next;
+      return { result, keys: next };
     });
     setActiveIndex(null);
   }

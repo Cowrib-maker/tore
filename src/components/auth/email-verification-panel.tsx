@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 
 import { EmailVerificationOtpForm } from "@/components/auth/email-verification-otp-form";
@@ -43,13 +43,6 @@ export function EmailVerificationPanel({
     }
   }, []);
 
-  useEffect(() => {
-    const next = normalizeVerificationEmail(model.email);
-    if (next) {
-      setIdentityEmail(next);
-    }
-  }, [model.email]);
-
   const continueHref =
     model.status === "success"
       ? model.continueHref
@@ -90,7 +83,7 @@ export function EmailVerificationPanel({
       : model.status === "pending" && model.fromUnverifiedLogin
         ? copy.verifyUnverifiedLoginBody
         : copy.verifyPendingBody;
-  const email = identityEmail;
+  const email = normalizeVerificationEmail(model.email) ?? identityEmail;
   const startCooldown = model.status === "pending" && model.sent;
   const callbackUrl =
     model.status === "pending" ? model.callbackUrl : null;

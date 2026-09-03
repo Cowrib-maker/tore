@@ -3,6 +3,7 @@ import { assertValidPdfUpload } from "@/application/ai/pdf-upload-validation";
 import { CaseEvidenceType } from "@/domain/entities/case-file";
 import type { FileStorage } from "@/domain/ports/file-storage";
 import type { CaseReviewWorkspacePayload } from "@/engine/doctrine";
+import { getFileStorage } from "@/infrastructure/storage";
 import { LEGAL_AI_DOCUMENT_MIME } from "@/application/ai/legal-ai-document.constants";
 
 import { requireOwnedCaseFile } from "./assert-access";
@@ -23,8 +24,6 @@ export type AttachCasePdfDeps = CaseFileDeps & {
 };
 
 export function defaultAttachCasePdfDeps(): AttachCasePdfDeps {
-  const { getFileStorage } =
-    require("@/infrastructure/storage") as typeof import("@/infrastructure/storage");
   return {
     ...defaultCaseFileDeps(),
     fileStorage: getFileStorage(),

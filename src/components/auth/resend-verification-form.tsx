@@ -5,7 +5,6 @@ import {
   useActionState,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 
@@ -35,8 +34,6 @@ export function ResendVerificationForm({
   hideEmailField?: boolean;
   onSent?: () => void;
 }) {
-  const onSentRef = useRef(onSent);
-  onSentRef.current = onSent;
   const knownEmail = defaultEmail?.trim() ?? "";
   const [typedEmail, setTypedEmail] = useState(knownEmail);
   const boundAction = useMemo(
@@ -46,16 +43,10 @@ export function ResendVerificationForm({
   const [state, dispatch, pending] = useActionState(boundAction, initialState);
 
   useEffect(() => {
-    if (knownEmail) {
-      setTypedEmail(knownEmail);
-    }
-  }, [knownEmail]);
-
-  useEffect(() => {
     if (state.success && state.code === AUTH_ACTION_CODE.RESEND_SENT) {
-      onSentRef.current?.();
+      onSent?.();
     }
-  }, [state]);
+  }, [onSent, state]);
 
   const showEmailField = !hideEmailField || !knownEmail;
   const feedback = userFacingResendFeedback(state, copy);

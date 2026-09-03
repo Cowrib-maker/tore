@@ -29,12 +29,27 @@ export function LegalAiAccessGateCard({
   gate: LegalAiAccessGate;
   onPaid?: () => void;
 }) {
+  const key = [
+    gate.kind,
+    gate.question,
+    gate.checkout?.invoiceId ?? "",
+    gate.checkoutError ?? "",
+  ].join(":");
+  return <LegalAiAccessGateCardContent key={key} gate={gate} onPaid={onPaid} />;
+}
+
+function LegalAiAccessGateCardContent({
+  gate,
+  onPaid,
+}: {
+  gate: LegalAiAccessGate;
+  onPaid?: () => void;
+}) {
   const loginHref = loginHrefForLegalAi(gate.question);
   const registerHref = registerClientHrefForLegalAi(gate.question);
-  const onPaidRef = useRef(onPaid);
-  onPaidRef.current = onPaid;
   const paidRef = useRef(false);
-  const [waiting, setWaiting] = useState(gate.kind === "billing");
+  const [paid, setPaid] = useState(false);
+  const waiting = gate.kind === "billing" && !paid;
   const [checkout, setCheckout] = useState<LegalAiCheckoutView | null>(
     gate.checkout ?? null,
   );
@@ -42,24 +57,17 @@ export function LegalAiAccessGateCard({
   const [selecting, setSelecting] = useState(false);
 
   useEffect(() => {
-    setCheckout(gate.checkout ?? null);
-    setCheckoutError(gate.checkoutError);
-  }, [gate.checkout, gate.checkoutError]);
-
-  useEffect(() => {
     if (gate.kind !== "billing") {
       return;
     }
-    paidRef.current = false;
-    setWaiting(true);
 
     function finishPaid() {
       if (paidRef.current) {
         return;
       }
       paidRef.current = true;
-      setWaiting(false);
-      onPaidRef.current?.();
+      setPaid(true);
+      onPaid?.();
     }
 
     const invoiceId = checkout?.invoiceId;
@@ -107,7 +115,7 @@ export function LegalAiAccessGateCard({
         window.clearInterval(invoiceTimer);
       }
     };
-  }, [gate.kind, checkout?.invoiceId, checkout?.audience]);
+  }, [gate.kind, checkout?.invoiceId, checkout?.audience, onPaid]);
 
   const qr = qrImageSrc(checkout?.qrImage ?? null);
   const amount = checkout?.amountMnt;
@@ -223,7 +231,7 @@ export function LegalAiAccessGateCard({
                 variant="outline"
                 onClick={() => {
                   paidRef.current = false;
-                  onPaidRef.current?.();
+                  onPaid?.();
                 }}
               >
                 Төлсөн — үргэлжлүүлэх

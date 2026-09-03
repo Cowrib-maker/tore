@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MessageCircle, Send, X } from "lucide-react";
@@ -22,21 +22,18 @@ export function FloatingLegalAiWidget() {
   const [message, setMessage] = useState("");
   const { messages, conversationId, loading, error, accessGate, sendMessage } =
     useLegalAiChatSession();
-  const sendMessageRef = useRef(sendMessage);
-  sendMessageRef.current = sendMessage;
-
   useEffect(() => {
     function handleOpenRequest(event: Event) {
       setOpen(true);
       const detail = (event as CustomEvent<OpenLegalAiWidgetDetail>).detail;
       if (detail?.message) {
-        void sendMessageRef.current(detail.message);
+        void sendMessage(detail.message);
       }
     }
     window.addEventListener(OPEN_LEGAL_AI_WIDGET_EVENT, handleOpenRequest);
     return () =>
       window.removeEventListener(OPEN_LEGAL_AI_WIDGET_EVENT, handleOpenRequest);
-  }, []);
+  }, [sendMessage]);
 
   // usePathname() can be null during SSR; never render the chrome until the
   // path is known, otherwise "/" SSR may emit the FAB and the client removes it.

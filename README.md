@@ -14,7 +14,7 @@ Two-sided LegalTech marketplace connecting clients with licensed lawyers in Mong
 ### 1. Install dependencies
 
 ```bash
-npm install
+npm ci
 ```
 
 ### 2. Configure environment
@@ -28,6 +28,7 @@ Set `DATABASE_URL`, `AUTH_SECRET` (min 32 chars), and `AUTH_URL`.
 ### 3. Database setup
 
 ```bash
+npm run db:generate
 npx prisma migrate dev
 npm run db:seed
 ```
@@ -39,6 +40,21 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+### Production preflight
+
+```bash
+npm ci
+npm run db:generate
+npm run lint
+npm run typecheck
+npm test
+npm run db:migrate:deploy
+npm run build
+```
+
+Run `npm run db:migrate:deploy` against the intended database before
+deploying the application build.
 
 ## Sprint 1 — Complete (core) + Milestone cleanup
 

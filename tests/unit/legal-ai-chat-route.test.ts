@@ -39,4 +39,8 @@ describe("POST /api/ai/chat citation contract", () => {
     expect(route).toContain("lookup.replaced");
     expect(route).not.toContain("getSessionUser");
   });
+
+  it("uses the shared production-aware guest cookie options", () => {
+    expect(route).toContain("guestCookieOptions(guest.expiresAt)");
+  });
 });

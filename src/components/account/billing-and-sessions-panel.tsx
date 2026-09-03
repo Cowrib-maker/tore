@@ -172,15 +172,20 @@ export function BillingAndSessionsPanel({
   );
 
   useEffect(() => {
-    void load()
-      .then((payload) => {
-        if (payload.pendingInvoice?.invoiceId && payload.billingRequired) {
-          setPaymentState("waiting");
-          pollInvoice(payload.pendingInvoice.invoiceId);
-        }
-      })
-      .catch(() => setError(copy.sessionsLoadError));
-    return () => stopPolling();
+    const initializationTimer = window.setTimeout(() => {
+      void load()
+        .then((payload) => {
+          if (payload.pendingInvoice?.invoiceId && payload.billingRequired) {
+            setPaymentState("waiting");
+            pollInvoice(payload.pendingInvoice.invoiceId);
+          }
+        })
+        .catch(() => setError(copy.sessionsLoadError));
+    }, 0);
+    return () => {
+      window.clearTimeout(initializationTimer);
+      stopPolling();
+    };
   }, [copy.sessionsLoadError, load, pollInvoice, stopPolling]);
 
   const startCheckout = async () => {

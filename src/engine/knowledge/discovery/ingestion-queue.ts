@@ -176,7 +176,7 @@ export class LegalInfoIngestionQueue {
     let attempted = 0;
     let succeeded = 0;
     let failed = 0;
-    let skippedSuccess = loaded.documents.filter(
+    const skippedSuccess = loaded.documents.filter(
       (doc) => doc.status === LegalInfoDocumentStatus.SUCCESS,
     ).length;
     let skippedDuplicate = 0;

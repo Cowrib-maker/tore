@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 
@@ -48,13 +48,10 @@ export function CaseWorkspaceHome({
   titleError,
   titleSuccess,
 }: Props) {
-  const [editing, setEditing] = useState(false);
+  const [isEditing, setEditing] = useState(false);
+  const editing = isEditing && !titleSuccess;
   const title = payload.title;
   const version = payload.version;
-
-  useEffect(() => {
-    if (titleSuccess) setEditing(false);
-  }, [titleSuccess]);
 
   const pdfs = documents.length
     ? documents

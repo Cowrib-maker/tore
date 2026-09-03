@@ -27,60 +27,68 @@ export default async function LawyerCaseReviewPage({
     redirect("/lawyer/workspace/cases");
   }
 
+  let workspace;
+  let forbidden = false;
   try {
-    const workspace = await loadCaseWorkspaceForPage(caseId);
-    if (!isCaseReviewWorkspacePayload(workspace.payload)) {
-      return (
-        <CaseWorkspaceLayout active="cases">
-          <EmptyState
-            title="Шинжилгээний үр дүнг харуулах боломжгүй"
-            description="Хөдөлгүүрийн хариу буруу бүтэцтэй байна. Тодорхойгүй байдлыг нуухгүй."
-          />
-        </CaseWorkspaceLayout>
-      );
+    workspace = await loadCaseWorkspaceForPage(caseId);
+  } catch (error) {
+    if (error instanceof DomainError && error.code === "FORBIDDEN") {
+      forbidden = true;
+    } else if (error instanceof DomainError && error.code === "NOT_FOUND") {
+      redirect("/lawyer/workspace/cases");
+    } else {
+      throw error;
     }
+  }
+
+  if (forbidden) {
     return (
       <CaseWorkspaceLayout active="cases">
-        <p className="mb-5 text-sm text-[#5C6570]">
-          <a
-            href="/lawyer/workspace"
-            className="font-medium text-[#0B1F3A] underline underline-offset-4"
-          >
-            Ажлын талбар
-          </a>
-          <span className="mx-2 text-[#8A939D]">/</span>
-          <a
-            href="/lawyer/workspace/cases"
-            className="font-medium text-[#0B1F3A] underline underline-offset-4"
-          >
-            Миний хэргүүд
-          </a>
-        </p>
-        <CaseReviewWorkspace
-          payload={workspace.payload}
-          createdAt={workspace.createdAt}
-          conversations={workspace.conversations}
-          documents={workspace.documents}
-          activity={workspace.activity}
+        <div data-testid="unauthorized-case-review">
+          <EmptyState
+            title="Хандах эрхгүй"
+            description="Та зөвхөн өөрийн хэргээ нээж болно."
+          />
+        </div>
+      </CaseWorkspaceLayout>
+    );
+  }
+
+  if (!workspace || !isCaseReviewWorkspacePayload(workspace.payload)) {
+    return (
+      <CaseWorkspaceLayout active="cases">
+        <EmptyState
+          title="Шинжилгээний үр дүнг харуулах боломжгүй"
+          description="Хөдөлгүүрийн хариу буруу бүтэцтэй байна. Тодорхойгүй байдлыг нуухгүй."
         />
       </CaseWorkspaceLayout>
     );
-  } catch (error) {
-    if (error instanceof DomainError && error.code === "FORBIDDEN") {
-      return (
-        <CaseWorkspaceLayout active="cases">
-          <div data-testid="unauthorized-case-review">
-            <EmptyState
-              title="Хандах эрхгүй"
-              description="Та зөвхөн өөрийн хэргээ нээж болно."
-            />
-          </div>
-        </CaseWorkspaceLayout>
-      );
-    }
-    if (error instanceof DomainError && error.code === "NOT_FOUND") {
-      redirect("/lawyer/workspace/cases");
-    }
-    throw error;
   }
+
+  return (
+    <CaseWorkspaceLayout active="cases">
+      <p className="mb-5 text-sm text-[#5C6570]">
+        <a
+          href="/lawyer/workspace"
+          className="font-medium text-[#0B1F3A] underline underline-offset-4"
+        >
+          Ажлын талбар
+        </a>
+        <span className="mx-2 text-[#8A939D]">/</span>
+        <a
+          href="/lawyer/workspace/cases"
+          className="font-medium text-[#0B1F3A] underline underline-offset-4"
+        >
+          Миний хэргүүд
+        </a>
+      </p>
+      <CaseReviewWorkspace
+        payload={workspace.payload}
+        createdAt={workspace.createdAt}
+        conversations={workspace.conversations}
+        documents={workspace.documents}
+        activity={workspace.activity}
+      />
+    </CaseWorkspaceLayout>
+  );
 }

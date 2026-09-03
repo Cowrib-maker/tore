@@ -19,12 +19,14 @@ export function ConsultationPaymentCard({
   qrImage: string | null;
   shortUrl: string | null;
 }) {
-  const [waiting, setWaiting] = useState(true);
+  const [completedInvoiceId, setCompletedInvoiceId] = useState<string | null>(
+    null,
+  );
   const paidRef = useRef(false);
+  const waiting = completedInvoiceId !== invoiceId;
 
   useEffect(() => {
     paidRef.current = false;
-    setWaiting(true);
     const timer = window.setInterval(() => {
       void fetch(`/api/citizen/billing/invoices/${invoiceId}`, {
         credentials: "include",
@@ -37,7 +39,7 @@ export function ConsultationPaymentCard({
           };
           if (isLawyerInvoicePaid(payload) && !paidRef.current) {
             paidRef.current = true;
-            setWaiting(false);
+            setCompletedInvoiceId(invoiceId);
             window.location.reload();
           }
         })

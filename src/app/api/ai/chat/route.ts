@@ -15,7 +15,10 @@ import {
 } from "@/domain/errors/domain-error";
 import { EntitlementError } from "@/domain/errors/entitlement-error";
 import { EntitlementFeature, UserRole } from "@/domain/enums";
-import { GUEST_SESSION_COOKIE } from "@/infrastructure/legal-ai/guest-session-cookie";
+import {
+  GUEST_SESSION_COOKIE,
+  guestCookieOptions,
+} from "@/infrastructure/legal-ai/guest-session-cookie";
 import {
   consumeRateLimit,
   LEGAL_AI_CHAT_RATE_LIMIT,
@@ -119,12 +122,11 @@ export async function POST(request: Request) {
     });
 
     if (!actor && guest?.cookieValue) {
-      response.cookies.set(GUEST_SESSION_COOKIE, guest.cookieValue, {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        expires: guest.expiresAt,
-      });
+      response.cookies.set(
+        GUEST_SESSION_COOKIE,
+        guest.cookieValue,
+        guestCookieOptions(guest.expiresAt),
+      );
     }
     return response;
   } catch (error) {

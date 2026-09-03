@@ -1,9 +1,12 @@
 import type { MetadataRoute } from "next";
+import { connection } from "next/server";
 
 import { lawyerProfileRepository } from "@/infrastructure/repositories";
 import { env } from "@/lib/env";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  await connection();
+
   const base = env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
   const now = new Date();
 
