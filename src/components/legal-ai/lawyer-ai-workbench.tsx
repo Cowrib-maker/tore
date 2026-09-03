@@ -417,7 +417,7 @@ export function LawyerAiWorkbench({
   return (
     <ResizableLegalAiFrame>
     <div
-      className="flex h-full min-h-0 flex-1 overflow-hidden bg-[#F4F2EE]"
+      className="flex h-full min-h-0 overflow-hidden bg-[#F4F2EE]"
       data-testid="lawyer-ai-workbench"
     >
       <div className="flex min-w-0 flex-1 flex-col">
@@ -520,7 +520,7 @@ export function LawyerAiWorkbench({
               conversationMode ? "min-h-0 flex-1" : "h-0 flex-none overflow-hidden",
             )}
           >
-            <div className="mx-auto flex w-full max-w-[1040px] flex-col gap-5 px-4 py-6 sm:px-6">
+            <div className="mx-auto flex w-full flex-col gap-5 px-4 py-6 sm:px-6">
               {messages.map((item, index) => (
                 <MessageBubble
                   key={`${item.role}-${index}`}
@@ -561,7 +561,7 @@ export function LawyerAiWorkbench({
           <div className="shrink-0 pb-4 pt-2 sm:pb-6">
             <form
               onSubmit={handleSubmit}
-              className="mx-auto w-full max-w-[1040px] px-4 sm:px-6"
+              className="w-full px-4 sm:px-6"
               data-testid="lawyer-ai-composer"
             >
               {!conversationMode ? (

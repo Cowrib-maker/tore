@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Expand, Minimize2 } from "lucide-react";
+import { Expand, Grip, Minimize2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -92,7 +92,7 @@ export function ResizableLegalAiFrame({
     <div
       ref={frameRef}
       className={cn(
-        "relative mx-auto w-full overflow-hidden bg-[#FAF9F7] md:rounded-xl md:border md:border-[#0B1F3A]/10 md:shadow-xl",
+        "relative mx-auto h-full w-full overflow-hidden bg-[#FAF9F7] md:rounded-xl md:border md:border-[#0B1F3A]/10 md:shadow-xl",
         fullscreen && "h-svh w-svw max-w-none rounded-none border-0",
         className,
       )}
@@ -121,8 +121,11 @@ export function ResizableLegalAiFrame({
         aria-label="Чатын өргөн ба өндрийг өөрчлөх"
         aria-orientation="horizontal"
         onPointerDown={resize}
-        className="absolute right-0 bottom-0 z-20 hidden size-6 cursor-nwse-resize bg-linear-to-tl from-[#0B1F3A]/25 from-0% via-[#0B1F3A]/25 via-10% to-transparent md:block"
-      />
+        data-testid="legal-ai-resize-handle"
+        className="absolute right-2 bottom-2 z-30 hidden size-9 cursor-nwse-resize touch-none items-end justify-end rounded-md border border-[#0B1F3A]/15 bg-white/90 p-1 text-[#0B1F3A] shadow-sm hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A7A72]/50 md:flex"
+      >
+        <Grip className="size-4 rotate-45" aria-hidden />
+      </div>
     </div>
   );
 }

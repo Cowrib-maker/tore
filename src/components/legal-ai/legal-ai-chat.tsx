@@ -477,7 +477,7 @@ export function LegalAiChat({
           : "border-t border-[#0B1F3A]/8 bg-white px-3 py-3 sm:px-6 sm:py-4",
       )}
     >
-      <div className={cn(isEmpty ? "w-full" : "mx-auto w-full max-w-3xl")}>
+      <div className="w-full">
         {attachedDocuments.length || uploading ? (
           <ul className="mb-2 flex flex-wrap gap-2">
             {attachedDocuments.map((document) => {
@@ -603,7 +603,7 @@ export function LegalAiChat({
 
   return (
     <ResizableLegalAiFrame>
-    <div className="flex h-svh min-h-0 flex-1 overflow-hidden bg-[#FAF9F7] text-[#0A0F14]">
+    <div className="flex h-full min-h-0 overflow-hidden bg-[#FAF9F7] text-[#0A0F14]">
       <aside className="hidden w-[17.5rem] shrink-0 lg:flex">{sidebar}</aside>
 
       <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
@@ -671,7 +671,7 @@ export function LegalAiChat({
 
         {isEmpty ? (
           <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-            <div className="mx-auto flex w-full max-w-[45rem] flex-1 flex-col justify-center px-4 py-8 sm:px-6">
+            <div className="flex w-full flex-1 flex-col justify-center px-4 py-8 sm:px-6">
               <EmptyWorkspace
                 onQuickAction={(prompt) => {
                   setMessage(prompt);
@@ -707,7 +707,7 @@ export function LegalAiChat({
               ref={transcriptRef}
               className="min-h-0 flex-1 overflow-y-auto"
             >
-              <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-8 sm:px-6">
+              <div className="mx-auto flex w-full flex-col gap-5 px-4 py-8 sm:px-6">
                 {messages.map((item, index) => (
                   <MessageBubble key={`${item.role}-${index}`} message={item} />
                 ))}

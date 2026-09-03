@@ -383,12 +383,13 @@ export function OrthographyCheckButton({
       aria-pressed={pressed}
       onClick={onClick}
       className={cn(
-        "inline-flex size-9 items-center justify-center rounded-lg text-[#5C6570] transition hover:bg-[#0B1F3A]/8 hover:text-[#0B1F3A]",
+        "inline-flex h-9 items-center justify-center gap-1.5 rounded-lg px-2 text-[#5C6570] transition hover:bg-[#0B1F3A]/8 hover:text-[#0B1F3A]",
         pressed && "bg-[#0B1F3A]/10 text-[#0B1F3A]",
         (disabled || loading) && "opacity-50",
       )}
     >
       <SpellCheck2 className="size-4" />
+      <span className="hidden text-xs font-medium sm:inline">Зөв бичиг</span>
     </button>
   );
 }

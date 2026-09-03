@@ -21,6 +21,7 @@ const COMMON_TYPO_CORRECTIONS: Record<string, string> = {
   хувцаса: "хувцас",
   явч: "яавч",
   явач: "яавч",
+  тогтоомжыг: "тогтоомжийг",
 };
 
 function relaxedSpellingKey(word: string): string {
@@ -55,8 +56,10 @@ const CORE_DICTIONARY_WORDS = [
   "хариуцлага", "гэмт", "гэмт хэрэг", "гэмт үйлдэл", "баримт", "баримт бичиг",
   "нотлох", "нотлох баримт", "гэрч", "мэдүүлэг", "өмгөөлөгч", "хохирогч",
   "шинжилгээ", "шинжлэх", "дүгнэлт", "санал", "гэрээ", "зөрчил", "маргаан",
-  "бодлого", "бодох", "бодож", "заалт", "зүйл", "тогтоол", "ял", "торгууль",
+  "бодлого", "бодох", "бодож", "заалт", "зүйл", "тогтоол", "тогтоомж",
+  "тогтоомжийг", "ял", "торгууль",
   "хийх", "хийж", "хийсэн", "өгөх", "авах", "авч", "авсан", "хэлэх", "хэлсэн",
+  "зөрчсөн",
   "бичих", "бичсэн", "унших", "уншсэн", "сурах", "сурсан", "ажиллах", "ажил",
   "олох", "олсон", "мэдэх", "мэдсэн", "харах", "харсан", "шалгах", "шалгаж",
   "зөв", "буруу", "сайн", "муу", "их", "бага", "шинэ", "хуучин", "том", "жижиг",
@@ -106,6 +109,7 @@ export function isKnownMongolianWord(word: string): boolean {
   const normalized = normalizeMongolianWord(word);
   if (!normalized || normalized.length < 2) return true;
   if (!/[а-яөүё]/u.test(normalized)) return true;
+  if (COMMON_TYPO_CORRECTIONS[normalized]) return false;
   return DICTIONARY.has(normalized) || hasKnownStemWithSuffix(normalized);
 }
 

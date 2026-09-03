@@ -9,6 +9,7 @@ import {
   inferWordGender,
   scanMongolianText,
   isKnownMongolianWord,
+  buildOrthographySuggestions,
 } from "@/domain/mongolian-orthography";
 
 describe("mongolian orthography engine", () => {
@@ -16,6 +17,22 @@ describe("mongolian orthography engine", () => {
     expect(isKnownMongolianWord("нэхэмжлэгчийн")).toBe(true);
     expect(isKnownMongolianWord("гэрээний")).toBe(true);
     expect(isKnownMongolianWord("зөвлөлөөс")).toBe(true);
+  });
+
+  it("suggests the correct legal suffix without flagging a valid legal verb", () => {
+    const result = buildOrthographySuggestions(
+      "Монгол Улсын иргэний хууль тогтоомжыг зөрчсөн.",
+    );
+
+    expect(result.suggestions).toContainEqual(
+      expect.objectContaining({
+        sourceWord: "тогтоомжыг",
+        suggestedWord: "тогтоомжийг",
+      }),
+    );
+    expect(result.suggestions.some((item) => item.sourceWord === "зөрчсөн")).toBe(
+      false,
+    );
   });
 
   it("classifies masculine, feminine, and neutral vowels (§7)", () => {
