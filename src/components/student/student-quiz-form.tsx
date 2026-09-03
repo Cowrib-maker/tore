@@ -30,9 +30,12 @@ export function StudentQuizForm({
   const [pending, startTransition] = useTransition();
 
   function submit() {
-    const unanswered = quiz.questions.filter(
-      (question) => !answers[question.id],
-    ).length;
+    const unanswered = quiz.questions.filter((question) => {
+      if (question.type !== "matching") return !answers[question.id];
+      return question.options.some(
+        (option) => !answers[question.id]?.includes(`${option.id}:`),
+      );
+    }).length;
     if (
       unanswered > 0 &&
       !window.confirm(
@@ -92,36 +95,13 @@ export function StudentQuizForm({
           <p className="mt-3 text-[15px] font-medium leading-7 text-[#0B1F3A]">
             {question.prompt}
           </p>
-          <div className="mt-4 space-y-2">
-            {question.options.map((option) => {
-              const selected = answers[question.id] === option.id;
-              return (
-                <label
-                  key={option.id}
-                  className={`flex cursor-pointer gap-3 rounded-xl border px-3 py-3 text-[14px] leading-6 transition ${
-                    selected
-                      ? "border-[#1A7A72] bg-[#E8F4F1] text-[#0B1F3A]"
-                      : "border-[#0B1F3A]/10 bg-white text-[#5C6570] hover:border-[#0B1F3A]/25"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    className="mt-1"
-                    name={question.id}
-                    value={option.id}
-                    checked={selected}
-                    onChange={() =>
-                      setAnswers((prev) => ({
-                        ...prev,
-                        [question.id]: option.id,
-                      }))
-                    }
-                  />
-                  <span>{option.label}</span>
-                </label>
-              );
-            })}
-          </div>
+          <QuestionAnswer
+            question={question}
+            answer={answers[question.id] ?? ""}
+            onChange={(answer) =>
+              setAnswers((previous) => ({ ...previous, [question.id]: answer }))
+            }
+          />
         </fieldset>
       ))}
 
@@ -140,6 +120,110 @@ export function StudentQuizForm({
       >
         {pending ? "Илгээж байна…" : copy.submitQuiz}
       </button>
+    </div>
+  );
+}
+
+function QuestionAnswer({
+  question,
+  answer,
+  onChange,
+}: {
+  question: StudentPublicQuiz["questions"][number];
+  answer: string;
+  onChange: (answer: string) => void;
+}) {
+  const type = question.type ?? "single";
+  if (type === "short-answer") {
+    return (
+      <input
+        value={answer}
+        onChange={(event) => onChange(event.target.value)}
+        className="mt-4 w-full rounded-xl border border-[#0B1F3A]/15 bg-white px-3 py-3 text-[14px] text-[#0B1F3A] outline-none transition focus:border-[#1A7A72] focus:ring-2 focus:ring-[#1A7A72]/20"
+        aria-label={question.prompt}
+      />
+    );
+  }
+
+  if (type === "matching") {
+    const selected = new Map(
+      answer
+        .split(",")
+        .map((pair) => pair.split(":", 2))
+        .filter((pair): pair is [string, string] => pair.length === 2),
+    );
+    const choices = question.matchingOptions ?? [];
+    return (
+      <div className="mt-4 space-y-3">
+        {question.options.map((option) => (
+          <label key={option.id} className="grid gap-2 text-[14px] text-[#0B1F3A] sm:grid-cols-2 sm:items-center">
+            <span>{option.label}</span>
+            <select
+              value={selected.get(option.id) ?? ""}
+              onChange={(event) => {
+                selected.set(option.id, event.target.value);
+                onChange(
+                  [...selected.entries()]
+                    .filter(([, value]) => value)
+                    .map(([left, right]) => `${left}:${right}`)
+                    .join(","),
+                );
+              }}
+              className="rounded-lg border border-[#0B1F3A]/15 bg-white px-3 py-2 text-[#0B1F3A] outline-none focus:border-[#1A7A72] focus:ring-2 focus:ring-[#1A7A72]/20"
+            >
+              <option value="">Сонгоно уу</option>
+              {choices.map((choice) => (
+                <option key={choice.id} value={choice.id}>
+                  {choice.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4 space-y-2">
+      {question.options.map((option) => {
+        const selected =
+          type === "multiple"
+            ? answer.split(",").includes(option.id)
+            : answer === option.id;
+        return (
+          <label
+            key={option.id}
+            className={`flex cursor-pointer gap-3 rounded-xl border px-3 py-3 text-[14px] leading-6 transition ${
+              selected
+                ? "border-[#1A7A72] bg-[#E8F4F1] text-[#0B1F3A]"
+                : "border-[#0B1F3A]/10 bg-white text-[#5C6570] hover:border-[#0B1F3A]/25"
+            }`}
+          >
+            <input
+              type={type === "multiple" ? "checkbox" : "radio"}
+              className="mt-1"
+              name={question.id}
+              value={option.id}
+              checked={selected}
+              onChange={() => {
+                if (type === "multiple") {
+                  const values = new Set(answer.split(",").filter(Boolean));
+                  if (selected) {
+                    values.delete(option.id);
+                  } else {
+                    values.add(option.id);
+                  }
+                  onChange([...values].join(","));
+                  return;
+                }
+                onChange(option.id);
+              }}
+            />
+            <span>{option.label}</span>
+          </label>
+        );
+      })}
     </div>
   );
 }

@@ -1,11 +1,19 @@
+import {
+  getStudentProblem as buildStudentProblem,
+  getTheoryCourseContent,
+} from "./content";
 import { administrativeLessons, administrativeProblem, administrativeTest } from "./administrative";
 import { civilLessons, civilProblem, civilTest } from "./civil";
 import { criminalLessons, criminalProblem, criminalTest } from "./criminal";
+import { generateOriginalStudentQuestions } from "./generate-test";
 import { publicStudentQuiz } from "./grade-quiz";
 import {
+  isStudentDifficulty,
   isStudentQuizKind,
   isStudentTrackId,
+  type StudentDifficulty,
   type StudentLesson,
+  type StudentLegalProblem,
   type StudentPublicQuiz,
   type StudentQuiz,
   type StudentQuizKind,
@@ -48,8 +56,24 @@ export function getStudentLesson(
   );
 }
 
+export function getStudentTheoryCourse(
+  trackId: StudentTrackId,
+  lessonId: string,
+) {
+  const lesson = getStudentLesson(trackId, lessonId);
+  return lesson ? getTheoryCourseContent(lesson) : null;
+}
+
 export function getStudentQuiz(quizId: string): StudentQuiz | null {
-  return QUIZZES.find((quiz) => quiz.id === quizId) ?? null;
+  const [baseQuizId, rawDifficulty] = quizId.split(":", 2);
+  const quiz = QUIZZES.find((item) => item.id === baseQuizId) ?? null;
+  if (!quiz || quiz.kind !== "test" || !rawDifficulty) return quiz;
+  if (!isStudentDifficulty(rawDifficulty)) return null;
+  return {
+    ...quiz,
+    id: quizId,
+    questions: generateOriginalStudentQuestions(quiz.trackId, rawDifficulty),
+  };
 }
 
 export function getTrackQuiz(
@@ -64,10 +88,31 @@ export function getTrackQuiz(
 
 export function getPublicTrackQuiz(
   trackId: StudentTrackId,
+  kind: "test",
+  difficulty?: StudentDifficulty,
+): StudentPublicQuiz | null;
+export function getPublicTrackQuiz(
+  trackId: StudentTrackId,
+  kind: "problem",
+): StudentPublicQuiz | null;
+export function getPublicTrackQuiz(
+  trackId: StudentTrackId,
   kind: StudentQuizKind,
+  difficulty: StudentDifficulty = "medium",
 ): StudentPublicQuiz | null {
   const quiz = getTrackQuiz(trackId, kind);
-  return quiz ? publicStudentQuiz(quiz) : null;
+  if (!quiz) return null;
+  if (kind === "test") {
+    const generated = getStudentQuiz(`${quiz.id}:${difficulty}`);
+    return generated
+      ? { ...publicStudentQuiz(generated), difficulty }
+      : null;
+  }
+  return publicStudentQuiz(quiz);
+}
+
+export function getStudentProblem(trackId: StudentTrackId): StudentLegalProblem {
+  return buildStudentProblem(trackId);
 }
 
 export function parseStudentTrackId(value: string): StudentTrackId | null {
@@ -78,21 +123,38 @@ export function parseStudentQuizKind(value: string): StudentQuizKind | null {
   return isStudentQuizKind(value) ? value : null;
 }
 
+export function parseStudentDifficulty(value: string | undefined): StudentDifficulty {
+  return value && isStudentDifficulty(value) ? value : "medium";
+}
+
 export {
+  STUDENT_DIFFICULTIES,
   STUDENT_QUIZ_KINDS,
   STUDENT_TRACK_IDS,
   StudentTrackId,
+  isStudentDifficulty,
   isStudentQuizKind,
   isStudentTrackId,
 } from "./types";
 export type {
+  StudentDifficulty,
   StudentGradeBand,
+  StudentQuizGrade,
+  StudentLegalProblem,
+  StudentLegalSource,
   StudentLesson,
+  StudentProblemGrade,
+  StudentProblemEvaluation,
   StudentPublicQuiz,
   StudentQuestionReview,
   StudentQuiz,
-  StudentQuizGrade,
   StudentQuizKind,
   StudentTrackId as StudentTrackIdType,
 } from "./types";
-export { gradeBandFromPercent, gradeStudentQuiz, publicStudentQuiz } from "./grade-quiz";
+export {
+  gradeBandFromPercent,
+  gradeStudentQuiz,
+  publicStudentQuiz,
+} from "./grade-quiz";
+export { gradeStudentProblem } from "./grade-problem";
+export { generateOriginalStudentQuestions } from "./generate-test";

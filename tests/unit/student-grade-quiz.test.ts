@@ -4,6 +4,7 @@ import {
   gradeStudentQuiz,
   getPublicTrackQuiz,
   getStudentQuiz,
+  parseStudentDifficulty,
   parseStudentQuizKind,
   parseStudentTrackId,
   publicStudentQuiz,
@@ -21,7 +22,7 @@ describe("student quiz grading", () => {
     const wrong = first.options.find((o) => o.id !== first.correctOptionId)!;
 
     const grade = gradeStudentQuiz(quiz, {
-      [first.id]: first.correctOptionId,
+      [first.id]: first.correctOptionId!,
       [second.id]: wrong.id,
     });
 
@@ -77,5 +78,7 @@ describe("student quiz grading", () => {
     expect(parseStudentQuizKind("test")).toBe("test");
     expect(parseStudentQuizKind("problem")).toBe("problem");
     expect(parseStudentQuizKind("exam")).toBeNull();
+    expect(parseStudentDifficulty("expert")).toBe("expert");
+    expect(parseStudentDifficulty("unknown")).toBe("medium");
   });
 });

@@ -8,9 +8,16 @@ import {
   classifyVowel,
   inferWordGender,
   scanMongolianText,
+  isKnownMongolianWord,
 } from "@/domain/mongolian-orthography";
 
 describe("mongolian orthography engine", () => {
+  it("recognizes inflected legal vocabulary without treating it as an error", () => {
+    expect(isKnownMongolianWord("нэхэмжлэгчийн")).toBe(true);
+    expect(isKnownMongolianWord("гэрээний")).toBe(true);
+    expect(isKnownMongolianWord("зөвлөлөөс")).toBe(true);
+  });
+
   it("classifies masculine, feminine, and neutral vowels (§7)", () => {
     expect(classifyVowel("а")).toBe("masculine");
     expect(classifyVowel("ө")).toBe("feminine");

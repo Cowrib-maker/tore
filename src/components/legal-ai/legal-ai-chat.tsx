@@ -53,6 +53,7 @@ import {
 import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
 import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
+import { ResizableLegalAiFrame } from "@/components/legal-ai/resizable-legal-ai-frame";
 import {
   OrthographyCheckButton,
   OrthographySpellPanel,
@@ -601,6 +602,7 @@ export function LegalAiChat({
   );
 
   return (
+    <ResizableLegalAiFrame>
     <div className="flex h-svh min-h-0 flex-1 overflow-hidden bg-[#FAF9F7] text-[#0A0F14]">
       <aside className="hidden w-[17.5rem] shrink-0 lg:flex">{sidebar}</aside>
 
@@ -739,6 +741,7 @@ export function LegalAiChat({
         )}
       </div>
     </div>
+    </ResizableLegalAiFrame>
   );
 }
 

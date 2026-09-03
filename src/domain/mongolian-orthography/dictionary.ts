@@ -1,5 +1,12 @@
 ﻿import { normalizeMongolianWord } from "@/domain/mongolian-orthography/engine";
 import { levenshteinDistance } from "@/domain/mongolian-orthography/levenshtein";
+import {
+  GENERAL_MONGOLIAN_VOCABULARY,
+  LEGAL_MONGOLIAN_VOCABULARY,
+  MONGOLIAN_ENTITY_VOCABULARY,
+  PRODUCT_CUSTOM_VOCABULARY,
+  PRODUCTIVE_SUFFIXES,
+} from "@/domain/mongolian-orthography/lexicon";
 
 /** High-confidence typo to correction pairs (spellcheck.mn-style daily errors). */
 const COMMON_TYPO_CORRECTIONS: Record<string, string> = {
@@ -60,6 +67,10 @@ const CORE_DICTIONARY_WORDS = [
   "иргэн", "захиргаа", "захиргааны", "иргэний", "эрүүгийн", "мөнгө", "төлбөр",
   "үнэ", "үнэгүй", "төлбөртэй", "багц", "үйлчилгээ", "систем", "програм",
   "мэдээлэл", "технологи", "интернет", "файл", "хавсралт",
+  ...GENERAL_MONGOLIAN_VOCABULARY,
+  ...LEGAL_MONGOLIAN_VOCABULARY,
+  ...MONGOLIAN_ENTITY_VOCABULARY,
+  ...PRODUCT_CUSTOM_VOCABULARY,
 ] as const;
 
 const DICTIONARY = new Set<string>();
@@ -95,7 +106,16 @@ export function isKnownMongolianWord(word: string): boolean {
   const normalized = normalizeMongolianWord(word);
   if (!normalized || normalized.length < 2) return true;
   if (!/[а-яөүё]/u.test(normalized)) return true;
-  return DICTIONARY.has(normalized);
+  return DICTIONARY.has(normalized) || hasKnownStemWithSuffix(normalized);
+}
+
+function hasKnownStemWithSuffix(word: string): boolean {
+  for (const suffix of PRODUCTIVE_SUFFIXES) {
+    if (!word.endsWith(suffix) || word.length <= suffix.length + 1) continue;
+    const stem = word.slice(0, -suffix.length);
+    if (DICTIONARY.has(stem)) return true;
+  }
+  return false;
 }
 
 export function suggestDictionaryWords(

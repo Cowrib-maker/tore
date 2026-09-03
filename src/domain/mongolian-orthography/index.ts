@@ -41,6 +41,13 @@ export {
   dictionarySizeForTests,
 } from "./dictionary";
 export {
+  GENERAL_MONGOLIAN_VOCABULARY,
+  LEGAL_MONGOLIAN_VOCABULARY,
+  MONGOLIAN_ENTITY_VOCABULARY,
+  PRODUCT_CUSTOM_VOCABULARY,
+  PRODUCTIVE_SUFFIXES,
+} from "./lexicon";
+export {
   levenshteinDistance,
 } from "./levenshtein";
 export {

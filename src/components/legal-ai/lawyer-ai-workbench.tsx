@@ -43,6 +43,7 @@ import { requestLawyerCheckout } from "@/components/legal-ai/request-lawyer-chec
 import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-list";
 import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
+import { ResizableLegalAiFrame } from "@/components/legal-ai/resizable-legal-ai-frame";
 import {
   OrthographyCheckButton,
   OrthographySpellPanel,
@@ -414,8 +415,9 @@ export function LawyerAiWorkbench({
     : null;
 
   return (
+    <ResizableLegalAiFrame>
     <div
-      className="flex min-h-0 flex-1 overflow-hidden bg-[#F4F2EE]"
+      className="flex h-full min-h-0 flex-1 overflow-hidden bg-[#F4F2EE]"
       data-testid="lawyer-ai-workbench"
     >
       <div className="flex min-w-0 flex-1 flex-col">
@@ -778,6 +780,7 @@ export function LawyerAiWorkbench({
         </SheetContent>
       </Sheet>
     </div>
+    </ResizableLegalAiFrame>
   );
 }
 

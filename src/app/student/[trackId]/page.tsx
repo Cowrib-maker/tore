@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { StudentShell } from "@/components/student/student-shell";
 import {
   getPublicTrackQuiz,
+  getStudentProblem,
   listStudentLessons,
   parseStudentTrackId,
 } from "@/domain/student";
@@ -23,7 +24,7 @@ export default async function StudentTrackPage({
   const methodLessons = listStudentLessons(trackId, "method");
   const theoryLessons = listStudentLessons(trackId, "theory");
   const testQuiz = getPublicTrackQuiz(trackId, "test");
-  const problemQuiz = getPublicTrackQuiz(trackId, "problem");
+  const problemQuiz = getStudentProblem(trackId);
 
   return (
     <StudentShell
