@@ -13,9 +13,10 @@ const WORD_RE = /[А-Яа-яӨөҮүЁёЪъЬьЫы]+(?:-[А-Яа-яӨөҮүЁ�
 const CYRILLIC_RE = /^[А-Яа-яӨөҮүЁёЪъЬьЫы-]+$/u;
 
 // The dictionary is based on the Mongolian Hunspell dictionary (dict-mn).
-// It recognizes stems and affix combinations instead of treating every
-// surface form as an unrelated dictionary entry.
-const spell = nspell(mn);
+// Pass the affix and dictionary buffers explicitly so the nspell typings
+// resolve the constructor overload without relying on cross-package
+// Dictionary type compatibility.
+const spell = nspell(mn.aff, mn.dic);
 
 function preserveCase(source: string, candidate: string): string {
   if (source === source.toUpperCase()) return candidate.toUpperCase();
