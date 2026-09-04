@@ -134,7 +134,7 @@ async function main() {
           dateRange: args.dateRange,
         });
 
-        const payload = await page.evaluate(async (url) => {
+        const payload = await page.evaluate(async (url: string) => {
           const response = await fetch(url, {
             headers: { "X-Requested-With": "XMLHttpRequest" },
           });
