@@ -13,6 +13,10 @@ import { env } from "@/lib/env";
 
 import "./globals.css";
 
+// The app uses request/session/database-backed server components.
+// Prevent Next.js from executing those pages during static build-time data collection.
+export const dynamic = "force-dynamic";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -50,8 +54,6 @@ export async function generateMetadata(): Promise<Metadata> {
       description: dict.meta.description,
     },
     icons: {
-      // Static SVGs synced to ToreMark geometry (browsers can't use the React component).
-      // src/app/icon.svg + apple-icon.svg are also emitted by the App Router file convention.
       icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     },
   };
