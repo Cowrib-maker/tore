@@ -70,12 +70,13 @@ function collectWordSpans(text: string): WordSpan[] {
 }
 
 /**
- * Dictionary spellchecking must be conservative. A legal document contains
- * names, places, statute terminology and valid inflected forms that will not
- * all be present in a finite dictionary. Nearest-neighbour matching alone
- * therefore creates dangerous false positives (e.g. "анхан" -> "авсан").
- * Only surface-near candidates with a strong typo signal are allowed here;
- * otherwise the word is left untouched until a real linguistic rule confirms it.
+ * Spelling correction is deliberately word-level, never sentence-semantic.
+ * A word that is not in the finite dictionary is NOT automatically an error:
+ * it may be a valid name, place, legal term or an inflected form.
+ *
+ * A dictionary suggestion is therefore accepted only when it is an extremely
+ * strong one-edit typo of a dictionary entry. We do not use two-edit nearest
+ * neighbours, phonetic relaxation, or contextual meaning for correction.
  */
 function highConfidenceCandidates(source: string, candidates: readonly string[]): string[] {
   const normalized = normalizeMongolianWord(source);
@@ -83,20 +84,12 @@ function highConfidenceCandidates(source: string, candidates: readonly string[])
   return unique.filter((candidate) => {
     if (candidate === normalized) return false;
     const distance = levenshteinDistance(normalized, candidate);
-    if (distance === 1) {
-      if (normalized.length <= 4) return true;
-      const prefixLength = Math.min(3, normalized.length, candidate.length);
-      return normalized.slice(0, prefixLength) === candidate.slice(0, prefixLength);
-    }
-    // Two edits are accepted only for longer words when most of the surface
-    // is identical. This avoids unrelated short legal words becoming fixes.
-    if (distance === 2 && normalized.length >= 9) {
-      const prefixLength = Math.min(5, normalized.length, candidate.length);
-      const suffixLength = Math.min(2, normalized.length, candidate.length);
-      return normalized.slice(0, prefixLength) === candidate.slice(0, prefixLength)
-        || normalized.slice(-suffixLength) === candidate.slice(-suffixLength);
-    }
-    return false;
+    if (distance !== 1) return false;
+    if (normalized.length <= 4) return true;
+    // For longer words require the same beginning so unrelated dictionary
+    // words cannot become corrections merely because their edit distance is 1.
+    const prefixLength = Math.min(3, normalized.length, candidate.length);
+    return normalized.slice(0, prefixLength) === candidate.slice(0, prefixLength);
   });
 }
 
