@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
+import type { KeyboardEventHandler, RefObject, ReactNode, UIEvent } from "react";
 import type { OrthographySuggestionView } from "@/components/orthography/orthography-checker";
 import { cn } from "@/lib/utils";
 
@@ -11,8 +12,8 @@ type Props = {
   rows?: number;
   disabled?: boolean;
   onChange: (value: string) => void;
-  onKeyDown?: React.KeyboardEventHandler<HTMLTextAreaElement>;
-  inputRef?: React.RefObject<HTMLTextAreaElement | null>;
+  onKeyDown?: KeyboardEventHandler<HTMLTextAreaElement>;
+  inputRef?: RefObject<HTMLTextAreaElement | null>;
   className?: string;
 };
 
@@ -42,21 +43,14 @@ export function SpellcheckTextarea({
   const mirrorRef = useRef<HTMLDivElement>(null);
   const ranges = useMemo(() => rangesForText(value, suggestions), [value, suggestions]);
 
-  useEffect(() => {
-    const mirror = mirrorRef.current;
-    if (!mirror) return;
-    mirror.scrollTop = 0;
-    mirror.scrollLeft = 0;
-  }, [value]);
-
-  function syncScroll(event: React.UIEvent<HTMLTextAreaElement>) {
+  function syncScroll(event: UIEvent<HTMLTextAreaElement>) {
     const mirror = mirrorRef.current;
     if (!mirror) return;
     mirror.scrollTop = event.currentTarget.scrollTop;
     mirror.scrollLeft = event.currentTarget.scrollLeft;
   }
 
-  const parts: React.ReactNode[] = [];
+  const parts: ReactNode[] = [];
   let cursor = 0;
   ranges.forEach((item, index) => {
     if (item.start < cursor) return;
@@ -66,7 +60,7 @@ export function SpellcheckTextarea({
     parts.push(
       <span
         key={`error-${item.start}-${item.end}-${index}`}
-        className="decoration-wavy decoration-2 underline decoration-[#DC2626] underline-offset-[3px]"
+        className="underline decoration-wavy decoration-2 decoration-[#DC2626] underline-offset-[3px]"
         title={`${item.sourceWord} → ${item.suggestedWord}`}
       >
         {value.slice(item.start, item.end)}
