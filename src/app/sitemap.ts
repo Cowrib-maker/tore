@@ -3,6 +3,11 @@ import type { MetadataRoute } from "next";
 import { lawyerProfileRepository } from "@/infrastructure/repositories";
 import { env } from "@/lib/env";
 
+// Sitemap reads live database data, so it must never execute during `next build`.
+// Keep it request-time only to avoid blocking Vercel's page-data collection when
+// the production database is unavailable or not reachable from the build worker.
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
   const now = new Date();
