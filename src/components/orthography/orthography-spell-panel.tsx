@@ -53,6 +53,8 @@ export function OrthographySpellPanel({
   );
   const errorCount = suggestions.length;
 
+  useInlineComposerSpellcheck(text, suggestions);
+
   function applySuggestion(item: Suggestion, index: number) {
     const next = `${text.slice(0, item.start)}${item.suggestedWord}${text.slice(item.end)}`;
     onApplySuggestion(next);
@@ -183,4 +185,105 @@ export function OrthographySpellPanel({
       ) : null}
     </div>
   );
+}
+
+function useInlineComposerSpellcheck(
+  text: string,
+  suggestions: readonly Suggestion[],
+) {
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const textarea = document.querySelector<HTMLTextAreaElement>(
+      '[data-testid="lawyer-ai-composer"] textarea',
+    );
+    if (!textarea) return;
+    const parent = textarea.parentElement;
+    if (!parent) return;
+
+    const previous = {
+      parentPosition: parent.style.position,
+      color: textarea.style.color,
+      caretColor: textarea.style.caretColor,
+      background: textarea.style.background,
+      position: textarea.style.position,
+      zIndex: textarea.style.zIndex,
+    };
+
+    parent.style.position = "relative";
+    textarea.style.position = "relative";
+    textarea.style.zIndex = "2";
+    textarea.style.background = "transparent";
+    textarea.style.color = "transparent";
+    textarea.style.caretColor = "#0B1F3A";
+
+    const overlay = document.createElement("div");
+    const content = document.createElement("div");
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.style.position = "absolute";
+    overlay.style.inset = "0";
+    overlay.style.zIndex = "1";
+    overlay.style.pointerEvents = "none";
+    overlay.style.overflow = "hidden";
+    overlay.style.padding = "8px 12px";
+    overlay.style.font = getComputedStyle(textarea).font;
+    overlay.style.lineHeight = getComputedStyle(textarea).lineHeight;
+    overlay.style.letterSpacing = getComputedStyle(textarea).letterSpacing;
+    overlay.style.whiteSpace = "pre-wrap";
+    overlay.style.overflowWrap = "break-word";
+    overlay.style.wordBreak = "break-word";
+    overlay.style.color = "#0B1F3A";
+
+    content.style.whiteSpace = "pre-wrap";
+    content.style.overflowWrap = "break-word";
+    content.style.wordBreak = "break-word";
+    content.style.minHeight = "100%";
+    content.style.transform = `translate(${-textarea.scrollLeft}px, ${-textarea.scrollTop}px)`;
+    content.style.transformOrigin = "top left";
+
+    const sorted = [...suggestions]
+      .filter((item) => item.start >= 0 && item.end > item.start && item.end <= text.length)
+      .sort((a, b) => a.start - b.start);
+    let cursor = 0;
+    for (const item of sorted) {
+      if (item.start < cursor) continue;
+      if (item.start > cursor) {
+        content.appendChild(document.createTextNode(text.slice(cursor, item.start)));
+      }
+      const mark = document.createElement("span");
+      mark.textContent = text.slice(item.start, item.end);
+      mark.style.textDecorationLine = "underline";
+      mark.style.textDecorationStyle = "wavy";
+      mark.style.textDecorationColor = "#DC2626";
+      mark.style.textDecorationThickness = "1.5px";
+      mark.style.textUnderlineOffset = "3px";
+      content.appendChild(mark);
+      cursor = item.end;
+    }
+    if (cursor < text.length) {
+      content.appendChild(document.createTextNode(text.slice(cursor)));
+    }
+
+    overlay.appendChild(content);
+    parent.appendChild(overlay);
+
+    const sync = () => {
+      content.style.transform = `translate(${-textarea.scrollLeft}px, ${-textarea.scrollTop}px)`;
+    };
+    textarea.addEventListener("scroll", sync, { passive: true });
+    const resizeObserver = new ResizeObserver(sync);
+    resizeObserver.observe(textarea);
+
+    return () => {
+      textarea.removeEventListener("scroll", sync);
+      resizeObserver.disconnect();
+      overlay.remove();
+      parent.style.position = previous.parentPosition;
+      textarea.style.color = previous.color;
+      textarea.style.caretColor = previous.caretColor;
+      textarea.style.background = previous.background;
+      textarea.style.position = previous.position;
+      textarea.style.zIndex = previous.zIndex;
+    };
+  }, [text, suggestions]);
 }
