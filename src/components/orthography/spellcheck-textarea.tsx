@@ -80,12 +80,12 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
   const relatedWords = Array.from(new Set(active?.relatedWords ?? [])).filter((word) => !candidates.includes(word));
 
   return (
-    <div className="relative">
+    <div className="relative isolate">
       <div
         data-spellcheck-mirror
         aria-hidden="true"
         className={cn(
-          "pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words px-3 py-2 text-[15px] leading-6 text-transparent",
+          "pointer-events-none absolute inset-0 z-0 overflow-hidden whitespace-pre-wrap break-words px-3 py-2 text-[15px] leading-6 text-transparent",
           className,
         )}
       >
@@ -105,14 +105,14 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
         disabled={disabled}
         spellCheck={false}
         className={cn(
-          "relative min-h-16 w-full resize-none bg-transparent px-3 py-2 text-[15px] leading-6 text-[#0B1F3A] caret-[#0B1F3A] outline-none selection:bg-[#0F3D33]/15",
+          "relative z-10 min-h-16 w-full resize-none bg-transparent px-3 py-2 text-[15px] leading-6 text-[#0B1F3A] caret-[#0B1F3A] outline-none selection:bg-[#0F3D33]/15",
           className,
         )}
       />
 
       {active ? (
         <div
-          className="absolute left-3 right-3 top-full z-40 mt-1 max-h-64 overflow-y-auto rounded-lg border border-[#0B1F3A]/15 bg-white p-2 shadow-xl"
+          className="pointer-events-auto absolute left-3 right-3 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-lg border border-[#0B1F3A]/15 bg-white p-2 shadow-xl"
           role="dialog"
           aria-label={`${active.sourceWord} үгийн санал`}
         >
