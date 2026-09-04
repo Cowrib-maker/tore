@@ -1,6 +1,7 @@
 import { getOrthographyRule, type OrthographyIssue, type OrthographyIssueCode } from "@/domain/mongolian-orthography";
 import { isKnownMongolianWord, suggestDictionaryWords, suggestRootSimilarWords } from "@/domain/mongolian-orthography/dictionary";
 import { normalizeMongolianWord, scanMongolianText } from "@/domain/mongolian-orthography/engine";
+import { levenshteinDistance } from "@/domain/mongolian-orthography/levenshtein";
 import { findLatinToCyrillicSuggestions, type LatinToCyrillicSuggestion } from "@/domain/mongolian-orthography/latin-to-cyrillic";
 
 export type OrthographySuggestion = {
@@ -12,9 +13,7 @@ export type OrthographySuggestion = {
   ruleTitle: string | null;
   start: number;
   end: number;
-  /** Ranked spelling candidates for the clicked misspelling. */
   candidates?: readonly string[];
-  /** Dictionary words sharing an approximate Mongolian stem/root. */
   relatedWords?: readonly string[];
 };
 
@@ -70,9 +69,41 @@ function collectWordSpans(text: string): WordSpan[] {
   return spans;
 }
 
+/**
+ * Dictionary spellchecking must be conservative. A legal document contains
+ * names, places, statute terminology and valid inflected forms that will not
+ * all be present in a finite dictionary. Nearest-neighbour matching alone
+ * therefore creates dangerous false positives (e.g. "анхан" -> "авсан").
+ * Only surface-near candidates with a strong typo signal are allowed here;
+ * otherwise the word is left untouched until a real linguistic rule confirms it.
+ */
+function highConfidenceCandidates(source: string, candidates: readonly string[]): string[] {
+  const normalized = normalizeMongolianWord(source);
+  const unique = Array.from(new Set(candidates.map(normalizeMongolianWord).filter(Boolean)));
+  return unique.filter((candidate) => {
+    if (candidate === normalized) return false;
+    const distance = levenshteinDistance(normalized, candidate);
+    if (distance === 1) {
+      if (normalized.length <= 4) return true;
+      const prefixLength = Math.min(3, normalized.length, candidate.length);
+      return normalized.slice(0, prefixLength) === candidate.slice(0, prefixLength);
+    }
+    // Two edits are accepted only for longer words when most of the surface
+    // is identical. This avoids unrelated short legal words becoming fixes.
+    if (distance === 2 && normalized.length >= 9) {
+      const prefixLength = Math.min(5, normalized.length, candidate.length);
+      const suffixLength = Math.min(2, normalized.length, candidate.length);
+      return normalized.slice(0, prefixLength) === candidate.slice(0, prefixLength)
+        || normalized.slice(-suffixLength) === candidate.slice(-suffixLength);
+    }
+    return false;
+  });
+}
+
 function suggestDictionaryForSpan(span: WordSpan, options?: { highConfidenceOnly?: boolean }): OrthographySuggestion | null {
   if (isKnownMongolianWord(span.normalized)) return null;
-  const candidates = suggestDictionaryWords(span.normalized, 6, options);
+  const rawCandidates = suggestDictionaryWords(span.normalized, 8, options);
+  const candidates = highConfidenceCandidates(span.normalized, rawCandidates);
   const suggested = candidates[0];
   if (!suggested || suggested === span.normalized) return null;
   return {
