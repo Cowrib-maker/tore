@@ -67,9 +67,7 @@ const DICTIONARY = new Set<string>();
 for (const raw of CORE_DICTIONARY_WORDS) {
   for (const part of raw.split(/\s+/u)) {
     const normalized = normalizeMongolianWord(part);
-    if (normalized.length >= 2) {
-      DICTIONARY.add(normalized);
-    }
+    if (normalized.length >= 2) DICTIONARY.add(normalized);
   }
 }
 
@@ -85,9 +83,7 @@ const SUFFIXES = [
 for (const stem of STEM_EXPANSIONS) {
   for (const suffix of SUFFIXES) {
     const combined = normalizeMongolianWord(`${stem}${suffix}`);
-    if (combined.length >= 2) {
-      DICTIONARY.add(combined);
-    }
+    if (combined.length >= 2) DICTIONARY.add(combined);
   }
 }
 
@@ -104,48 +100,67 @@ export function suggestDictionaryWords(
   options?: { highConfidenceOnly?: boolean },
 ): readonly string[] {
   const normalized = normalizeMongolianWord(word);
-  if (!normalized || normalized.length < 2) return [];
-  if (DICTIONARY.has(normalized)) return [];
+  if (!normalized || normalized.length < 2 || DICTIONARY.has(normalized)) return [];
 
   const mapped = COMMON_TYPO_CORRECTIONS[normalized];
-  if (mapped && DICTIONARY.has(mapped)) {
-    return [mapped];
-  }
+  if (mapped && DICTIONARY.has(mapped)) return [mapped];
+  if (options?.highConfidenceOnly) return [];
 
-  if (options?.highConfidenceOnly) {
-    return [];
-  }
-
-  const maxDistance =
-    normalized.length <= 4 ? 1 : normalized.length <= 7 ? 2 : 3;
-
+  const maxDistance = normalized.length <= 4 ? 1 : normalized.length <= 7 ? 2 : 3;
   const scored: Array<{ word: string; distance: number }> = [];
   for (const candidate of DICTIONARY) {
-    if (Math.abs(candidate.length - normalized.length) > maxDistance + 1) {
-      continue;
-    }
+    if (Math.abs(candidate.length - normalized.length) > maxDistance + 1) continue;
     const distance = spellingDistance(normalized, candidate);
-    if (distance > maxDistance) continue;
-    scored.push({ word: candidate, distance });
+    if (distance <= maxDistance) scored.push({ word: candidate, distance });
   }
-
   scored.sort(
     (a, b) =>
       a.distance - b.distance ||
-      Math.abs(a.word.length - normalized.length) -
-        Math.abs(b.word.length - normalized.length) ||
+      Math.abs(a.word.length - normalized.length) - Math.abs(b.word.length - normalized.length) ||
       a.word.localeCompare(b.word, "mn"),
   );
+  return scored.slice(0, limit).map((item) => item.word);
+}
 
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const item of scored) {
-    if (seen.has(item.word)) continue;
-    seen.add(item.word);
-    out.push(item.word);
-    if (out.length >= limit) break;
+/**
+ * Approximate Mongolian stem/root key used only for related-word discovery.
+ * This is intentionally conservative: it strips common inflectional endings
+ * and never changes the actual correction decision.
+ */
+export function mongolianRootKey(word: string): string {
+  let value = normalizeMongolianWord(word);
+  const suffixes = [
+    "уудаасаа", "үүдээсээ", "нуудаас", "нүүдээс", "чуудаас", "чүүдээс",
+    "аасаа", "ээсээ", "тайгаа", "тэйгээ", "уудаар", "үүдээр", "нуудаар", "нүүдээр",
+    "уудын", "үүдийн", "нуудын", "нүүдийн", "уудыг", "үүдийг", "нуудыг", "нүүдийг",
+    "тай", "тэй", "аас", "ээс", "руу", "рүү", "ийн", "ын", "ийг", "ыг", "д", "т", "а", "э", "о", "ө",
+  ];
+  for (const suffix of suffixes.sort((a, b) => b.length - a.length)) {
+    if (value.length - suffix.length >= 3 && value.endsWith(suffix)) {
+      value = value.slice(0, -suffix.length);
+      break;
+    }
   }
-  return out;
+  return value;
+}
+
+/** Find dictionary words sharing an approximate root, then rank by spelling similarity. */
+export function suggestRootSimilarWords(word: string, limit = 5): readonly string[] {
+  const normalized = normalizeMongolianWord(word);
+  if (!normalized || normalized.length < 2) return [];
+  const root = mongolianRootKey(normalized);
+  if (root.length < 3) return [];
+
+  const scored: Array<{ word: string; score: number; distance: number }> = [];
+  for (const candidate of DICTIONARY) {
+    if (candidate === normalized) continue;
+    const candidateRoot = mongolianRootKey(candidate);
+    if (candidateRoot !== root) continue;
+    const distance = spellingDistance(normalized, candidate);
+    scored.push({ word: candidate, score: distance, distance });
+  }
+  scored.sort((a, b) => a.score - b.score || a.word.localeCompare(b.word, "mn"));
+  return scored.slice(0, limit).map((item) => item.word);
 }
 
 export function dictionarySizeForTests(): number {
