@@ -1,5 +1,20 @@
 import type { LegalAiSafeCitation } from "@/application/ai/legal-ai-citation";
 
+/**
+ * True only when validTo is a parseable date strictly before today.
+ * Absent or unparseable validTo never triggers this — we only ever flag
+ * supersession when the source data gives us a concrete expiry date.
+ */
+export function isCitationSuperseded(
+  validTo: string | null | undefined,
+  now: Date = new Date(),
+): boolean {
+  if (!validTo) return false;
+  const parsed = new Date(validTo);
+  if (Number.isNaN(parsed.getTime())) return false;
+  return parsed.getTime() < now.getTime();
+}
+
 export function formatCitationArticleLine(
   citation: Pick<LegalAiSafeCitation, "article" | "paragraph">,
 ): string | null {
@@ -39,6 +54,12 @@ export function LegalAiCitationList({
           return (
             <li key={citation.id} className="text-[13px] leading-5 text-[#3F4852]">
               <p className="font-medium text-[#0A0F14]">{citation.title}</p>
+              {isCitationSuperseded(citation.validTo) ? (
+                <span className="mt-1 inline-flex w-fit items-center gap-1 rounded-full bg-[#FCEBEA] px-2 py-0.5 text-[10px] font-semibold tracking-[0.04em] text-[#B3261E]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#B3261E]" />
+                  ХҮЧИНГҮЙ БОЛСОН · {citation.validTo}
+                </span>
+              ) : null}
               {articleLine ? <p>{articleLine}</p> : null}
               {citation.sourceVersion ? (
                 <p>Хувилбар: {citation.sourceVersion}</p>

@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import {
   formatCitationArticleLine,
+  isCitationSuperseded,
   LegalAiCitationList,
 } from "@/components/legal-ai/legal-ai-citation-list";
 import type { LegalAiSafeCitation } from "@/application/ai/legal-ai-citation";
@@ -78,5 +79,39 @@ describe("formatCitationArticleLine", () => {
     expect(formatCitationArticleLine({ article: null, paragraph: null })).toBe(
       null,
     );
+  });
+});
+
+describe("isCitationSuperseded", () => {
+  it("is false when validTo is missing or unparseable", () => {
+    expect(isCitationSuperseded(null)).toBe(false);
+    expect(isCitationSuperseded(undefined)).toBe(false);
+    expect(isCitationSuperseded("not-a-date")).toBe(false);
+  });
+
+  it("is true only when validTo is strictly before the reference date", () => {
+    const now = new Date("2026-09-08T00:00:00.000Z");
+    expect(isCitationSuperseded("2020-01-01", now)).toBe(true);
+    expect(isCitationSuperseded("2030-01-01", now)).toBe(false);
+    expect(isCitationSuperseded("2026-09-08", now)).toBe(false);
+  });
+});
+
+describe("LegalAiCitationList superseded badge", () => {
+  it("shows a superseded badge only when validTo is in the past", () => {
+    const past = renderToStaticMarkup(
+      createElement(LegalAiCitationList, {
+        citations: [citation({ validTo: "2020-01-01" })],
+      }),
+    );
+    expect(past).toContain("ХҮЧИНГҮЙ БОЛСОН");
+    expect(past).toContain("2020-01-01");
+
+    const noExpiry = renderToStaticMarkup(
+      createElement(LegalAiCitationList, {
+        citations: [citation()],
+      }),
+    );
+    expect(noExpiry).not.toContain("ХҮЧИНГҮЙ БОЛСОН");
   });
 });
