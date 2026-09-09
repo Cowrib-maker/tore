@@ -62,6 +62,9 @@ export class S3FileStorage implements FileStorage {
         Key: key,
         Body: input.body,
         ContentType: input.contentType,
+        // Encrypt at rest explicitly rather than relying on the bucket's
+        // default encryption setting, which can drift or be misconfigured.
+        ServerSideEncryption: "AES256",
         Metadata: {
           originalfilename: sanitizeFileName(input.fileName),
         },
