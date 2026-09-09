@@ -22,6 +22,7 @@ import {
   useLegalAiChatSession,
   type ChatMessage,
 } from "@/components/legal-ai/use-legal-ai-chat-session";
+import { useThinkingStageLabel } from "@/components/legal-ai/legal-ai-thinking-stages";
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
 import { cn } from "@/lib/utils";
 
@@ -341,6 +342,7 @@ function ChatTranscript({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const thinkingStageLabel = useThinkingStageLabel(loading);
 
   useEffect(() => {
     ref.current?.scrollTo({ top: ref.current.scrollHeight, behavior: "smooth" });
@@ -388,9 +390,7 @@ function ChatTranscript({
         )
       )}
       {loading ? (
-        <p className="text-[11px] text-[#8A939D]">
-          TORE Legal AI бичиж байна...
-        </p>
+        <p className="text-[11px] text-[#8A939D]">{thinkingStageLabel}</p>
       ) : null}
       {chatError ? (
         <p role="alert" className="text-[11px] text-red-600">

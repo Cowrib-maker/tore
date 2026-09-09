@@ -46,6 +46,7 @@ import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gat
 import { requestLawyerCheckout } from "@/components/legal-ai/request-lawyer-checkout";
 import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-list";
 import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
+import { useThinkingStageLabel } from "@/components/legal-ai/legal-ai-thinking-stages";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
 import {
   OrthographyCheckButton,
@@ -115,6 +116,7 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
   const [conversationId, setConversationId] = useState(initialConversationId);
   const [caseFileId] = useState(initialCaseFileId);
   const [loading, setLoading] = useState(false);
+  const thinkingStageLabel = useThinkingStageLabel(loading);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [attachedDocuments, setAttachedDocuments] = useState<AttachedDocument[]>(initialAttachedDocuments);
@@ -274,7 +276,7 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
           <div ref={transcriptRef} className={cn("min-h-0 overflow-y-auto transition-[flex-grow,min-height] duration-300 ease-out", conversationMode ? "min-h-0 flex-1" : "h-0 flex-none overflow-hidden")}>
             <div className="mx-auto flex w-full max-w-[1040px] flex-col gap-5 px-4 py-6 sm:px-6">
               {messages.map((item, index) => <MessageBubble key={`${item.role}-${index}`} message={item} appear={item.role === "ASSISTANT"} />)}
-              {loading ? <div className="flex items-start gap-3"><AiMark /><div className="rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-white px-4 py-3 text-sm text-[#66717D]"><span className="inline-flex items-center gap-2"><LoaderCircle className="size-3.5 animate-spin text-[#6B5B95]" />TORE хариулж байна...</span></div></div> : null}
+              {loading ? <div className="flex items-start gap-3"><AiMark /><div className="rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-white px-4 py-3 text-sm text-[#66717D]"><span className="inline-flex items-center gap-2"><LoaderCircle className="size-3.5 animate-spin text-[#6B5B95]" />{thinkingStageLabel}</span></div></div> : null}
               {error ? <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
               {accessGate ? <LegalAiAccessGateCard gate={accessGate} onPaid={() => void sendMessage(accessGate.question, { resume: true })} /> : null}
             </div>

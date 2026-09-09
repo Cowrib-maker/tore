@@ -18,6 +18,7 @@ import {
   clientRejectLegalAiDocument,
   legalAiExtractStatusHint,
 } from "@/application/ai/legal-ai-document-file";
+import { useThinkingStageLabel } from "@/components/legal-ai/legal-ai-thinking-stages";
 import { useLegalAiChatSession } from "@/components/legal-ai/use-legal-ai-chat-session";
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
 import { cn } from "@/lib/utils";
@@ -51,6 +52,7 @@ export function WorkspaceColumnPanel({
     stop,
     setConversationId,
   } = useLegalAiChatSession();
+  const thinkingStageLabel = useThinkingStageLabel(loading);
 
   const [message, setMessage] = useState("");
   const [attachedDocuments, setAttachedDocuments] = useState<AttachedDocument[]>(
@@ -262,9 +264,7 @@ export function WorkspaceColumnPanel({
           )
         )}
         {loading ? (
-          <p className="text-[11px] text-[#8A939D]">
-            TORE Legal AI бичиж байна...
-          </p>
+          <p className="text-[11px] text-[#8A939D]">{thinkingStageLabel}</p>
         ) : null}
         {chatError ? (
           <p role="alert" className="text-[11px] text-red-600">

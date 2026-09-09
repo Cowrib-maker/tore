@@ -50,6 +50,7 @@ import {
 } from "@/application/ai/legal-ai-citation";
 import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-list";
 import { LEGAL_AI_CHAT_RETRY_MESSAGE } from "@/components/legal-ai/legal-ai-chat-errors";
+import { useThinkingStageLabel } from "@/components/legal-ai/legal-ai-thinking-stages";
 import {
   interpretLegalAiChatAccess,
   type LegalAiAccessGate,
@@ -150,6 +151,7 @@ export function LegalAiChat({
     initialConversationId,
   );
   const [loading, setLoading] = useState(false);
+  const thinkingStageLabel = useThinkingStageLabel(loading);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [attachedDocuments, setAttachedDocuments] = useState<AttachedDocument[]>(
@@ -758,7 +760,7 @@ export function LegalAiChat({
                   <div className="flex items-start gap-3">
                     <WorkspaceMark />
                     <div className="rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-white px-4 py-3 text-sm text-[#66717D] shadow-[0_8px_24px_-16px_rgba(11,31,58,0.35)]">
-                      TORE Chat хариулж байна...
+                      {thinkingStageLabel}
                     </div>
                   </div>
                 ) : null}
