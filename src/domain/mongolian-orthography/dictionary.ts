@@ -3,6 +3,7 @@ import {
   LEGAL_LEXICON_STEMS,
   LEGAL_LEXICON_WORDS,
 } from "@/domain/mongolian-orthography/legal-lexicon";
+import { levenshteinDistance } from "@/domain/mongolian-orthography/levenshtein";
 
 /** High-confidence typo to correction pairs (spellcheck.mn-style daily errors). */
 const COMMON_TYPO_CORRECTIONS: Record<string, string> = {
@@ -21,6 +22,8 @@ const COMMON_TYPO_CORRECTIONS: Record<string, string> = {
 
 const CORE_DICTIONARY_WORDS = [
   "би", "чи", "та", "тэр", "энэ", "тэд", "бид", "минь", "чинь", "нь",
+  "намайг", "чамайг", "түүнийг", "биднийг", "танайг", "тэднийг",
+  "надад", "чамд", "түүнд", "бидэнд", "танд", "тэдэнд",
   "бол", "бай", "байна", "байсан", "байгаа", "байж", "байх", "болно", "болсон",
   "юм", "вэ", "уу", "үү", "бэ", "бүү", "ч", "харин", "гэхдээ", "учир нь",
   "мөн", "эсвэл", "болон", "тэгээд", "дараа", "өмнө", "одоо", "өнөөдөр",
@@ -45,7 +48,7 @@ const CORE_DICTIONARY_WORDS = [
   "нэг", "тав", "зургаа", "долоо", "найм", "ес", "арав",
   "асуудал", "асуулт", "хариулт", "тайлбар", "жишээ", "утга", "үг", "үгс",
   "өгүүлбэр", "бичиг", "ном", "сургалт", "сургууль", "багш", "оюутан",
-  "иргэн", "захиргаа", "захиргааны", "иргэний", "эрүүгийн", "мөнгө", "төлбөр",
+  "иргэн", "иргэд", "захиргаа", "захиргааны", "иргэний", "эрүүгийн", "мөнгө", "төлбөр",
   "үнэ", "үнэгүй", "төлбөртэй", "багц", "үйлчилгээ", "систем", "програм",
   "мэдээлэл", "технологи", "интернет", "файл", "хавсралт",
 ] as const;
@@ -61,11 +64,16 @@ const MORPHOLOGICAL_SUFFIXES = [
 
 const DICTIONARY = new Set<string>();
 const STEMS = new Set<string>();
+/** Fully-formed words only (never a bare morphological stem) — the only
+ * pool fuzzy typo-matching may suggest from, so a suggestion is always a
+ * real, complete word. */
+const COMPLETE_WORDS = new Set<string>();
 
 function addWord(raw: string) {
   const normalized = normalizeMongolianWord(raw);
   if (normalized.length >= 2) {
     DICTIONARY.add(normalized);
+    COMPLETE_WORDS.add(normalized);
   }
 }
 
@@ -92,7 +100,7 @@ for (const stem of LEGAL_LEXICON_STEMS) {
 }
 
 const STEM_EXPANSIONS = [
-  "гэр", "хүн", "хувцас", "хууль", "хэрэг", "баримт", "эрх", "асуудал",
+  "гэр", "хүн", "хувцас", "хууль", "хуульч", "хэрэг", "баримт", "эрх", "асуудал",
   "шүүх", "гэрээ", "ажил", "бичиг", "асуулт", "хариулт", "шинжилгээ",
   "заалт", "зүйл", "хэсэг", "ял", "хариуцлага", "хохирол", "нөхөн",
 ] as const;
@@ -113,6 +121,37 @@ for (const [, correction] of Object.entries(COMMON_TYPO_CORRECTIONS)) {
   addWord(correction);
 }
 
+const ELISION_VOWELS = ["а", "о", "у", "ы", "э", "и", "ө", "ү"] as const;
+const ELISION_CONSONANT_PAIR_RE = /^[бвгджзклмнпрстфхцчшщ]{2}$/u;
+
+/**
+ * Many 2+ syllable Mongolian nouns drop the stem's last short vowel when a
+ * vowel-initial suffix follows: хэрэг+ээс → хэргээс, асуудал+ыг → асуудлыг,
+ * ажил+аас → ажлаас. Plain suffix-stripping leaves a stem ending in two
+ * consonants ("хэрг", "асуудл", "ажл") that never matches the dictionary,
+ * so those perfectly correct forms looked unknown. This reconstructs the
+ * elided vowel — try each vowel between the stem's last two consonants and
+ * accept only an unambiguous dictionary hit, so an actual typo (which
+ * would need the same lucky, unique reconstruction) is very unlikely to
+ * be mistaken for one of these.
+ */
+function matchesElidedStem(stem: string): boolean {
+  if (stem.length < 3) return false;
+  const lastTwo = stem.slice(-2);
+  if (!ELISION_CONSONANT_PAIR_RE.test(lastTwo)) return false;
+  const before = stem.slice(0, -2);
+
+  let found: string | null = null;
+  for (const vowel of ELISION_VOWELS) {
+    const candidate = `${before}${lastTwo[0]}${vowel}${lastTwo[1]}`;
+    if (DICTIONARY.has(candidate) || STEMS.has(candidate)) {
+      if (found && found !== candidate) return false;
+      found = candidate;
+    }
+  }
+  return found !== null;
+}
+
 function matchesMorphology(word: string): boolean {
   if (DICTIONARY.has(word) || STEMS.has(word)) {
     return true;
@@ -126,12 +165,18 @@ function matchesMorphology(word: string): boolean {
     if (DICTIONARY.has(stem) || STEMS.has(stem)) {
       return true;
     }
+    if (matchesElidedStem(stem)) {
+      return true;
+    }
     for (const suffix2 of MORPHOLOGICAL_SUFFIXES) {
       if (!stem.endsWith(suffix2) || stem.length <= suffix2.length + 1) {
         continue;
       }
       const stem2 = stem.slice(0, -suffix2.length);
       if (DICTIONARY.has(stem2) || STEMS.has(stem2)) {
+        return true;
+      }
+      if (matchesElidedStem(stem2)) {
         return true;
       }
     }
@@ -147,10 +192,47 @@ export function isKnownMongolianWord(word: string): boolean {
   return matchesMorphology(normalized);
 }
 
+const FUZZY_MIN_WORD_LENGTH = 4;
+const FUZZY_MAX_DISTANCE = 1;
+
 /**
- * Suggest spelling fixes only from high-confidence typo map.
- * Fuzzy matching is intentionally disabled — small dictionaries produce
- * unusable false positives in legal text (нөхөн→хэрхэн, хэсэг→хэрэг, …).
+ * Single-edit ("one typo") fuzzy match against COMPLETE_WORDS only.
+ * Deliberately narrow to keep false positives on legal terminology out:
+ * distance must be exactly 1, the unknown word must be at least 4
+ * characters (so short words like "тэр"/"тэс" never collide), and the
+ * match must be unambiguous — if two dictionary words are both one edit
+ * away, neither is suggested, since guessing wrong is worse than saying
+ * nothing.
+ */
+function fuzzyDictionaryMatch(normalized: string): readonly string[] {
+  if (normalized.length < FUZZY_MIN_WORD_LENGTH) return [];
+
+  let match: string | null = null;
+  for (const candidate of COMPLETE_WORDS) {
+    if (Math.abs(candidate.length - normalized.length) > FUZZY_MAX_DISTANCE) {
+      continue;
+    }
+    if (levenshteinDistance(normalized, candidate) !== FUZZY_MAX_DISTANCE) {
+      continue;
+    }
+    if (match && match !== candidate) {
+      return [];
+    }
+    match = candidate;
+  }
+
+  return match ? [match] : [];
+}
+
+/**
+ * Suggest spelling fixes: the high-confidence typo map first, then (unless
+ * `highConfidenceOnly` is set, e.g. the word already triggered a harmony
+ * warning) a conservative single-edit fuzzy match against known complete
+ * words. Fuzzy matching against the *full* legal lexicon used to be
+ * disabled outright because it produced false positives like
+ * нөхөн→хэрхэн; restricting it to distance-1 + unambiguous + complete
+ * words only removes that failure mode (multi-edit or ambiguous pairs are
+ * never suggested).
  */
 export function suggestDictionaryWords(
   word: string,
@@ -158,7 +240,6 @@ export function suggestDictionaryWords(
   options?: { highConfidenceOnly?: boolean },
 ): readonly string[] {
   void limit;
-  void options;
   const normalized = normalizeMongolianWord(word);
   if (!normalized || normalized.length < 2) return [];
   if (isKnownMongolianWord(normalized)) return [];
@@ -168,7 +249,9 @@ export function suggestDictionaryWords(
     return [mapped];
   }
 
-  return [];
+  if (options?.highConfidenceOnly) return [];
+
+  return fuzzyDictionaryMatch(normalized);
 }
 
 export function dictionarySizeForTests(): number {

@@ -43,6 +43,34 @@ export type OrthographyCheckResult = {
 const WORD_RE =
   /[A-Za-zА-Яа-яӨөҮүЁёЪъЬьЫы]+(?:-[A-Za-zА-Яа-яӨөҮүЁёЪъЬьЫы]+)*/gu;
 
+/** A Cyrillic word with a digit glued straight onto it, no space or
+ * hyphen — almost always a stray keystroke ("юу1"), never a legitimate
+ * construct (ordinal citations like "20-р зүйл" always use a hyphen, so
+ * they never match this pattern). */
+const DIGIT_GLUED_WORD_RE = /[А-Яа-яӨөҮүЁё]+[0-9]+/gu;
+
+function findDigitGlueSuggestions(text: string): OrthographySuggestion[] {
+  const results: OrthographySuggestion[] = [];
+  for (const match of text.matchAll(DIGIT_GLUED_WORD_RE)) {
+    const raw = match[0];
+    const start = match.index ?? 0;
+    if (text[start - 1] === "-") continue;
+    const lettersOnly = raw.replace(/[0-9]+$/u, "");
+    if (!lettersOnly || lettersOnly === raw) continue;
+    results.push({
+      kind: "SPELLING",
+      sourceWord: raw,
+      suggestedWord: lettersOnly,
+      suggestionLabel: `Тоо санамсаргүй орсон бололтой: «${lettersOnly}»`,
+      ruleIds: ["§1"],
+      ruleTitle: "Үгийн зөв бичлэг",
+      start,
+      end: start + raw.length,
+    });
+  }
+  return results;
+}
+
 function suggestForIssue(
   issue: OrthographyIssue,
   span: { start: number; end: number; surface: string },
@@ -105,6 +133,33 @@ function collectWordSpans(text: string): WordSpan[] {
     });
   }
   return spans;
+}
+
+const DOUBLED_FINAL_CONSONANT_RE = /([бвгджзйклмнпрстфхцчшщ])\1$/u;
+
+/**
+ * Catches typos like "байхх" (extra key press) that the morphology
+ * suffix-stripper otherwise mistakes for a valid word, because many of
+ * its single-letter suffixes (х, д, т, н, с, р, …) happen to equal the
+ * duplicated letter itself.
+ */
+function findDoubledLetterSuggestion(
+  span: WordSpan,
+): OrthographySuggestion | null {
+  if (span.normalized.length < 4) return null;
+  if (!DOUBLED_FINAL_CONSONANT_RE.test(span.normalized)) return null;
+  const deduped = span.normalized.slice(0, -1);
+  if (!isKnownMongolianWord(deduped)) return null;
+  return {
+    kind: "SPELLING",
+    sourceWord: span.surface,
+    suggestedWord: deduped,
+    suggestionLabel: `Давхар үсэг оржээ: «${deduped}»`,
+    ruleIds: ["§1"],
+    ruleTitle: "Үгийн зөв бичлэг",
+    start: span.start,
+    end: span.end,
+  };
 }
 
 function suggestDictionaryForSpan(
@@ -174,6 +229,12 @@ export function buildOrthographySuggestions(
   for (const span of spans) {
     const key = `${span.start}:${span.end}`;
     if (usedKeys.has(key)) continue;
+    const doubled = findDoubledLetterSuggestion(span);
+    if (doubled) {
+      usedKeys.add(key);
+      spelling.push(doubled);
+      continue;
+    }
     const suggestion = suggestDictionaryForSpan(span, {
       highConfidenceOnly: harmonyOnlyWords.has(span.normalized),
     });
@@ -182,13 +243,15 @@ export function buildOrthographySuggestions(
     spelling.push(suggestion);
   }
 
+  const digitGlued = findDigitGlueSuggestions(checkableText);
+
   const latin: OrthographySuggestion[] = options?.includeLatinToCyrillic
     ? findLatinToCyrillicSuggestions(checkableText).map((item) =>
         latinToSuggestion(item, checkableText),
       )
     : [];
 
-  const suggestions = [...orthography, ...spelling, ...latin].sort(
+  const suggestions = [...orthography, ...spelling, ...digitGlued, ...latin].sort(
     (a, b) => a.start - b.start || a.end - b.end,
   );
 
@@ -197,7 +260,7 @@ export function buildOrthographySuggestions(
     suggestionCount: suggestions.length,
     orthographyCount: orthography.length,
     latinCount: latin.length,
-    spellingCount: spelling.length,
+    spellingCount: spelling.length + digitGlued.length,
     wordCount: countWords(text),
     characterCount: text.length,
   };
