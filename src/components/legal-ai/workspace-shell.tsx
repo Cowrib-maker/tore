@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Paperclip, Send, Sparkles } from "lucide-react";
+import { Paperclip, Send, Sparkles, Square } from "lucide-react";
 
 import {
   LEGAL_AI_DOCUMENT_FILE_ACCEPT,
@@ -55,6 +55,7 @@ export function WorkspaceShell() {
     error: chatError,
     accessGate,
     sendMessage,
+    stop,
     setConversationId,
   } = useLegalAiChatSession();
 
@@ -272,6 +273,7 @@ export function WorkspaceShell() {
               onChange={setMessage}
               onSubmit={handleSubmit}
               loading={loading}
+              onStop={stop}
             />
           </div>
         ) : null}
@@ -315,6 +317,7 @@ export function WorkspaceShell() {
           onChange={setMessage}
           onSubmit={handleSubmit}
           loading={loading}
+          onStop={stop}
           compact
         />
       </aside>
@@ -408,12 +411,14 @@ function ChatComposer({
   onChange,
   onSubmit,
   loading,
+  onStop,
   compact = false,
 }: {
   message: string;
   onChange: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   loading: boolean;
+  onStop?: () => void;
   compact?: boolean;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -440,17 +445,31 @@ function ChatComposer({
             compact ? "text-[12.5px]" : "text-sm",
           )}
         />
-        <button
-          type="submit"
-          aria-label="Илгээх"
-          disabled={!message.trim() || loading}
-          className={cn(
-            "flex shrink-0 items-center justify-center rounded-lg bg-[#0B1F3A] text-white transition hover:bg-[#173A66] disabled:cursor-not-allowed disabled:opacity-40",
-            compact ? "size-8" : "size-9",
-          )}
-        >
-          <Send className="size-3.5" />
-        </button>
+        {loading && onStop ? (
+          <button
+            type="button"
+            aria-label="Зогсоох"
+            onClick={onStop}
+            className={cn(
+              "flex shrink-0 items-center justify-center rounded-lg bg-[#0B1F3A] text-white transition hover:bg-[#173A66]",
+              compact ? "size-8" : "size-9",
+            )}
+          >
+            <Square className="size-3 fill-current" />
+          </button>
+        ) : (
+          <button
+            type="submit"
+            aria-label="Илгээх"
+            disabled={!message.trim() || loading}
+            className={cn(
+              "flex shrink-0 items-center justify-center rounded-lg bg-[#0B1F3A] text-white transition hover:bg-[#173A66] disabled:cursor-not-allowed disabled:opacity-40",
+              compact ? "size-8" : "size-9",
+            )}
+          >
+            <Send className="size-3.5" />
+          </button>
+        )}
       </div>
     </form>
   );

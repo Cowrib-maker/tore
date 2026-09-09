@@ -20,6 +20,7 @@ import {
   Plus,
   Send,
   Sparkles,
+  Square,
   X,
 } from "lucide-react";
 
@@ -125,6 +126,7 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
   const documentInputRef = useRef<HTMLInputElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const {
     loading: orthographyLoading,
     result: orthographyResult,
@@ -195,8 +197,10 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
     setError(""); setAccessGate(null);
     if (!options?.resume) { setDraft(""); clearOrthography(); setMessages((current) => [...current, { role: "USER", content: text }]); }
     setLoading(true);
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
-      const response = await fetch("/api/ai/chat", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: text, conversationId, caseFileId: conversationId ? undefined : caseFileId }) });
+      const response = await fetch("/api/ai/chat", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: text, conversationId, caseFileId: conversationId ? undefined : caseFileId }), signal: controller.signal });
       const data = (await response.json()) as { error?: string; conversationId?: string; message?: { content?: string; citations?: unknown }; code?: string };
       const interpreted = interpretLegalAiChatAccess({ status: response.status, body: data, question: text });
       if (interpreted.type === "auth") { setAccessGate(interpreted.gate); setDraft(text); return; }
@@ -208,8 +212,18 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
       // list — clear it once the turn lands. The document stays attached to
       // the conversation server-side either way.
       setAttachedDocuments([]);
-    } catch (err) { setError(err instanceof Error ? err.message : "AI үйлчилгээтэй холбогдоход алдаа гарлаа."); }
-    finally { setLoading(false); }
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        // Cancelled by the user via the Stop button — no error to show.
+      } else {
+        setError(err instanceof Error ? err.message : "AI үйлчилгээтэй холбогдоход алдаа гарлаа.");
+      }
+    }
+    finally { abortRef.current = null; setLoading(false); }
+  }
+
+  function stopGeneration() {
+    abortRef.current?.abort();
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -288,7 +302,11 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
                     <button type="button" aria-label="Баримт хавсаргах" onClick={() => { if (!uploading) documentInputRef.current?.click(); }} className="inline-flex size-9 items-center justify-center rounded-lg text-[#5C6570] transition hover:bg-[#EAF4F0] hover:text-[#0F3D33]"><Paperclip className="size-4" /></button>
                     <OrthographyCheckButton loading={orthographyLoading} disabled={loading || uploading} pressed={orthographyOpen} onClick={() => void checkOrthography(draft, { mode: "manual" })} />
                   </div>
-                  <Button type="submit" size="sm" disabled={!canSend} className="gap-1.5 bg-[#0F3D33] text-white hover:bg-[#145244]"><Send className="size-3.5" />Илгээх</Button>
+                  {loading ? (
+                    <Button type="button" size="sm" onClick={stopGeneration} className="gap-1.5 bg-[#0F3D33] text-white hover:bg-[#145244]"><Square className="size-3 fill-current" />Зогсоох</Button>
+                  ) : (
+                    <Button type="submit" size="sm" disabled={!canSend} className="gap-1.5 bg-[#0F3D33] text-white hover:bg-[#145244]"><Send className="size-3.5" />Илгээх</Button>
+                  )}
                 </div>
               </div>
               {orthographyOpen || orthographyLoading ? <OrthographySpellPanel className="mt-3" text={orthographyCheckedText || draft.trim()} loading={orthographyLoading} result={orthographyResult} gateMessage={orthographyGate} needsBilling={orthographyNeedsBilling} billingHref="/legal-ai" includeLatinToCyrillic={includeLatinToCyrillic} onIncludeLatinChange={(value) => { setIncludeLatinToCyrillic(value); void checkOrthography(draft, { includeLatinToCyrillic: value, mode: "manual" }); }} onApplySuggestion={setDraft} onRecheck={(next) => void checkOrthography(next, { mode: "manual" })} onClose={clearOrthography} onCheck={() => void checkOrthography(draft, { mode: "manual" })} /> : null}

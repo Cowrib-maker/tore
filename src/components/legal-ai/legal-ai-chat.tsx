@@ -19,6 +19,7 @@ import {
   Scale,
   Send,
   Shield,
+  Square,
   SquarePen,
   Users,
   X,
@@ -182,6 +183,7 @@ export function LegalAiChat({
   const transcriptRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<{ stop: () => void } | null>(null);
   const conversationIdRef = useRef(conversationId);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     conversationIdRef.current = conversationId;
@@ -401,6 +403,9 @@ export function LegalAiChat({
     }
     setLoading(true);
 
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       const response = await fetch("/api/ai/chat", {
         method: "POST",
@@ -412,6 +417,7 @@ export function LegalAiChat({
           message: text,
           conversationId: conversationIdRef.current,
         }),
+        signal: controller.signal,
       });
 
       const data = (await response.json()) as {
@@ -460,11 +466,20 @@ export function LegalAiChat({
       // keeps being re-injected on every later turn); only the composer
       // chip goes away.
       setAttachedDocuments([]);
-    } catch {
-      setError(LEGAL_AI_CHAT_RETRY_MESSAGE);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        // Cancelled by the user via the Stop button — no error to show.
+      } else {
+        setError(LEGAL_AI_CHAT_RETRY_MESSAGE);
+      }
     } finally {
+      abortRef.current = null;
       setLoading(false);
     }
+  }
+
+  function stopGeneration() {
+    abortRef.current?.abort();
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -577,15 +592,27 @@ export function LegalAiChat({
                 onClick={() => void checkOrthography(message, { mode: "manual" })}
               />
             </div>
-            <Button
-              type="submit"
-              size="sm"
-              disabled={!message.trim() || loading || uploading}
-              className="gap-1.5 bg-[#0B1F3A] text-white hover:bg-[#173A66]"
-            >
-              <Send className="size-3.5" />
-              Илгээх
-            </Button>
+            {loading ? (
+              <Button
+                type="button"
+                size="sm"
+                onClick={stopGeneration}
+                className="gap-1.5 bg-[#0B1F3A] text-white hover:bg-[#173A66]"
+              >
+                <Square className="size-3 fill-current" />
+                Зогсоох
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                size="sm"
+                disabled={!message.trim() || uploading}
+                className="gap-1.5 bg-[#0B1F3A] text-white hover:bg-[#173A66]"
+              >
+                <Send className="size-3.5" />
+                Илгээх
+              </Button>
+            )}
           </div>
         </div>
         {orthographyOpen || orthographyLoading ? (

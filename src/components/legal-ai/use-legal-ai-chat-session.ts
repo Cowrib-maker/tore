@@ -33,6 +33,7 @@ export function useLegalAiChatSession(initial?: {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [accessGate, setAccessGate] = useState<LegalAiAccessGate | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     conversationIdRef.current = conversationId;
@@ -51,6 +52,8 @@ export function useLegalAiChatSession(initial?: {
     setLoading(true);
 
     try {
+      const controller = new AbortController();
+      abortRef.current = controller;
       const response = await fetch("/api/ai/chat", {
         method: "POST",
         credentials: "include",
@@ -59,6 +62,7 @@ export function useLegalAiChatSession(initial?: {
           message: text,
           conversationId: conversationIdRef.current,
         }),
+        signal: controller.signal,
       });
 
       const data = (await response.json()) as {
@@ -107,12 +111,20 @@ export function useLegalAiChatSession(initial?: {
         },
       ]);
       return "ok";
-    } catch {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        return "error";
+      }
       setError(LEGAL_AI_CHAT_RETRY_MESSAGE);
       return "error";
     } finally {
+      abortRef.current = null;
       setLoading(false);
     }
+  }
+
+  function stop() {
+    abortRef.current?.abort();
   }
 
   return {
@@ -122,6 +134,7 @@ export function useLegalAiChatSession(initial?: {
     error,
     accessGate,
     sendMessage,
+    stop,
     setMessages,
     /**
      * Lets a caller sync in a conversationId obtained from a side-channel

@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Paperclip, Send } from "lucide-react";
+import { Paperclip, Send, Square } from "lucide-react";
 
 import {
   LEGAL_AI_DOCUMENT_FILE_ACCEPT,
@@ -48,6 +48,7 @@ export function WorkspaceColumnPanel({
     error: chatError,
     accessGate,
     sendMessage,
+    stop,
     setConversationId,
   } = useLegalAiChatSession();
 
@@ -294,14 +295,25 @@ export function WorkspaceColumnPanel({
             disabled={loading}
             className="min-w-0 flex-1 resize-none bg-transparent px-1 py-1.5 text-[13px] leading-5 outline-none placeholder:text-[#9AA3AD]"
           />
-          <button
-            type="submit"
-            aria-label="Илгээх"
-            disabled={!message.trim() || loading}
-            className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#0B1F3A] text-white transition hover:bg-[#173A66] disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <Send className="size-3.5" />
-          </button>
+          {loading ? (
+            <button
+              type="button"
+              aria-label="Зогсоох"
+              onClick={stop}
+              className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#0B1F3A] text-white transition hover:bg-[#173A66]"
+            >
+              <Square className="size-3 fill-current" />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              aria-label="Илгээх"
+              disabled={!message.trim() || loading}
+              className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#0B1F3A] text-white transition hover:bg-[#173A66] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Send className="size-3.5" />
+            </button>
+          )}
         </div>
       </form>
     </div>
