@@ -580,6 +580,7 @@ export const en: Dictionary = {
               heading: "4.1. Nature of the information provided",
               clauses: [
                 "TORE Chat and TORE Legal AI are tools that assist with legal information, analysis, and drafting; their output is not professional legal advice or legal representation.",
+                "TORE Chat and TORE Legal AI search and answer from TORE's own legal knowledge base — laws, resolutions, and court decisions ingested and regularly updated from official sources such as legalinfo.mn, shuukh.mn, and parliament.mn.",
                 "Citations are drawn only from verified official sources (such as legalinfo.mn, shuukh.mn, and parliament.mn). When no such source is found, TORE will not fabricate a law, provision, or court decision.",
               ],
             },

@@ -520,6 +520,7 @@ export const ko: Dictionary = {
               heading: "4.1. 정보의 성격",
               clauses: [
                 "TORE Chat 및 TORE Legal AI는 법률 정보, 분석, 초안 작성을 지원하는 도구이며, 그 결과물은 전문적인 법률 자문이나 법률 대리가 아닙니다.",
+                "TORE Chat 및 TORE Legal AI는 legalinfo.mn, shuukh.mn, parliament.mn 등 공식 출처에서 수집하여 정기적으로 갱신하는 TORE 자체 법률 데이터베이스(법령, 결의, 판결 원문)에서 검색하여 답변합니다.",
                 "인용은 검증된 공식 출처(legalinfo.mn, shuukh.mn, parliament.mn 등)에서만 가져옵니다. 해당 출처를 찾을 수 없는 경우 TORE는 법률, 조항, 판결을 임의로 만들어내지 않습니다.",
               ],
             },

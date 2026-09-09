@@ -512,6 +512,7 @@ export const zh: Dictionary = {
               heading: "4.1 信息性质",
               clauses: [
                 "TORE Chat 与 TORE Legal AI 是协助获取法律信息、进行分析及起草文书的工具，其输出内容不构成专业法律意见或代理服务。",
+                "TORE Chat 与 TORE Legal AI 从 TORE 自建并定期更新的法律知识库（收录自 legalinfo.mn、shuukh.mn、parliament.mn 等官方来源的法律、决议及判决原文）中检索并生成回答。",
                 "引用内容仅来自经核实的官方来源（如 legalinfo.mn、shuukh.mn、parliament.mn 等）。若未找到此类来源，TORE 不会编造法律条文或法院裁判。",
               ],
             },
