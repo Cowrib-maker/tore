@@ -488,43 +488,42 @@ export function LegalAiChat({
       )}
     >
       <div className={cn(isEmpty ? "w-full" : "mx-auto w-full max-w-3xl")}>
-        {attachedDocuments.length || uploading ? (
-          <ul className="mb-2 flex flex-wrap gap-2">
-            {attachedDocuments.map((document) => {
-              const hint = legalAiExtractStatusHint(document.extractStatus);
-              return (
-                <li
-                  key={document.id}
-                  className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-[#F8FAFC] py-1 pr-1.5 pl-2.5 text-xs text-[#3F4852]"
-                >
-                  <Paperclip className="size-3.5 shrink-0" />
-                  <span className="truncate">{document.fileName}</span>
-                  {hint ? (
-                    <span className="shrink-0 text-[10px] text-amber-700">
-                      {hint}
-                    </span>
-                  ) : null}
-                  <button
-                    type="button"
-                    aria-label={`${document.fileName} хасах`}
-                    className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[#66717D] hover:bg-[#0B1F3A]/8 hover:text-[#0B1F3A]"
-                    onClick={() => removeAttachedDocument(document.id)}
-                  >
-                    <X className="size-3" />
-                  </button>
-                </li>
-              );
-            })}
-            {uploading ? (
-              <li className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-[#F8FAFC] py-1 pr-2.5 pl-2.5 text-xs text-[#3F4852]">
-                <Paperclip className="size-3.5 shrink-0" />
-                <span>Файл хавсаргаж байна...</span>
-              </li>
-            ) : null}
-          </ul>
-        ) : null}
-
         <div className="rounded-2xl border border-[#D9DEE5] bg-[#F8FAFC] p-2 shadow-[0_12px_32px_-24px_rgba(11,31,58,0.45)] focus-within:border-[#0B1F3A]/35">
+          {attachedDocuments.length || uploading ? (
+            <ul className="mb-2 flex flex-wrap gap-2 px-0.5 pt-0.5">
+              {attachedDocuments.map((document) => {
+                const hint = legalAiExtractStatusHint(document.extractStatus);
+                return (
+                  <li
+                    key={document.id}
+                    className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-white py-1 pr-1.5 pl-2.5 text-xs text-[#3F4852]"
+                  >
+                    <Paperclip className="size-3.5 shrink-0" />
+                    <span className="truncate">{document.fileName}</span>
+                    {hint ? (
+                      <span className="shrink-0 text-[10px] text-amber-700">
+                        {hint}
+                      </span>
+                    ) : null}
+                    <button
+                      type="button"
+                      aria-label={`${document.fileName} хасах`}
+                      className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[#66717D] hover:bg-[#0B1F3A]/8 hover:text-[#0B1F3A]"
+                      onClick={() => removeAttachedDocument(document.id)}
+                    >
+                      <X className="size-3" />
+                    </button>
+                  </li>
+                );
+              })}
+              {uploading ? (
+                <li className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-white py-1 pr-2.5 pl-2.5 text-xs text-[#3F4852]">
+                  <Paperclip className="size-3.5 shrink-0" />
+                  <span>Файл хавсаргаж байна...</span>
+                </li>
+              ) : null}
+            </ul>
+          ) : null}
           <textarea
             ref={messageTextareaRef}
             value={message}
