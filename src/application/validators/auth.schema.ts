@@ -23,13 +23,22 @@ const baseRegisterSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: emailSchema,
   password: passwordSchema,
+  confirmPassword: z.string().min(1, "Confirm your password"),
   acceptTerms: z
     .boolean()
     .refine((value) => value === true, "You must accept the terms and policies"),
   preferredLanguage: z.enum(["mn", "en", "zh", "ko"]).default("mn"),
 });
 
-export const registerClientSchema = baseRegisterSchema;
+const passwordsMustMatch: { message: string; path: (string | number)[] } = {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+};
+
+export const registerClientSchema = baseRegisterSchema.refine(
+  (value) => value.password === value.confirmPassword,
+  passwordsMustMatch,
+);
 
 export const LAWYER_POSITION_VALUES = [
   "ATTORNEY",
@@ -38,12 +47,25 @@ export const LAWYER_POSITION_VALUES = [
   "OTHER_LAWYER",
 ] as const;
 
-export const registerLawyerSchema = baseRegisterSchema.extend({
-  position: z.enum(LAWYER_POSITION_VALUES).default("ATTORNEY"),
-});
+export const registerLawyerSchema = baseRegisterSchema
+  .extend({
+    position: z.enum(LAWYER_POSITION_VALUES).default("ATTORNEY"),
+  })
+  .refine(
+    (value) => value.password === value.confirmPassword,
+    passwordsMustMatch,
+  );
 
-export type RegisterClientInput = z.infer<typeof registerClientSchema>;
-export type RegisterLawyerInput = z.infer<typeof registerLawyerSchema>;
+// confirmPassword only drives the form-validation match check above — the
+// use cases below never read it, so it's excluded from the type they take.
+export type RegisterClientInput = Omit<
+  z.infer<typeof registerClientSchema>,
+  "confirmPassword"
+>;
+export type RegisterLawyerInput = Omit<
+  z.infer<typeof registerLawyerSchema>,
+  "confirmPassword"
+>;
 
 export const forgotPasswordSchema = z.object({
   email: emailSchema,

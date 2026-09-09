@@ -88,6 +88,7 @@ export async function registerClientAction(
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
     acceptTerms: formData.get("acceptTerms") === "on",
     preferredLanguage: formData.get("preferredLanguage") ?? "mn",
   });
@@ -126,6 +127,7 @@ export async function registerLawyerAction(
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
     acceptTerms: formData.get("acceptTerms") === "on",
     preferredLanguage: formData.get("preferredLanguage") ?? "mn",
     position: formData.get("position") ?? "ATTORNEY",

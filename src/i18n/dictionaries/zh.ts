@@ -422,6 +422,8 @@ export const zh: Dictionary = {
     resetSubmit: "更新密码",
     newPassword: "新密码",
     confirmPassword: "确认密码",
+    showPassword: "显示密码",
+    hidePassword: "隐藏密码",
   },
   legal: {
     termsTitle: "服务条款",

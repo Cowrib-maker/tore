@@ -270,6 +270,8 @@ export type Dictionary = {
     resetSubmit: string;
     newPassword: string;
     confirmPassword: string;
+    showPassword: string;
+    hidePassword: string;
   };
   legal: {
     termsTitle: string;

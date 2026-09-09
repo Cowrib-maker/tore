@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { localeMeta, type Locale } from "@/i18n/config";
 import { localeMenuOrder } from "@/i18n/client-storage";
@@ -88,18 +89,34 @@ export function RegisterClientForm({
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">{copy.password}</Label>
-            <Input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
               required
               autoComplete="new-password"
               aria-invalid={Boolean(state.error)}
               aria-describedby={
                 state.error ? "register-client-form-error" : undefined
               }
+              showLabel={copy.showPassword}
+              hideLabel={copy.hidePassword}
             />
             <p className="text-xs text-muted-foreground">{copy.passwordHint}</p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">{copy.confirmPassword}</Label>
+            <PasswordInput
+              id="confirmPassword"
+              name="confirmPassword"
+              required
+              autoComplete="new-password"
+              aria-invalid={Boolean(state.error)}
+              aria-describedby={
+                state.error ? "register-client-form-error" : undefined
+              }
+              showLabel={copy.showPassword}
+              hideLabel={copy.hidePassword}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="preferredLanguage">{copy.preferredLanguage}</Label>

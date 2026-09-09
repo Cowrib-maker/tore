@@ -429,6 +429,8 @@ export const ko: Dictionary = {
     resetSubmit: "비밀번호 업데이트",
     newPassword: "새 비밀번호",
     confirmPassword: "비밀번호 확인",
+    showPassword: "비밀번호 표시",
+    hidePassword: "비밀번호 숨기기",
   },
   legal: {
     termsTitle: "서비스 약관",

@@ -489,6 +489,8 @@ export const en: Dictionary = {
     resetSubmit: "Update password",
     newPassword: "New password",
     confirmPassword: "Confirm password",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
   },
   legal: {
     termsTitle: "Terms of Service",

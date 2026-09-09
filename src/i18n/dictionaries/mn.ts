@@ -484,6 +484,8 @@ ctaStart: "Өмгөөлөгч хайх",
     resetSubmit: "Нууц үг шинэчлэх",
     newPassword: "Шинэ нууц үг",
     confirmPassword: "Нууц үг баталгаажуулах",
+    showPassword: "Нууц үгийг харуулах",
+    hidePassword: "Нууц үгийг нуух",
   },
   legal: {
     termsTitle: "Үйлчилгээний нөхцөл",
