@@ -10,7 +10,10 @@ import {
 } from "react";
 import { Paperclip, Send, Sparkles } from "lucide-react";
 
-import { LEGAL_AI_DOCUMENT_FILE_ACCEPT } from "@/application/ai/legal-ai-document.constants";
+import {
+  LEGAL_AI_DOCUMENT_FILE_ACCEPT,
+  LEGAL_AI_NEEDS_OCR_WARNING,
+} from "@/application/ai/legal-ai-document.constants";
 import {
   clientRejectLegalAiDocument,
   legalAiExtractStatusHint,
@@ -102,16 +105,20 @@ export function WorkspaceShell() {
 
       const documentId = data.id;
       const documentFileName = data.fileName;
+      const extractStatus = data.extractStatus ?? "OK";
       setConversationId(data.conversationId);
       setAttachedDocuments((current) => [
         ...current,
         {
           id: documentId,
           fileName: documentFileName,
-          extractStatus: data.extractStatus ?? "OK",
+          extractStatus,
           pageCount: data.pageCount ?? null,
         },
       ]);
+      if (extractStatus === "NEEDS_OCR") {
+        setUploadError(LEGAL_AI_NEEDS_OCR_WARNING);
+      }
     } catch (err) {
       setUploadError(
         err instanceof Error ? err.message : "Файл хавсаргахад алдаа гарлаа.",

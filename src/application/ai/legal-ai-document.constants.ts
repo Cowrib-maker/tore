@@ -101,6 +101,14 @@ export const LEGAL_AI_OCR_EMPTY_MESSAGE =
   "OCR-оос уншигдах текст олдсонгүй.";
 export const LEGAL_AI_OCR_TIMEOUT_MESSAGE =
   "OCR уншилт хугацаа хэтэрлээ. Файлыг шалгаад дахин оролдоно уу.";
+/**
+ * Shown in the upload UI (not thrown) when a file was accepted but stored as
+ * NEEDS_OCR: the AI will not see any text from it until it is re-attached in
+ * a readable form. Kept as one constant so every upload surface (citizen
+ * chat, lawyer workbench, workspace panels) shows the same honest wording.
+ */
+export const LEGAL_AI_NEEDS_OCR_WARNING =
+  "Файлыг уншиж чадсангүй тул AI үүнийг ашиглахгүй. Тод зурган (JPG/PNG) эсвэл текст бүхий PDF-ээр дахин хавсаргана уу.";
 
 /** Per-image OCR budget. Scanned PDFs OCR at most OCR_MAX_PDF_PAGES pages. */
 export const OCR_TIMEOUT_MS = 25_000;

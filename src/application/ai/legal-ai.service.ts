@@ -409,6 +409,7 @@ export class LegalAiService {
       verifiedAuthorities,
       caseContextBlock,
       documentContextBlock,
+      hasReadableDocumentText: documents.length > 0 ? hasDocumentText : undefined,
       foreignLegalScope,
     });
 
@@ -530,6 +531,9 @@ export class LegalAiService {
           input.userId,
         )
       : [];
+    const hasReadableDocumentText = documents.some(
+      (item) => item.extractStatus === "OK" && item.extractedText,
+    );
     const prompt = this.dependencies.promptBuilder.build({
       message: input.message,
       userType,
@@ -541,6 +545,7 @@ export class LegalAiService {
         documents,
         MAX_DOCUMENT_EXTRACT_CHARS,
       ),
+      hasReadableDocumentText: documents.length > 0 ? hasReadableDocumentText : undefined,
     });
     const completion = await this.dependencies.completion.complete({
       systemPrompt: prompt.systemPrompt,

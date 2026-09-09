@@ -23,7 +23,10 @@ import {
   X,
 } from "lucide-react";
 
-import { LEGAL_AI_DOCUMENT_FILE_ACCEPT } from "@/application/ai/legal-ai-document.constants";
+import {
+  LEGAL_AI_DOCUMENT_FILE_ACCEPT,
+  LEGAL_AI_NEEDS_OCR_WARNING,
+} from "@/application/ai/legal-ai-document.constants";
 import {
   clientRejectLegalAiDocument,
   legalAiExtractStatusHint,
@@ -172,8 +175,12 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
       if (!response.ok) throw new Error(data.error ?? "Баримт хавсаргахад алдаа гарлаа.");
       if (data.storageKey || data.key) throw new Error("Баримт хавсаргахад алдаа гарлаа.");
       if (!data.id || !data.fileName || !data.conversationId) throw new Error("Баримт хавсаргахад алдаа гарлаа.");
+      const extractStatus = data.extractStatus ?? "OK";
       setConversationId(data.conversationId);
-      setAttachedDocuments((current) => [...current, { id: data.id!, fileName: data.fileName!, mimeType: data.mimeType ?? "application/pdf", sizeBytes: data.sizeBytes ?? file.size, extractStatus: data.extractStatus ?? "OK", pageCount: data.pageCount ?? null }]);
+      setAttachedDocuments((current) => [...current, { id: data.id!, fileName: data.fileName!, mimeType: data.mimeType ?? "application/pdf", sizeBytes: data.sizeBytes ?? file.size, extractStatus, pageCount: data.pageCount ?? null }]);
+      if (extractStatus === "NEEDS_OCR") {
+        setError(LEGAL_AI_NEEDS_OCR_WARNING);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Баримт хавсаргахад алдаа гарлаа.");
     } finally { setUploading(false); }

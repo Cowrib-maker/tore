@@ -35,7 +35,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { LEGAL_AI_DOCUMENT_FILE_ACCEPT } from "@/application/ai/legal-ai-document.constants";
+import {
+  LEGAL_AI_DOCUMENT_FILE_ACCEPT,
+  LEGAL_AI_NEEDS_OCR_WARNING,
+} from "@/application/ai/legal-ai-document.constants";
 import {
   clientRejectLegalAiDocument,
   legalAiExtractStatusHint,
@@ -312,6 +315,7 @@ export function LegalAiChat({
 
       const documentId = data.id;
       const documentFileName = data.fileName;
+      const extractStatus = data.extractStatus ?? "OK";
       setConversationId(data.conversationId);
       setAttachedDocuments((current) => [
         ...current,
@@ -320,10 +324,13 @@ export function LegalAiChat({
           fileName: documentFileName,
           mimeType: data.mimeType ?? "application/octet-stream",
           sizeBytes: data.sizeBytes ?? file.size,
-          extractStatus: data.extractStatus ?? "OK",
+          extractStatus,
           pageCount: data.pageCount ?? null,
         },
       ]);
+      if (extractStatus === "NEEDS_OCR") {
+        setError(LEGAL_AI_NEEDS_OCR_WARNING);
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Баримт хавсаргахад алдаа гарлаа.",

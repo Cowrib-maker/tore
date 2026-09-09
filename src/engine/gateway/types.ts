@@ -139,6 +139,14 @@ export type PromptBuildInput = {
   documentFileName?: string;
   /** Already-wrapped untrusted document blocks (preferred over documentExtract). */
   documentContextBlock?: string;
+  /**
+   * True only when at least one attachment has real OCR/extracted text
+   * (extractStatus "OK" with non-empty text). False when every attachment
+   * is NEEDS_OCR/unreadable — the model must say so instead of silently
+   * answering as if nothing was attached. Undefined when documentContextBlock
+   * was not built from tracked attachments at all.
+   */
+  hasReadableDocumentText?: boolean;
   /** Citizen intake: short clarifying questions instead of a full legal brief. */
   intakeClarification?: boolean;
   /** Internal hint for phrasing a clarification (not shown verbatim to users). */

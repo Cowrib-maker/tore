@@ -62,7 +62,7 @@ export function clientRejectLegalAiDocument(file: {
 
 export function legalAiExtractStatusHint(status: string): string | null {
   if (status === "NEEDS_OCR") {
-    return "OCR шаардлагатай";
+    return "AI уншиж чадаагүй";
   }
   if (status === "EMPTY" || status === "FAILED") {
     return "текст уншигдаагүй";
