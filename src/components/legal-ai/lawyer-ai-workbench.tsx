@@ -204,6 +204,10 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
       if (interpreted.type === "error") throw new Error(interpreted.message);
       setConversationId(data.conversationId);
       setMessages((current) => [...current, { role: "ASSISTANT", content: data.message?.content ?? "", citations: parseSafeCitationsFromUnknown(data.message?.citations) }]);
+      // Composer's attachment strip is a "about to send" tray, not a running
+      // list — clear it once the turn lands. The document stays attached to
+      // the conversation server-side either way.
+      setAttachedDocuments([]);
     } catch (err) { setError(err instanceof Error ? err.message : "AI үйлчилгээтэй холбогдоход алдаа гарлаа."); }
     finally { setLoading(false); }
   }

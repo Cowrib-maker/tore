@@ -152,7 +152,13 @@ export function WorkspaceColumnPanel({
     const text = message.trim();
     if (!text || loading) return;
     setMessage("");
-    await sendMessage(text, "PROFESSIONAL");
+    const result = await sendMessage(text, "PROFESSIONAL");
+    // Composer's attachment strip is a "about to send" tray, not a running
+    // list — clear it once the turn lands. The document stays attached to
+    // the conversation server-side either way.
+    if (result === "ok") {
+      setAttachedDocuments([]);
+    }
   }
 
   return (

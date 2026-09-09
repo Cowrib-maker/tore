@@ -453,6 +453,13 @@ export function LegalAiChat({
           citations: parseSafeCitationsFromUnknown(data.message?.citations),
         },
       ]);
+      // The composer's attachment strip is a "what I'm about to send" tray,
+      // not a running list of everything ever attached to this conversation
+      // — clear it once the turn lands (resumed turns included). The
+      // document itself stays attached server-side (its extracted text
+      // keeps being re-injected on every later turn); only the composer
+      // chip goes away.
+      setAttachedDocuments([]);
     } catch {
       setError(LEGAL_AI_CHAT_RETRY_MESSAGE);
     } finally {
