@@ -19,7 +19,21 @@ export type PdfEmbeddedImageExtractor = {
   }>;
 };
 
-const MAX_IMAGE_PIXELS = 16_777_216;
+/**
+ * pdf.js's maxImageSize silently drops any embedded image over this pixel
+ * count (a console.warn, no error, no signal in the returned data — see
+ * https://github.com/mozilla/pdf.js/issues/14626) instead of throwing or
+ * downscaling it. 16_777_216 (4096x4096) was too tight: a routine 600 DPI
+ * scan of an A4 page is ~4960x7016 (~34.8M px) and would be dropped
+ * outright, silently producing NEEDS_OCR for a perfectly normal scan.
+ * 25_000_000 (~5000x5000) covers scans up to roughly 500 DPI on A4/Letter
+ * while keeping a single decoded RGB buffer under ~75MB, comfortably
+ * inside typical serverless function memory. If production telemetry
+ * shows real scans still getting dropped above this, downsampling the
+ * decoded image before OCR (rather than raising this further) is the
+ * safer way to support very high DPI scans.
+ */
+const MAX_IMAGE_PIXELS = 25_000_000;
 
 /**
  * Pulls already-encoded page bitmaps out of a PDF via unpdf extractImages.
