@@ -348,6 +348,8 @@ export const en: Dictionary = {
     intelligenceSourceExcerpt: "Excerpt from source",
     intelligenceSourceExcerptNote:
       "This is not an AI conclusion. It is a short excerpt from the official source text only.",
+    intelligenceNoExcerpt:
+      "No excerpt was extracted for this item yet. Open the official source below to read it in full.",
     intelligenceOfficialSource: "Official source",
     intelligenceOpenSource: "Open source →",
     intelligenceSections: {

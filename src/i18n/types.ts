@@ -117,6 +117,7 @@ export type PublicHomeCopy = {
   intelligenceDateUnknown: string;
   intelligenceSourceExcerpt: string;
   intelligenceSourceExcerptNote: string;
+  intelligenceNoExcerpt: string;
   intelligenceOfficialSource: string;
   intelligenceOpenSource: string;
   intelligenceSections: {

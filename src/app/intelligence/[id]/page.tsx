@@ -72,19 +72,25 @@ export default async function IntelligenceDetailPage({
           />
         </dl>
 
-        {record.summary ? (
-          <section className="mt-8 rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 sm:p-6">
-            <h2 className="text-[12px] font-semibold tracking-[0.14em] text-[#1A7A72] uppercase">
-              {home.intelligenceSourceExcerpt}
-            </h2>
-            <p className="mt-3 text-[15px] leading-7 text-[#3D4A57]">
-              {record.summary}
+        <section className="mt-8 rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 sm:p-6">
+          <h2 className="text-[12px] font-semibold tracking-[0.14em] text-[#1A7A72] uppercase">
+            {home.intelligenceSourceExcerpt}
+          </h2>
+          {record.summary ? (
+            <>
+              <p className="mt-3 text-[15px] leading-7 text-[#3D4A57]">
+                {record.summary}
+              </p>
+              <p className="mt-3 text-[12px] text-[#8A939D]">
+                {home.intelligenceSourceExcerptNote}
+              </p>
+            </>
+          ) : (
+            <p className="mt-3 text-[14px] leading-relaxed text-[#5C6570]">
+              {home.intelligenceNoExcerpt}
             </p>
-            <p className="mt-3 text-[12px] text-[#8A939D]">
-              {home.intelligenceSourceExcerptNote}
-            </p>
-          </section>
-        ) : null}
+          )}
+        </section>
 
         <section className="mt-6 rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 sm:p-6">
           <h2 className="text-[12px] font-semibold tracking-[0.14em] text-[#1A7A72] uppercase">

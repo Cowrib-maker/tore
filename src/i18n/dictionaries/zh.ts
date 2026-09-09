@@ -289,6 +289,7 @@ export const zh: Dictionary = {
     intelligenceSourceExcerpt: "来源摘录",
     intelligenceSourceExcerptNote:
       "这不是 AI 结论，仅是官方来源文本的简短摘录。",
+    intelligenceNoExcerpt: "此条目暂无摘录。请点击下方链接查看官方来源全文。",
     intelligenceOfficialSource: "官方来源",
     intelligenceOpenSource: "打开来源 →",
     intelligenceSections: {

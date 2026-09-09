@@ -291,6 +291,8 @@ export const ko: Dictionary = {
     intelligenceSourceExcerpt: "출처 발췌",
     intelligenceSourceExcerptNote:
       "AI 결론이 아닙니다. 공식 출처 텍스트의 짧은 발췌입니다.",
+    intelligenceNoExcerpt:
+      "이 항목에는 아직 발췌가 없습니다. 아래 공식 출처를 열어 전문을 확인하세요.",
     intelligenceOfficialSource: "공식 출처",
     intelligenceOpenSource: "출처 열기 →",
     intelligenceSections: {

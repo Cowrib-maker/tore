@@ -339,6 +339,8 @@ ctaStart: "Өмгөөлөгч хайх",
     intelligenceSourceExcerpt: "Эх сурвалжаас авсан хэсэг",
     intelligenceSourceExcerptNote:
       "Энэ нь AI-ийн дүгнэлт биш. Зөвхөн албан ёсны эх сурвалжийн текстээс авсан товч хэсэг.",
+    intelligenceNoExcerpt:
+      "Энэ мэдээнд одоогоор эх сурвалжаас автоматаар авсан хэсэг байхгүй байна. Доорх холбоосоор албан ёсны эх сурвалж руу орж бүрэн эхээр нь уншина уу.",
     intelligenceOfficialSource: "Албан ёсны эх сурвалж",
     intelligenceOpenSource: "Эх сурвалж нээх →",
     intelligenceSections: {
