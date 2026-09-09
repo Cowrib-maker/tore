@@ -6,7 +6,6 @@ import { gradeStudentQuizUseCase } from "@/application/use-cases/student/grade-q
 import {
   evaluateStudentProblemUseCase,
   STUDENT_PROBLEM_ANSWER_MAX_CHARS,
-  STUDENT_PROBLEM_ANSWER_MIN_CHARS,
 } from "@/application/use-cases/student/evaluate-student-problem";
 import type { StudentProblemGrade, StudentQuizGrade } from "@/domain/student";
 import { getClientIp } from "@/application/common/client-ip";
@@ -38,14 +37,6 @@ const problemPayloadSchema = z.object({
   answer: z.string().min(1).max(STUDENT_PROBLEM_ANSWER_MAX_CHARS),
 });
 
-const PROBLEM_ACTION_ERROR_MESSAGES: Record<string, string> = {
-  invalid: "Хариултын мэдээлэл буруу байна. Дахин оролдоно уу.",
-  not_found: "Бодлого олдсонгүй.",
-  too_short: `Хариулт хэтэрхий богино байна (доод тал нь ${STUDENT_PROBLEM_ANSWER_MIN_CHARS} тэмдэгт).`,
-  too_long: `Хариулт хэтэрхий урт байна (дээд тал нь ${STUDENT_PROBLEM_ANSWER_MAX_CHARS} тэмдэгт).`,
-  rate_limited: "Түр хугацаанд хэт олон удаа илгээлээ. Хэдэн минутын дараа дахин оролдоно уу.",
-};
-
 /**
  * Unauthenticated (Student track has no login wall) and each call can
  * trigger a real AI grading request, so this is rate-limited per IP —
@@ -75,8 +66,4 @@ export async function evaluateStudentProblemAction(input: {
     return { error: result.error };
   }
   return result;
-}
-
-export function studentProblemActionErrorMessage(error: string): string {
-  return PROBLEM_ACTION_ERROR_MESSAGES[error] ?? "Алдаа гарлаа. Дахин оролдоно уу.";
 }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
-import { getClientProfileForSession } from "@/application/actions/profile.actions";
+import { getClientProfileForSession } from "@/application/actions/profile-session.queries";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { ConsultationPaymentCard } from "@/components/marketplace/consultation-payment-card";

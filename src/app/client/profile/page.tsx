@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
-import { getClientProfileForSession } from "@/application/actions/profile.actions";
+import { getClientProfileForSession } from "@/application/actions/profile-session.queries";
 import { ChangeEmailForm } from "@/components/profiles/change-email-form";
 import { ChangePasswordForm } from "@/components/profiles/change-password-form";
 import { ClientProfileForm } from "@/components/profiles/client-profile-form";

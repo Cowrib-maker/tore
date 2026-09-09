@@ -1,6 +1,5 @@
 "use server";
 
-import { cache } from "react";
 import { revalidatePath } from "next/cache";
 
 import type { ActionState } from "@/application/common/action-state";
@@ -9,7 +8,6 @@ import { mapActionError } from "@/application/common/map-action-error";
 import { parseWithSchema } from "@/application/common/parse-form";
 import { enforceRateLimit } from "@/application/common/rate-limit-action";
 import { requireActor } from "@/application/common/require-actor";
-import { getSessionUser } from "@/application/common/session";
 import { updateClientProfileUseCase } from "@/application/use-cases/profiles/update-client-profile";
 import { updateLawyerProfileUseCase } from "@/application/use-cases/profiles/update-lawyer-profile";
 import { uploadProfilePhotoUseCase } from "@/application/use-cases/profiles/upload-profile-photo";
@@ -19,8 +17,6 @@ import {
   updateClientProfileSchema,
   updateLawyerProfileSchema,
 } from "@/application/validators/profile.schema";
-import type { ClientProfile, LawyerProfile } from "@/domain/entities/profile";
-import type { User } from "@/domain/entities/user";
 import { UserRole } from "@/domain/enums";
 import {
   auditLogRepository,
@@ -30,7 +26,6 @@ import {
 } from "@/infrastructure/repositories";
 import { PROFILE_WRITE_RATE_LIMIT } from "@/infrastructure/security/rate-limiter";
 import { getFileStorage } from "@/infrastructure/storage";
-import { resolveProfilePhotoUrl } from "@/infrastructure/storage/file-access";
 
 const updateClientDeps = {
   clientProfileRepository,
@@ -171,71 +166,3 @@ export async function uploadProfilePhotoAction(
   }
 }
 
-export type ClientProfileSessionResult =
-  | { status: "ok"; user: User; profile: ClientProfile }
-  | { status: "unauthenticated" }
-  | { status: "profile_missing"; user: User };
-
-export type LawyerProfileSessionResult =
-  | {
-      status: "ok";
-      user: User;
-      profile: LawyerProfile;
-      hasActiveOffering: boolean;
-      photoUrl: string | null;
-    }
-  | { status: "unauthenticated" }
-  | { status: "profile_missing"; user: User };
-
-export const getClientProfileForSession = cache(
-  async (): Promise<ClientProfileSessionResult> => {
-    const session = await getSessionUser();
-    if (!session?.user?.id || session.user.role !== UserRole.CLIENT) {
-      return { status: "unauthenticated" };
-    }
-
-    const [user, profile] = await Promise.all([
-      userRepository.findById(session.user.id),
-      clientProfileRepository.findByUserId(session.user.id),
-    ]);
-
-    if (!user) {
-      return { status: "unauthenticated" };
-    }
-
-    if (!profile) {
-      return { status: "profile_missing", user };
-    }
-
-    return { status: "ok", user, profile };
-  },
-);
-
-export const getLawyerProfileForSession = cache(
-  async (): Promise<LawyerProfileSessionResult> => {
-    const session = await getSessionUser();
-    if (!session?.user?.id || session.user.role !== UserRole.LAWYER) {
-      return { status: "unauthenticated" };
-    }
-
-    const [user, profile] = await Promise.all([
-      userRepository.findById(session.user.id),
-      lawyerProfileRepository.findByUserId(session.user.id),
-    ]);
-
-    if (!user) {
-      return { status: "unauthenticated" };
-    }
-
-    if (!profile) {
-      return { status: "profile_missing", user };
-    }
-
-    const hasActiveOffering = await lawyerProfileRepository.hasActiveOffering(
-      profile.id,
-    );
-    const photoUrl = resolveProfilePhotoUrl(user.image, { forOwner: true });
-
-    return { status: "ok", user, profile, hasActiveOffering, photoUrl };
-  },
-);

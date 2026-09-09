@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
-import { getLawyerProfileForSession } from "@/application/actions/profile.actions";
+import { getLawyerProfileForSession } from "@/application/actions/profile-session.queries";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { Badge } from "@/components/ui/badge";

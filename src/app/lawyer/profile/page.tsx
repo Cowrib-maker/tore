@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
-import { getLawyerProfileForSession } from "@/application/actions/profile.actions";
+import { getLawyerProfileForSession } from "@/application/actions/profile-session.queries";
 import { getLawyerVerificationForSession } from "@/application/actions/verification.actions";
 import { LawyerTaxonomyForm } from "@/components/marketplace/lawyer-taxonomy-form";
 import {

@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 
-import { evaluateStudentProblemAction, studentProblemActionErrorMessage } from "@/application/actions/student.actions";
+import { evaluateStudentProblemAction } from "@/application/actions/student.actions";
+import { studentProblemActionErrorMessage } from "@/application/actions/student-action-messages";
 import type { StudentLegalProblem, StudentProblemGrade } from "@/domain/student";
 import type { Dictionary } from "@/i18n/types";
 
