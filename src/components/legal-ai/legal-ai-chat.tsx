@@ -67,6 +67,7 @@ import {
   loginHrefForLegalAi,
   registerClientHrefForLegalAi,
 } from "@/domain/services/rbac";
+import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
 import { cn } from "@/lib/utils";
 
 type Message = {
@@ -176,6 +177,7 @@ export function LegalAiChat({
   });
 
   const documentInputRef = useRef<HTMLInputElement>(null);
+  const messageTextareaRef = useRef<HTMLTextAreaElement>(null);
   const pendingUploadRef = useRef<File | null>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<{ stop: () => void } | null>(null);
@@ -184,6 +186,8 @@ export function LegalAiChat({
   useEffect(() => {
     conversationIdRef.current = conversationId;
   }, [conversationId]);
+
+  useAutoResizeTextarea(messageTextareaRef, message);
 
   useEffect(() => {
     transcriptRef.current?.scrollTo({
@@ -522,6 +526,7 @@ export function LegalAiChat({
 
         <div className="rounded-2xl border border-[#D9DEE5] bg-[#F8FAFC] p-2 shadow-[0_12px_32px_-24px_rgba(11,31,58,0.45)] focus-within:border-[#0B1F3A]/35">
           <textarea
+            ref={messageTextareaRef}
             value={message}
             onChange={(event) => setMessage(event.target.value)}
             onKeyDown={(event) => {
@@ -531,7 +536,7 @@ export function LegalAiChat({
               }
             }}
             placeholder="Асуудлаа өөрийнхөөрөө бичээрэй. Хуулийн нэр томъёо мэдэх шаардлагагүй."
-            rows={2}
+            rows={1}
             className="min-h-12 w-full resize-none bg-transparent px-3 py-2 text-sm leading-6 text-[#0A0F14] outline-none placeholder:text-[#9AA3AD]"
             disabled={loading || uploading}
           />

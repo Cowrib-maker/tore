@@ -19,6 +19,7 @@ import {
   legalAiExtractStatusHint,
 } from "@/application/ai/legal-ai-document-file";
 import { useLegalAiChatSession } from "@/components/legal-ai/use-legal-ai-chat-session";
+import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
 import { cn } from "@/lib/utils";
 
 type AttachedDocument = {
@@ -59,7 +60,10 @@ export function WorkspaceColumnPanel({
   const [dragOver, setDragOver] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const messageTextareaRef = useRef<HTMLTextAreaElement>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
+
+  useAutoResizeTextarea(messageTextareaRef, message, 160);
 
   useEffect(() => {
     transcriptRef.current?.scrollTo({
@@ -268,13 +272,21 @@ export function WorkspaceColumnPanel({
       </div>
 
       <form onSubmit={handleSubmit} className="border-t border-[#0B1F3A]/8 p-2.5">
-        <div className="flex items-center gap-2 rounded-xl border border-[#D9DEE5] bg-[#F8FAFC] px-2 py-1.5">
-          <input
+        <div className="flex items-end gap-2 rounded-xl border border-[#D9DEE5] bg-[#F8FAFC] px-2 py-1.5">
+          <textarea
+            ref={messageTextareaRef}
             value={message}
             onChange={(event) => setMessage(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                event.currentTarget.form?.requestSubmit();
+              }
+            }}
             placeholder="Асуух..."
+            rows={1}
             disabled={loading}
-            className="min-w-0 flex-1 bg-transparent px-1 py-1.5 text-[13px] outline-none placeholder:text-[#9AA3AD]"
+            className="min-w-0 flex-1 resize-none bg-transparent px-1 py-1.5 text-[13px] leading-5 outline-none placeholder:text-[#9AA3AD]"
           />
           <button
             type="submit"

@@ -22,6 +22,7 @@ import {
   useLegalAiChatSession,
   type ChatMessage,
 } from "@/components/legal-ai/use-legal-ai-chat-session";
+import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
 import { cn } from "@/lib/utils";
 
 type SectionKey = "case-file" | "documents" | "ai" | "research" | "notes";
@@ -415,16 +416,27 @@ function ChatComposer({
   loading: boolean;
   compact?: boolean;
 }) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  useAutoResizeTextarea(textareaRef, message, 160);
+
   return (
     <form onSubmit={onSubmit} className="border-t border-[#0B1F3A]/8 p-2.5">
-      <div className="flex items-center gap-2 rounded-xl border border-[#D9DEE5] bg-[#F8FAFC] px-2 py-1.5">
-        <input
+      <div className="flex items-end gap-2 rounded-xl border border-[#D9DEE5] bg-[#F8FAFC] px-2 py-1.5">
+        <textarea
+          ref={textareaRef}
           value={message}
           onChange={(event) => onChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              event.currentTarget.form?.requestSubmit();
+            }
+          }}
           placeholder="Асуух..."
+          rows={1}
           disabled={loading}
           className={cn(
-            "min-w-0 flex-1 bg-transparent px-1 py-1.5 outline-none placeholder:text-[#9AA3AD]",
+            "min-w-0 flex-1 resize-none bg-transparent px-1 py-1.5 leading-5 outline-none placeholder:text-[#9AA3AD]",
             compact ? "text-[12.5px]" : "text-sm",
           )}
         />

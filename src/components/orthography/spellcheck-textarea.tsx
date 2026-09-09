@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEventHandler, RefObject, ReactNode, UIEvent, MouseEvent } from "react";
 import type { OrthographySuggestionView } from "@/components/orthography/orthography-checker";
+import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
 import { cn } from "@/lib/utils";
 
 type SuggestionWithRelated = OrthographySuggestionView & {
@@ -32,6 +33,13 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const ranges = useMemo(() => rangesForText(value, suggestions), [value, suggestions]);
   const active = activeIndex == null ? null : ranges[activeIndex] ?? null;
+
+  const localRef = useRef<HTMLTextAreaElement>(null);
+  useAutoResizeTextarea(localRef, value);
+  function setTextareaRef(el: HTMLTextAreaElement | null) {
+    localRef.current = el;
+    if (inputRef) inputRef.current = el;
+  }
 
   useEffect(() => setActiveIndex(null), [value]);
 
@@ -94,7 +102,7 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
       </div>
 
       <textarea
-        ref={inputRef}
+        ref={setTextareaRef}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={onKeyDown}
