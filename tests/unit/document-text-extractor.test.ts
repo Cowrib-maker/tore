@@ -4,6 +4,8 @@ import { htmlToStructuredText, MammothDocxTextExtractor } from "@/infrastructure
 import { LegalAiDocumentExtractorService } from "@/infrastructure/ai/document-text-extractor";
 import type { OcrEngine } from "@/infrastructure/ai/ocr-engine";
 import type { PdfEmbeddedImageExtractor } from "@/infrastructure/ai/pdf-embedded-image-extractor";
+import type { SpreadsheetTextExtractor } from "@/infrastructure/ai/spreadsheet-text-extractor";
+import type { PlainTextExtractor } from "@/infrastructure/ai/plain-text-extractor";
 
 import { buildMinimalDocx } from "./helpers/minimal-docx";
 
@@ -197,5 +199,81 @@ describe("LegalAiDocumentExtractorService", () => {
     });
     expect(result).toEqual({ status: "OK", text: "Clause 1", pageCount: 1 });
     expect(ocr.recognize).not.toHaveBeenCalled();
+  });
+
+  it("routes .xlsx uploads to the spreadsheet extractor without touching PDF/DOCX/OCR", async () => {
+    const pdf = { extract: vi.fn(async () => ({ status: "OK" as const, text: "should-not-run", pageCount: 1 })) };
+    const docx = { extract: vi.fn(async () => ({ status: "OK" as const, text: "should-not-run", pageCount: null })) };
+    const ocr = ocrOk("should-not-run");
+    const spreadsheet: SpreadsheetTextExtractor = {
+      extract: vi.fn(async () => ({ status: "OK" as const, text: "Sheet1\nA1 | B1", pageCount: null })),
+    };
+    const extractor = new LegalAiDocumentExtractorService(
+      pdf,
+      docx,
+      ocr,
+      noPdfImages(),
+      spreadsheet,
+      { extract: vi.fn(async () => ({ status: "OK" as const, text: "should-not-run", pageCount: null })) },
+    );
+    const body = new Uint8Array([0x50, 0x4b, 0x03, 0x04]);
+    const result = await extractor.extract({ format: "xlsx", body });
+    expect(result).toEqual({ status: "OK", text: "Sheet1\nA1 | B1", pageCount: null });
+    expect(spreadsheet.extract).toHaveBeenCalledWith(body);
+    expect(pdf.extract).not.toHaveBeenCalled();
+    expect(docx.extract).not.toHaveBeenCalled();
+    expect(ocr.recognize).not.toHaveBeenCalled();
+  });
+
+  it("routes .txt and .csv uploads to the plain-text extractor", async () => {
+    const plainText: PlainTextExtractor = {
+      extract: vi.fn(async () => ({ status: "OK" as const, text: "Hello, TORE", pageCount: null })),
+    };
+    const extractor = new LegalAiDocumentExtractorService(
+      { extract: async () => ({ status: "OK", text: "should-not-run", pageCount: 1 }) },
+      { extract: async () => ({ status: "OK", text: "should-not-run", pageCount: null }) },
+      ocrOk("should-not-run"),
+      noPdfImages(),
+      { extract: async () => ({ status: "OK", text: "should-not-run", pageCount: null }) },
+      plainText,
+    );
+    for (const format of ["txt", "csv"] as const) {
+      const body = new TextEncoder().encode("Hello, TORE");
+      const result = await extractor.extract({ format, body });
+      expect(result).toEqual({ status: "OK", text: "Hello, TORE", pageCount: null });
+    }
+    expect(plainText.extract).toHaveBeenCalledTimes(2);
+  });
+
+  it("passes through EMPTY and FAILED statuses from the spreadsheet and plain-text extractors unchanged", async () => {
+    const emptySpreadsheet: SpreadsheetTextExtractor = {
+      extract: async () => ({ status: "EMPTY", text: "", pageCount: null }),
+    };
+    const extractorA = new LegalAiDocumentExtractorService(
+      { extract: async () => ({ status: "OK", text: "should-not-run", pageCount: 1 }) },
+      { extract: async () => ({ status: "OK", text: "should-not-run", pageCount: null }) },
+      ocrOk("should-not-run"),
+      noPdfImages(),
+      emptySpreadsheet,
+      { extract: async () => ({ status: "OK", text: "should-not-run", pageCount: null }) },
+    );
+    expect(
+      await extractorA.extract({ format: "xlsx", body: new Uint8Array([0x50, 0x4b]) }),
+    ).toEqual({ status: "EMPTY", text: "", pageCount: null });
+
+    const failedPlainText: PlainTextExtractor = {
+      extract: async () => ({ status: "FAILED", text: "", pageCount: null }),
+    };
+    const extractorB = new LegalAiDocumentExtractorService(
+      { extract: async () => ({ status: "OK", text: "should-not-run", pageCount: 1 }) },
+      { extract: async () => ({ status: "OK", text: "should-not-run", pageCount: null }) },
+      ocrOk("should-not-run"),
+      noPdfImages(),
+      { extract: async () => ({ status: "OK", text: "should-not-run", pageCount: null }) },
+      failedPlainText,
+    );
+    expect(
+      await extractorB.extract({ format: "csv", body: new Uint8Array([0, 1, 2]) }),
+    ).toEqual({ status: "FAILED", text: "", pageCount: null });
   });
 });

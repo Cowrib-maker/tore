@@ -9,6 +9,12 @@ import { clientRejectLegalAiDocument } from "@/application/ai/legal-ai-document-
 import { ValidationError } from "@/domain/errors/domain-error";
 
 import { buildMinimalPdf } from "./helpers/minimal-pdf";
+import { buildMinimalDocx } from "./helpers/minimal-docx";
+import {
+  buildMinimalPptx,
+  buildMinimalXlsx,
+  buildMinimalZip,
+} from "./helpers/minimal-zip";
 
 const PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 const JPEG = new Uint8Array([0xff, 0xd8, 0xff, 0xe0]);
@@ -19,7 +25,7 @@ const OLE = new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]);
 const ZIP = new Uint8Array([0x50, 0x4b, 0x03, 0x04]);
 
 describe("Legal AI document upload validation", () => {
-  it("accepts PDF, DOCX, JPEG, PNG, and WEBP by magic bytes", () => {
+  it("accepts PDF, DOCX, XLSX, JPEG, PNG, WEBP, TXT, and CSV by content", () => {
     expect(
       assertValidLegalAiDocumentUpload({
         fileName: "a.pdf",
@@ -32,9 +38,17 @@ describe("Legal AI document upload validation", () => {
         fileName: "a.docx",
         contentType:
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        body: ZIP,
+        body: buildMinimalDocx(["Hello TORE"]),
       }).format,
     ).toBe("docx");
+    expect(
+      assertValidLegalAiDocumentUpload({
+        fileName: "a.xlsx",
+        contentType:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        body: buildMinimalXlsx(),
+      }).format,
+    ).toBe("xlsx");
     expect(
       assertValidLegalAiDocumentUpload({
         fileName: "a.jpg",
@@ -56,6 +70,61 @@ describe("Legal AI document upload validation", () => {
         body: WEBP,
       }).format,
     ).toBe("webp");
+    expect(
+      assertValidLegalAiDocumentUpload({
+        fileName: "notes.txt",
+        contentType: "text/plain",
+        body: new TextEncoder().encode("Гэрээний тайлбар"),
+      }).format,
+    ).toBe("txt");
+    expect(
+      assertValidLegalAiDocumentUpload({
+        fileName: "ledger.csv",
+        contentType: "text/csv",
+        body: new TextEncoder().encode("огноо,дүн\n2026-01-01,1000"),
+      }).format,
+    ).toBe("csv");
+  });
+
+  it("tells .docx, .xlsx, and .pptx apart even though all three are ZIP archives", () => {
+    expect(detectLegalAiDocumentFormat(buildMinimalDocx(["Hello TORE"]))).toBe("docx");
+    expect(detectLegalAiDocumentFormat(buildMinimalXlsx())).toBe("xlsx");
+    // pptx is not a supported format — must not be misdetected as docx/xlsx.
+    expect(detectLegalAiDocumentFormat(buildMinimalPptx())).toBeNull();
+    // A real zip with neither marker part is also not a known format.
+    expect(
+      detectLegalAiDocumentFormat(buildMinimalZip([{ name: "readme.txt", content: "hi" }])),
+    ).toBeNull();
+  });
+
+  it("rejects a real .xlsx renamed/relabeled as .docx and vice versa", () => {
+    expect(() =>
+      assertValidLegalAiDocumentUpload({
+        fileName: "sneaky.docx",
+        contentType:
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        body: buildMinimalXlsx(),
+      }),
+    ).toThrow(ValidationError);
+    expect(() =>
+      assertValidLegalAiDocumentUpload({
+        fileName: "sneaky.xlsx",
+        contentType:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        body: buildMinimalDocx(["Hello TORE"]),
+      }),
+    ).toThrow(ValidationError);
+  });
+
+  it("rejects a binary file mislabeled as .txt", () => {
+    const binary = new Uint8Array([0x00, 0x01, 0x02, 0xff, 0xfe, 0x00, 0x00]);
+    expect(() =>
+      assertValidLegalAiDocumentUpload({
+        fileName: "not-really-text.txt",
+        contentType: "text/plain",
+        body: binary,
+      }),
+    ).toThrow(ValidationError);
   });
 
   it("rejects legacy .doc with a clear message", () => {

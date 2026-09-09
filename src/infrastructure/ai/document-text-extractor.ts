@@ -14,6 +14,14 @@ import {
   getPdfTextExtractor,
   type PdfTextExtractor,
 } from "@/infrastructure/ai/pdf-text-extractor";
+import {
+  getSpreadsheetTextExtractor,
+  type SpreadsheetTextExtractor,
+} from "@/infrastructure/ai/spreadsheet-text-extractor";
+import {
+  getPlainTextExtractor,
+  type PlainTextExtractor,
+} from "@/infrastructure/ai/plain-text-extractor";
 
 export type DocumentExtractResult = {
   status: LegalAiDocumentExtractStatus;
@@ -45,6 +53,8 @@ export class LegalAiDocumentExtractorService implements LegalAiDocumentExtractor
     private readonly docx: DocxTextExtractor = getDocxTextExtractor(),
     private readonly ocr?: OcrEngine,
     private readonly pdfImages: PdfEmbeddedImageExtractor = getPdfEmbeddedImageExtractor(),
+    private readonly spreadsheet: SpreadsheetTextExtractor = getSpreadsheetTextExtractor(),
+    private readonly plainText: PlainTextExtractor = getPlainTextExtractor(),
   ) {}
 
   async extract(input: {
@@ -65,6 +75,14 @@ export class LegalAiDocumentExtractorService implements LegalAiDocumentExtractor
 
     if (input.format === "docx") {
       return this.docx.extract(input.body);
+    }
+
+    if (input.format === "xlsx") {
+      return this.spreadsheet.extract(input.body);
+    }
+
+    if (input.format === "txt" || input.format === "csv") {
+      return this.plainText.extract(input.body);
     }
 
     return { status: "FAILED", text: "", pageCount: null };

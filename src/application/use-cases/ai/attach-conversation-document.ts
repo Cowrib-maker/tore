@@ -43,6 +43,14 @@ const FAILED_DOCX_MESSAGE =
   "DOCX файлыг уншиж чадсангүй. Файлыг шалгаад дахин оролдоно уу.";
 const EMPTY_DOCX_MESSAGE =
   "Энэ DOCX-ээс уншигдах текст олдсонгүй.";
+const FAILED_XLSX_MESSAGE =
+  "Excel файлыг уншиж чадсангүй. Файлыг шалгаад дахин оролдоно уу.";
+const EMPTY_XLSX_MESSAGE =
+  "Энэ Excel файлаас уншигдах өгөгдөл олдсонгүй.";
+const FAILED_TEXT_MESSAGE =
+  "Файлыг уншиж чадсангүй. Файлыг шалгаад дахин оролдоно уу.";
+const EMPTY_TEXT_MESSAGE =
+  "Энэ файлаас уншигдах текст олдсонгүй.";
 
 /**
  * Validate → extract → store. FAILED extracts never reach FileStorage.
@@ -74,14 +82,10 @@ export async function attachConversationDocumentUseCase(
     );
   }
   if (normalized.status === "EMPTY") {
-    throw new ValidationError(
-      validated.format === "docx" ? EMPTY_DOCX_MESSAGE : LEGAL_AI_OCR_EMPTY_MESSAGE,
-    );
+    throw new ValidationError(emptyExtractMessage(validated.format));
   }
   if (normalized.status === "OK" && !normalized.text) {
-    throw new ValidationError(
-      validated.format === "docx" ? EMPTY_DOCX_MESSAGE : LEGAL_AI_OCR_EMPTY_MESSAGE,
-    );
+    throw new ValidationError(emptyExtractMessage(validated.format));
   }
 
   const conversation = await resolveOwnedConversation(
@@ -141,7 +145,26 @@ function failedExtractMessage(
   if (format === "pdf") {
     return FAILED_PDF_MESSAGE;
   }
+  if (format === "xlsx") {
+    return FAILED_XLSX_MESSAGE;
+  }
+  if (format === "txt" || format === "csv") {
+    return FAILED_TEXT_MESSAGE;
+  }
   return LEGAL_AI_OCR_FAILED_MESSAGE;
+}
+
+function emptyExtractMessage(format: LegalAiDocumentFormat): string {
+  if (format === "docx") {
+    return EMPTY_DOCX_MESSAGE;
+  }
+  if (format === "xlsx") {
+    return EMPTY_XLSX_MESSAGE;
+  }
+  if (format === "txt" || format === "csv") {
+    return EMPTY_TEXT_MESSAGE;
+  }
+  return LEGAL_AI_OCR_EMPTY_MESSAGE;
 }
 
 function normalizeExtract(

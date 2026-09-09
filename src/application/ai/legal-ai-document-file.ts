@@ -8,19 +8,25 @@ import {
 const ACCEPTED_EXTENSIONS = new Set([
   ".pdf",
   ".docx",
+  ".xlsx",
   ".jpg",
   ".jpeg",
   ".png",
   ".webp",
+  ".txt",
+  ".csv",
 ]);
 
 const ACCEPTED_MIMES = new Set([
   "application/pdf",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "image/jpeg",
   "image/jpg",
   "image/png",
   "image/webp",
+  "text/plain",
+  "text/csv",
 ]);
 
 export function isLegacyDocFile(fileName: string, contentType = ""): boolean {

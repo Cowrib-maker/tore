@@ -15,6 +15,7 @@ import {
 } from "@/application/ai/legal-ai-document.constants";
 import { isLegacyDocFile } from "@/application/ai/legal-ai-document-file";
 import { ValidationError } from "@/domain/errors/domain-error";
+import { listZipEntries } from "@/domain/documents/zip-reader";
 
 export type DocumentUploadBytes = {
   fileName: string;
@@ -34,7 +35,7 @@ export function hasPdfMagicBytes(body: Uint8Array): boolean {
 
 export function detectLegalAiDocumentFormat(
   body: Uint8Array,
-): LegalAiDocumentFormat | "doc" | null {
+): LegalAiDocumentFormat | "doc" | "text" | null {
   if (hasPrefix(body, PDF_MAGIC_BYTES)) {
     return "pdf";
   }
@@ -51,15 +52,66 @@ export function detectLegalAiDocumentFormat(
     return "webp";
   }
   if (hasPrefix(body, ZIP_MAGIC_BYTES)) {
-    return "docx";
+    return detectOoxmlFormat(body);
+  }
+  if (looksLikePlainText(body)) {
+    return "text";
   }
   return null;
 }
 
 /**
+ * .docx, .xlsx, and .pptx are all ZIP archives sharing the same "PK" magic
+ * bytes — the actual kind only shows up in which OOXML part is inside.
+ * pptx is deliberately not returned as a known format: not yet supported,
+ * and returning null here (rather than mis-detecting it as docx/xlsx) keeps
+ * assertValidLegalAiDocumentUpload's cross-check from being spoofable by
+ * renaming a .pptx to .docx.
+ */
+function detectOoxmlFormat(body: Uint8Array): "docx" | "xlsx" | null {
+  try {
+    const names = new Set(listZipEntries(body).map((entry) => entry.name));
+    if (names.has("xl/workbook.xml")) return "xlsx";
+    if (names.has("word/document.xml")) return "docx";
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * .txt/.csv have no magic bytes, so this is a heuristic, not a signature
+ * check: reject NUL bytes outright (a strong binary signal) and reject
+ * bodies with more than a token amount of non-whitespace control bytes.
+ * A mislabeled binary file that slips through only means a garbled/EMPTY
+ * extract downstream, not a security issue (unlike the OOXML/PDF checks
+ * above, this format is never treated as executable or parsed structurally).
+ */
+function looksLikePlainText(body: Uint8Array): boolean {
+  if (body.byteLength === 0) {
+    return false;
+  }
+  const sample = body.subarray(0, Math.min(body.byteLength, 8192));
+  let controlBytes = 0;
+  for (const byte of sample) {
+    if (byte === 0x00) {
+      return false;
+    }
+    const isWhitespaceControl = byte === 0x09 || byte === 0x0a || byte === 0x0d;
+    if (byte < 0x20 && !isWhitespaceControl) {
+      controlBytes += 1;
+    }
+  }
+  return controlBytes / sample.length < 0.01;
+}
+
+/**
  * Server-side Legal AI attachment gate. Client MIME is never sufficient.
- * ZIP magic is accepted as DOCX only when the name/MIME claim DOCX
- * (xlsx/pptx are rejected). Legacy .doc is always rejected.
+ * ZIP magic (shared by docx/xlsx/pptx) is resolved by peeking at which
+ * OOXML part is actually inside, then cross-checked against the claimed
+ * name/MIME so a renamed file cannot smuggle in as a different format
+ * (pptx is not a supported format at all, so it is rejected either way).
+ * Legacy .doc is always rejected.
  */
 export function assertValidLegalAiDocumentUpload(
   input: DocumentUploadBytes,
@@ -83,7 +135,24 @@ export function assertValidLegalAiDocumentUpload(
   }
 
   const claimed = claimedFormat(input.fileName, input.contentType);
+
+  if (detected === "text") {
+    // No magic bytes to detect txt vs csv apart — the extension/MIME the
+    // client claimed is the only signal, so it decides the final format.
+    if (claimed !== "txt" && claimed !== "csv") {
+      throw new ValidationError(LEGAL_AI_UNSUPPORTED_FORMAT_MESSAGE);
+    }
+    return {
+      format: claimed,
+      mimeType: LEGAL_AI_DOCUMENT_MIME_BY_FORMAT[claimed],
+      fileName: input.fileName,
+    };
+  }
+
   if (detected === "docx" && claimed !== "docx") {
+    throw new ValidationError(LEGAL_AI_UNSUPPORTED_FORMAT_MESSAGE);
+  }
+  if (detected === "xlsx" && claimed !== "xlsx") {
     throw new ValidationError(LEGAL_AI_UNSUPPORTED_FORMAT_MESSAGE);
   }
   if (claimed && claimed !== detected && !(jpegAlias(claimed) && detected === "jpeg")) {
@@ -113,6 +182,13 @@ function claimedFormat(
     return "docx";
   }
   if (
+    mime ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    extension === "xlsx"
+  ) {
+    return "xlsx";
+  }
+  if (
     mime === "application/msword" ||
     mime === "application/x-msword" ||
     extension === "doc"
@@ -124,6 +200,8 @@ function claimedFormat(
   }
   if (mime === "image/png" || extension === "png") return "png";
   if (mime === "image/webp" || extension === "webp") return "webp";
+  if (mime === "text/plain" || extension === "txt") return "txt";
+  if (mime === "text/csv" || extension === "csv") return "csv";
   return null;
 }
 

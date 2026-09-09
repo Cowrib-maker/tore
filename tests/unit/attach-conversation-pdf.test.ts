@@ -11,6 +11,7 @@ import { assertCanAccessStoredFile } from "@/application/services/assert-can-acc
 import type { LegalAiDocumentExtractor } from "@/infrastructure/ai/document-text-extractor";
 
 import { buildMinimalPdf } from "./helpers/minimal-pdf";
+import { buildMinimalXlsx } from "./helpers/minimal-zip";
 
 function createStore(): LegalAiStore & {
   documents: Map<string, { userId: string; storageKey: string }>;
@@ -582,6 +583,185 @@ describe("attachConversationDocumentUseCase", () => {
     ).rejects.toBeInstanceOf(ValidationError);
     expect(extract).not.toHaveBeenCalled();
     expect(fileStorage.keys).toEqual([]);
+  });
+  it("persists a successful XLSX extract as OK", async () => {
+    const store = createStore();
+    const fileStorage = createStorage();
+    const xlsx = buildMinimalXlsx("Гэрээний нөхцөл");
+    const result = await attachConversationDocumentUseCase(
+      {
+        userId: "lawyer-1",
+        conversationId: "conv-owner",
+        fileName: "table.xlsx",
+        contentType:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        body: xlsx,
+      },
+      {
+        store,
+        fileStorage,
+        extractor: {
+          async extract() {
+            return { status: "OK", text: "Sheet1\nA1 | Гэрээний нөхцөл", pageCount: null };
+          },
+        },
+      },
+    );
+    expect(result.extractStatus).toBe("OK");
+    expect(result.mimeType).toContain("spreadsheetml");
+    expect(fileStorage.keys).toHaveLength(1);
+    expect(store.documents.size).toBe(1);
+  });
+
+  it("does not store empty XLSX extracts as successful", async () => {
+    const store = createStore();
+    const fileStorage = createStorage();
+    const xlsx = buildMinimalXlsx();
+    await expect(
+      attachConversationDocumentUseCase(
+        {
+          userId: "lawyer-1",
+          conversationId: "conv-owner",
+          fileName: "empty.xlsx",
+          contentType:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          body: xlsx,
+        },
+        {
+          store,
+          fileStorage,
+          extractor: {
+            async extract() {
+              return { status: "EMPTY", text: "", pageCount: null };
+            },
+          },
+        },
+      ),
+    ).rejects.toMatchObject({
+      message: expect.stringMatching(/Excel файлаас уншигдах өгөгдөл олдсонгүй/),
+    });
+    expect(fileStorage.keys).toEqual([]);
+    expect(store.documents.size).toBe(0);
+  });
+
+  it("does not store FAILED XLSX extracts", async () => {
+    const store = createStore();
+    const fileStorage = createStorage();
+    const xlsx = buildMinimalXlsx();
+    await expect(
+      attachConversationDocumentUseCase(
+        {
+          userId: "lawyer-1",
+          conversationId: "conv-owner",
+          fileName: "broken.xlsx",
+          contentType:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          body: xlsx,
+        },
+        {
+          store,
+          fileStorage,
+          extractor: {
+            async extract() {
+              return { status: "FAILED", text: "", pageCount: null };
+            },
+          },
+        },
+      ),
+    ).rejects.toMatchObject({
+      message: expect.stringMatching(/Excel файлыг уншиж чадсангүй/),
+    });
+    expect(fileStorage.keys).toEqual([]);
+    expect(store.documents.size).toBe(0);
+  });
+
+  it("persists successful TXT and CSV extracts as OK", async () => {
+    const store = createStore();
+    const fileStorage = createStorage();
+    const files = [
+      {
+        fileName: "notes.txt",
+        contentType: "text/plain",
+        body: new TextEncoder().encode("Хугацаа: 2026-09-09"),
+      },
+      {
+        fileName: "table.csv",
+        contentType: "text/csv",
+        body: new TextEncoder().encode("name,amount\nA,1"),
+      },
+    ];
+    for (const file of files) {
+      const result = await attachConversationDocumentUseCase(
+        {
+          userId: "lawyer-1",
+          conversationId: "conv-owner",
+          ...file,
+        },
+        {
+          store,
+          fileStorage,
+          extractor: {
+            async extract() {
+              return { status: "OK", text: "decoded text", pageCount: null };
+            },
+          },
+        },
+      );
+      expect(result.extractStatus).toBe("OK");
+    }
+    expect(store.documents.size).toBe(files.length);
+  });
+
+  it("does not store empty or FAILED TXT/CSV extracts", async () => {
+    const store = createStore();
+    const fileStorage = createStorage();
+    await expect(
+      attachConversationDocumentUseCase(
+        {
+          userId: "lawyer-1",
+          conversationId: "conv-owner",
+          fileName: "empty.txt",
+          contentType: "text/plain",
+          body: new TextEncoder().encode(""),
+        },
+        {
+          store,
+          fileStorage,
+          extractor: {
+            async extract() {
+              return { status: "EMPTY", text: "", pageCount: null };
+            },
+          },
+        },
+      ),
+    ).rejects.toMatchObject({
+      message: expect.stringMatching(/файлаас уншигдах текст олдсонгүй/),
+    });
+
+    await expect(
+      attachConversationDocumentUseCase(
+        {
+          userId: "lawyer-1",
+          conversationId: "conv-owner",
+          fileName: "broken.csv",
+          contentType: "text/csv",
+          body: new TextEncoder().encode("a,b\n1,2"),
+        },
+        {
+          store,
+          fileStorage,
+          extractor: {
+            async extract() {
+              return { status: "FAILED", text: "", pageCount: null };
+            },
+          },
+        },
+      ),
+    ).rejects.toMatchObject({
+      message: expect.stringMatching(/Файлыг уншиж чадсангүй/),
+    });
+    expect(fileStorage.keys).toEqual([]);
+    expect(store.documents.size).toBe(0);
   });
 });
 

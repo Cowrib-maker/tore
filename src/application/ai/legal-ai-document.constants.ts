@@ -1,5 +1,5 @@
 /**
- * Legal AI document attachments — PDF, DOCX, and raster images.
+ * Legal AI document attachments — PDF, DOCX, XLSX, TXT, CSV, and raster images.
  * Multiple documents per conversation. Extracted text is re-injected on
  * every subsequent chat turn (no embeddings / RAG), so an unbounded file
  * would dominate the model context and burn the monthly ceiling quickly.
@@ -32,16 +32,23 @@ export const OLE_MAGIC_BYTES = new Uint8Array([
 export const LEGAL_AI_PDF_MIME = "application/pdf";
 export const LEGAL_AI_DOCX_MIME =
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+export const LEGAL_AI_XLSX_MIME =
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 export const LEGAL_AI_JPEG_MIME = "image/jpeg";
 export const LEGAL_AI_PNG_MIME = "image/png";
 export const LEGAL_AI_WEBP_MIME = "image/webp";
+export const LEGAL_AI_TXT_MIME = "text/plain";
+export const LEGAL_AI_CSV_MIME = "text/csv";
 
 export const LEGAL_AI_DOCUMENT_FORMATS = [
   "pdf",
   "docx",
+  "xlsx",
   "jpeg",
   "png",
   "webp",
+  "txt",
+  "csv",
 ] as const;
 
 export type LegalAiDocumentFormat = (typeof LEGAL_AI_DOCUMENT_FORMATS)[number];
@@ -62,35 +69,47 @@ export const LEGAL_AI_DOCUMENT_MIME_BY_FORMAT: Record<
 > = {
   pdf: LEGAL_AI_PDF_MIME,
   docx: LEGAL_AI_DOCX_MIME,
+  xlsx: LEGAL_AI_XLSX_MIME,
   jpeg: LEGAL_AI_JPEG_MIME,
   png: LEGAL_AI_PNG_MIME,
   webp: LEGAL_AI_WEBP_MIME,
+  txt: LEGAL_AI_TXT_MIME,
+  csv: LEGAL_AI_CSV_MIME,
 };
 
 export const LEGAL_AI_DOCUMENT_MIMES = [
   LEGAL_AI_PDF_MIME,
   LEGAL_AI_DOCX_MIME,
+  LEGAL_AI_XLSX_MIME,
   LEGAL_AI_JPEG_MIME,
   LEGAL_AI_PNG_MIME,
   LEGAL_AI_WEBP_MIME,
+  LEGAL_AI_TXT_MIME,
+  LEGAL_AI_CSV_MIME,
 ] as const;
 
 export const LEGAL_AI_DOCUMENT_FILE_ACCEPT = [
   ".pdf",
   ".docx",
+  ".xlsx",
   ".jpg",
   ".jpeg",
   ".png",
   ".webp",
+  ".txt",
+  ".csv",
   LEGAL_AI_PDF_MIME,
   LEGAL_AI_DOCX_MIME,
+  LEGAL_AI_XLSX_MIME,
   LEGAL_AI_JPEG_MIME,
   LEGAL_AI_PNG_MIME,
   LEGAL_AI_WEBP_MIME,
+  LEGAL_AI_TXT_MIME,
+  LEGAL_AI_CSV_MIME,
 ].join(",");
 
 export const LEGAL_AI_UNSUPPORTED_FORMAT_MESSAGE =
-  "Зөвхөн PDF, DOCX, JPG, JPEG, PNG, WEBP файл хавсаргана уу.";
+  "Зөвхөн PDF, DOCX, XLSX, JPG, JPEG, PNG, WEBP, TXT, CSV файл хавсаргана уу.";
 export const LEGAL_AI_LEGACY_DOC_MESSAGE =
   "Хуучин .doc файлыг дэмжихгүй. .docx форматаар хадгалаад дахин хавсаргана уу.";
 export const LEGAL_AI_DOCUMENT_SIZE_MESSAGE =
