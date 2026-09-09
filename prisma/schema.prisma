@@ -461,7 +461,6 @@ model LawyerProfile {
   payouts      Payout[]
 
   @@index([verificationStatus])
-  @@index([isListed, verificationStatus])
   @@index([isListed, verificationStatus, position])
   @@index([averageRating(sort: Desc)])
   @@index([slug])
