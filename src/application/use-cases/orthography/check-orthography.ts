@@ -7,8 +7,11 @@ import { EntitlementError } from "@/domain/errors/entitlement-error";
 import type { EntitlementUsageRepository } from "@/domain/repositories/entitlement-usage-repository";
 import type { SubscriptionRepository } from "@/domain/repositories/subscription-repository";
 import type { UserRepository } from "@/domain/repositories/user-repository";
-import { buildHunspellWordSuggestions } from "@/domain/mongolian-orthography/hunspell-server";
-import type { OrthographyCheckResult, OrthographySuggestion } from "@/domain/mongolian-orthography/suggestions";
+import {
+  buildOrthographySuggestions,
+  type OrthographyCheckResult,
+  type OrthographySuggestion,
+} from "@/domain/mongolian-orthography";
 
 export type OrthographyCheckDeps = {
   subscriptionRepository: SubscriptionRepository;
@@ -49,30 +52,13 @@ export async function checkOrthographyForPaidUser(
   if (!trimmed) return { suggestions: [], suggestionCount: 0, orthographyCount: 0, latinCount: 0, spellingCount: 0, wordCount: 0, characterCount: 0, premium: true };
   if (trimmed.length > MAX_CHARS) throw new ValidationError(`Текст хэт урт байна (дээд тал ${MAX_CHARS} тэмдэгт).`);
 
-  const wordSuggestions = buildHunspellWordSuggestions(trimmed);
-  const suggestions: OrthographySuggestion[] = wordSuggestions.map((item) => ({
-    kind: "SPELLING",
-    sourceWord: item.sourceWord,
-    suggestedWord: item.suggestedWord,
-    suggestionLabel: `Зөв бичлэг: «${item.suggestedWord}»`,
-    ruleIds: ["MONGOLIAN_HUNSPELL"],
-    ruleTitle: "Монгол хэлний зөв бичлэг",
-    start: item.start,
-    end: item.end,
-    candidates: item.candidates,
-  }));
+  // Self-contained Mongolian vowel-harmony/suffix-rule engine + curated
+  // dictionary — no external hunspell dictionary dependency required.
+  const result = buildOrthographySuggestions(trimmed, {
+    includeLatinToCyrillic: input.includeLatinToCyrillic,
+  });
 
-  const wordCount = trimmed.split(/\s+/u).filter(Boolean).length;
-  return {
-    suggestions,
-    suggestionCount: suggestions.length,
-    orthographyCount: 0,
-    latinCount: 0,
-    spellingCount: suggestions.length,
-    wordCount,
-    characterCount: trimmed.length,
-    premium: true,
-  };
+  return { ...result, premium: true };
 }
 
 export type { OrthographySuggestion };
