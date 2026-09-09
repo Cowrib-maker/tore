@@ -1,23 +1,25 @@
 import { StudentTrackId, type StudentLesson, type StudentQuiz } from "./types";
 
 /**
- * Administrative curriculum: German Verwaltungsakt exam schema + Mongolian
- * three-stage court/problem method (admissibility → legality → remedies).
- * Article numbers below are study landmarks — always re-verify on legalinfo.mn
- * before citing in real work. Do not invent additional numbers from memory.
+ * Administrative curriculum: Mongolia's own three-stage court/problem method
+ * (admissibility -> legality -> remedies), grounded in ЗЕХ (Administrative
+ * General Law) and ЗХШХШТХ (Law on Procedure for Resolving Administrative
+ * Cases in Court). Article numbers below are study landmarks — always
+ * re-verify on legalinfo.mn before citing in real work. Do not invent
+ * additional numbers from memory.
  */
 export const administrativeLessons: readonly StudentLesson[] = [
   {
     id: "admin-verwaltungsakt-method",
     trackId: StudentTrackId.ADMINISTRATIVE,
     kind: "method",
-    title: "Ром–Германы захиргааны бодлого бодох аргачлал (Verwaltungsakt)",
+    title: "Захиргааны бодлого бодох ерөнхий логик",
     summary:
       "Акт мөн эсэх → эрх хэмжээ → журам → материаллаг хууль зүй → зохистой байдал. Формын алдааг агуулгын алдаанаас салгана.",
     sections: [
       {
-        heading: "Яагаад энэ схем вэ",
-        body: "Германы захиргааны эрх зүйн шалгалт Verwaltungsakt (захиргааны акт)-ыг төвд тавьдаг. Эхлээд «энэ нь акт мөн үү» гэж ялгаад, дараа нь эрх хэмжээ (Zuständigkeit), журам (Verfahren), хэлбэр (Form), материаллаг хууль зүй (materielle Rechtmäßigkeit), зохистой байдал (Ermessen / Verhältnismäßigkeit)-ыг дараалуулна. Эрүүгийн бүрэлдэхүүн, иргэний нэхэмжлэлтэй хольж болохгүй. Сургалтын зорилго: «надад таалагдахгүй» гэсэн мэдрэмжийг элемент бүрийн Subsumtion-оор солих.",
+        heading: "Яагаад энэ дараалал вэ",
+        body: "Монголын захиргааны эрх зүйн шалгалт захиргааны актыг төвд тавьдаг. Эхлээд «энэ нь акт мөн үү» гэж ялгаад, дараа нь эрх хэмжээ, журам, хэлбэр, материаллаг хууль зүй, зохистой байдлыг дараалуулна. Эрүүгийн бүрэлдэхүүн, иргэний нэхэмжлэлтэй хольж болохгүй. Сургалтын зорилго: «надад таалагдахгүй» гэсэн мэдрэмжийг элемент бүрийг баримтад тулгасан дүгнэлтээр солих.",
       },
       {
         heading: "Алхам 1. Захиргааны акт мөн эсэх",
@@ -29,7 +31,7 @@ export const administrativeLessons: readonly StudentLesson[] = [
       },
       {
         heading: "Алхам 3. Материаллаг хууль зүй ба зохистой байдал",
-        body: "Шийдвэр ямар хууль, дүрэмд тулгуурласан бэ? Баримт зөв тогтоогдсон уу? Хууль зөв хэрэглэгдсэн үү? Дискрец (Ermessen) байвал: зорилгод нийцсэн үү, илүү хүнд арга сонгосон уу (Verhältnismäßigkeit). Зохиомол зүйл, заалт бичихгүй — албан ёсны эхийг нягтална.",
+        body: "Шийдвэр ямар хууль, дүрэмд тулгуурласан бэ? Баримт зөв тогтоогдсон уу? Хууль зөв хэрэглэгдсэн үү? Үзэмж (дискрец) байвал: зорилгод нийцсэн үү, илүү хүнд арга сонгосон уу. Зохиомол зүйл, заалт бичихгүй — албан ёсны эхийг нягтална.",
       },
       {
         heading: "Сургалтын алдаа",
@@ -43,11 +45,11 @@ export const administrativeLessons: readonly StudentLesson[] = [
     kind: "method",
     title: "Монголын захиргааны эрх зүйн бодлого бодох аргачлал",
     summary:
-      "ЗЕХ + ЗХШХШТХ-ийн гурван үе: (1) нэхэмжлэлийн урьдчилсан нөхцөл → (2) акт хууль ёсны эсэх (хэлбэр + бодит тал) → (3) эрх зүйн үр дагавар. Алхам алхмаар Subsumtion.",
+      "ЗЕХ + ЗХШХШТХ-ийн гурван үе: (1) нэхэмжлэлийн урьдчилсан нөхцөл → (2) акт хууль ёсны эсэх (хэлбэр + бодит тал) → (3) эрх зүйн үр дагавар.",
     sections: [
       {
         heading: "Юу бодож байна вэ",
-        body: "Захиргааны бодлого бол төрийн байгууллага, албан тушаалтны шийдвэр, үйл ажиллагаа хуульд нийцсэн эсэхийг тогтоох системтэй ажиллагаа. «Надад таалагдахгүй» гэсэн мэдрэмж хангалтгүй. Монгол Улсын Захиргааны ерөнхий хууль (ЗЕХ) болон Захиргааны хэрэг шүүхэд хянан шийдвэрлэх тухай хууль (ЗХШХШТХ)-ийн логикоор гурван том үе шаттай бодно. Ром–Германы Verwaltungsakt схем нь 2-р үеийн доторх хэлбэр/бодит талтай нийцнэ. Доорх зүйл, заалтын дугаар нь сургалтын чиглүүлэгч — бодит ажилд legalinfo.mn дээрх хүчин төгөлдөр эхийг нягтална.",
+        body: "Захиргааны бодлого бол төрийн байгууллага, албан тушаалтны шийдвэр, үйл ажиллагаа хуульд нийцсэн эсэхийг тогтоох системтэй ажиллагаа. «Надад таалагдахгүй» гэсэн мэдрэмж хангалтгүй. Монгол Улсын Захиргааны ерөнхий хууль (ЗЕХ) болон Захиргааны хэрэг шүүхэд хянан шийдвэрлэх тухай хууль (ЗХШХШТХ)-ийн логикоор гурван том үе шаттай бодно. Доорх зүйл, заалтын дугаар нь сургалтын чиглүүлэгч — бодит ажилд legalinfo.mn дээрх хүчин төгөлдөр эхийг нягтална.",
       },
       {
         heading: "0. Объект: захиргааны акт мөн эсэх",
@@ -84,7 +86,7 @@ export const administrativeLessons: readonly StudentLesson[] = [
     sections: [
       {
         heading: "Акт",
-        body: "Гадаад үйлчлэлтэй, тодорхой этгээдэд чиглэсэн, эрх зүйн үр дагавар бүхий шийдвэр. «Тушаал» гэж нэрлэсэн ч агуулгаар нь шалгана. Нэршил агуулгыг орлохгүй. Энэ бол Verwaltungsakt болон Монголын 0-р алхмын хаалга.",
+        body: "Гадаад үйлчлэлтэй, тодорхой этгээдэд чиглэсэн, эрх зүйн үр дагавар бүхий шийдвэр. «Тушаал» гэж нэрлэсэн ч агуулгаар нь шалгана. Нэршил агуулгыг орлохгүй. Энэ бол Монголын бодлого бодох 0-р алхмын хаалга.",
       },
       {
         heading: "Эрх хэмжээ",
@@ -121,7 +123,7 @@ export const administrativeTest: StudentQuiz = {
   kind: "test",
   title: "Захиргааны эрх зүй — онолын тест",
   intro:
-    "Монголын гурван үе шат болон Verwaltungsakt схемийг шалгана. Зүйл, заалтын дугаарыг санаанаасаа бичих шаардлагагүй — бүтцийг мэднэ.",
+    "Монголын гурван үе шатыг шалгана. Зүйл, заалтын дугаарыг санаанаасаа бичих шаардлагагүй — бүтцийг мэднэ.",
   questions: [
     {
       id: "a-t1",
@@ -134,7 +136,7 @@ export const administrativeTest: StudentQuiz = {
             "Урьдчилсан нөхцөл → акт хууль ёсны эсэх → эрх зүйн үр дагавар",
         },
         { id: "c", label: "Гэрээ → төлбөр → хохирол" },
-        { id: "d", label: "Зөвхөн IRAC-ийн Conclusion" },
+        { id: "d", label: "Зөвхөн эцсийн дүгнэлт" },
       ],
       correctOptionId: "b",
       explanation:
@@ -185,7 +187,7 @@ export const administrativeTest: StudentQuiz = {
         { id: "d", label: "Зөвхөн нэршлээр шийднэ" },
       ],
       correctOptionId: "b",
-      explanation: "2-р үеийн А/Б задрал. Verwaltungsakt-тай нийцнэ.",
+      explanation: "2-р үеийн А/Б задрал.",
     },
     {
       id: "a-t5",
@@ -256,7 +258,7 @@ export const administrativeProblem: StudentQuiz = {
   kind: "problem",
   title: "Захиргааны эрх зүй — бодлогын шалгалт",
   intro:
-    "Баримтыг Монголын гурван үе / Verwaltungsakt аргачлалаар задлана. Зохиомол зүйл заалт байхгүй.",
+    "Баримтыг Монголын гурван үеийн аргачлалаар задлана. Зохиомол зүйл заалт байхгүй.",
   questions: [
     {
       id: "a-p1",
@@ -310,7 +312,7 @@ export const administrativeProblem: StudentQuiz = {
         { id: "d", label: "Зөвхөн «хатуу шийдвэр» гэж бичнэ" },
       ],
       correctOptionId: "b",
-      explanation: "2А ≠ 2Б. Нөхөхгүй.",
+      explanation: "Хэлбэр тал ≠ бодит тал. Нөхөхгүй.",
     },
     {
       id: "a-p4",
