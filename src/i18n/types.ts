@@ -278,12 +278,17 @@ export type Dictionary = {
     termsTitle: string;
     privacyTitle: string;
     placeholderBanner: string;
-    termsIntro: string;
-    termsScope: string;
-    termsAccounts: string;
-    termsMarketplace: string;
-    termsLegalAi: string;
-    termsContact: string;
+    termsDocument: {
+      effectiveDate: string;
+      disclaimer: string;
+      chapters: {
+        title: string;
+        sections: {
+          heading: string;
+          clauses: string[];
+        }[];
+      }[];
+    };
     privacyIntro: string;
     privacyData: string;
     privacyUse: string;

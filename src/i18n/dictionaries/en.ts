@@ -499,18 +499,138 @@ export const en: Dictionary = {
     privacyTitle: "Privacy Policy",
     placeholderBanner:
       "Effective 31 August 2026. TORE is not a law firm and does not provide professional legal advice.",
-    termsIntro:
-      "TORE operates an online marketplace that connects clients with independent lawyers for consultation booking, and provides TORE Chat and TORE Legal AI as legal-information assistants. TORE is not a law firm and does not provide lawyer representation or professional legal advice.",
-    termsScope:
-      "By creating an account you agree to use the platform lawfully, provide accurate registration information, and respect booking, payment, and verification rules published in the product.",
-    termsAccounts:
-      "You are responsible for safeguarding your credentials. Account roles (client, lawyer, admin) govern which features you may use. Credential-document access and marketplace listing remain subject to verification status. Approved lawyers may list or unlist their own public profiles.",
-    termsMarketplace:
-      "Bookings, fees, cancellations, and disputes follow the platform policies in effect at the time of the booking. Lawyers remain responsible for their own professional licenses and client engagements. TORE may process payments according to published platform rules.",
-    termsLegalAi:
-      "TORE Chat and TORE Legal AI are legal-information and drafting assistants. Output is not professional legal advice. Citations must come from verified official sources (legalinfo.mn, shuukh.mn, parliament.mn). If no verified source is found, the system must not invent provisions, article numbers, or court cases. Uploaded files are user data, not official law. Paid question entitlements and prices are shown in the product.",
-    termsContact:
-      "Questions about these terms: support@tore.mn.",
+    termsDocument: {
+      effectiveDate: "Effective: September 9, 2026.",
+      disclaimer: "TORE is not a law firm, and output from TORE Chat and TORE Legal AI is not professional legal advice or legal representation.",
+      chapters: [
+        {
+          title: "CHAPTER ONE. General Provisions",
+          sections: [
+            {
+              heading: "1.1. Definitions and scope",
+              clauses: [
+                "These Terms of Service (\"Terms\") apply to all services provided through tore.mn, including TORE Marketplace (booking consultations with verified lawyers), TORE Chat, and TORE Legal AI.",
+                "TORE is not a law firm and does not provide professional legal advice or representation. TORE is an online platform that connects individuals and legal entities with verified lawyers for paid consultations, and a legal-information assistant service.",
+              ],
+            },
+            {
+              heading: "1.2. Acceptance and amendment of the Terms",
+              clauses: [
+                "By registering for or using TORE, the user is deemed to have fully accepted these Terms.",
+                "TORE may add to, amend, or update these Terms without prior notice, and continued use of the platform after such a change constitutes acceptance of the updated Terms. TORE will notify users in advance by email or in-app notice of changes that require notice.",
+              ],
+            },
+            {
+              heading: "1.3. Intellectual property",
+              clauses: [
+                "The software, logo, marks, design, and content within the TORE platform are the intellectual property of TORE or its rights holders, and may not be copied, modified, or reused in any form without written permission.",
+              ],
+            },
+          ],
+        },
+        {
+          title: "CHAPTER TWO. Registration and User Rights and Obligations",
+          sections: [
+            {
+              heading: "2.1. Registration and login credential security",
+              clauses: [
+                "To use TORE's services, a user (an individual or a lawyer) must register and verify their email address. Registration information must be accurate and kept up to date if it changes.",
+                "The user is fully responsible for the security of their own login credentials and must not transfer or share them with a third party. If unauthorized access is suspected, the user must notify TORE immediately at support@tore.mn.",
+              ],
+            },
+            {
+              heading: "2.2. Account types and lawyer verification",
+              clauses: [
+                "TORE has three basic account types: citizen (client), lawyer, and admin. Available features differ by account type.",
+                "A lawyer may open their profile in the public marketplace listing and accept consultation bookings only after submitting supporting credential documents and passing TORE's verification process. TORE reserves the right to decline, suspend, or revoke verification.",
+              ],
+            },
+            {
+              heading: "2.3. Prohibited conduct",
+              clauses: [
+                "The user must not use the platform for an unlawful purpose, in a way that infringes another person's rights, or by supplying false information.",
+              ],
+            },
+          ],
+        },
+        {
+          title: "CHAPTER THREE. Subscription Plans and Billing",
+          sections: [
+            {
+              heading: "3.1. Subscription plans",
+              clauses: [
+                "TORE offers paid subscription plans for citizens and lawyers, each granting a different quota of Legal AI questions and document analyses. Plan names, features, and the price in effect at any given time are shown on the corresponding page of tore.mn.",
+                "Subscription fees renew monthly and are processed through the QPay payment system.",
+                "TORE may change (increase or decrease) subscription prices going forward based on market conditions and cost changes, and will give advance notice of such changes.",
+              ],
+            },
+            {
+              heading: "3.2. Booking cancellation and refunds",
+              clauses: [
+                "A citizen client books and pays in advance for a consultation slot with a lawyer. Cancellations are governed as follows: (a) cancelling 24 or more hours before the scheduled start gives a full refund; (b) cancelling between 2 and 24 hours before gives a 50% refund; (c) cancelling less than 2 hours before the scheduled start gives no refund. A booking cancelled by the lawyer or by TORE is always refunded in full.",
+                "The refund policy for the monthly subscription fee follows what is stated on the checkout page at the time of purchase.",
+              ],
+            },
+          ],
+        },
+        {
+          title: "CHAPTER FOUR. Use of TORE Chat and TORE Legal AI",
+          sections: [
+            {
+              heading: "4.1. Nature of the information provided",
+              clauses: [
+                "TORE Chat and TORE Legal AI are tools that assist with legal information, analysis, and drafting; their output is not professional legal advice or legal representation.",
+                "Citations are drawn only from verified official sources (such as legalinfo.mn, shuukh.mn, and parliament.mn). When no such source is found, TORE will not fabricate a law, provision, or court decision.",
+              ],
+            },
+            {
+              heading: "4.2. User responsibility and plan limits",
+              clauses: [
+                "A file or other material a user attaches to Legal AI is the user's own data, not an official law or court instrument. The user is fully responsible for the accuracy of any attached document and for the legal consequences of relying on it.",
+                "The number of paid questions and the right to analyze documents depend on the user's chosen subscription plan.",
+              ],
+            },
+          ],
+        },
+        {
+          title: "CHAPTER FIVE. Liability",
+          sections: [
+            {
+              heading: "5.1. User liability",
+              clauses: [
+                "The user must provide accurate information on the platform and comply with these Terms and applicable law, and is fully responsible for any loss arising from a breach of that duty.",
+                "The consultation relationship and the substance of professional advice between a lawyer and a client is the responsibility of that lawyer; TORE is not a party to that relationship.",
+              ],
+            },
+            {
+              heading: "5.2. Limits on TORE's liability",
+              clauses: [
+                "TORE is not liable, to the maximum extent permitted by law, for loss arising from a technical failure or from a disruption to a third-party service (such as QPay, email, or legalinfo.mn).",
+                "TORE reserves the right to restrict, suspend, or terminate the account of a user who breaches these Terms.",
+              ],
+            },
+          ],
+        },
+        {
+          title: "CHAPTER SIX. Governing Law and Dispute Resolution",
+          sections: [
+            {
+              heading: "6.1. Governing law and dispute resolution",
+              clauses: [
+                "Matters not covered by these Terms are governed by the laws of Mongolia.",
+                "The parties will first make a good-faith effort to resolve any dispute by mutual negotiation. If no agreement is reached, the dispute will be resolved by a court of competent jurisdiction in accordance with the laws of Mongolia.",
+              ],
+            },
+            {
+              heading: "6.2. Contact",
+              clauses: [
+                "Send questions or complaints about these Terms to support@tore.mn.",
+              ],
+            },
+          ],
+        },
+      ],
+    },
     privacyIntro:
       "This privacy notice describes how TORE may process account, booking, verification, communications, and Legal AI data when you use the service.",
     privacyData:

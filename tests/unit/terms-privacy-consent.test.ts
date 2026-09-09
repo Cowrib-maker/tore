@@ -33,7 +33,12 @@ describe("auth consent + password schemas", () => {
     expect(en.legal.privacyTitle.length).toBeGreaterThan(3);
     expect(en.legal.placeholderBanner.toLowerCase()).toContain("effective");
     expect(en.legal.placeholderBanner.toLowerCase()).not.toContain("placeholder");
-    expect(en.legal.termsLegalAi.toLowerCase()).toContain("legalinfo.mn");
+    const termsClauseText = en.legal.termsDocument.chapters
+      .flatMap((chapter) => chapter.sections)
+      .flatMap((section) => section.clauses)
+      .join(" ")
+      .toLowerCase();
+    expect(termsClauseText).toContain("legalinfo.mn");
     expect(en.auth.termsOfService).toBeTruthy();
     expect(en.auth.privacyPolicy).toBeTruthy();
   });
