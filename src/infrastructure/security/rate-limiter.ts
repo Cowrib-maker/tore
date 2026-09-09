@@ -199,3 +199,14 @@ export const HOMEPAGE_FEEDBACK_RATE_LIMIT = {
   limit: 5,
   windowMs: 15 * 60 * 1000,
 };
+
+/**
+ * TORE Student case-study grading is unauthenticated (no login wall on the
+ * learning track) and each submission can trigger a real AI call, so it is
+ * rate-limited per IP like other public actions — 8 graded submissions is
+ * generous for genuine studying but bounds the AI cost of abuse/scripting.
+ */
+export const STUDENT_PROBLEM_EVALUATION_RATE_LIMIT = {
+  limit: 8,
+  windowMs: 15 * 60 * 1000,
+};

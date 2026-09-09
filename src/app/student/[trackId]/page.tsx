@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { StudentShell } from "@/components/student/student-shell";
 import {
   getPublicTrackQuiz,
+  getStudentLegalProblem,
   listStudentLessons,
   parseStudentTrackId,
 } from "@/domain/student";
@@ -24,6 +25,7 @@ export default async function StudentTrackPage({
   const theoryLessons = listStudentLessons(trackId, "theory");
   const testQuiz = getPublicTrackQuiz(trackId, "test");
   const problemQuiz = getPublicTrackQuiz(trackId, "problem");
+  const caseStudy = getStudentLegalProblem(trackId);
 
   return (
     <StudentShell
@@ -75,6 +77,15 @@ export default async function StudentTrackPage({
               intro={problemQuiz.intro}
               cta={student.startQuiz}
               badge={student.modules.problems}
+            />
+          ) : null}
+          {caseStudy ? (
+            <QuizCard
+              href={`/student/${trackId}/case-study`}
+              title={caseStudy.title}
+              intro={student.caseStudy.cardIntro}
+              cta={student.caseStudy.cta}
+              badge={student.modules.aiTutor}
             />
           ) : null}
         </ul>

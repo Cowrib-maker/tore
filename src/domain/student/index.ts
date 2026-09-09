@@ -2,6 +2,7 @@ import { administrativeLessons, administrativeProblem, administrativeTest } from
 import { civilLessons, civilProblem, civilTest } from "./civil";
 import { criminalLessons, criminalProblem, criminalTest } from "./criminal";
 import { publicStudentQuiz } from "./grade-quiz";
+import { getStudentLegalProblem as getLegalProblem, findStudentLegalProblemById } from "./legal-problems";
 import {
   isStudentQuizKind,
   isStudentTrackId,
@@ -70,6 +71,16 @@ export function getPublicTrackQuiz(
   return quiz ? publicStudentQuiz(quiz) : null;
 }
 
+/**
+ * Free-text case-study exercise (distinct from the "problem" StudentQuiz
+ * kind, which is still multiple choice). One per track today.
+ */
+export function getStudentLegalProblem(trackId: StudentTrackId) {
+  return getLegalProblem(trackId);
+}
+
+export { findStudentLegalProblemById };
+
 export function parseStudentTrackId(value: string): StudentTrackId | null {
   return isStudentTrackId(value) ? value : null;
 }
@@ -88,6 +99,12 @@ export {
 export type {
   StudentGradeBand,
   StudentLesson,
+  StudentLegalProblem,
+  StudentLegalSource,
+  StudentProblemEvaluation,
+  StudentProblemGrade,
+  StudentProblemRubricItem,
+  StudentProblemRubricScore,
   StudentPublicQuiz,
   StudentQuestionReview,
   StudentQuiz,
