@@ -147,6 +147,7 @@ export class PrismaUserRepository implements UserRepository {
       where: { id: userId },
       data: {
         ...(input.name !== undefined ? { name: input.name } : {}),
+        ...(input.image !== undefined ? { image: input.image } : {}),
       },
       select: userSelect,
     });

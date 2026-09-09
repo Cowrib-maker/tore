@@ -4,7 +4,7 @@ import { provisionPersonalTenantOnRegister } from "@/application/use-cases/auth/
 import type { RegisterLawyerInput } from "@/application/validators/auth.schema";
 import { PLATFORM_SETTING_KEYS } from "@/domain/constants/platform-settings";
 import type { User } from "@/domain/entities/user";
-import { AuditAction, UserRole } from "@/domain/enums";
+import { AuditAction, LawyerPosition, UserRole } from "@/domain/enums";
 import { ConflictError } from "@/domain/errors/domain-error";
 import type { UnitOfWork } from "@/domain/ports/unit-of-work";
 import type { PlatformSettingRepository } from "@/domain/repositories/platform-setting-repository";
@@ -59,6 +59,7 @@ export async function registerLawyerUseCase(
       input.name,
       user.id,
       repos.lawyerProfileRepository,
+      { position: input.position as LawyerPosition },
     );
 
     await repos.termsAcceptanceRepository.createBundle({

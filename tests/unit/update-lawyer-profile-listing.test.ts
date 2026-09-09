@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { setLawyerDirectoryListingUseCase } from "@/application/use-cases/profiles/set-lawyer-directory-listing";
 import { updateLawyerProfileUseCase } from "@/application/use-cases/profiles/update-lawyer-profile";
-import { UserRole, LawyerVerificationStatus } from "@/domain/enums";
+import { UserRole, LawyerPosition, LawyerVerificationStatus } from "@/domain/enums";
 import { ForbiddenError, ValidationError } from "@/domain/errors/domain-error";
 import type { LawyerProfile } from "@/domain/entities/profile";
 
@@ -18,6 +18,7 @@ function profile(overrides: Partial<LawyerProfile> = {}): LawyerProfile {
     education: null,
     phone: null,
     verificationStatus: LawyerVerificationStatus.APPROVED,
+    position: LawyerPosition.ATTORNEY,
     verifiedAt: new Date(),
     isListed: false,
     averageRating: null,
@@ -180,5 +181,50 @@ describe("setLawyerDirectoryListingUseCase", () => {
         } as never,
       ),
     ).rejects.toBeInstanceOf(ForbiddenError);
+  });
+
+  it("rejects listing a fully-approved non-ATTORNEY position, even for an admin", async () => {
+    for (const position of [
+      LawyerPosition.PROSECUTOR,
+      LawyerPosition.JUDGE,
+      LawyerPosition.OTHER_LAWYER,
+    ]) {
+      const update = vi.fn();
+      await expect(
+        setLawyerDirectoryListingUseCase(
+          { userId: "admin", role: UserRole.ADMIN },
+          { lawyerProfileId: "lp_1", isListed: true },
+          {
+            lawyerProfileRepository: {
+              findById: vi.fn().mockResolvedValue(profile({ position })),
+              update,
+            },
+            auditLogRepository: { create: vi.fn() },
+          } as never,
+        ),
+      ).rejects.toBeInstanceOf(ValidationError);
+      expect(update).not.toHaveBeenCalled();
+    }
+  });
+
+  it("still allows unlisting (isListed: false) a non-ATTORNEY position without error", async () => {
+    const existing = profile({
+      position: LawyerPosition.PROSECUTOR,
+      isListed: false,
+    });
+    const update = vi.fn().mockResolvedValue(existing);
+    const result = await setLawyerDirectoryListingUseCase(
+      { userId: "admin", role: UserRole.ADMIN },
+      { lawyerProfileId: "lp_1", isListed: false },
+      {
+        lawyerProfileRepository: {
+          findById: vi.fn().mockResolvedValue(existing),
+          update,
+        },
+        auditLogRepository: { create: vi.fn().mockResolvedValue({}) },
+      } as never,
+    );
+    expect(update).toHaveBeenCalledWith("lp_1", { isListed: false });
+    expect(result.isListed).toBe(false);
   });
 });

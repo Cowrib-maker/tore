@@ -1,4 +1,5 @@
 import type { LawyerProfile } from "@/domain/entities/profile";
+import type { LawyerPosition } from "@/domain/enums";
 import { ConflictError } from "@/domain/errors/domain-error";
 import type { LawyerProfileRepository } from "@/domain/repositories/profile-repository";
 import { generateLawyerSlug } from "@/domain/services/slug-generator";
@@ -17,6 +18,7 @@ export async function createLawyerProfileWithUniqueSlug(
   options?: {
     headline?: string;
     timezone?: string;
+    position?: LawyerPosition;
   },
 ): Promise<LawyerProfile> {
   for (let attempt = 0; attempt < MAX_SLUG_ATTEMPTS; attempt += 1) {
@@ -27,6 +29,7 @@ export async function createLawyerProfileWithUniqueSlug(
         slug,
         headline: options?.headline,
         timezone: options?.timezone,
+        position: options?.position,
       });
     } catch (error) {
       if (error instanceof ConflictError) {

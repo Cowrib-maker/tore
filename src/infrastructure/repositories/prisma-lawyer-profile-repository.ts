@@ -4,7 +4,10 @@ import type {
   UpdateLawyerProfileInput,
 } from "@/domain/entities/profile";
 import type { LawyerVerificationStatus } from "@/domain/enums";
-import { LawyerVerificationStatus as LawyerVerificationStatusEnum } from "@/domain/enums";
+import {
+  LawyerPosition,
+  LawyerVerificationStatus as LawyerVerificationStatusEnum,
+} from "@/domain/enums";
 import type {
   LawyerDiscoveryFilters,
   LawyerProfileRepository,
@@ -83,6 +86,7 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
           headline: input.headline,
           timezone: input.timezone ?? "Asia/Ulaanbaatar",
           verificationStatus: LawyerVerificationStatusEnum.PENDING,
+          position: input.position ?? LawyerPosition.ATTORNEY,
           isListed: false,
         },
         select: lawyerProfileSelect,
@@ -170,6 +174,9 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
         deletedAt: null,
         isListed: true,
         verificationStatus: LawyerVerificationStatusEnum.APPROVED,
+        // Defense-in-depth: only ATTORNEY may ever surface in the public
+        // marketplace, even if isListed/verificationStatus were somehow set.
+        position: LawyerPosition.ATTORNEY,
         offerings: {
           some: {
             isActive: true,

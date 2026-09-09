@@ -26,4 +26,6 @@ export interface CreateUserInput {
 
 export interface UpdateUserProfileInput {
   name?: string | null;
+  /** Storage key for the uploaded profile photo (see FilePurpose "profile-photo"), or null to clear it. */
+  image?: string | null;
 }

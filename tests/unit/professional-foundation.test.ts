@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 
 import type { LawyerProfile } from "@/domain/entities/profile";
-import { LawyerVerificationStatus, ProfessionalType } from "@/domain/enums";
+import { LawyerPosition, LawyerVerificationStatus, ProfessionalType } from "@/domain/enums";
 import { mapLawyerProfileToProfessional } from "@/infrastructure/mappers/professional.mapper";
 import {
   FOUNDATION_PROFESSIONAL_V1_FLAG,
@@ -22,6 +22,7 @@ function makeLawyerProfile(
     education: null,
     phone: null,
     verificationStatus: LawyerVerificationStatus.PENDING,
+    position: LawyerPosition.ATTORNEY,
     verifiedAt: null,
     isListed: false,
     averageRating: null,

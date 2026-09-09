@@ -50,6 +50,7 @@ const registerInput = {
   password: "Password1!",
   acceptTerms: true as const,
   preferredLanguage: "mn" as const,
+  position: "ATTORNEY" as const,
 };
 
 describe("registration personal tenant provisioning", () => {

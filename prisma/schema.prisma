@@ -31,6 +31,17 @@ enum LawyerVerificationStatus {
   SUSPENDED
 }
 
+/// Sub-profession chosen at registration. Only ATTORNEY may ever appear on
+/// the public marketplace (listing, bookings, offerings) — see
+/// domain/services/lawyer-eligibility.ts. All positions get the shared
+/// /lawyer/* workspace and Legal AI access via UserRole.LAWYER alone.
+enum LawyerPosition {
+  ATTORNEY
+  PROSECUTOR
+  JUDGE
+  OTHER_LAWYER
+}
+
 enum CredentialReviewStatus {
   SUBMITTED
   APPROVED
@@ -427,6 +438,7 @@ model LawyerProfile {
   education          String?                  @db.Text
   phone              String?
   verificationStatus LawyerVerificationStatus @default(PENDING) @map("verification_status")
+  position           LawyerPosition           @default(ATTORNEY)
   verifiedAt         DateTime?                @map("verified_at")
   isListed           Boolean                  @default(false) @map("is_listed")
   averageRating      Decimal?                 @map("average_rating") @db.Decimal(3, 2)
@@ -450,6 +462,7 @@ model LawyerProfile {
 
   @@index([verificationStatus])
   @@index([isListed, verificationStatus])
+  @@index([isListed, verificationStatus, position])
   @@index([averageRating(sort: Desc)])
   @@index([slug])
   @@index([deletedAt])

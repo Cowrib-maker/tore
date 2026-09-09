@@ -1,6 +1,7 @@
 import type { LawyerProfile } from "@/domain/entities/profile";
 import {
   CredentialReviewStatus,
+  LawyerPosition,
   LawyerVerificationStatus,
   UserRole,
   UserStatus,
@@ -8,6 +9,11 @@ import {
 
 export function isLawyerVerified(profile: LawyerProfile): boolean {
   return profile.verificationStatus === LawyerVerificationStatus.APPROVED;
+}
+
+/** Only the ATTORNEY position may ever take marketplace bookings. */
+export function isMarketplaceEligiblePosition(profile: LawyerProfile): boolean {
+  return profile.position === LawyerPosition.ATTORNEY;
 }
 
 export function isLawyerPubliclyListed(
@@ -19,6 +25,7 @@ export function isLawyerPubliclyListed(
     profile.isListed &&
     isLawyerVerified(profile) &&
     hasActiveOffering &&
+    isMarketplaceEligiblePosition(profile) &&
     profile.verificationStatus !== LawyerVerificationStatus.SUSPENDED
   );
 }

@@ -16,9 +16,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LawyerListingActions } from "@/components/verification/lawyer-listing-actions";
-import { UserRole } from "@/domain/enums";
+import { LawyerPosition, UserRole } from "@/domain/enums";
 import { isLawyerVerified } from "@/domain/services/lawyer-eligibility";
-import { getDashboardPath } from "@/domain/services/rbac";
+import { getDashboardPath, LEGAL_AI_PATH } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 import { formatVerificationStatus } from "@/lib/format-labels";
 import { cn } from "@/lib/utils";
@@ -78,6 +78,7 @@ export default async function LawyerDashboardPage() {
   const verified = isLawyerVerified(data.profile);
   const hasActiveOffering = data.hasActiveOffering;
   const listed = data.profile.isListed;
+  const isAttorney = data.profile.position === LawyerPosition.ATTORNEY;
   const ld = m.lawyerDashboard;
   const pf = m.lawyerProfileForm;
 
@@ -145,6 +146,8 @@ export default async function LawyerDashboardPage() {
             </Link>
           </CardFooter>
         </Card>
+        {isAttorney ? (
+        <>
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between gap-2">
@@ -255,6 +258,23 @@ export default async function LawyerDashboardPage() {
             </Link>
           </CardFooter>
         </Card>
+        </>
+        ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>{ld.workspaceTitle}</CardTitle>
+            <CardDescription>{ld.workspaceHelp}</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Link
+              href={LEGAL_AI_PATH}
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+            >
+              {ld.openLegalAi}
+            </Link>
+          </CardFooter>
+        </Card>
+        )}
       </div>
     </>
   );

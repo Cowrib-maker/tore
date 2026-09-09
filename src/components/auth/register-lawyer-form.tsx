@@ -97,6 +97,23 @@ export function RegisterLawyerForm({
             <p className="text-xs text-muted-foreground">{copy.passwordHint}</p>
           </div>
           <div className="space-y-2">
+            <Label htmlFor="position">{copy.position}</Label>
+            <NativeSelect
+              id="position"
+              name="position"
+              defaultValue="ATTORNEY"
+              aria-invalid={Boolean(state.error)}
+              aria-describedby={
+                state.error ? "register-lawyer-form-error" : undefined
+              }
+            >
+              <option value="ATTORNEY">{copy.positionAttorney}</option>
+              <option value="PROSECUTOR">{copy.positionProsecutor}</option>
+              <option value="JUDGE">{copy.positionJudge}</option>
+              <option value="OTHER_LAWYER">{copy.positionOtherLawyer}</option>
+            </NativeSelect>
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="preferredLanguage">{copy.preferredLanguage}</Label>
             <NativeSelect
               id="preferredLanguage"

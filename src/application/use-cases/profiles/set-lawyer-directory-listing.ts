@@ -1,6 +1,6 @@
 import type { ActorContext } from "@/application/common/actor-context";
 import type { LawyerProfile } from "@/domain/entities/profile";
-import { AuditAction, UserRole } from "@/domain/enums";
+import { AuditAction, LawyerPosition, UserRole } from "@/domain/enums";
 import {
   ForbiddenError,
   NotFoundError,
@@ -33,6 +33,12 @@ export async function setLawyerDirectoryListingUseCase(
     actor.role === UserRole.LAWYER && actor.userId === existing.userId;
   if (!isAdmin && !isOwner) {
     throw new ForbiddenError();
+  }
+
+  if (input.isListed && existing.position !== LawyerPosition.ATTORNEY) {
+    throw new ValidationError(
+      "Only the attorney position can be listed in the public directory",
+    );
   }
 
   if (input.isListed && !isLawyerVerified(existing)) {

@@ -160,6 +160,9 @@ export const marketplaceMn: MarketplaceDictionary = {
     bookingsHelp:
       "Үйлчлүүлэгчийн хүсэлтийг хянаж, хүлээн авах эсвэл татгалзана.",
     openBookings: "Хүсэлт нээх",
+    workspaceTitle: "Мэргэжлийн ажлын орчин",
+    workspaceHelp: "Таны албан тушаал нийтийн зах зээлийн жагсаалт, захиалгад хамаарахгүй. Хууль зүйн AI хэрэгслээ ашиглана уу.",
+    openLegalAi: "Хууль зүйн AI нээх",
   },
   clientDashboard: {
     intro:
@@ -333,6 +336,15 @@ export const marketplaceMn: MarketplaceDictionary = {
     document: "Үнэмлэхийн зураг/PDF (хамгийн ихдээ 10МБ)",
     uploading: "Хуулж байна…",
     submit: "Баталгаажуулах хүсэлт илгээх",
+  },
+  profilePhoto: {
+    title: "Профайлын зураг",
+    description: "Хувийн мэдээллийн хэсэгт харагдах зургаа оруулна уу.",
+    noPhoto: "Зураг оруулаагүй байна",
+    chooseFile: "Зураг сонгох (JPEG, PNG, WebP, хамгийн ихдээ 5МБ)",
+    uploading: "Хуулж байна…",
+    submit: "Зураг хадгалах",
+    success: "Профайлын зураг шинэчлэгдлээ.",
   },
   reviewCredential: {
     saved: "Шийдвэр хадгалагдлаа.",

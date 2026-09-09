@@ -74,6 +74,16 @@ export async function assertCanAccessStoredFile(
     return;
   }
 
+  if (purpose === "profile-photo") {
+    // Owner-only via the authenticated route. Public marketplace visitors
+    // see attorney photos through the separate, unauthenticated
+    // /api/profile-photos route instead (never this one).
+    if (actor.userId !== ownerId) {
+      throw new ForbiddenError();
+    }
+    return;
+  }
+
   if (purpose === "evidence") {
     if (actor.role !== UserRole.LAWYER) {
       throw new ForbiddenError();

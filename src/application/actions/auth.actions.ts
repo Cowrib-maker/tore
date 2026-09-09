@@ -128,6 +128,7 @@ export async function registerLawyerAction(
     password: formData.get("password"),
     acceptTerms: formData.get("acceptTerms") === "on",
     preferredLanguage: formData.get("preferredLanguage") ?? "mn",
+    position: formData.get("position") ?? "ATTORNEY",
   });
   if (!parsed.ok) return parsed.state;
 

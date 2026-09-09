@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+export const PROFILE_PHOTO_MAX_BYTES = 5 * 1024 * 1024;
+export const PROFILE_PHOTO_ALLOWED_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+] as const;
+
 const emptyToNull = (value: string) => {
   const trimmed = value.trim();
   return trimmed === "" ? null : trimmed;

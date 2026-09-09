@@ -23,6 +23,20 @@ export enum CredentialReviewStatus {
   REJECTED = "REJECTED",
 }
 
+/**
+ * Sub-profession chosen at registration under the shared LAWYER account
+ * role. Only ATTORNEY may ever appear on the public marketplace (listing,
+ * bookings, offerings) — see domain/services/lawyer-eligibility.ts. Every
+ * position gets the shared /lawyer/* workspace and Legal AI access, which
+ * are gated on UserRole.LAWYER alone and need no position check.
+ */
+export enum LawyerPosition {
+  ATTORNEY = "ATTORNEY",
+  PROSECUTOR = "PROSECUTOR",
+  JUDGE = "JUDGE",
+  OTHER_LAWYER = "OTHER_LAWYER",
+}
+
 export enum BookingStatus {
   DRAFT = "DRAFT",
   PENDING_PAYMENT = "PENDING_PAYMENT",

@@ -157,6 +157,9 @@ export const marketplaceEn: MarketplaceDictionary = {
     bookings: "Consultation requests",
     bookingsHelp: "Review and accept or decline client consultation requests.",
     openBookings: "Open bookings",
+    workspaceTitle: "Professional workspace",
+    workspaceHelp: "Your position is not part of the public marketplace listing or bookings. Use your Legal AI tools instead.",
+    openLegalAi: "Open Legal AI",
   },
   clientDashboard: {
     intro:
@@ -325,6 +328,15 @@ export const marketplaceEn: MarketplaceDictionary = {
     document: "License document (PDF or image, max 10MB)",
     uploading: "Uploading…",
     submit: "Submit verification request",
+  },
+  profilePhoto: {
+    title: "Profile photo",
+    description: "Upload the photo shown on your personal info section.",
+    noPhoto: "No photo uploaded yet",
+    chooseFile: "Choose a photo (JPEG, PNG, WebP, max 5MB)",
+    uploading: "Uploading…",
+    submit: "Save photo",
+    success: "Profile photo updated.",
   },
   reviewCredential: {
     saved: "Review saved.",

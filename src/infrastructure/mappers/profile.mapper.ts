@@ -2,7 +2,7 @@ import type {
   ClientProfile,
   LawyerProfile,
 } from "@/domain/entities/profile";
-import type { LawyerVerificationStatus } from "@/domain/enums";
+import type { LawyerPosition, LawyerVerificationStatus } from "@/domain/enums";
 
 type ClientProfileRecord = {
   id: string;
@@ -25,6 +25,7 @@ type LawyerProfileRecord = {
   education: string | null;
   phone: string | null;
   verificationStatus: string;
+  position: string;
   verifiedAt: Date | null;
   isListed: boolean;
   averageRating: { toNumber(): number } | number | null;
@@ -66,6 +67,7 @@ export function mapLawyerProfile(record: LawyerProfileRecord): LawyerProfile {
     education: record.education,
     phone: record.phone,
     verificationStatus: record.verificationStatus as LawyerVerificationStatus,
+    position: record.position as LawyerPosition,
     verifiedAt: record.verifiedAt,
     isListed: record.isListed,
     averageRating,
@@ -98,6 +100,7 @@ export const lawyerProfileSelect = {
   education: true,
   phone: true,
   verificationStatus: true,
+  position: true,
   verifiedAt: true,
   isListed: true,
   averageRating: true,

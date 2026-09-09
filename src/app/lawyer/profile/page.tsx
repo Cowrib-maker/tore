@@ -15,6 +15,7 @@ import { ChangeEmailForm } from "@/components/profiles/change-email-form";
 import { ChangePasswordForm } from "@/components/profiles/change-password-form";
 import { BillingAndSessionsPanel } from "@/components/account/billing-and-sessions-panel";
 import { LawyerProfileForm } from "@/components/profiles/lawyer-profile-form";
+import { ProfilePhotoUploadForm } from "@/components/profiles/profile-photo-upload-form";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { LawyerVerificationSection } from "@/components/verification/lawyer-verification-section";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
@@ -27,7 +28,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { WorkspaceTabs } from "@/components/ui/workspace-tabs";
-import { UserRole } from "@/domain/enums";
+import { LawyerPosition, UserRole } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 import { buildAppFilePath } from "@/infrastructure/storage/file-access";
@@ -116,6 +117,7 @@ export default async function LawyerProfilePage() {
     saving: m.common.saving,
   };
   const names = splitDisplayName(data.user.name);
+  const isAttorney = data.profile.position === LawyerPosition.ATTORNEY;
   const credentials =
     verification.status === "ok"
       ? await Promise.all(
@@ -129,6 +131,7 @@ export default async function LawyerProfilePage() {
   return (
     <>
       <DashboardPageHeading>{lp.title}</DashboardPageHeading>
+      {isAttorney ? (
       <div className="mb-5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         <span>
           {lp.publicProfile}{" "}
@@ -148,6 +151,7 @@ export default async function LawyerProfilePage() {
           </Link>
         ) : null}
       </div>
+      ) : null}
       <WorkspaceTabs
         defaultValue="profile"
         items={[
@@ -168,7 +172,11 @@ export default async function LawyerProfilePage() {
                     </Link>
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
+                  <ProfilePhotoUploadForm
+                    photoUrl={data.photoUrl}
+                    copy={m.profilePhoto}
+                  />
                   <LawyerProfileForm
                     key={data.profile.updatedAt.toISOString()}
                     lastName={names.lastName}
@@ -212,7 +220,7 @@ export default async function LawyerProfilePage() {
               </Card>
             ),
           },
-          {
+          ...(isAttorney ? [{
             value: "verification",
             label: m.account.tabVerification,
             content:
@@ -230,8 +238,8 @@ export default async function LawyerProfilePage() {
                   locale={locale}
                 />
               ) : null,
-          },
-          {
+          }] : []),
+          ...(isAttorney ? [{
             value: "schedule",
             label: m.account.tabSchedule,
             content: (
@@ -272,7 +280,7 @@ export default async function LawyerProfilePage() {
                 </Card>
               </div>
             ),
-          },
+          }] : []),
           {
             value: "security",
             label: m.account.tabSecurity,

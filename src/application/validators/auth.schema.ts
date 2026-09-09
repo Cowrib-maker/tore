@@ -31,7 +31,16 @@ const baseRegisterSchema = z.object({
 
 export const registerClientSchema = baseRegisterSchema;
 
-export const registerLawyerSchema = baseRegisterSchema;
+export const LAWYER_POSITION_VALUES = [
+  "ATTORNEY",
+  "PROSECUTOR",
+  "JUDGE",
+  "OTHER_LAWYER",
+] as const;
+
+export const registerLawyerSchema = baseRegisterSchema.extend({
+  position: z.enum(LAWYER_POSITION_VALUES).default("ATTORNEY"),
+});
 
 export type RegisterClientInput = z.infer<typeof registerClientSchema>;
 export type RegisterLawyerInput = z.infer<typeof registerLawyerSchema>;

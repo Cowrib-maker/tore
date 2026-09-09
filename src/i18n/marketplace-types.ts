@@ -134,6 +134,9 @@ export type MarketplaceDictionary = {
     bookings: string;
     bookingsHelp: string;
     openBookings: string;
+    workspaceTitle: string;
+    workspaceHelp: string;
+    openLegalAi: string;
   };
   clientDashboard: {
     intro: string;
@@ -287,6 +290,15 @@ export type MarketplaceDictionary = {
     document: string;
     uploading: string;
     submit: string;
+  };
+  profilePhoto: {
+    title: string;
+    description: string;
+    noPhoto: string;
+    chooseFile: string;
+    uploading: string;
+    submit: string;
+    success: string;
   };
   reviewCredential: {
     saved: string;

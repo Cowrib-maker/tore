@@ -10,7 +10,7 @@ import type {
   LawyerDiscoveryFilters,
   LawyerProfileRepository,
 } from "@/domain/repositories/profile-repository";
-import { CredentialReviewStatus } from "@/domain/enums";
+import { CredentialReviewStatus, LawyerPosition } from "@/domain/enums";
 import type {
   LanguageRepository,
   LawyerTaxonomyRepository,
@@ -24,6 +24,7 @@ import {
 import { NotFoundError } from "@/domain/errors/domain-error";
 import type { Locale } from "@/i18n/config";
 import { localizedTaxonomyName } from "@/lib/localized-content";
+import { resolveProfilePhotoUrl } from "@/infrastructure/storage/file-access";
 
 export type DirectoryLawyerCard = {
   profile: LawyerProfile;
@@ -134,7 +135,7 @@ export async function searchListedLawyers(
     return {
       profile,
       displayName: user?.name ?? profile.slug,
-      imageUrl: user?.image ?? null,
+      imageUrl: resolveProfilePhotoUrl(user?.image ?? null),
       phone: profile.phone,
       licenseNumber: publicLicenseNumber(credentialsByProfile.get(profile.id) ?? []),
       minPriceMnt:
@@ -159,7 +160,12 @@ export async function getPublicLawyerProfile(
   const hasActive = await deps.lawyerProfileRepository.hasActiveOffering(
     profile.id,
   );
-  if (!profile.isListed || profile.verificationStatus !== "APPROVED" || !hasActive) {
+  if (
+    !profile.isListed ||
+    profile.verificationStatus !== "APPROVED" ||
+    !hasActive ||
+    profile.position !== LawyerPosition.ATTORNEY
+  ) {
     throw new NotFoundError("LawyerProfile");
   }
 
@@ -226,7 +232,7 @@ export async function getPublicLawyerProfile(
   return {
     profile,
     displayName: user?.name ?? profile.slug,
-    imageUrl: user?.image ?? null,
+    imageUrl: resolveProfilePhotoUrl(user?.image ?? null),
     phone: profile.phone,
     licenseNumber: publicLicenseNumber(credentials),
     offerings,

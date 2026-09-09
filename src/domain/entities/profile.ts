@@ -1,5 +1,6 @@
 import type {
   CredentialReviewStatus,
+  LawyerPosition,
   LawyerVerificationStatus,
 } from "@/domain/enums";
 
@@ -35,6 +36,7 @@ export interface LawyerProfile {
   education: string | null;
   phone: string | null;
   verificationStatus: LawyerVerificationStatus;
+  position: LawyerPosition;
   verifiedAt: Date | null;
   isListed: boolean;
   averageRating: number | null;
@@ -50,6 +52,7 @@ export interface CreateLawyerProfileInput {
   slug: string;
   headline?: string;
   timezone?: string;
+  position?: LawyerPosition;
 }
 
 export interface UpdateLawyerProfileInput {

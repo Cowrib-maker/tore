@@ -5,6 +5,7 @@ import { submitLawyerCredentialUseCase } from "@/application/use-cases/verificat
 import type { LawyerCredential, LawyerProfile } from "@/domain/entities/profile";
 import {
   CredentialReviewStatus,
+  LawyerPosition,
   LawyerVerificationStatus,
   UserRole,
 } from "@/domain/enums";
@@ -26,6 +27,7 @@ function profile(
     education: null,
     phone: null,
     verificationStatus: LawyerVerificationStatus.PENDING,
+    position: LawyerPosition.ATTORNEY,
     verifiedAt: null,
     isListed: false,
     averageRating: null,

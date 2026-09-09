@@ -237,6 +237,11 @@ export type Dictionary = {
     clientDescription: string;
     lawyerTitle: string;
     lawyerDescription: string;
+    position: string;
+    positionAttorney: string;
+    positionProsecutor: string;
+    positionJudge: string;
+    positionOtherLawyer: string;
     fullName: string;
     namePlaceholder: string;
     emailPlaceholder: string;

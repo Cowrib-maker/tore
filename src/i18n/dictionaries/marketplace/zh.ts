@@ -154,6 +154,9 @@ export const marketplaceZh: MarketplaceDictionary = {
     bookings: "咨询申请",
     bookingsHelp: "审阅并接受或拒绝客户的咨询申请。",
     openBookings: "打开预约",
+    workspaceTitle: "专业工作台",
+    workspaceHelp: "您的职位不参与公开市场列表或预约。请使用您的法律 AI 工具。",
+    openLegalAi: "打开法律 AI",
   },
   clientDashboard: {
     intro:
@@ -315,6 +318,15 @@ export const marketplaceZh: MarketplaceDictionary = {
     document: "证照文件（PDF 或图片，最大 10MB）",
     uploading: "上传中…",
     submit: "提交资质核验",
+  },
+  profilePhoto: {
+    title: "个人照片",
+    description: "上传显示在个人信息栏中的照片。",
+    noPhoto: "尚未上传照片",
+    chooseFile: "选择照片（JPEG、PNG、WebP，最大 5MB）",
+    uploading: "上传中…",
+    submit: "保存照片",
+    success: "个人照片已更新。",
   },
   reviewCredential: {
     saved: "审核结果已保存。",

@@ -4,7 +4,7 @@ import { ConflictError } from "@/domain/errors/domain-error";
 import type { LawyerProfileRepository } from "@/domain/repositories/profile-repository";
 import { createLawyerProfileWithUniqueSlug } from "@/domain/services/allocate-lawyer-slug";
 import type { LawyerProfile } from "@/domain/entities/profile";
-import { LawyerVerificationStatus } from "@/domain/enums";
+import { LawyerPosition, LawyerVerificationStatus } from "@/domain/enums";
 
 function makeProfile(slug: string): LawyerProfile {
   const now = new Date();
@@ -19,6 +19,7 @@ function makeProfile(slug: string): LawyerProfile {
     education: null,
     phone: null,
     verificationStatus: LawyerVerificationStatus.PENDING,
+    position: LawyerPosition.ATTORNEY,
     verifiedAt: null,
     isListed: false,
     averageRating: null,

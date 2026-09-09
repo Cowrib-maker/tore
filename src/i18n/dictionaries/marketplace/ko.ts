@@ -155,6 +155,9 @@ export const marketplaceKo: MarketplaceDictionary = {
     bookings: "상담 신청",
     bookingsHelp: "고객의 상담 신청을 검토하고 수락하거나 거절하십시오.",
     openBookings: "예약 열기",
+    workspaceTitle: "전문가 작업 공간",
+    workspaceHelp: "귀하의 직위는 공개 마켓플레이스 목록이나 예약에 해당하지 않습니다. 법률 AI 도구를 이용하세요.",
+    openLegalAi: "법률 AI 열기",
   },
   clientDashboard: {
     intro:
@@ -320,6 +323,15 @@ export const marketplaceKo: MarketplaceDictionary = {
     document: "면허 문서 (PDF 또는 이미지, 최대 10MB)",
     uploading: "업로드 중…",
     submit: "자격 검증 제출",
+  },
+  profilePhoto: {
+    title: "프로필 사진",
+    description: "개인 정보 섹션에 표시될 사진을 업로드하세요.",
+    noPhoto: "업로드된 사진이 없습니다",
+    chooseFile: "사진 선택 (JPEG, PNG, WebP, 최대 5MB)",
+    uploading: "업로드 중…",
+    submit: "사진 저장",
+    success: "프로필 사진이 업데이트되었습니다.",
   },
   reviewCredential: {
     saved: "검토 결과가 저장되었습니다.",
