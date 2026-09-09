@@ -99,6 +99,13 @@ export const envSchema = z.object({
    */
   OPENAI_API_KEY: emptyToUndefined(z.string().optional()),
   /**
+   * Anthropic Claude — optional second Legal AI completion provider.
+   * When unset, LegalAiService behavior is unchanged (OpenAI-only, as before).
+   * When set, it is wired as an automatic fallback if OpenAI fails, for
+   * provider resilience. Never required at boot; never logged.
+   */
+  ANTHROPIC_API_KEY: emptyToUndefined(z.string().optional()),
+  /**
    * QPay Merchant V2. Server-only. Sandbox vs production is selected by BASE_URL.
    * Credentials are optional at boot — empty or placeholder values must not fail
    * process start. Call-time helpers (isQpayConfigured / readQpayConfig) enforce

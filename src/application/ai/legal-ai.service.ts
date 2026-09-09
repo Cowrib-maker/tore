@@ -423,7 +423,7 @@ export class LegalAiService {
         conversationId: conversation.id,
         content:
           completion.content.trim() || "Хариу боловсруулах явцад алдаа гарлаа.",
-        provider: "OPENAI",
+        provider: completion.provider,
         model: completion.model,
         inputTokens: completion.inputTokens,
         outputTokens: completion.outputTokens,
@@ -432,7 +432,7 @@ export class LegalAiService {
     if (input.userId) {
       await this.dependencies.store.recordUsage({
         userId: input.userId,
-        provider: "OPENAI",
+        provider: completion.provider,
         model: completion.model,
         inputTokens: completion.inputTokens,
         outputTokens: completion.outputTokens,
@@ -556,7 +556,7 @@ export class LegalAiService {
         conversationId: input.conversationId,
         content:
           completion.content.trim() || "Хариу боловсруулах явцад алдаа гарлаа.",
-        provider: "OPENAI",
+        provider: completion.provider,
         model: completion.model,
         inputTokens: completion.inputTokens,
         outputTokens: completion.outputTokens,
@@ -564,7 +564,7 @@ export class LegalAiService {
     if (input.userId) {
       await this.dependencies.store.recordUsage({
         userId: input.userId,
-        provider: "OPENAI",
+        provider: completion.provider,
         model: completion.model,
         inputTokens: completion.inputTokens,
         outputTokens: completion.outputTokens,
@@ -639,7 +639,7 @@ export class LegalAiService {
       await this.dependencies.store.createAssistantMessage({
         conversationId: input.conversationId,
         content,
-        provider: "OPENAI",
+        provider: completion.provider,
         model: completion.model,
         inputTokens: completion.inputTokens,
         outputTokens: completion.outputTokens,
@@ -648,7 +648,7 @@ export class LegalAiService {
     if (input.userId) {
       await this.dependencies.store.recordUsage({
         userId: input.userId,
-        provider: "OPENAI",
+        provider: completion.provider,
         model: completion.model,
         inputTokens: completion.inputTokens,
         outputTokens: completion.outputTokens,

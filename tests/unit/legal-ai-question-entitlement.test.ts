@@ -173,6 +173,7 @@ function completion(): LegalAiCompletionPort {
     complete: async () => ({
       content: "Хууль зүйн хариу",
       model: "test-model",
+      provider: "OPENAI",
       inputTokens: 1,
       outputTokens: 1,
     }),

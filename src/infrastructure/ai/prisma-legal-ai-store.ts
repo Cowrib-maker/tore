@@ -5,6 +5,7 @@ import type {
   LegalAiConversation,
   LegalAiConversationDocumentExtract,
   LegalAiConversationDocumentMeta,
+  LegalAiProvider,
   LegalAiRecentConversationSummary,
   LegalAiStore,
   LegalAiStoredMessage,
@@ -191,7 +192,7 @@ export class PrismaLegalAiStore implements LegalAiStore {
   async createAssistantMessage(input: {
     conversationId: string;
     content: string;
-    provider?: "OPENAI";
+    provider?: LegalAiProvider;
     model?: string;
     inputTokens?: number;
     outputTokens?: number;
@@ -217,7 +218,7 @@ export class PrismaLegalAiStore implements LegalAiStore {
 
   async recordUsage(input: {
     userId: string;
-    provider: "OPENAI";
+    provider: LegalAiProvider;
     model: string;
     inputTokens: number;
     outputTokens: number;

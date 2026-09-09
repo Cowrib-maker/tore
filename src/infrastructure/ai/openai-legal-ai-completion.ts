@@ -72,6 +72,7 @@ export class OpenAiLegalAiCompletion implements LegalAiCompletionPort {
           completion.choices?.[0]?.message?.content?.trim() ??
           UNAVAILABLE_MESSAGE,
         model: completion.model ?? this.model,
+        provider: "OPENAI",
         inputTokens: completion.usage?.prompt_tokens ?? 0,
         outputTokens: completion.usage?.completion_tokens ?? 0,
       };

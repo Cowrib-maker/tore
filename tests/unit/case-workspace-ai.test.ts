@@ -226,6 +226,7 @@ function createService(store: LegalAiStore) {
     complete: async () => ({
       content: "mocked-answer",
       model: "test",
+      provider: "OPENAI",
       inputTokens: 1,
       outputTokens: 1,
     }),

@@ -15,6 +15,7 @@ function completionReturning(content: string, model = "gpt-5.6-luna"): LegalAiCo
     complete: vi.fn(async () => ({
       content,
       model,
+      provider: "OPENAI" as const,
       inputTokens: 100,
       outputTokens: 50,
     })),

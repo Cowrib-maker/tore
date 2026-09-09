@@ -276,6 +276,7 @@ function createCompletion(
   complete: LegalAiCompletionPort["complete"] = async () => ({
     content: "mocked-answer",
     model: "gpt-5.6-luna",
+    provider: "OPENAI",
     inputTokens: 11,
     outputTokens: 7,
   }),
@@ -647,6 +648,7 @@ describe("LegalAiService", () => {
       return {
         content: "ok",
         model: "gpt-5.6-luna",
+        provider: "OPENAI",
         inputTokens: 1,
         outputTokens: 1,
       };
@@ -1352,6 +1354,7 @@ describe("LegalAiService", () => {
           ? "follow-up-legal-answer"
           : "clarification-turn-one",
       model: "gpt-5.6-luna",
+      provider: "OPENAI",
       inputTokens: 11,
       outputTokens: 7,
     }));
@@ -1385,6 +1388,7 @@ describe("LegalAiService", () => {
       content:
         messages.length > 1 ? "contextual-follow-up" : "first-clarification",
       model: "gpt-5.6-luna",
+      provider: "OPENAI",
       inputTokens: 11,
       outputTokens: 7,
     }));

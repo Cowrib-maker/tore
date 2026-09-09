@@ -13,6 +13,8 @@ import { createLegalRelevanceEngine } from "@/engine/relevance";
 import { KnowledgeLegalCorpusRetriever } from "@/infrastructure/ai/knowledge-legal-corpus-retriever";
 import { createReadOnlyKnowledgeRepository } from "@/infrastructure/ai/read-only-knowledge-repository";
 import { OpenAiLegalAiCompletion } from "@/infrastructure/ai/openai-legal-ai-completion";
+import { AnthropicLegalAiCompletion } from "@/infrastructure/ai/anthropic-legal-ai-completion";
+import { FallbackLegalAiCompletion } from "@/infrastructure/ai/fallback-legal-ai-completion";
 import { PrismaLegalAiStore } from "@/infrastructure/ai/prisma-legal-ai-store";
 import { LegalDataEngineClient } from "@/infrastructure/legal-data-engine/legal-data-engine-client";
 import {
@@ -33,6 +35,22 @@ import {
 import { env } from "@/lib/env";
 
 let singleton: LegalAiService | undefined;
+
+/**
+ * OpenAI stays the default, tested primary provider. Claude is wired in
+ * only as an automatic fallback, and only when ANTHROPIC_API_KEY is set —
+ * with no key configured, this returns the exact same OpenAI-only
+ * completion port as before this function existed, so existing behavior
+ * is unchanged unless an operator opts in.
+ */
+function createCompletion() {
+  const openAi = new OpenAiLegalAiCompletion(env.OPENAI_API_KEY);
+  if (!env.ANTHROPIC_API_KEY) {
+    return openAi;
+  }
+  const anthropic = new AnthropicLegalAiCompletion(env.ANTHROPIC_API_KEY);
+  return new FallbackLegalAiCompletion(openAi, anthropic);
+}
 
 function createRemoteCorpusRetriever(): LegalCorpusRetriever {
   if (!env.ENGINE_BASE_URL || !env.ENGINE_SERVICE_TOKEN) {
@@ -70,7 +88,7 @@ export function createLegalAiService(): LegalAiService {
     reasoning: createReasoningEngine(),
     legalRelevance: createLegalRelevanceEngine({ domainFilter, intent }),
     store: new PrismaLegalAiStore(),
-    completion: new OpenAiLegalAiCompletion(env.OPENAI_API_KEY),
+    completion: createCompletion(),
     corpusRetriever: createCorpusRetriever(),
     legalQuestionAccess: createLegalQuestionAccess({
       guestSessions: prismaGuestSessionStore,

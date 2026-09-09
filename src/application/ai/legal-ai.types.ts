@@ -12,6 +12,9 @@ export { LegalQuestionStatus };
 
 export type LegalAiMessageRole = "USER" | "ASSISTANT" | "SYSTEM";
 
+/** Mirrors the Prisma AIProvider enum (OPENAI, CLAUDE). */
+export type LegalAiProvider = "OPENAI" | "CLAUDE";
+
 export type LegalAiStoredMessage = {
   role: LegalAiMessageRole;
   content: string;
@@ -142,14 +145,14 @@ export type LegalAiStore = {
   createAssistantMessage(input: {
     conversationId: string;
     content: string;
-    provider?: "OPENAI";
+    provider?: LegalAiProvider;
     model?: string;
     inputTokens?: number;
     outputTokens?: number;
   }): Promise<LegalAiAssistantMessage>;
   recordUsage(input: {
     userId: string;
-    provider: "OPENAI";
+    provider: LegalAiProvider;
     model: string;
     inputTokens: number;
     outputTokens: number;
@@ -185,6 +188,7 @@ export type LegalAiStore = {
 export type LegalAiCompletionResult = {
   content: string;
   model: string;
+  provider: LegalAiProvider;
   inputTokens: number;
   outputTokens: number;
 };
