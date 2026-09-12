@@ -57,9 +57,12 @@ export async function assertCanAccessStoredFile(
   }
 
   if (purpose === "legal-ai-document") {
-    if (actor.role !== UserRole.LAWYER) {
-      throw new ForbiddenError();
-    }
+    // Both citizens (UserRole.CLIENT) and lawyers can attach documents to
+    // their own Legal AI conversation (attachConversationDocumentUseCase
+    // has no role gate) — access here must match that, not be lawyer-only.
+    // Ownership is the real check, enforced twice below: the key's own
+    // ownerId segment, then a DB-backed lookup so a forged/reused key
+    // still can't be walked to another user's row.
     if (actor.userId !== ownerId) {
       throw new ForbiddenError();
     }

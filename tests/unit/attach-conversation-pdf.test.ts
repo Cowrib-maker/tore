@@ -799,7 +799,7 @@ describe("legal-ai-document file ACL", () => {
     ).rejects.toBeInstanceOf(ForbiddenError);
   });
 
-  it("denies clients", async () => {
+  it("denies a client who does not own the document", async () => {
     await expect(
       assertCanAccessStoredFile(
         { userId: "client-1", role: UserRole.CLIENT },
@@ -807,6 +807,26 @@ describe("legal-ai-document file ACL", () => {
         deps as never,
       ),
     ).rejects.toBeInstanceOf(ForbiddenError);
+  });
+
+  it("allows a citizen (UserRole.CLIENT) to access their own uploaded document", async () => {
+    // attachConversationDocumentUseCase has no role gate — any authenticated
+    // user, citizen included, can attach a document to their own
+    // conversation. Access here must match: ownership, not lawyer-only.
+    const ownKey = "legal-ai-document/client-1/uuid-own.pdf";
+    const clientDeps = {
+      ...deps,
+      findLegalAiDocumentByStorageKey: vi.fn(async (storageKey: string) =>
+        storageKey === ownKey ? { userId: "client-1" } : null,
+      ),
+    };
+    await expect(
+      assertCanAccessStoredFile(
+        { userId: "client-1", role: UserRole.CLIENT },
+        ownKey,
+        clientDeps as never,
+      ),
+    ).resolves.toBeUndefined();
   });
 
   it("allows admins without a document row lookup", async () => {
