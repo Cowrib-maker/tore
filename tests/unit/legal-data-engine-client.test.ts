@@ -231,6 +231,94 @@ describe("LegalDataEngineClient", () => {
       client.retrieve({ question: "Эрүүгийн хуулийн 17.1" }),
     ).resolves.toEqual({ ok: false, kind: "network", status: null });
   });
+
+  it("maps verify network failure without leaking the raw error", async () => {
+    const client = new LegalDataEngineClient({
+      baseUrl: "http://engine.test",
+      serviceToken: "secret-token",
+      fetchImpl: vi.fn(async () => {
+        throw new Error("ECONNREFUSED secret-token");
+      }) as unknown as typeof fetch,
+    });
+    await expect(
+      client.verify({ citations: [{ query: "Эрүүгийн хуулийн 17.1" }] }),
+    ).resolves.toEqual({ ok: false, kind: "network", status: null });
+  });
+
+  it("maps a non-JSON retrieve response body to invalid_response", async () => {
+    const fetchImpl = vi.fn(async () => {
+      return new Response("<html>not json</html>", {
+        status: 200,
+        headers: { "Content-Type": "text/html" },
+      });
+    });
+    const client = new LegalDataEngineClient({
+      baseUrl: "http://engine.test",
+      serviceToken: "secret-token",
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    });
+    await expect(
+      client.retrieve({ question: "Эрүүгийн хуулийн 17.1" }),
+    ).resolves.toEqual({ ok: false, kind: "invalid_response", status: 200 });
+  });
+
+  it("maps a schema-mismatched retrieve response body to invalid_response", async () => {
+    const fetchImpl = vi.fn(async () =>
+      // Valid JSON, but missing every field the response schema requires.
+      jsonResponse(200, { unexpected: "shape" }),
+    );
+    const client = new LegalDataEngineClient({
+      baseUrl: "http://engine.test",
+      serviceToken: "secret-token",
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    });
+    await expect(
+      client.retrieve({ question: "Эрүүгийн хуулийн 17.1" }),
+    ).resolves.toEqual({ ok: false, kind: "invalid_response", status: 200 });
+  });
+
+  it("maps a non-JSON verify response body to invalid_response", async () => {
+    const fetchImpl = vi.fn(async () => {
+      return new Response("not json at all", {
+        status: 200,
+        headers: { "Content-Type": "text/plain" },
+      });
+    });
+    const client = new LegalDataEngineClient({
+      baseUrl: "http://engine.test",
+      serviceToken: "secret-token",
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    });
+    await expect(
+      client.verify({ citations: [{ query: "Эрүүгийн хуулийн 17.1" }] }),
+    ).resolves.toEqual({ ok: false, kind: "invalid_response", status: 200 });
+  });
+
+  it("maps a schema-mismatched verify response body to invalid_response", async () => {
+    const fetchImpl = vi.fn(async () =>
+      jsonResponse(200, { results: [{ query: "x" }] }),
+    );
+    const client = new LegalDataEngineClient({
+      baseUrl: "http://engine.test",
+      serviceToken: "secret-token",
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    });
+    await expect(
+      client.verify({ citations: [{ query: "Эрүүгийн хуулийн 17.1" }] }),
+    ).resolves.toEqual({ ok: false, kind: "invalid_response", status: 200 });
+  });
+
+  it("maps a non-5xx, non-401/403 error status to invalid_response", async () => {
+    const fetchImpl = vi.fn(async () => jsonResponse(404, { error: "not found" }));
+    const client = new LegalDataEngineClient({
+      baseUrl: "http://engine.test",
+      serviceToken: "secret-token",
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    });
+    await expect(
+      client.retrieve({ question: "Эрүүгийн хуулийн 17.1" }),
+    ).resolves.toEqual({ ok: false, kind: "invalid_response", status: 404 });
+  });
 });
 
 describe("HttpLegalCorpusRetriever", () => {

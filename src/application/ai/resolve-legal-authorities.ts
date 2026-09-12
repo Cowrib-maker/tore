@@ -6,12 +6,110 @@ import {
 import type { LegalCorpusRetriever } from "@/application/ai/legal-corpus";
 import {
   CitationVerificationStatus,
+  LegalCorpusSource,
   selectOfficiallyVerifiedAuthorities,
   verifyHintFromRetrieved,
   type LegalCitationVerdict,
+  type LegalCitationVerifyResult,
   type LegalCorpusAuthority,
   type LegalCorpusRetrieveResult,
 } from "@/application/ai/legal-corpus";
+import {
+  logLegalCorpusEvent,
+  withLatency,
+  type LegalCorpusLogOperation,
+} from "@/infrastructure/observability/legal-corpus-metrics";
+
+/**
+ * HTTP/engine-only failure reasons — as opposed to `not_found` (local or
+ * engine genuinely has nothing) or `not_configured` (engine intentionally
+ * disabled), which are not failures. See LegalCorpusUnavailableReason in
+ * legal-corpus.ts for the full set this is drawn from.
+ */
+const ENGINE_FAILURE_REASONS = new Set([
+  "unauthorized",
+  "server_error",
+  "network",
+  "invalid_response",
+]);
+
+/**
+ * Logs a safe, PII-free summary of a retrieveExactCitation/retrieveLegalQuestion
+ * outcome. Never touches the question text, authority excerpts, or any
+ * document content carried on `retrieved` — only its kind/source/reason.
+ */
+function logRetrieveOutcome(
+  operation: LegalCorpusLogOperation,
+  retrieved: LegalCorpusRetrieveResult,
+  latencyMs: number,
+): void {
+  if (retrieved.kind === "retrieved") {
+    logLegalCorpusEvent({
+      operation,
+      outcome:
+        retrieved.source === LegalCorpusSource.LEGAL_DATA_ENGINE
+          ? "engine_success"
+          : "local_fallback",
+      source: retrieved.source,
+      latencyMs,
+    });
+    return;
+  }
+  if (retrieved.kind === "as_of_unavailable") {
+    logLegalCorpusEvent({ operation, outcome: "as_of_unavailable", latencyMs });
+    return;
+  }
+  if (retrieved.reason === "timeout") {
+    logLegalCorpusEvent({
+      operation,
+      outcome: "timeout",
+      reason: retrieved.reason,
+      latencyMs,
+    });
+  } else if (ENGINE_FAILURE_REASONS.has(retrieved.reason)) {
+    logLegalCorpusEvent({
+      operation,
+      outcome: "engine_failure",
+      reason: retrieved.reason,
+      latencyMs,
+    });
+  } else if (retrieved.reason === "not_configured") {
+    logLegalCorpusEvent({
+      operation,
+      outcome: "not_configured",
+      reason: retrieved.reason,
+      latencyMs,
+    });
+  } else {
+    logLegalCorpusEvent({
+      operation,
+      outcome: "not_found",
+      reason: retrieved.reason,
+      latencyMs,
+    });
+  }
+}
+
+/** Logs a safe summary of a verifyCitation outcome — status only, never citation content. */
+function logVerifyOutcome(
+  verification: LegalCitationVerifyResult,
+  latencyMs: number,
+): void {
+  if (!verification.ok) {
+    logRetrieveOutcome(
+      "verifyCitation",
+      { kind: "unavailable", reason: verification.reason, authorities: [], retrievedAt: null },
+      latencyMs,
+    );
+    return;
+  }
+  logLegalCorpusEvent({
+    operation: "verifyCitation",
+    outcome: "verification_result",
+    verificationStatus: verification.verdict.status,
+    latencyMs,
+  });
+}
 
 export const MISSING_LEGAL_SOURCE_MESSAGE =
   "Холбогдох эрх зүйн зохицуулалт одоогоор баталгаатай эх сурвалжаас олдсонгүй.";
@@ -93,11 +191,19 @@ export async function resolveLegalAuthorities(input: {
     });
   }
 
-  const retrieved = await input.retriever.retrieveLegalQuestion({
-    question: input.question,
-    query: input.question,
-    locator: null,
-  });
+  const { result: retrieved, latencyMs: retrieveLegalQuestionLatencyMs } =
+    await withLatency(() =>
+      input.retriever.retrieveLegalQuestion({
+        question: input.question,
+        query: input.question,
+        locator: null,
+      }),
+    );
+  logRetrieveOutcome(
+    "retrieveLegalQuestion",
+    retrieved,
+    retrieveLegalQuestionLatencyMs,
+  );
 
   if (retrieved.kind === "as_of_unavailable") {
     return {
@@ -136,11 +242,19 @@ async function resolveExactCitation(input: {
   locator: string | null;
   retriever: LegalCorpusRetriever;
 }): Promise<ResolveLegalAuthoritiesResult> {
-  const retrieved = await input.retriever.retrieveExactCitation({
-    question: input.question,
-    query: input.query,
-    locator: input.locator,
-  });
+  const { result: retrieved, latencyMs: retrieveExactCitationLatencyMs } =
+    await withLatency(() =>
+      input.retriever.retrieveExactCitation({
+        question: input.question,
+        query: input.query,
+        locator: input.locator,
+      }),
+    );
+  logRetrieveOutcome(
+    "retrieveExactCitation",
+    retrieved,
+    retrieveExactCitationLatencyMs,
+  );
 
   const retrieveRefusal = retrieveRefusalMessage(retrieved);
   if (retrieveRefusal) {
@@ -158,11 +272,15 @@ async function resolveExactCitation(input: {
     };
   }
 
-  const verification = await input.retriever.verifyCitation({
-    question: input.question,
-    query: input.query,
-    ...verifyHintFromRetrieved(retrieved.authorities),
-  });
+  const { result: verification, latencyMs: verifyCitationLatencyMs } =
+    await withLatency(() =>
+      input.retriever.verifyCitation({
+        question: input.question,
+        query: input.query,
+        ...verifyHintFromRetrieved(retrieved.authorities),
+      }),
+    );
+  logVerifyOutcome(verification, verifyCitationLatencyMs);
 
   if (!verification.ok) {
     return {
