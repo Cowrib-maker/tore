@@ -20,6 +20,7 @@ import { detectForeignLegalScope } from "@/engine/relevance";
 import {
   MISSING_LEGAL_SOURCE_MESSAGE,
   resolveLegalAuthorities,
+  type ResolvedLegalAuthority,
 } from "@/application/ai/resolve-legal-authorities";
 import type {
   LegalAiCompletionPort,
@@ -460,7 +461,11 @@ export class LegalAiService {
           ? MISSING_LEGAL_SOURCE_MESSAGE
           : undefined;
 
-    const reasoningPlan = this.prepareReasoningPlan(message, intent);
+    const reasoningPlan = this.prepareReasoningPlan(
+      message,
+      intent,
+      verifiedAuthorities,
+    );
 
     const prompt = this.dependencies.promptBuilder.build({
       message,
@@ -816,9 +821,22 @@ export class LegalAiService {
     return existing;
   }
 
+  /**
+   * Feeds the same already-verified authorities used for the answer prompt
+   * into the reasoning engine's citation model, so its authority/gap
+   * assessment (ReasoningContext.missingInformation etc.) reflects what was
+   * actually resolved instead of a permanently-empty input.
+   *
+   * documents/graphNeighbors are deliberately left empty, not fabricated:
+   * user-uploaded document extracts are evidence, not legal authorities —
+   * conflating the two here would blur exactly the authoritative-vs-uploaded
+   * distinction the product must preserve — and TORE does not yet consume
+   * LegalRelation graph traversal at all, so there is nothing real to report.
+   */
   private prepareReasoningPlan(
     message: string,
     intent: IntentClassification,
+    verifiedAuthorities: ResolvedLegalAuthority[] | undefined,
   ): ReasoningPlan {
     return this.dependencies.reasoning.prepare({
       question: message,
@@ -826,7 +844,14 @@ export class LegalAiService {
         type: intent.intent,
         confidence: intent.confidence,
       },
-      citations: [],
+      citations: (verifiedAuthorities ?? []).map((authority) => ({
+        query: authority.article ?? authority.locator,
+        resolved: true,
+        nodeId: authority.nodeId,
+        documentId: authority.documentId,
+        canonical: authority.title,
+        kind: "ARTICLE",
+      })),
       documents: [],
       graphNeighbors: [],
     });

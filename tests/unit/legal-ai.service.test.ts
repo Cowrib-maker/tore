@@ -491,6 +491,41 @@ describe("LegalAiService", () => {
     expect(corpusRetriever.verifyCitation).not.toHaveBeenCalled();
   });
 
+  it("feeds the reasoning engine the same verified authorities used for the answer, not a hardcoded empty input", async () => {
+    const reasoning = createReasoningEngine();
+    const prepare = vi.spyOn(reasoning, "prepare");
+    const corpusRetriever = createRetriever();
+    corpusRetriever.retrieveLegalQuestion.mockResolvedValueOnce({
+      kind: "retrieved",
+      status: "ok",
+      authorities: [sampleAuthority()],
+      retrievedAt: "2026-01-01T00:00:00.000Z",
+    });
+    const { service } = createService({ reasoning, corpusRetriever });
+
+    await service.createTurn({
+      userId: "user-1",
+      message: "Хөдөлмөрийн гэрээг хэрхэн цуцлах вэ?",
+    });
+
+    expect(prepare).toHaveBeenCalledOnce();
+    const request = prepare.mock.calls[0]?.[0];
+    expect(request?.citations).toEqual([
+      {
+        query: "17.1",
+        resolved: true,
+        nodeId: "node-1",
+        documentId: "doc-1",
+        canonical: "Эрүүгийн хууль",
+        kind: "ARTICLE",
+      },
+    ]);
+    // Uploaded documents and graph neighbors are not authorities — never
+    // fabricated into this input.
+    expect(request?.documents).toEqual([]);
+    expect(request?.graphNeighbors).toEqual([]);
+  });
+
   it("refuses a non-legal question without calling OpenAI or the legal corpus", async () => {
     const reasoning = createReasoningEngine();
     const prepare = vi.spyOn(reasoning, "prepare");
