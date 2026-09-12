@@ -241,27 +241,25 @@ export class PrismaLegalAiStore implements LegalAiStore {
     if (input.citations.length === 0) {
       return [];
     }
-    const created: LegalAiSafeCitation[] = [];
-    for (const citation of input.citations) {
-      const row = await prisma.aICitation.create({
-        data: {
-          messageId: input.messageId,
-          title: citation.title,
-          sourceType: citation.sourceType,
-          sourceUrl: citation.sourceUrl ?? null,
-          reference: citation.reference ?? null,
-          excerpt: citation.excerpt ?? null,
-        },
-        select: {
-          id: true,
-          title: true,
-          sourceType: true,
-          sourceUrl: true,
-        },
-      });
-      created.push(toSafeLegalAiCitation(row.id, citation));
-    }
-    return created;
+    // Single batched INSERT ... RETURNING instead of one round trip per
+    // citation. Postgres returns rows for a single multi-row INSERT in the
+    // same order as the VALUES list, so zipping by index against the
+    // original (small, already-capped — see MAX_QUESTION_HITS) input array
+    // is safe.
+    const rows = await prisma.aICitation.createManyAndReturn({
+      data: input.citations.map((citation) => ({
+        messageId: input.messageId,
+        title: citation.title,
+        sourceType: citation.sourceType,
+        sourceUrl: citation.sourceUrl ?? null,
+        reference: citation.reference ?? null,
+        excerpt: citation.excerpt ?? null,
+      })),
+      select: { id: true },
+    });
+    return rows.map((row, index) =>
+      toSafeLegalAiCitation(row.id, input.citations[index]!),
+    );
   }
 
   async listOwnedDocumentExtracts(
