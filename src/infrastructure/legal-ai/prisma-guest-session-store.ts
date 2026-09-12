@@ -31,6 +31,28 @@ export const prismaGuestSessionStore: GuestSessionStore = {
       },
     });
   },
+
+  async tryConsumeFreeLegalQuestion(id, limit, now) {
+    const result = await prisma.guestSession.updateMany({
+      where: {
+        id,
+        freeLegalQuestionsUsed: { lt: limit },
+        expiresAt: { gt: now },
+      },
+      data: {
+        freeLegalQuestionsUsed: { increment: 1 },
+        lastSeenAt: now,
+      },
+    });
+    return result.count > 0;
+  },
+
+  async releaseFreeLegalQuestion(id) {
+    await prisma.guestSession.updateMany({
+      where: { id, freeLegalQuestionsUsed: { gt: 0 } },
+      data: { freeLegalQuestionsUsed: { decrement: 1 } },
+    });
+  },
 };
 
 export const prismaConversationBillingStore: ConversationBillingStore = {

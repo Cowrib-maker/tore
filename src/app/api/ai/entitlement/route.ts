@@ -12,6 +12,7 @@ import {
 import {
   entitlementUsageRepository,
   subscriptionRepository,
+  unpaidCitizenLegalQuestionUsageRepository,
   userRepository,
 } from "@/infrastructure/repositories";
 
@@ -46,6 +47,7 @@ export async function GET() {
     conversations: prismaConversationBillingStore,
     subscriptionRepository,
     entitlementUsageRepository,
+    unpaidCitizenUsage: unpaidCitizenLegalQuestionUsageRepository,
     userRepository,
   });
 

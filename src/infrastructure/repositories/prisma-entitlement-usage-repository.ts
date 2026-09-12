@@ -55,6 +55,21 @@ export class PrismaEntitlementUsageRepository
     });
     return mapEntitlementUsage(record);
   }
+
+  async tryReserveLegalAiQuery(id: string, limit: number): Promise<boolean> {
+    const result = await this.db.entitlementUsage.updateMany({
+      where: { id, legalAiQueryCount: { lt: limit } },
+      data: { legalAiQueryCount: { increment: 1 } },
+    });
+    return result.count > 0;
+  }
+
+  async releaseLegalAiQuery(id: string): Promise<void> {
+    await this.db.entitlementUsage.updateMany({
+      where: { id, legalAiQueryCount: { gt: 0 } },
+      data: { legalAiQueryCount: { decrement: 1 } },
+    });
+  }
 }
 
 export const entitlementUsageRepository = new PrismaEntitlementUsageRepository();

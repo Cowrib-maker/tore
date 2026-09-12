@@ -52,6 +52,7 @@ import { decideLegalQuestionThreadAction } from "@/domain/legal-ai/legal-questio
 import {
   allowAllLegalQuestionAccess,
   type LegalQuestionAccessPort,
+  type LegalQuestionReservation,
   type LegalQuestionSubject,
 } from "@/application/legal-ai/legal-question-access";
 
@@ -150,9 +151,79 @@ export class LegalAiService {
       relevance: relevance.relevance,
     });
 
-    if (thread.type === "START_NEW") {
-      await this.legalQuestionAccess.assertCanStartNewLegalQuestion(subject);
+    const startingNewQuestion = thread.type === "START_NEW";
+    // Authorization IS the atomic quota reservation now (see
+    // legal-question-access.ts's P0-3 fix) — guest/paid/unpaid-citizen
+    // quota is incremented inside this call, not after a successful
+    // reply, and the returned reservation carries the exact row that was
+    // incremented (never re-derived from `subject` later — see
+    // LegalQuestionReservation's doc for why that distinction matters).
+    // If anything downstream throws (AI failure, persistence failure,
+    // etc.), the catch below releases that exact reservation so a failed
+    // turn still never permanently consumes quota, matching the
+    // pre-existing "only successful replies are billed" behavior.
+    //
+    // Known limitation: this release is in-process. A process crash or
+    // platform-level timeout between a successful reservation and this
+    // catch block running would leave the reservation permanently
+    // consumed with no compensating release — there is no durable
+    // saga/outbox here (deliberately out of scope for this milestone).
+    let reservation: LegalQuestionReservation = { kind: "none" };
+    if (startingNewQuestion) {
+      reservation =
+        await this.legalQuestionAccess.assertCanStartNewLegalQuestion(subject);
     }
+
+    try {
+      return await this.continueAuthorizedTurn({
+        input,
+        message,
+        capability,
+        subject,
+        priorMessages,
+        conversationState,
+        relevance,
+        thread,
+      });
+    } catch (error) {
+      if (startingNewQuestion) {
+        await this.legalQuestionAccess
+          .releaseNewLegalQuestion(reservation)
+          .catch((releaseError: unknown) => {
+            console.error(
+              "Failed to release legal-question reservation after a failed turn.",
+              releaseError,
+            );
+          });
+      }
+      throw error;
+    }
+  }
+
+  private async continueAuthorizedTurn(ctx: {
+    input: LegalAiCreateTurnInput;
+    message: string;
+    capability: LegalAiCapability;
+    subject: LegalQuestionSubject;
+    priorMessages: LegalAiStoredMessage[];
+    conversationState: {
+      id?: string;
+      questionStatus: LegalQuestionStatus;
+      caseFileId?: string | null;
+    };
+    relevance: Awaited<ReturnType<LegalRelevanceService["classify"]>>;
+    thread: ReturnType<typeof decideLegalQuestionThreadAction>;
+  }): Promise<LegalAiCreateTurnResult> {
+    const {
+      input,
+      message,
+      capability,
+      subject,
+      priorMessages,
+      conversationState,
+      relevance,
+      thread,
+    } = ctx;
 
     const paidGeneralAccess =
       relevance.relevance === LegalRelevance.NON_LEGAL

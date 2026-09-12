@@ -380,8 +380,11 @@ function paidLegalQuestionAccess(
   overrides?: Partial<LegalQuestionAccessPort>,
 ): LegalQuestionAccessPort {
   return {
-    async assertCanStartNewLegalQuestion() {},
+    async assertCanStartNewLegalQuestion() {
+      return { kind: "none" };
+    },
     async consumeNewLegalQuestion() {},
+    async releaseNewLegalQuestion() {},
     async hasPaidLegalAiAccess() {
       return true;
     },

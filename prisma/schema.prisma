@@ -285,6 +285,7 @@ model User {
   entitlementUsages  EntitlementUsage[]
   billingInvoices    Invoice[]
   guestSessions      GuestSession[] @relation("GuestSessionClaimedBy")
+  unpaidCitizenLegalQuestionUsage UnpaidCitizenLegalQuestionUsage?
 
 
   @@index([role, status])
@@ -973,6 +974,30 @@ model AIConversation {
   @@index([guestSessionId, updatedAt(sort: Desc)])
   @@index([caseFileId, updatedAt(sort: Desc)])
   @@map("ai_conversations")
+}
+
+/**
+ * Lifetime (never period-resetting) counter of free legal questions an
+ * unpaid citizen has used — the atomic, race-safe enforcement source of
+ * truth for UNPAID_CITIZEN_FREE_LEGAL_QUESTIONS. Deliberately separate
+ * from EntitlementUsage: that table is keyed by (userId, periodStart) and
+ * resets every month, which is the wrong shape for a one-time free
+ * allowance — reusing it (even with a sentinel periodStart) would either
+ * silently turn a one-time allowance into a monthly one or require a
+ * fragile special case in shared subscription-period logic.
+ *
+ * AIConversation.billedQuestionCount remains the historical/audit trail
+ * of which conversations were billed; this table is the live,
+ * atomically-updated gate checked before starting a new question.
+ */
+model UnpaidCitizenLegalQuestionUsage {
+  userId        String   @id @map("user_id")
+  questionsUsed Int      @default(0) @map("questions_used")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("unpaid_citizen_legal_question_usages")
 }
 
 /// User-uploaded Legal AI attachments (PDF, DOCX, images). Multiple per conversation.

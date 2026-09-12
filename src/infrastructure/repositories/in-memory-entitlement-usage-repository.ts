@@ -67,4 +67,28 @@ export class InMemoryEntitlementUsageRepository
     this.rows.set(periodKey(next.userId, next.periodStart), next);
     return clone(next);
   }
+
+  async tryReserveLegalAiQuery(id: string, limit: number): Promise<boolean> {
+    const current = [...this.rows.values()].find((row) => row.id === id);
+    if (!current) throw new Error("Entitlement usage not found");
+    if (current.legalAiQueryCount >= limit) return false;
+    const next: EntitlementUsage = {
+      ...current,
+      legalAiQueryCount: current.legalAiQueryCount + 1,
+      updatedAt: new Date(),
+    };
+    this.rows.set(periodKey(next.userId, next.periodStart), next);
+    return true;
+  }
+
+  async releaseLegalAiQuery(id: string): Promise<void> {
+    const current = [...this.rows.values()].find((row) => row.id === id);
+    if (!current || current.legalAiQueryCount <= 0) return;
+    const next: EntitlementUsage = {
+      ...current,
+      legalAiQueryCount: current.legalAiQueryCount - 1,
+      updatedAt: new Date(),
+    };
+    this.rows.set(periodKey(next.userId, next.periodStart), next);
+  }
 }

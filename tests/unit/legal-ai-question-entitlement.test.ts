@@ -25,6 +25,7 @@ import { createIntentEngine } from "@/engine/intent";
 import { createReasoningEngine } from "@/engine/reasoning";
 import { LegalRelevance, type LegalRelevanceService } from "@/engine/relevance";
 import { InMemoryEntitlementUsageRepository } from "@/infrastructure/repositories/in-memory-entitlement-usage-repository";
+import { InMemoryUnpaidCitizenLegalQuestionUsageRepository } from "@/infrastructure/repositories/in-memory-unpaid-citizen-legal-question-usage-repository";
 import { InMemorySubscriptionRepository } from "@/infrastructure/repositories/in-memory-subscription-repository";
 
 function createStore(): LegalAiStore & {
@@ -191,10 +192,13 @@ function createService(
         expiresAt: new Date(Date.now() + 86_400_000),
       }),
       incrementFreeLegalQuestionsUsed: async () => {},
+      tryConsumeFreeLegalQuestion: async () => true,
+      releaseFreeLegalQuestion: async () => {},
     },
     conversations: store,
     subscriptionRepository: new InMemorySubscriptionRepository(),
     entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+    unpaidCitizenUsage: new InMemoryUnpaidCitizenLegalQuestionUsageRepository(),
   }),
   completionPort: LegalAiCompletionPort = completion(),
 ) {
@@ -240,10 +244,19 @@ describe("LegalAiService question threads", () => {
         incrementFreeLegalQuestionsUsed: async () => {
           used.count += 1;
         },
+        tryConsumeFreeLegalQuestion: async (_id, limit) => {
+          if (used.count >= limit) return false;
+          used.count += 1;
+          return true;
+        },
+        releaseFreeLegalQuestion: async () => {
+          if (used.count > 0) used.count -= 1;
+        },
       },
       conversations: store,
       subscriptionRepository: new InMemorySubscriptionRepository(),
       entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+      unpaidCitizenUsage: new InMemoryUnpaidCitizenLegalQuestionUsageRepository(),
     });
 
     const first = createService(
@@ -294,10 +307,19 @@ describe("LegalAiService question threads", () => {
         incrementFreeLegalQuestionsUsed: async () => {
           used.count += 1;
         },
+        tryConsumeFreeLegalQuestion: async (_id, limit) => {
+          if (used.count >= limit) return false;
+          used.count += 1;
+          return true;
+        },
+        releaseFreeLegalQuestion: async () => {
+          if (used.count > 0) used.count -= 1;
+        },
       },
       conversations: store,
       subscriptionRepository: new InMemorySubscriptionRepository(),
       entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+      unpaidCitizenUsage: new InMemoryUnpaidCitizenLegalQuestionUsageRepository(),
     });
     await createService(
       store,
@@ -324,10 +346,19 @@ describe("LegalAiService question threads", () => {
         incrementFreeLegalQuestionsUsed: async () => {
           used.count += 1;
         },
+        tryConsumeFreeLegalQuestion: async (_id, limit) => {
+          if (used.count >= limit) return false;
+          used.count += 1;
+          return true;
+        },
+        releaseFreeLegalQuestion: async () => {
+          if (used.count > 0) used.count -= 1;
+        },
       },
       conversations: store,
       subscriptionRepository: new InMemorySubscriptionRepository(),
       entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+      unpaidCitizenUsage: new InMemoryUnpaidCitizenLegalQuestionUsageRepository(),
     });
     const conv = await store.createConversation({
       guestSessionId: "guest-1",
@@ -355,10 +386,13 @@ describe("LegalAiService question threads", () => {
       guestSessions: {
         getById: async () => null,
         incrementFreeLegalQuestionsUsed: async () => {},
+        tryConsumeFreeLegalQuestion: async () => false,
+        releaseFreeLegalQuestion: async () => {},
       },
       conversations: store,
       subscriptionRepository: new InMemorySubscriptionRepository(),
       entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+      unpaidCitizenUsage: new InMemoryUnpaidCitizenLegalQuestionUsageRepository(),
     });
     const first = await createService(
       store,
@@ -398,10 +432,19 @@ describe("LegalAiService question threads", () => {
         incrementFreeLegalQuestionsUsed: async () => {
           used.count += 1;
         },
+        tryConsumeFreeLegalQuestion: async (_id, limit) => {
+          if (used.count >= limit) return false;
+          used.count += 1;
+          return true;
+        },
+        releaseFreeLegalQuestion: async () => {
+          if (used.count > 0) used.count -= 1;
+        },
       },
       conversations: store,
       subscriptionRepository: new InMemorySubscriptionRepository(),
       entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+      unpaidCitizenUsage: new InMemoryUnpaidCitizenLegalQuestionUsageRepository(),
     });
     const failing = {
       isConfigured: () => true,
@@ -430,6 +473,65 @@ describe("LegalAiService question threads", () => {
     );
   });
 
+  it("does not permanently consume the unpaid-citizen lifetime allowance when OpenAI fails", async () => {
+    const store = createStore();
+    const unpaidCitizenUsage = new InMemoryUnpaidCitizenLegalQuestionUsageRepository();
+    const access = createLegalQuestionAccess({
+      guestSessions: {
+        getById: async () => null,
+        incrementFreeLegalQuestionsUsed: async () => {},
+        tryConsumeFreeLegalQuestion: async () => false,
+        releaseFreeLegalQuestion: async () => {},
+      },
+      conversations: store,
+      subscriptionRepository: new InMemorySubscriptionRepository(),
+      entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+      unpaidCitizenUsage,
+    });
+    const failing = {
+      isConfigured: () => true,
+      complete: async () => {
+        throw new LegalAiError(
+          "AI үйлчилгээтэй холбогдоход алдаа гарлаа.",
+          503,
+          "AI_UNAVAILABLE",
+        );
+      },
+    };
+    await expect(
+      createService(
+        store,
+        relevance(LegalRelevance.LEGAL),
+        access,
+        failing,
+      ).createTurn({
+        userId: "client-1",
+        actorRole: UserRole.CLIENT,
+        message: "Хөрш маань хашааг минь нураасан.",
+      }),
+    ).rejects.toMatchObject({ code: "AI_UNAVAILABLE" });
+    expect(await unpaidCitizenUsage.getUsedCount("client-1")).toBe(0);
+    expect([...store.conversations.values()][0]?.billedQuestionCount ?? 0).toBe(
+      0,
+    );
+
+    // The allowance is usable again on a subsequent successful attempt —
+    // the failure above did not silently burn it.
+    const succeeded = await createService(
+      store,
+      relevance(LegalRelevance.LEGAL),
+      access,
+    ).createTurn({
+      userId: "client-1",
+      actorRole: UserRole.CLIENT,
+      message: "Хөрш маань хашааг минь нураасан.",
+    });
+    expect(await unpaidCitizenUsage.getUsedCount("client-1")).toBe(1);
+    expect(
+      store.conversations.get(succeeded.conversationId)?.billedQuestionCount,
+    ).toBe(1);
+  });
+
   it("consumes paid-citizen quota only on a new legal question", async () => {
     const store = createStore();
     const subscriptions = new InMemorySubscriptionRepository();
@@ -451,10 +553,13 @@ describe("LegalAiService question threads", () => {
       guestSessions: {
         getById: async () => null,
         incrementFreeLegalQuestionsUsed: async () => {},
+        tryConsumeFreeLegalQuestion: async () => false,
+        releaseFreeLegalQuestion: async () => {},
       },
       conversations: store,
       subscriptionRepository: subscriptions,
       entitlementUsageRepository: usage,
+      unpaidCitizenUsage: new InMemoryUnpaidCitizenLegalQuestionUsageRepository(),
     });
     const first = await createService(
       store,
@@ -485,10 +590,13 @@ describe("LegalAiService question threads", () => {
       guestSessions: {
         getById: async () => null,
         incrementFreeLegalQuestionsUsed: async () => {},
+        tryConsumeFreeLegalQuestion: async () => false,
+        releaseFreeLegalQuestion: async () => {},
       },
       conversations: store,
       subscriptionRepository: new InMemorySubscriptionRepository(),
       entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+      unpaidCitizenUsage: new InMemoryUnpaidCitizenLegalQuestionUsageRepository(),
     });
     const first = await createService(
       store,

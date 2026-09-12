@@ -10,6 +10,7 @@ import { SubscriptionStatus, UserRole, UserStatus } from "@/domain/enums";
 import type { User } from "@/domain/entities/user";
 import { InMemoryEntitlementUsageRepository } from "@/infrastructure/repositories/in-memory-entitlement-usage-repository";
 import { InMemorySubscriptionRepository } from "@/infrastructure/repositories/in-memory-subscription-repository";
+import { InMemoryUnpaidCitizenLegalQuestionUsageRepository } from "@/infrastructure/repositories/in-memory-unpaid-citizen-legal-question-usage-repository";
 
 function demoUser(overrides?: Partial<User>): User {
   const now = new Date();
@@ -60,10 +61,13 @@ describe("platform demo accounts", () => {
       guestSessions: {
         getById: async () => null,
         incrementFreeLegalQuestionsUsed: async () => {},
+        tryConsumeFreeLegalQuestion: async () => false,
+        releaseFreeLegalQuestion: async () => {},
       },
       conversations: { countBilledQuestionsForUser: async () => 99 },
       subscriptionRepository: subscriptions,
       entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+      unpaidCitizenUsage: new InMemoryUnpaidCitizenLegalQuestionUsageRepository(),
       userRepository: { findById: async () => user },
     });
 
@@ -73,7 +77,7 @@ describe("platform demo accounts", () => {
         userId: user.id,
         role: UserRole.CLIENT,
       }),
-    ).resolves.toBeUndefined();
+    ).resolves.toEqual({ kind: "none" });
     await expect(
       access.hasPaidLegalAiAccess({
         kind: "user",

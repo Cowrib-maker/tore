@@ -32,10 +32,20 @@ export async function checkOrthographyForPaidUser(
   if (!actor) throw new UnauthorizedError("Зөв бичгийн алдаа шалгагч ашиглахын тулд нэвтэрнэ үү.");
 
   const access = createLegalQuestionAccess({
-    guestSessions: { getById: async () => null, incrementFreeLegalQuestionsUsed: async () => {} },
+    guestSessions: {
+      getById: async () => null,
+      incrementFreeLegalQuestionsUsed: async () => {},
+      tryConsumeFreeLegalQuestion: async () => false,
+      releaseFreeLegalQuestion: async () => {},
+    },
     conversations: { countBilledQuestionsForUser: async () => 0 },
     subscriptionRepository: deps.subscriptionRepository,
     entitlementUsageRepository: deps.entitlementUsageRepository,
+    unpaidCitizenUsage: {
+      tryReserve: async () => false,
+      release: async () => {},
+      getUsedCount: async () => 0,
+    },
     userRepository: deps.userRepository,
   });
 

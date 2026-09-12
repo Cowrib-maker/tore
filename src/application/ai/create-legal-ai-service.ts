@@ -30,6 +30,7 @@ import {
   caseFileRepository,
   entitlementUsageRepository,
   subscriptionRepository,
+  unpaidCitizenLegalQuestionUsageRepository,
   userRepository,
 } from "@/infrastructure/repositories";
 import { env } from "@/lib/env";
@@ -95,6 +96,7 @@ export function createLegalAiService(): LegalAiService {
       conversations: prismaConversationBillingStore,
       subscriptionRepository,
       entitlementUsageRepository,
+      unpaidCitizenUsage: unpaidCitizenLegalQuestionUsageRepository,
       userRepository,
     }),
     caseContextLoader: createOwnedCaseContextLoader(caseFileRepository),
