@@ -10,6 +10,7 @@ import { LegalAiError } from "@/application/ai/legal-ai.errors";
 import { assertCanAccessStoredFile } from "@/application/services/assert-can-access-stored-file";
 import type { LegalAiDocumentExtractor } from "@/infrastructure/ai/document-text-extractor";
 
+import { buildMinimalDocx } from "./helpers/minimal-docx";
 import { buildMinimalPdf } from "./helpers/minimal-pdf";
 import { buildMinimalXlsx } from "./helpers/minimal-zip";
 
@@ -223,7 +224,7 @@ describe("attachConversationDocumentUseCase", () => {
           fileName: "empty.docx",
           contentType:
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          body: new Uint8Array([0x50, 0x4b, 0x03, 0x04]),
+          body: buildMinimalDocx(["placeholder"]),
         },
         { store, fileStorage, extractor: { extract } },
       ),
@@ -445,7 +446,7 @@ describe("attachConversationDocumentUseCase", () => {
   it("stores a successful DOCX extract and rejects malformed DOCX without persisting", async () => {
     const store = createStore();
     const fileStorage = createStorage();
-    const zip = new Uint8Array([0x50, 0x4b, 0x03, 0x04]);
+    const zip = buildMinimalDocx(["Numbered clause", "Paragraph two."]);
     const ok = await attachConversationDocumentUseCase(
       {
         userId: "lawyer-1",
@@ -496,7 +497,7 @@ describe("attachConversationDocumentUseCase", () => {
   it("allows mixed PDF, DOCX, and image attachments on one conversation", async () => {
     const store = createStore();
     const fileStorage = createStorage();
-    const zip = new Uint8Array([0x50, 0x4b, 0x03, 0x04]);
+    const zip = buildMinimalDocx(["Numbered clause", "Paragraph two."]);
     const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
     await attachConversationDocumentUseCase(
       {
@@ -722,7 +723,10 @@ describe("attachConversationDocumentUseCase", () => {
           conversationId: "conv-owner",
           fileName: "empty.txt",
           contentType: "text/plain",
-          body: new TextEncoder().encode(""),
+          // Non-empty bytes so upload validation passes and the extractor's
+          // own EMPTY status (asserted below) is what's actually under test —
+          // a zero-byte body would instead fail earlier as "unsupported format".
+          body: new TextEncoder().encode("   "),
         },
         {
           store,

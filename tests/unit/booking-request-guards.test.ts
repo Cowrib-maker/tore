@@ -22,6 +22,7 @@ const lawyerProfile = {
   education: null,
   phone: null,
   timezone: "Asia/Ulaanbaatar",
+  position: "ATTORNEY" as const,
   verificationStatus: "APPROVED" as const,
   verifiedAt: new Date(),
   isListed: true,

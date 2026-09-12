@@ -13,6 +13,7 @@ describe("auth consent + password schemas", () => {
       name: "Ada Client",
       email: "ada@example.com",
       password: "Password1",
+      confirmPassword: "Password1",
       acceptTerms: false,
       preferredLanguage: "en",
     });
@@ -22,6 +23,7 @@ describe("auth consent + password schemas", () => {
       name: "Ada Client",
       email: "ada@example.com",
       password: "Password1",
+      confirmPassword: "Password1",
       acceptTerms: true,
       preferredLanguage: "en",
     });
