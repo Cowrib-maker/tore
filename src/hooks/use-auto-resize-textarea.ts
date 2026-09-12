@@ -3,7 +3,7 @@
 import { useLayoutEffect } from "react";
 import type { RefObject } from "react";
 
-export const AUTO_RESIZE_TEXTAREA_DEFAULT_MAX_HEIGHT_PX = 240;
+export const AUTO_RESIZE_TEXTAREA_DEFAULT_MAX_HEIGHT_PX = 160;
 
 /**
  * Grows a <textarea> to fit its content as the user types — like Claude's

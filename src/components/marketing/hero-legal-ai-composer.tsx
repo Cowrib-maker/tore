@@ -7,6 +7,7 @@ import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gat
 import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
 import { useLegalAiChatSession } from "@/components/legal-ai/use-legal-ai-chat-session";
+import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
 
 export function HeroLegalAiComposer({
   placeholder,
@@ -23,6 +24,9 @@ export function HeroLegalAiComposer({
   const { messages, loading, error, accessGate, sendMessage } =
     useLegalAiChatSession({ checkoutEnabled });
   const transcriptRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useAutoResizeTextarea(textareaRef, question);
 
   useEffect(() => {
     transcriptRef.current?.scrollTo({
@@ -92,6 +96,7 @@ export function HeroLegalAiComposer({
         className="rounded-3xl border border-[#0B1F3A]/10 bg-white p-3 shadow-[0_22px_50px_-24px_rgba(11,31,58,0.32)] transition focus-within:border-[#1A7A72]/45"
       >
         <textarea
+          ref={textareaRef}
           value={question}
           onChange={(event) => setQuestion(event.target.value)}
           onKeyDown={(event) => {
@@ -102,8 +107,8 @@ export function HeroLegalAiComposer({
           }}
           placeholder={placeholder}
           disabled={loading}
-          rows={4}
-          className="min-h-[6.5rem] w-full resize-none bg-transparent px-3 py-2 text-[15px] leading-6 text-[#0A0F14] outline-none placeholder:text-[#9AA3AD]"
+          rows={1}
+          className="min-h-12 w-full resize-none bg-transparent px-3 py-2 text-[15px] leading-6 text-[#0A0F14] outline-none placeholder:text-[#9AA3AD]"
         />
         <div className="flex items-center justify-end pt-1">
           <button

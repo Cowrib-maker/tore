@@ -21,6 +21,7 @@ type Props = {
   onKeyDown?: KeyboardEventHandler<HTMLTextAreaElement>;
   inputRef?: RefObject<HTMLTextAreaElement | null>;
   className?: string;
+  maxHeightPx?: number;
 };
 
 function rangesForText(text: string, suggestions: OrthographySuggestionView[]): SuggestionWithRelated[] {
@@ -29,13 +30,13 @@ function rangesForText(text: string, suggestions: OrthographySuggestionView[]): 
     .sort((a, b) => a.start - b.start || b.end - a.end) as SuggestionWithRelated[];
 }
 
-export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, disabled, onChange, onKeyDown, inputRef, className }: Props) {
+export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, disabled, onChange, onKeyDown, inputRef, className, maxHeightPx }: Props) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const ranges = useMemo(() => rangesForText(value, suggestions), [value, suggestions]);
   const active = activeIndex == null ? null : ranges[activeIndex] ?? null;
 
   const localRef = useRef<HTMLTextAreaElement>(null);
-  useAutoResizeTextarea(localRef, value);
+  useAutoResizeTextarea(localRef, value, maxHeightPx);
   function setTextareaRef(el: HTMLTextAreaElement | null) {
     localRef.current = el;
     if (inputRef) inputRef.current = el;

@@ -514,7 +514,7 @@ export function LegalAiChat({
       <div className={cn(isEmpty ? "w-full" : "mx-auto w-full max-w-3xl")}>
         <div className="rounded-2xl border border-[#D9DEE5] bg-[#F8FAFC] p-2 shadow-[0_12px_32px_-24px_rgba(11,31,58,0.45)] focus-within:border-[#0B1F3A]/35">
           {attachedDocuments.length || uploading ? (
-            <ul className="mb-2 flex flex-wrap gap-2 px-0.5 pt-0.5">
+            <ul className="mb-2 flex max-h-24 flex-wrap gap-2 overflow-y-auto px-0.5 pt-0.5">
               {attachedDocuments.map((document) => {
                 const hint = legalAiExtractStatusHint(document.extractStatus);
                 return (
