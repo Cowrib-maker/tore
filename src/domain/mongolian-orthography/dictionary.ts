@@ -54,7 +54,7 @@ const CORE_DICTIONARY_WORDS = [
   "иргэн", "иргэд", "захиргаа", "захиргааны", "иргэний", "эрүүгийн", "мөнгө", "төлбөр",
   "үнэ", "үнэгүй", "төлбөртэй", "багц", "үйлчилгээ", "систем", "програм",
   "мэдээлэл", "технологи", "интернет", "файл", "хавсралт",
-  "ширхэг", "хаалт", "хүүхэд", "миний",
+  "ширхэг", "хаалт", "хүүхэд", "миний", "эсэх",
 ] as const;
 
 /** Longest-first suffixes for morphological recognition (not typo correction). */
@@ -74,6 +74,12 @@ export const MORPHOLOGICAL_SUFFIXES = [
   // Plural for person-nouns after ч/ж/ш/г (e.g. хуульч→хуульчид,
   // шүүгч→шүүгчид) — a standard, closed-class Mongolian plural marker.
   "ид",
+  // Habitual/customary aspect (vowel-harmony variants) — e.g. "хамаарах"
+  // (to pertain, already known) → "хамаардаг" (customarily pertains).
+  // Found missing via the larger evaluation-corpus scan: "хамаардаг",
+  // "боддог", "заадаг" all registered unknown and got wrong fuzzy
+  // "corrections" despite sitting on already-known stems.
+  "даг", "дог", "дэг", "дөг",
 ] as const;
 
 const DICTIONARY = new Set<string>();

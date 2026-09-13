@@ -38,6 +38,11 @@ export const LEGAL_LEXICON_WORDS = [
   // the pre-refactor CORE_DICTIONARY_WORDS list so criminal case text
   // involving traffic violations does not trip false positives).
   "прокурор", "прокурорын", "цагдаа", "цагдаагийн", "шүүхийн", "өмгөөлөл", "өмгөөллийн", "яллагч", "яллах", "гаргагч", "шийтгэл", "бүхий", "тушаалтан", "магадалгаа", "жолооч", "тээврийн", "хэрэгсэл", "согтууруулах", "согтолт", "амьсгал", "спирт", "агууламж", "удирдлага", "болгон", "дарааллаар", "улмаар", "иймд", "ингэснээр", "бөгөөд", "буюу", "боловч", "хэрэв", "объект", "субъект", "санаатай", "болгоомжгүй", "хянан", "шийдвэрлэх", "шийдвэрлэсэн", "шийдвэрлэж", "газар", "сум", "дундын", "аймгийн", "монгол", "улс", "монголын",
+  // Constitutional/sovereignty vocabulary — "тусгаар тогтносон" (sovereign
+  // and independent) is a cornerstone Article 1 phrase; missing it meant a
+  // clearly wrong "correction" toward "тусгай"/"дугаар" on core
+  // constitutional text (found via the evaluation-corpus false-positive scan).
+  "тусгаар",
 ] as const;
 
 export const LEGAL_LEXICON_STEMS = [

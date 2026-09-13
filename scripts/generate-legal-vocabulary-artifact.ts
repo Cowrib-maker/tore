@@ -24,7 +24,6 @@
  * Usage: npx tsx scripts/generate-legal-vocabulary-artifact.ts
  */
 
-import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -33,6 +32,7 @@ import {
   extractVocabularyCandidates,
   type CorpusDocumentInput,
 } from "../src/domain/mongolian-orthography/corpus-vocabulary";
+import { buildFixtureKnowledgeExport } from "./lib/fixture-legal-corpus";
 
 /**
  * Words a human confirmed, by reading the extraction output and the
@@ -51,20 +51,14 @@ const APPROVED_WORDS = new Set(["үндсэн", "дүгээр"]);
 const FIXTURE_EXPORT_PATH = join(process.cwd(), "tmp", "fixture-legal-corpus-export.json");
 const ARTIFACT_PATH = join(process.cwd(), "generated", "legal-vocabulary.json");
 
-function main() {
+async function main() {
   // Regenerate the fixture export fresh from tracked source each time so
   // this script is one reproducible step, not dependent on whatever
   // happens to already be sitting in tmp/.
-  const stdout = execFileSync(process.execPath, [
-    require.resolve("tsx/cli"),
-    join(__dirname, "build-fixture-legal-corpus-export.ts"),
-  ]);
-  writeFileSync(FIXTURE_EXPORT_PATH, stdout);
+  const exportData = await buildFixtureKnowledgeExport();
+  mkdirSync(join(process.cwd(), "tmp"), { recursive: true });
+  writeFileSync(FIXTURE_EXPORT_PATH, JSON.stringify(exportData, null, 2));
 
-  const exportData = JSON.parse(stdout.toString("utf8")) as {
-    documentCount: number;
-    documents: { id: string; articles: { text: string }[] }[];
-  };
   const documents: CorpusDocumentInput[] = exportData.documents.map((doc) => ({
     id: doc.id,
     text: doc.articles.map((a) => a.text).join("\n"),
@@ -99,4 +93,4 @@ function main() {
   console.log(`Wrote ${artifact.entries.length} approved entries to ${ARTIFACT_PATH}`);
 }
 
-main();
+void main();

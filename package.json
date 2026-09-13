@@ -35,6 +35,8 @@
     "ingest:legalinfo:local-prisma": "tsx scripts/ingest-legalinfo-local-prisma.ts",
     "ingest:shuukh:canary": "tsx scripts/ingest-shuukh-canary.ts",
     "extract:legal-vocabulary": "tsx scripts/extract-legal-vocabulary.ts",
+    "build:evaluation-corpus": "tsx scripts/build-evaluation-corpus.ts",
+    "measure:orthography-engine": "tsx scripts/measure-orthography-engine.ts",
     "postinstall": "prisma generate"
   },
   "prisma": { "seed": "tsx prisma/seed.ts" },
