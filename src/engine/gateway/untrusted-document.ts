@@ -22,6 +22,8 @@ const FENCE_LIKE = [
   /---\s*(BEGIN|END)\s+UNTRUSTED DOCUMENT[^\n]*---/gi,
   /UNTRUSTED_USER_DOCUMENT_(DATA|ATTACHMENT)/gi,
   /VERIFIED LEGAL SOURCES/gi,
+  /---\s*END\s+OWNED_CASE_FILE_DATA\s*---/gi,
+  /\bOWNED_CASE_FILE_DATA\b/gi,
 ];
 
 const REDACTION = "[redacted-instruction-like-text]";
