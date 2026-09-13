@@ -5,11 +5,27 @@ import type {
   LegalCorpusRetrieveResult,
   LegalCorpusVerifyInput,
 } from "@/application/ai/legal-corpus";
+import { LegalCorpusSource } from "@/application/ai/legal-corpus";
 
 function hasRetrievedAuthorities(
   result: LegalCorpusRetrieveResult,
 ): result is Extract<LegalCorpusRetrieveResult, { kind: "retrieved" }> {
   return result.kind === "retrieved" && result.authorities.length > 0;
+}
+
+/**
+ * Stamps which retriever produced a "retrieved" result. Other result kinds
+ * ("as_of_unavailable" / "unavailable") carry no authorities to attribute,
+ * so they pass through unchanged.
+ */
+function withSource(
+  result: LegalCorpusRetrieveResult,
+  source: LegalCorpusSource,
+): LegalCorpusRetrieveResult {
+  if (result.kind !== "retrieved") {
+    return result;
+  }
+  return { ...result, source };
 }
 
 function isLocalMiss(result: LegalCitationVerifyResult): boolean {
@@ -42,9 +58,10 @@ export class FallbackLegalCorpusRetriever implements LegalCorpusRetriever {
       return local;
     }
     if (hasRetrievedAuthorities(local)) {
-      return local;
+      return withSource(local, LegalCorpusSource.FALLBACK_LOCAL_CORPUS);
     }
-    return this.remote.retrieveExactCitation(input);
+    const remote = await this.remote.retrieveExactCitation(input);
+    return withSource(remote, LegalCorpusSource.LEGAL_DATA_ENGINE);
   }
   async retrieveLegalQuestion(
     input: LegalCorpusRetrieveInput,
@@ -56,7 +73,7 @@ export class FallbackLegalCorpusRetriever implements LegalCorpusRetriever {
     }
 
     if (hasRetrievedAuthorities(local)) {
-      return local;
+      return withSource(local, LegalCorpusSource.FALLBACK_LOCAL_CORPUS);
     }
 
     // Local Prisma corpus was queried — do not wait on remote engine timeouts.
@@ -64,7 +81,8 @@ export class FallbackLegalCorpusRetriever implements LegalCorpusRetriever {
       return local;
     }
 
-    return this.remote.retrieveLegalQuestion(input);
+    const remote = await this.remote.retrieveLegalQuestion(input);
+    return withSource(remote, LegalCorpusSource.LEGAL_DATA_ENGINE);
   }
   async verifyCitation(
     input: LegalCorpusVerifyInput,

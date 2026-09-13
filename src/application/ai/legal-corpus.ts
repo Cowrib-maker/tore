@@ -39,12 +39,35 @@ export type LegalCorpusUnavailableReason =
   | "invalid_response"
   | "not_found";
 
+/**
+ * Which retriever actually produced a "retrieved" result.
+ * - LOCAL_CORPUS: the local (Prisma-backed) retriever, used directly
+ *   (not through {@link FallbackLegalCorpusRetriever}).
+ * - FALLBACK_LOCAL_CORPUS: the local retriever, reached via the fallback
+ *   chain — i.e. the remote engine was never called because local already
+ *   had a verified hit.
+ * - LEGAL_DATA_ENGINE: the remote tore-legal-data-engine service.
+ */
+export const LegalCorpusSource = {
+  LEGAL_DATA_ENGINE: "LEGAL_DATA_ENGINE",
+  LOCAL_CORPUS: "LOCAL_CORPUS",
+  FALLBACK_LOCAL_CORPUS: "FALLBACK_LOCAL_CORPUS",
+} as const;
+
+export type LegalCorpusSource =
+  (typeof LegalCorpusSource)[keyof typeof LegalCorpusSource];
+
 export type LegalCorpusRetrieveResult =
   | {
       kind: "retrieved";
       status: "ok" | "placeholder";
       authorities: LegalCorpusAuthority[];
       retrievedAt: string;
+      /**
+       * Optional so existing retrievers (and any object literal built
+       * before this field existed) keep type-checking unchanged.
+       */
+      source?: LegalCorpusSource;
     }
   | {
       kind: "as_of_unavailable";
