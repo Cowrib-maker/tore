@@ -40,6 +40,20 @@ export class PrismaLawyerCredentialRepository
     return records.map(mapLawyerCredential);
   }
 
+  async findByLawyerProfileIds(
+    lawyerProfileIds: readonly string[],
+  ): Promise<LawyerCredential[]> {
+    if (lawyerProfileIds.length === 0) {
+      return [];
+    }
+    const records = await this.db.lawyerCredential.findMany({
+      where: { lawyerProfileId: { in: [...lawyerProfileIds] } },
+      orderBy: { submittedAt: "desc" },
+      select: lawyerCredentialSelect,
+    });
+    return records.map(mapLawyerCredential);
+  }
+
   async findPendingReview(
     options?: ListPageOptions,
   ): Promise<ListPage<LawyerCredential>> {

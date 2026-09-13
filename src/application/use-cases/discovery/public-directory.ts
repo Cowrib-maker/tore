@@ -79,6 +79,7 @@ export async function searchListedLawyers(
     languageLinks,
     allPracticeAreas,
     allLanguages,
+    allCredentials,
   ] = await Promise.all([
     deps.userRepository.findByIds(userIds),
     deps.consultationOfferingRepository.findActiveByLawyerProfileIds(
@@ -88,16 +89,15 @@ export async function searchListedLawyers(
     deps.lawyerTaxonomyRepository.getLanguagesForProfiles(profileIds),
     deps.practiceAreaRepository.findAllActive(),
     deps.languageRepository.findAllActive(),
+    deps.lawyerCredentialRepository.findByLawyerProfileIds(profileIds),
   ]);
 
   const credentialsByProfile = new Map<string, LawyerCredential[]>();
-  await Promise.all(
-    profileIds.map(async (profileId) => {
-      const credentials =
-        await deps.lawyerCredentialRepository.findByLawyerProfileId(profileId);
-      credentialsByProfile.set(profileId, credentials);
-    }),
-  );
+  for (const credential of allCredentials) {
+    const list = credentialsByProfile.get(credential.lawyerProfileId) ?? [];
+    list.push(credential);
+    credentialsByProfile.set(credential.lawyerProfileId, list);
+  }
 
   const userById = new Map(users.map((u) => [u.id, u]));
   const offeringsByProfile = new Map<string, ConsultationOffering[]>();
