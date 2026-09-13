@@ -39,6 +39,8 @@
     "measure:orthography-engine": "tsx scripts/measure-orthography-engine.ts",
     "benchmark:orthography-engine": "tsx scripts/benchmark-orthography-engine.ts",
     "evaluate:gold-set-metrics": "tsx scripts/compute-gold-set-metrics.ts",
+    "benchmark:generated-vocabulary-activation": "tsx scripts/benchmark-generated-vocabulary-activation.ts",
+    "compare:gold-set-off-on": "tsx scripts/compare-gold-set-off-on.ts",
     "postinstall": "prisma generate"
   },
   "prisma": { "seed": "tsx prisma/seed.ts" },

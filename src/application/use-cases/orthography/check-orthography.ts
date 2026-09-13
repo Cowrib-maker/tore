@@ -12,6 +12,16 @@ import {
   type OrthographyCheckResult,
   type OrthographySuggestion,
 } from "@/domain/mongolian-orthography";
+import { initializeGeneratedVocabularyIfEnabled } from "@/domain/mongolian-orthography/generated-vocabulary-activation";
+
+// Runs once when this server-only module is first loaded (Next.js loads
+// route/use-case modules once per server process, not per request) — a
+// deterministic, flag-gated activation point with no separate bootstrap
+// file to remember to wire up. A no-op when
+// TORE_GENERATED_LEGAL_VOCABULARY_V1 is unset (the default): the
+// hand-curated dictionary alone stays authoritative. See
+// generated-vocabulary-activation.ts for what "enabled" actually does.
+initializeGeneratedVocabularyIfEnabled();
 
 export type OrthographyCheckDeps = {
   subscriptionRepository: SubscriptionRepository;

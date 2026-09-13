@@ -18,8 +18,8 @@ describe("generated vocabulary — inactive by default", () => {
     // legal-vocabulary.json checked into the repo must not change
     // runtime behavior. Something has to explicitly call
     // registerGeneratedVocabulary() first.
-    expect(isKnownMongolianWord("үндсэн")).toBe(false);
-    expect(isKnownMongolianWord("дүгээр")).toBe(false);
+    expect(isKnownMongolianWord("акт")).toBe(false);
+    expect(isKnownMongolianWord("үндэслэл")).toBe(false);
   });
 });
 
@@ -28,8 +28,11 @@ describe("loadGeneratedVocabularyFile", () => {
     const result = loadGeneratedVocabularyFile(ARTIFACT_PATH);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.artifact.schemaVersion).toBe(1);
+    expect(result.artifact.schemaVersion).toBe(2);
     expect(result.artifact.entries.length).toBeGreaterThan(0);
+    for (const entry of result.artifact.entries) {
+      expect(entry.trustLevel).toBe("TRUSTED");
+    }
     expect(result.isStale).toBe(false);
   });
 
@@ -66,18 +69,18 @@ describe("registerGeneratedVocabulary — once explicitly activated", () => {
     if (!loaded.ok) throw new Error(loaded.error);
     registerGeneratedVocabulary(loaded.artifact.entries, { source: "legal-vocabulary.json" });
 
-    expect(isKnownMongolianWord("үндсэн")).toBe(true);
-    expect(isKnownMongolianWord("дүгээр")).toBe(true);
-    expect(suggestDictionaryWords("үндсэн")).toEqual([]);
+    expect(isKnownMongolianWord("акт")).toBe(true);
+    expect(isKnownMongolianWord("үндэслэл")).toBe(true);
+    expect(suggestDictionaryWords("акт")).toEqual([]);
 
-    // Category reflects whatever the artifact currently records for this
-    // word (LEGAL or COMMON, depending on the corpus run that produced
-    // it) — the important assertion is provenance exists and is
-    // attributed to this source, not a specific frozen category value
-    // that would make this test brittle against every artifact refresh.
-    const provenance = generatedVocabularyProvenance("үндсэн");
-    expect(provenance).toMatchObject({ source: "legal-vocabulary.json" });
-    expect(["COMMON", "LEGAL"]).toContain(provenance?.category);
+    // Every schemaVersion-2 entry is category MORPHOLOGICAL_STEM,
+    // trustLevel TRUSTED (that's the whole point of the controlled-
+    // activation tightening) — the important assertion is provenance
+    // exists and is attributed to this source, not a specific frozen
+    // occurrence count that would make this test brittle against every
+    // artifact refresh.
+    const provenance = generatedVocabularyProvenance("акт");
+    expect(provenance).toMatchObject({ source: "legal-vocabulary.json", category: "MORPHOLOGICAL_STEM" });
     expect(generatedVocabularyProvenance("хууль")).toBeNull(); // hand-curated, never "generated"
   });
 
@@ -106,10 +109,19 @@ describe("registerGeneratedVocabulary — once explicitly activated", () => {
     expect(buildOrthographySuggestions(statute).spellingCount).toBe(0);
   });
 
-  it("legal vocabulary does not override general spelling safety: a typo of a generated word is still ranked/gated by confidence, not blindly accepted", () => {
-    const loaded = loadGeneratedVocabularyFile(ARTIFACT_PATH);
-    if (!loaded.ok) throw new Error(loaded.error);
-    registerGeneratedVocabulary(loaded.artifact.entries);
+  it("generated vocabulary does not override general spelling safety: a typo near a generated word is still ranked/gated by confidence, not blindly accepted", () => {
+    // Registered inline as COMMON (a complete, fuzzy-suggestible word),
+    // rather than relying on the real artifact's current entries: every
+    // schemaVersion-2 artifact entry today is MORPHOLOGICAL_STEM (added
+    // via addStem, never a fuzzy-suggestion target — see COMPLETE_WORDS's
+    // own doc comment in dictionary.ts), so this test's actual intent —
+    // "a generated word doesn't bypass confidence gating" — needs a
+    // COMMON-category registration to exercise the fuzzy-suggestion path
+    // at all, independent of which specific words the artifact happens to
+    // contain right now.
+    registerGeneratedVocabulary([
+      { word: "үндсэн", category: "COMMON", occurrenceCount: 9, documentFrequency: 5 },
+    ]);
 
     // "үндсэн" -> typo "үндсн" (dropped a vowel). Must not be silently
     // accepted as known, and if a correction is offered it must be the
@@ -140,13 +152,13 @@ describe("registerGeneratedVocabulary — once explicitly activated", () => {
   it("registering is idempotent: registering the same entries twice changes nothing further", () => {
     const loaded = loadGeneratedVocabularyFile(ARTIFACT_PATH);
     if (!loaded.ok) throw new Error(loaded.error);
-    const expectedOccurrence = loaded.artifact.entries.find((e) => e.word === "үндсэн")?.occurrenceCount;
+    const expectedOccurrence = loaded.artifact.entries.find((e) => e.word === "акт")?.occurrenceCount;
     registerGeneratedVocabulary(loaded.artifact.entries);
     registerGeneratedVocabulary(loaded.artifact.entries);
-    expect(isKnownMongolianWord("үндсэн")).toBe(true);
+    expect(isKnownMongolianWord("акт")).toBe(true);
     // The second registration must not double-count — provenance still
     // reflects the artifact's own recorded occurrence count, not 2x it.
-    expect(generatedVocabularyProvenance("үндсэн")?.occurrenceCount).toBe(expectedOccurrence);
+    expect(generatedVocabularyProvenance("акт")?.occurrenceCount).toBe(expectedOccurrence);
   });
 
   it("cleanup fully reverses a normal registration", () => {

@@ -156,21 +156,40 @@ describe("Phase 6 — selectSafeDictionaryEntries never includes LEGAL, and neve
     // "акт" appears both as a literal LEGAL word and, via its inflected
     // forms, as a MORPHOLOGICAL_STEM — confirmed real behavior from the
     // 59-document evaluation corpus. Reproduced here with a smaller
-    // synthetic corpus tuned to the same shape.
+    // synthetic corpus tuned to the same shape: each surface form needs
+    // its OWN 2+ documents (MIN_DOCUMENT_FREQUENCY_TO_CONSIDER) to survive
+    // to the stem-derivation stage at all, and 3 independent forms
+    // (TRUSTED_STEM_MIN_FORMS) to clear the MORPHOLOGICAL_STEM TRUSTED bar
+    // — a single-document-each version of this corpus (as an earlier draft
+    // of this test used) never actually produces a competing
+    // MORPHOLOGICAL_STEM candidate at all, so it wasn't exercising a real
+    // two-category collision despite its comment's claim.
     const legalDocs = repeat("акт", 20); // frequent bare word, coverage < 0.5 overall once mixed below
     const stemDocs: CorpusDocumentInput[] = [
-      { id: "s1", text: "актаар батлав" },
-      { id: "s2", text: "актаас иш татав" },
-      { id: "s3", text: "актыг баримтжуулав" },
+      { id: "s1a", text: "актаар батлав" },
+      { id: "s1b", text: "дахин актаар батлав" },
+      { id: "s2a", text: "актаас иш татав" },
+      { id: "s2b", text: "дахин актаас иш татав" },
+      { id: "s3a", text: "актыг баримтжуулав" },
+      { id: "s3b", text: "дахин актыг баримтжуулав" },
     ];
     const fillerDocs = repeat("өөр агуулгатай текст энд.", 20);
     const result = extractVocabularyCandidates([...legalDocs, ...stemDocs, ...fillerDocs]);
+    const candidates = result.candidates.filter((c) => c.word === "акт");
+    // Sanity: this corpus really does produce BOTH a LEGAL/REVIEW record
+    // and a MORPHOLOGICAL_STEM/TRUSTED record for "акт" before dedup —
+    // otherwise the assertion below wouldn't be testing a real collision.
+    expect(candidates.some((c) => c.category === "LEGAL")).toBe(true);
+    expect(candidates.some((c) => c.category === "MORPHOLOGICAL_STEM" && c.trustLevel === "TRUSTED")).toBe(true);
+
     const artifact = buildGeneratedVocabularyArtifact(
-      result.candidates.filter((c) => c.word === "акт"),
+      candidates,
       { description: "test", documentCount: result.documentCount },
       "2026-01-01T00:00:00.000Z",
     );
     const aktEntries = artifact.entries.filter((e) => e.word === "акт");
     expect(aktEntries.length).toBe(1);
+    expect(aktEntries[0]?.category).toBe("MORPHOLOGICAL_STEM");
+    expect(aktEntries[0]?.trustLevel).toBe("TRUSTED");
   });
 });

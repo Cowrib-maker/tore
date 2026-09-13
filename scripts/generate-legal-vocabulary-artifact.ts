@@ -14,13 +14,18 @@
  * new word just because extraction found one — that always needs a
  * human to add it to APPROVED_WORDS first, with a reason.
  *
- * A human decision can outrank the algorithmic trustLevel computed by
- * corpus-vocabulary.ts (e.g. a word confirmed correct by reading the
- * source directly, even though this corpus is still too small for it to
- * clear the numeric TRUSTED bar on frequency alone) — but the script
- * still prints trustLevel per approved word so that gap is visible, not
- * silent.
+ * schemaVersion 2 (controlled-activation milestone): a human approval in
+ * APPROVED_WORDS is necessary but no longer sufficient to ship —
+ * buildGeneratedVocabularyArtifact() now ALSO requires the word's best
+ * available record to independently be TRUSTED (see its own doc comment).
+ * Previously (schemaVersion 1) a human decision could outrank the
+ * algorithmic trustLevel and ship a REVIEW-tier word anyway, with only a
+ * console warning; that override is gone. A word a human approves but
+ * that never clears TRUSTED (LEGAL never does, by policy — see
+ * computeTrustLevel) is now EXCLUDED from the artifact, reported below,
+ * not silently shipped and not silently dropped.
  *
+
  * Usage: npx tsx scripts/generate-legal-vocabulary-artifact.ts
  */
 
@@ -86,16 +91,6 @@ async function main() {
     process.exit(1);
   }
 
-  for (const entry of approved) {
-    if (entry.trustLevel !== "TRUSTED") {
-      console.warn(
-        `NOTE: "${entry.word}" is human-approved but only algorithmically ${entry.trustLevel} ` +
-          `(occ=${entry.occurrenceCount}, docFreq=${entry.documentFrequency}) — shipped anyway on the human review, ` +
-          "not hidden.",
-      );
-    }
-  }
-
   const artifact = buildGeneratedVocabularyArtifact(
     approved,
     {
@@ -108,12 +103,27 @@ async function main() {
         "text). No production database or network access was used.",
       documentCount: result.documentCount,
     },
-    "2026-09-13T00:00:00.000Z", // fixed for reproducible diffs; update by hand when regenerating for real
+    "2026-09-13T12:00:00.000Z", // fixed for reproducible diffs; update by hand when regenerating for real
   );
+
+  const shipped = new Set(artifact.entries.map((e) => e.word));
+  const excludedAsNotTrusted = [...APPROVED_WORDS].filter((word) => !shipped.has(word));
+  if (excludedAsNotTrusted.length > 0) {
+    console.log(
+      `EXCLUDED (human-approved but no record for this word cleared TRUSTED — schemaVersion 2 requires ` +
+        `TRUSTED, not just human approval; see computeTrustLevel in corpus-vocabulary.ts): ` +
+        `${excludedAsNotTrusted.join(", ")}`,
+    );
+    for (const word of excludedAsNotTrusted) {
+      for (const candidate of approved.filter((c) => c.word === word)) {
+        console.log(`  "${word}" [${candidate.category}]: trustLevel=${candidate.trustLevel} occ=${candidate.occurrenceCount} docFreq=${candidate.documentFrequency}`);
+      }
+    }
+  }
 
   mkdirSync(join(process.cwd(), "generated"), { recursive: true });
   writeFileSync(ARTIFACT_PATH, `${JSON.stringify(artifact, null, 2)}\n`);
-  console.log(`Wrote ${artifact.entries.length} approved entries to ${ARTIFACT_PATH}`);
+  console.log(`Wrote ${artifact.entries.length} TRUSTED entries to ${ARTIFACT_PATH}`);
 }
 
 void main();

@@ -642,16 +642,38 @@ export const VOCABULARY_GENERATOR_VERSION = 1;
  * count, generator version) travels with it. No document ids, no raw
  * corpus text, no per-document breakdown — that provenance lives in the
  * generation command that produced the file, not in the artifact
- * consumers load at runtime. */
+ * consumers load at runtime.
+ *
+ * `trustLevel` is a literal `"TRUSTED"`, not the full {@link TrustLevel}
+ * union, by deliberate design (schemaVersion 2 — see
+ * {@link GeneratedVocabularyArtifact}): the controlled-activation
+ * milestone's runtime layer only ever registers TRUSTED entries, so
+ * making anything else unrepresentable in this type means a REVIEW or
+ * ATTESTED entry is a compile-time error here, not a runtime filter that
+ * could silently be skipped. `category` excludes LEGAL for the same
+ * reason — computeTrustLevel() policy-caps LEGAL at REVIEW forever (see
+ * its own doc comment), so a LEGAL entry can never legitimately carry
+ * trustLevel: "TRUSTED" and the type reflects that structurally. */
 export type GeneratedVocabularyEntry = {
   word: string;
-  category: Extract<VocabularyCategory, "COMMON" | "LEGAL" | "MORPHOLOGICAL_STEM">;
+  category: Extract<VocabularyCategory, "COMMON" | "MORPHOLOGICAL_STEM">;
+  trustLevel: "TRUSTED";
   occurrenceCount: number;
   documentFrequency: number;
 };
 
+/**
+ * schemaVersion 2 (bumped from 1 for the controlled-activation milestone):
+ * adds the `trustLevel` field to every entry and narrows `category` to
+ * exclude LEGAL, so "this artifact contains only TRUSTED entries" (the
+ * activation infrastructure's core safety property) is a schema-level
+ * fact any loader can check without recomputing trust from corpus data.
+ * A schemaVersion-1 file (the pre-activation-milestone shape, no
+ * trustLevel field) is a DIFFERENT, no-longer-accepted shape — see
+ * generated-vocabulary-loader.ts.
+ */
 export type GeneratedVocabularyArtifact = {
-  schemaVersion: 1;
+  schemaVersion: 2;
   generatorVersion: number;
   generatedAt: string;
   /** Human-readable provenance for the whole file — which corpus, how
@@ -660,19 +682,50 @@ export type GeneratedVocabularyArtifact = {
     description: string;
     documentCount: number;
   };
-  /** Only entries a human has reviewed and approved for inclusion — this
-   * file is never the raw, unreviewed extraction output. Sorted the same
-   * way {@link extractVocabularyCandidates} sorts (category, then
-   * frequency desc, then alphabetically) for a stable, reviewable diff. */
+  /** Only entries a human has reviewed and approved for inclusion, AND
+   * that independently cleared this pipeline's TRUSTED bar (see
+   * {@link buildGeneratedVocabularyArtifact}) — this file is never the
+   * raw, unreviewed extraction output, and never includes a REVIEW-tier
+   * human override (that was a schemaVersion-1 behavior; a human wanting
+   * to ship a REVIEW-tier word now must strengthen the evidence, not
+   * override the warning). Sorted the same way
+   * {@link extractVocabularyCandidates} sorts (category, then frequency
+   * desc, then alphabetically) for a stable, reviewable diff — see
+   * {@link compareGeneratedVocabularyEntries}, the single comparator both
+   * the builder and the loader's integrity check use. */
   entries: readonly GeneratedVocabularyEntry[];
 };
 
 /**
+ * The one sort order a committed artifact's entries must follow —
+ * exported so the loader/integrity-check can verify "deterministically
+ * sorted" against the EXACT same comparator the builder uses, instead of
+ * two independently-maintained copies of the same three-field tie-break
+ * silently drifting apart.
+ */
+export function compareGeneratedVocabularyEntries(
+  a: GeneratedVocabularyEntry,
+  b: GeneratedVocabularyEntry,
+): number {
+  return (
+    CATEGORY_ORDER[a.category] - CATEGORY_ORDER[b.category] ||
+    b.occurrenceCount - a.occurrenceCount ||
+    a.word.localeCompare(b.word)
+  );
+}
+
+/**
  * Builds the committed-artifact shape from a set of *already
  * human-approved* candidates (e.g. a reviewed subset of
- * {@link selectSafeDictionaryEntries}'s output). Does not do any
- * filtering or review itself — approval is a human decision made before
- * calling this, not something this function can determine.
+ * {@link selectSafeDictionaryEntries}'s output). Does not do any human
+ * review itself — approval is a human decision made before calling this
+ * (see APPROVED_WORDS in scripts/generate-legal-vocabulary-artifact.ts) —
+ * but it DOES enforce the TRUSTED-only bar itself (not merely trust the
+ * caller): an approved candidate that isn't independently TRUSTED is
+ * silently excluded from the returned artifact, never silently downgraded
+ * or force-included. Callers that want visibility into an exclusion
+ * should check the input approvedEntries against the output entries
+ * themselves (see the generation script's own reporting).
  */
 const TRUST_ORDER: Record<TrustLevel, number> = { TRUSTED: 0, REVIEW: 1, ATTESTED: 2 };
 
@@ -686,10 +739,12 @@ const TRUST_ORDER: Record<TrustLevel, number> = { TRUSTED: 0, REVIEW: 1, ATTESTE
  * generalizes to more surface forms than a single literal word), then
  * higher occurrence count, all deterministic tie-breaks.
  */
+type DedupableCategory = "COMMON" | "LEGAL" | "MORPHOLOGICAL_STEM";
+
 function dedupeByWord(
-  entries: readonly (VocabularyCandidate & { category: GeneratedVocabularyEntry["category"] })[],
-): (VocabularyCandidate & { category: GeneratedVocabularyEntry["category"] })[] {
-  const byWord = new Map<string, VocabularyCandidate & { category: GeneratedVocabularyEntry["category"] }>();
+  entries: readonly (VocabularyCandidate & { category: DedupableCategory })[],
+): (VocabularyCandidate & { category: DedupableCategory })[] {
+  const byWord = new Map<string, VocabularyCandidate & { category: DedupableCategory }>();
   for (const candidate of entries) {
     const existing = byWord.get(candidate.word);
     if (!existing) {
@@ -712,19 +767,37 @@ export function buildGeneratedVocabularyArtifact(
   source: { description: string; documentCount: number },
   generatedAt: string,
 ): GeneratedVocabularyArtifact {
-  const eligible = approvedEntries.filter(
-    (c): c is VocabularyCandidate & { category: GeneratedVocabularyEntry["category"] } =>
+  // LEGAL stays IN this intermediate set (not filtered out yet): dedupeByWord
+  // needs to see a word's LEGAL/REVIEW record to correctly lose it against a
+  // competing MORPHOLOGICAL_STEM/TRUSTED record for the SAME word (e.g.
+  // "акт") — dropping LEGAL before dedup would just leave nothing to compare
+  // against and change nothing for words that only ever HAD a LEGAL record.
+  const eligibleForDedup = approvedEntries.filter(
+    (c): c is VocabularyCandidate & { category: "COMMON" | "LEGAL" | "MORPHOLOGICAL_STEM" } =>
       c.category === "COMMON" || c.category === "LEGAL" || c.category === "MORPHOLOGICAL_STEM",
   );
 
-  const entries: GeneratedVocabularyEntry[] = dedupeByWord(eligible)
+  // THE gate: a word's single best (post-dedup) record must independently be
+  // TRUSTED to ship at all. A word whose only record is LEGAL/REVIEW (no
+  // competing TRUSTED alternative) is dropped here, not force-included or
+  // silently downgraded — see this function's own doc comment. TRUSTED
+  // structurally implies category !== "LEGAL" (computeTrustLevel never
+  // returns TRUSTED for LEGAL), so this filter's type predicate narrows
+  // category the same way, rather than casting past the invariant.
+  const trusted = dedupeByWord(eligibleForDedup).filter(
+    (c): c is VocabularyCandidate & { category: "COMMON" | "MORPHOLOGICAL_STEM"; trustLevel: "TRUSTED" } =>
+      c.trustLevel === "TRUSTED" && c.category !== "LEGAL",
+  );
+
+  const entries: GeneratedVocabularyEntry[] = trusted
     .map((c) => ({
       word: c.word,
       category: c.category,
+      trustLevel: c.trustLevel,
       occurrenceCount: c.occurrenceCount,
       documentFrequency: c.documentFrequency,
     }))
-    .sort((a, b) => CATEGORY_ORDER[a.category] - CATEGORY_ORDER[b.category] || b.occurrenceCount - a.occurrenceCount || a.word.localeCompare(b.word));
+    .sort(compareGeneratedVocabularyEntries);
 
-  return { schemaVersion: 1, generatorVersion: VOCABULARY_GENERATOR_VERSION, generatedAt, source, entries };
+  return { schemaVersion: 2, generatorVersion: VOCABULARY_GENERATOR_VERSION, generatedAt, source, entries };
 }

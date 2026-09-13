@@ -58,3 +58,27 @@ export function isAdminDevtoolsEnabled(): boolean {
   }
   return allowFlag(ADMIN_DEVTOOLS_V1_FLAG);
 }
+
+/**
+ * Adversarial-orthography-evaluation milestone — controlled activation of
+ * the generated (corpus-derived) legal vocabulary layer in
+ * src/domain/mongolian-orthography/dictionary.ts. Must be exactly "1" to
+ * enable. Default: OFF (missing / any other value) — matches every other
+ * flag in this file, and matters more here than most: the hand-curated
+ * dictionary alone remains authoritative until this is explicitly turned
+ * on, and turning it back off (then restarting the process) is the
+ * complete, immediate kill switch — no migration, no cache to invalidate,
+ * no manual cleanup (see generated-vocabulary-activation.ts).
+ *
+ * Server-only by construction, not by convention alone: nothing in this
+ * flag's own code path touches `NEXT_PUBLIC_`-prefixed env, and the only
+ * caller (generated-vocabulary-activation.ts) is itself imported solely
+ * from server-only application code (the paid orthography-check use
+ * case), never from a "use client" component — so this can never be
+ * read, let alone set, from a browser request.
+ */
+export const GENERATED_LEGAL_VOCABULARY_V1_FLAG = "TORE_GENERATED_LEGAL_VOCABULARY_V1";
+
+export function isGeneratedLegalVocabularyEnabled(): boolean {
+  return allowFlag(GENERATED_LEGAL_VOCABULARY_V1_FLAG);
+}
