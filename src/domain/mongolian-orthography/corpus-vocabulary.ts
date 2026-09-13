@@ -25,7 +25,7 @@ import {
   isKnownMongolianWord,
   MORPHOLOGICAL_SUFFIXES,
 } from "@/domain/mongolian-orthography/dictionary";
-import { normalizeMongolianWord } from "@/domain/mongolian-orthography/engine";
+import { checkVowelHarmony, normalizeMongolianWord } from "@/domain/mongolian-orthography/engine";
 
 export type CorpusDocumentInput = {
   /** Stable id for provenance only — never used as vocabulary itself. */
@@ -46,9 +46,34 @@ export type RejectionReason =
   | "length_out_of_range"
   | "insufficient_evidence";
 
+/**
+ * ATTESTED, REVIEW, and TRUSTED are deliberately distinct claims:
+ *
+ *  - ATTESTED only means "this token occurs in the corpus". A word seen
+ *    20 times can still be a proper noun, an OCR artifact, a citation
+ *    fragment, or a plain grammatical particle — occurrence alone proves
+ *    nothing about spelling correctness. Every PROPER_NOUN and
+ *    ABBREVIATION candidate is ATTESTED and stays there forever: this
+ *    pipeline has no reliable way to promote a name or an abbreviation,
+ *    so it never tries.
+ *  - REVIEW means the token cleared this pipeline's numeric evidence
+ *    floor (frequency, document spread, stem-derivation safety) for its
+ *    category, and is worth a human looking at — not that it is correct.
+ *  - TRUSTED means it additionally cleared a stricter, category-specific
+ *    bar (see computeTrustLevel) that this milestone's evaluation could
+ *    actually justify with evidence. TRUSTED is still not "safe to
+ *    auto-merge": selectSafeDictionaryEntries()/the generation script
+ *    additionally requires a human to have put the exact word in an
+ *    explicit approval list before it reaches generated/legal-
+ *    vocabulary.json. TRUSTED narrows what a human is even offered to
+ *    approve; it never replaces that approval.
+ */
+export type TrustLevel = "ATTESTED" | "REVIEW" | "TRUSTED";
+
 export type VocabularyCandidate = {
   word: string;
   category: VocabularyCategory;
+  trustLevel: TrustLevel;
   /** Total occurrences across the corpus. */
   occurrenceCount: number;
   /** Number of distinct documents the word appears in. */
@@ -68,6 +93,13 @@ export type RejectedToken = {
   word: string;
   reason: RejectionReason;
   occurrenceCount: number;
+  /** True only for reason "insufficient_evidence": the token IS a
+   * plausible Mongolian word occurrence (ATTESTED, per the definition
+   * above), it simply doesn't have enough cross-document evidence yet.
+   * False for the other three reasons — those tokens were never treated
+   * as word candidates at all (a digit, a non-Mongolian string, an
+   * out-of-range length), so "attested" doesn't apply to them. */
+  attested: boolean;
 };
 
 export type VocabularyExtractionResult = {
@@ -90,6 +122,89 @@ const MIN_DOCUMENT_FREQUENCY_TO_CONSIDER = 2;
  * TF-IDF) is used rather than raw frequency so one very repetitive
  * document can't make a rare word look "common". */
 const COMMON_COVERAGE_RATIO = 0.5;
+
+/** REVIEW floor for COMMON/LEGAL candidates — below this, a candidate
+ * still exists (ATTESTED) but isn't worth a human's time yet. */
+const REVIEW_MIN_OCCURRENCE = 3;
+const REVIEW_MIN_DOCUMENT_FREQUENCY = MIN_DOCUMENT_FREQUENCY_TO_CONSIDER;
+/** TRUSTED floor for COMMON, on top of the REVIEW floor: this milestone's
+ * evaluation could not justify a lower bar (see the эсэх/тул/аль class of
+ * words that sit well below 0.7 coverage in a 59-document corpus despite
+ * being real, common Mongolian words — 0.7/10 is deliberately
+ * conservative, not tuned to include any specific word). */
+const TRUSTED_COMMON_MIN_COVERAGE_RATIO = 0.7;
+const TRUSTED_COMMON_MIN_OCCURRENCE = 10;
+/** TRUSTED floor for MORPHOLOGICAL_STEM: 2 independent forms is the bar
+ * to be ATTESTED as a stem candidate at all (see deriveMorphologicalStems);
+ * TRUSTED asks for a third, independent, distinct surface form — the
+ * "гэ" false positive (гэж/гэх/гэм) had exactly 3 forms but none of them
+ * were legitimate morphological evidence (all matched via excluded
+ * single-letter suffixes, so it would never have become a candidate
+ * under the current rules at all — this floor is an extra margin on top
+ * of that fix, not a replacement for it). */
+const TRUSTED_STEM_MIN_FORMS = 3;
+
+/** A candidate that itself fails the §8 vowel-harmony rule is more likely
+ * to be a compound, a loanword, or an extraction artifact than a simple
+ * native word — used only as a bonus signal toward TRUSTED, never as a
+ * rejection (plenty of genuine compounds/loanwords legitimately mix
+ * vowel classes), reusing the same rule engine.ts already applies to
+ * user-authored text rather than inventing a new plausibility check. */
+function hasPlausibleVowelHarmony(word: string): boolean {
+  return checkVowelHarmony(word) === null;
+}
+
+/**
+ * Computes the trust tier for a candidate that already exists (i.e. this
+ * is never called for ATTESTED-only rejected tokens — see RejectedToken.attested
+ * for those). See the TrustLevel doc comment for what each tier claims.
+ */
+function computeTrustLevel(input: {
+  word: string;
+  category: VocabularyCategory;
+  occurrenceCount: number;
+  documentFrequency: number;
+  documentCoverageRatio: number;
+  /** Only meaningful for MORPHOLOGICAL_STEM. */
+  independentFormCount?: number;
+}): TrustLevel {
+  if (input.category === "PROPER_NOUN" || input.category === "ABBREVIATION") {
+    // This pipeline has no reliable signal to promote a name or an
+    // abbreviation beyond "it occurred" — never REVIEW, let alone TRUSTED.
+    return "ATTESTED";
+  }
+
+  if (input.category === "MORPHOLOGICAL_STEM") {
+    if ((input.independentFormCount ?? 0) >= TRUSTED_STEM_MIN_FORMS && hasPlausibleVowelHarmony(input.word)) {
+      return "TRUSTED";
+    }
+    return "REVIEW";
+  }
+
+  // COMMON or LEGAL.
+  if (input.occurrenceCount < REVIEW_MIN_OCCURRENCE || input.documentFrequency < REVIEW_MIN_DOCUMENT_FREQUENCY) {
+    return "ATTESTED";
+  }
+  if (input.category === "LEGAL") {
+    // Policy decision (Phase 5 of the classification-safety milestone):
+    // the document-coverage-ratio split cannot reliably separate genuine
+    // legal terminology from an ordinary word that merely falls under
+    // 50% coverage in this specific corpus's topic mix (confirmed:
+    // тул/эсэх/аль/биш/ямар/мэт — plain grammar words — land in LEGAL
+    // right alongside акт/бүрэлдэхүүн/шаардлага/элемент). Until an
+    // independent legal-vs-general-Mongolian frequency baseline exists,
+    // LEGAL is capped at REVIEW regardless of frequency.
+    return "REVIEW";
+  }
+  if (
+    input.occurrenceCount >= TRUSTED_COMMON_MIN_OCCURRENCE &&
+    input.documentCoverageRatio >= TRUSTED_COMMON_MIN_COVERAGE_RATIO &&
+    hasPlausibleVowelHarmony(input.word)
+  ) {
+    return "TRUSTED";
+  }
+  return "REVIEW";
+}
 
 const ALL_CAPS_ABBREVIATION_RE = /^[А-ЯӨҮЁ]{2,6}$/u;
 const CAPITALIZED_WORD_RE = /^[А-ЯӨҮЁ][а-яөүё]+$/u;
@@ -229,6 +344,7 @@ export function extractVocabularyCandidates(
     candidates.push({
       word,
       category: "ABBREVIATION",
+      trustLevel: "ATTESTED",
       occurrenceCount: acc.occurrenceCount,
       documentFrequency: acc.documents.size,
       documentCoverageRatio: documentCount > 0 ? acc.documents.size / documentCount : 0,
@@ -245,6 +361,7 @@ export function extractVocabularyCandidates(
       candidates.push({
         word,
         category: "PROPER_NOUN",
+        trustLevel: "ATTESTED",
         occurrenceCount: acc.occurrenceCount,
         documentFrequency,
         documentCoverageRatio: documentCount > 0 ? documentFrequency / documentCount : 0,
@@ -267,6 +384,13 @@ export function extractVocabularyCandidates(
     candidates.push({
       word,
       category,
+      trustLevel: computeTrustLevel({
+        word,
+        category,
+        occurrenceCount: acc.occurrenceCount,
+        documentFrequency,
+        documentCoverageRatio: coverageRatio,
+      }),
       occurrenceCount: acc.occurrenceCount,
       documentFrequency,
       documentCoverageRatio: coverageRatio,
@@ -280,7 +404,12 @@ export function extractVocabularyCandidates(
   candidates.sort(compareCandidates);
 
   const rejected: RejectedToken[] = Array.from(rejectedCounts.entries())
-    .map(([word, { reason, count }]) => ({ word, reason, occurrenceCount: count }))
+    .map(([word, { reason, count }]) => ({
+      word,
+      reason,
+      occurrenceCount: count,
+      attested: reason === "insufficient_evidence",
+    }))
     .sort((a, b) => a.reason.localeCompare(b.reason) || b.occurrenceCount - a.occurrenceCount || a.word.localeCompare(b.word));
 
   return { documentCount, candidates, rejected };
@@ -293,6 +422,43 @@ export function extractVocabularyCandidates(
  * evidence, not a coincidence, and is more valuable to add to
  * dictionary.ts than every individual surface form.
  */
+/** A stem shorter than this is never derived, however strong the
+ * frequency evidence: the "гэ" false positive (2 characters) aggregated
+ * гэж/гэх/гэм — the quotative verb "to say" merged with гэм ("guilt", an
+ * unrelated root) purely because both reduce to the same 2-letter prefix
+ * once a coincidental single-letter suffix is stripped. Real Mongolian
+ * does have short native roots (эр, эм, ор, ир...), but this pipeline has
+ * no way to tell a genuine short root from a coincidental one, so it
+ * declines to guess rather than risk another "гэ". */
+const MIN_STEM_LENGTH = 3;
+
+/**
+ * Finds the longest matching suffix with length >= 2 (never length 1) —
+ * unlike matchesMorphology()'s runtime check (which may fall back to a
+ * single-letter case-marker match because it only ever *confirms* an
+ * ALREADY-known stem, so a coincidental short match is harmless), stem
+ * *discovery* is choosing what to treat as new evidence, and a
+ * single-letter suffix is exactly what let "гэ" and "хуульчид" (which
+ * mis-derived "хуульчи" by matching bare "д" instead of "ид" — found
+ * during this milestone's audit) go wrong. Longest-first also fixes a
+ * real bug: the previous implementation walked MORPHOLOGICAL_SUFFIXES in
+ * declaration order and stopped at the FIRST match, which is not
+ * necessarily the most specific one (declaration order is not strictly
+ * length-sorted).
+ */
+function longestNonTrivialSuffixMatch(word: string): { suffix: string; stem: string } | null {
+  let best: { suffix: string; stem: string } | null = null;
+  for (const suffix of MORPHOLOGICAL_SUFFIXES) {
+    if (suffix.length < 2) continue;
+    if (best && suffix.length <= best.suffix.length) continue;
+    if (!word.endsWith(suffix) || word.length - suffix.length < MIN_STEM_LENGTH) continue;
+    const stem = word.slice(0, -suffix.length);
+    if (boundaryWouldGeminate(stem, suffix)) continue;
+    best = { suffix, stem };
+  }
+  return best;
+}
+
 function deriveMorphologicalStems(
   survivors: ReadonlyMap<string, Accumulator & { documentFrequency: number }>,
   documentCount: number,
@@ -300,18 +466,14 @@ function deriveMorphologicalStems(
   const byStem = new Map<string, { forms: string[]; occurrenceCount: number; documents: Set<string> }>();
 
   for (const [word, acc] of survivors) {
-    for (const suffix of MORPHOLOGICAL_SUFFIXES) {
-      if (!word.endsWith(suffix) || word.length - suffix.length < 2) continue;
-      const stem = word.slice(0, -suffix.length);
-      if (boundaryWouldGeminate(stem, suffix)) continue;
+    const match = longestNonTrivialSuffixMatch(word);
+    if (!match) continue;
 
-      const entry = byStem.get(stem) ?? { forms: [], occurrenceCount: 0, documents: new Set<string>() };
-      entry.forms.push(word);
-      entry.occurrenceCount += acc.occurrenceCount;
-      for (const docId of acc.documents) entry.documents.add(docId);
-      byStem.set(stem, entry);
-      break; // longest-suffix-first isn't tracked here; one stripping per word is enough evidence
-    }
+    const entry = byStem.get(match.stem) ?? { forms: [], occurrenceCount: 0, documents: new Set<string>() };
+    entry.forms.push(word);
+    entry.occurrenceCount += acc.occurrenceCount;
+    for (const docId of acc.documents) entry.documents.add(docId);
+    byStem.set(match.stem, entry);
   }
 
   const stems: VocabularyCandidate[] = [];
@@ -321,6 +483,14 @@ function deriveMorphologicalStems(
     stems.push({
       word: stem,
       category: "MORPHOLOGICAL_STEM",
+      trustLevel: computeTrustLevel({
+        word: stem,
+        category: "MORPHOLOGICAL_STEM",
+        occurrenceCount: entry.occurrenceCount,
+        documentFrequency: entry.documents.size,
+        documentCoverageRatio: documentCount > 0 ? entry.documents.size / documentCount : 0,
+        independentFormCount: uniqueForms.length,
+      }),
       occurrenceCount: entry.occurrenceCount,
       documentFrequency: entry.documents.size,
       documentCoverageRatio: documentCount > 0 ? entry.documents.size / documentCount : 0,
@@ -360,14 +530,76 @@ export function selectSafeDictionaryEntries(
   result: VocabularyExtractionResult,
   options?: { minOccurrence?: number; minDocumentFrequency?: number },
 ): VocabularyCandidate[] {
-  const minOccurrence = options?.minOccurrence ?? 3;
-  const minDocumentFrequency = options?.minDocumentFrequency ?? MIN_DOCUMENT_FREQUENCY_TO_CONSIDER;
+  // Any caller-supplied numbers apply as an ADDITIONAL floor on top of
+  // trustLevel === "TRUSTED" — they can only narrow the result further,
+  // never loosen it (a low minOccurrence cannot make a REVIEW-tier LEGAL
+  // candidate "safe"; LEGAL is categorically excluded by computeTrustLevel
+  // regardless of frequency — see Phase 5 of the classification-safety
+  // milestone).
+  const minOccurrence = options?.minOccurrence ?? 0;
+  const minDocumentFrequency = options?.minDocumentFrequency ?? 0;
 
   return result.candidates
-    .filter((c) => c.category === "COMMON" || c.category === "LEGAL" || c.category === "MORPHOLOGICAL_STEM")
+    .filter((c) => c.trustLevel === "TRUSTED")
     .filter((c) => !c.alreadyKnown)
     .filter((c) => c.occurrenceCount >= minOccurrence && c.documentFrequency >= minDocumentFrequency)
     .sort(compareCandidates);
+}
+
+/**
+ * Phase 8 measurement helper: counts candidates by category and trust
+ * tier, plus how many rejected tokens are themselves ATTESTED
+ * (insufficient_evidence) vs. structurally excluded (everything else).
+ * Used by scripts/measure-orthography-engine.ts and by the milestone
+ * report — never by runtime code.
+ */
+export function summarizeVocabularyTrust(result: VocabularyExtractionResult): {
+  byCategoryAndTrust: Record<VocabularyCategory, Record<TrustLevel, number>>;
+  attestedRejectedCount: number;
+  structurallyExcludedCount: number;
+  totalAttested: number;
+  totalReview: number;
+  totalTrusted: number;
+} {
+  const byCategoryAndTrust = {
+    COMMON: { ATTESTED: 0, REVIEW: 0, TRUSTED: 0 },
+    LEGAL: { ATTESTED: 0, REVIEW: 0, TRUSTED: 0 },
+    PROPER_NOUN: { ATTESTED: 0, REVIEW: 0, TRUSTED: 0 },
+    ABBREVIATION: { ATTESTED: 0, REVIEW: 0, TRUSTED: 0 },
+    MORPHOLOGICAL_STEM: { ATTESTED: 0, REVIEW: 0, TRUSTED: 0 },
+  } as Record<VocabularyCategory, Record<TrustLevel, number>>;
+
+  for (const candidate of result.candidates) {
+    byCategoryAndTrust[candidate.category][candidate.trustLevel] += 1;
+  }
+
+  let attestedRejectedCount = 0;
+  let structurallyExcludedCount = 0;
+  for (const rejected of result.rejected) {
+    if (rejected.attested) attestedRejectedCount += 1;
+    else structurallyExcludedCount += 1;
+  }
+
+  let totalReview = 0;
+  let totalTrusted = 0;
+  for (const perTrust of Object.values(byCategoryAndTrust)) {
+    totalReview += perTrust.REVIEW;
+    totalTrusted += perTrust.TRUSTED;
+  }
+  // Every candidate is at least ATTESTED (occurs in the corpus), plus
+  // every ATTESTED-only rejected token (insufficient_evidence) is also
+  // ATTESTED per the Phase 2 definition, even though it never became a
+  // full candidate record.
+  const totalAttested = result.candidates.length + attestedRejectedCount;
+
+  return {
+    byCategoryAndTrust,
+    attestedRejectedCount,
+    structurallyExcludedCount,
+    totalAttested,
+    totalReview,
+    totalTrusted,
+  };
 }
 
 /** Shape actually needed from a {@link StoredKnowledgeDocument}-like
@@ -442,16 +674,50 @@ export type GeneratedVocabularyArtifact = {
  * filtering or review itself — approval is a human decision made before
  * calling this, not something this function can determine.
  */
+const TRUST_ORDER: Record<TrustLevel, number> = { TRUSTED: 0, REVIEW: 1, ATTESTED: 2 };
+
+/**
+ * The same word can legitimately produce two separate candidate records
+ * (e.g. "акт" as a literal LEGAL word from its own occurrences, and
+ * separately as a MORPHOLOGICAL_STEM derived from its case-inflected
+ * forms) — including both in an artifact would be a confusing, silently
+ * duplicated entry. Keeps the single best record per word: highest trust
+ * tier first, then MORPHOLOGICAL_STEM over COMMON over LEGAL (a stem
+ * generalizes to more surface forms than a single literal word), then
+ * higher occurrence count, all deterministic tie-breaks.
+ */
+function dedupeByWord(
+  entries: readonly (VocabularyCandidate & { category: GeneratedVocabularyEntry["category"] })[],
+): (VocabularyCandidate & { category: GeneratedVocabularyEntry["category"] })[] {
+  const byWord = new Map<string, VocabularyCandidate & { category: GeneratedVocabularyEntry["category"] }>();
+  for (const candidate of entries) {
+    const existing = byWord.get(candidate.word);
+    if (!existing) {
+      byWord.set(candidate.word, candidate);
+      continue;
+    }
+    const trustDelta = TRUST_ORDER[candidate.trustLevel] - TRUST_ORDER[existing.trustLevel];
+    const categoryDelta = CATEGORY_ORDER[candidate.category] - CATEGORY_ORDER[existing.category];
+    const better =
+      trustDelta < 0 ||
+      (trustDelta === 0 && categoryDelta < 0) ||
+      (trustDelta === 0 && categoryDelta === 0 && candidate.occurrenceCount > existing.occurrenceCount);
+    if (better) byWord.set(candidate.word, candidate);
+  }
+  return Array.from(byWord.values());
+}
+
 export function buildGeneratedVocabularyArtifact(
   approvedEntries: readonly VocabularyCandidate[],
   source: { description: string; documentCount: number },
   generatedAt: string,
 ): GeneratedVocabularyArtifact {
-  const entries: GeneratedVocabularyEntry[] = approvedEntries
-    .filter(
-      (c): c is VocabularyCandidate & { category: GeneratedVocabularyEntry["category"] } =>
-        c.category === "COMMON" || c.category === "LEGAL" || c.category === "MORPHOLOGICAL_STEM",
-    )
+  const eligible = approvedEntries.filter(
+    (c): c is VocabularyCandidate & { category: GeneratedVocabularyEntry["category"] } =>
+      c.category === "COMMON" || c.category === "LEGAL" || c.category === "MORPHOLOGICAL_STEM",
+  );
+
+  const entries: GeneratedVocabularyEntry[] = dedupeByWord(eligible)
     .map((c) => ({
       word: c.word,
       category: c.category,

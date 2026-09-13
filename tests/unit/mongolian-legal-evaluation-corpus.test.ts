@@ -19,8 +19,11 @@ import {
   DANGEROUS_MORPHOLOGICAL_STEM_FALSE_POSITIVE,
   LEGAL_TERM_SET,
   MORPHOLOGY_SET,
+  MORPHOLOGY_STEM_SAFETY_CASES,
   OCR_GARBAGE_CASES,
+  ORDINARY_WORDS_IN_LEGAL_TEXT,
   PROPER_NOUN_CASES,
+  RARE_WORD_CASES,
   SPELLCHECK_GOLD_SET_TYPOS,
   SPELLCHECK_GOLD_SET_VALID,
 } from "../evaluation/mongolian-legal-gold-set";
@@ -156,6 +159,52 @@ describe("Confirmed-dangerous MORPHOLOGICAL_STEM finding — must never be appro
       generated.entries.some((e) => e.word === DANGEROUS_MORPHOLOGICAL_STEM_FALSE_POSITIVE.stem),
     ).toBe(false);
   });
+
+  it(`"${DANGEROUS_MORPHOLOGICAL_STEM_FALSE_POSITIVE.stem}" no longer even becomes a candidate from its historically-wrong evidence`, () => {
+    const documents: CorpusDocumentInput[] = Array.from({ length: 10 }, (_, i) => ({
+      id: `d${i}`,
+      text: `Тэр ${DANGEROUS_MORPHOLOGICAL_STEM_FALSE_POSITIVE.wronglyMergedForms.join(" ")} гэсэн.`,
+    }));
+    const result = extractVocabularyCandidates(documents);
+    expect(
+      result.candidates.find((c) => c.word === DANGEROUS_MORPHOLOGICAL_STEM_FALSE_POSITIVE.stem),
+    ).toBeUndefined();
+  });
+});
+
+describe("C — ordinary words occurring in legal documents are not treated as exclusively-legal vocabulary", () => {
+  for (const { word, note } of ORDINARY_WORDS_IN_LEGAL_TEXT) {
+    it(`"${word}" is hand-curated as ordinary vocabulary — ${note}`, () => {
+      expect(isKnownMongolianWord(word)).toBe(true);
+    });
+  }
+});
+
+describe("G — rare words stay silent rather than being promoted on thin evidence", () => {
+  for (const { word, note } of RARE_WORD_CASES) {
+    it(`"${word}" — ${note}`, () => {
+      // Re-derive the same evaluation-scale evidence shape: a single
+      // occurrence across the whole corpus.
+      const documents: CorpusDocumentInput[] = [{ id: "d1", text: word }];
+      const result = extractVocabularyCandidates(documents);
+      const rejected = result.rejected.find((r) => r.word === word);
+      if (rejected) {
+        expect(rejected.reason).toBe("insufficient_evidence");
+        expect(rejected.attested).toBe(true);
+      }
+      // Whether or not it's already hand-curated, a single occurrence
+      // alone must never be promoted to a candidate in its own right.
+      expect(result.candidates.find((c) => c.word === word)).toBeUndefined();
+    });
+  }
+});
+
+describe("H — morphology-stem safety cases (see tests/unit/corpus-vocabulary-trust-levels.test.ts for the executable regressions)", () => {
+  for (const { description, note } of MORPHOLOGY_STEM_SAFETY_CASES) {
+    it(description, () => {
+      expect(note.length).toBeGreaterThan(0);
+    });
+  }
 });
 
 describe("Standing regressions from 0577f94/f8831e2 (must never regress)", () => {

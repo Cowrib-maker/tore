@@ -24,6 +24,7 @@ import {
   extractVocabularyCandidates,
   fromKnowledgeDocuments,
   selectSafeDictionaryEntries,
+  summarizeVocabularyTrust,
   type CorpusDocumentInput,
   type KnowledgeDocumentLike,
 } from "../src/domain/mongolian-orthography/corpus-vocabulary";
@@ -90,20 +91,25 @@ function main() {
   console.log(`rejected (distinct tokens): ${result.rejected.length}`);
   console.log("");
 
-  const byCategory = new Map<string, number>();
-  for (const candidate of result.candidates) {
-    byCategory.set(candidate.category, (byCategory.get(candidate.category) ?? 0) + 1);
-  }
-  console.log("By category:");
-  for (const [category, count] of [...byCategory.entries()].sort()) {
-    console.log(`  ${category}: ${count}`);
+  const summary = summarizeVocabularyTrust(result);
+  console.log("By category x trust tier (ATTESTED = occurs in corpus; REVIEW = worth a human");
+  console.log("look; TRUSTED = clears this pipeline's strictest evidence bar — still not");
+  console.log("auto-merge-safe, see selectSafeDictionaryEntries()):");
+  for (const [category, tiers] of Object.entries(summary.byCategoryAndTrust).sort()) {
+    console.log(`  ${category}: ATTESTED=${tiers.ATTESTED} REVIEW=${tiers.REVIEW} TRUSTED=${tiers.TRUSTED}`);
   }
   console.log("");
+  console.log(`Total ATTESTED (candidates + insufficient_evidence rejections): ${summary.totalAttested}`);
+  console.log(`Total REVIEW: ${summary.totalReview}`);
+  console.log(`Total TRUSTED: ${summary.totalTrusted}`);
+  console.log(`Structurally excluded (never treated as a word candidate at all): ${summary.structurallyExcludedCount}`);
+  console.log("");
 
-  console.log(`Safe-to-review candidates (not already known, COMMON/LEGAL/MORPHOLOGICAL_STEM only): ${safe.length}`);
+  console.log(`selectSafeDictionaryEntries() output (TRUSTED, not already known): ${safe.length}`);
   console.log("This list is NOT auto-merged anywhere — review each entry, then hand-add the ones");
   console.log("that are genuinely correct and useful to CORE_DICTIONARY_WORDS / LEGAL_LEXICON_WORDS");
-  console.log("/ LEGAL_LEXICON_STEMS in dictionary.ts / legal-lexicon.ts.");
+  console.log("/ LEGAL_LEXICON_STEMS in dictionary.ts / legal-lexicon.ts, or to APPROVED_WORDS in");
+  console.log("scripts/generate-legal-vocabulary-artifact.ts.");
   console.log("");
   for (const entry of safe.slice(0, 200)) {
     const provenance = entry.derivedFrom ? ` (from: ${entry.derivedFrom.join(", ")})` : "";

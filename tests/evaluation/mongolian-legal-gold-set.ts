@@ -212,16 +212,75 @@ export const LEGAL_TERM_SET: readonly {
 
 /**
  * A confirmed-dangerous MORPHOLOGICAL_STEM false positive, kept here as a
- * named regression case: the extraction pipeline can conflate
+ * named regression case: the extraction pipeline used to conflate
  * etymologically unrelated words that merely end in the same
- * single-letter case suffix. "гэ" aggregates гэж/гэх (the quotative verb
+ * single-letter case suffix. "гэ" aggregated гэж/гэх (the quotative verb
  * "to say/call") with гэм (guilt — a completely different root) purely
- * because "м" is also a listed case-suffix letter. This is exactly the
- * kind of candidate a human reviewer must catch — it clears every
- * numeric threshold (occ=78, docFreq=31/59) comfortably.
+ * because "м" is also a listed case-suffix letter, clearing every
+ * numeric threshold that existed at the time (occ=78, docFreq=31/59)
+ * comfortably. FIXED in the classification-safety milestone: stem
+ * discovery now requires a suffix of length >= 2 and a stem of length
+ * >= 3 (see MIN_STEM_LENGTH / longestNonTrivialSuffixMatch in
+ * corpus-vocabulary.ts), both of which "гэ" fails — it no longer even
+ * becomes a candidate. Kept here, and in
+ * tests/unit/corpus-vocabulary-trust-levels.test.ts, so a future change
+ * can't silently reopen this.
  */
 export const DANGEROUS_MORPHOLOGICAL_STEM_FALSE_POSITIVE = {
   stem: "гэ",
   wronglyMergedForms: ["гэж", "гэм", "гэх"],
   note: "гэм (guilt) is unrelated to гэж/гэх (quotative 'to say'); never approve this stem into generated/legal-vocabulary.json.",
 } as const;
+
+/**
+ * C — ordinary Mongolian words that occur frequently in legal documents
+ * WITHOUT being exclusively (or even primarily) legal vocabulary. This is
+ * exactly the distinction Phase 5 of the classification-safety milestone
+ * asked for: occurring-in-legal-text is not the same claim as
+ * being-a-legal-term. All five are already hand-curated as ordinary
+ * CORE_DICTIONARY_WORDS entries (not LEGAL_LEXICON_WORDS), independent of
+ * how often they show up in a legal corpus.
+ */
+export const ORDINARY_WORDS_IN_LEGAL_TEXT: readonly { word: string; note: string }[] = [
+  { word: "хүн", note: "'person' — occurs constantly in legal text (parties, victims, defendants are all 'хүн') but is basic general vocabulary, not a legal term of art." },
+  { word: "зүйл", note: "'thing'/'article' — legal texts use it for statute articles, but the word itself is ordinary ('a few things' uses the same word)." },
+  { word: "эрх", note: "'right'/'power' — extremely frequent in legal text (78 occurrences, the single most frequent LEGAL-bucket word in the 59-doc evaluation corpus) but is everyday vocabulary ('эрх чөлөө' = freedom, used well outside legal contexts)." },
+  { word: "үүрэг", note: "'duty/task' — used for legal obligations, but equally natural in 'гэрийн үүрэг' (homework) or any assigned task." },
+  { word: "хэрэг", note: "'matter/case' — legal 'case' is one sense, but 'хэрэг байхгүй' (it doesn't matter) is pure everyday usage." },
+];
+
+/**
+ * G — rare words: genuinely low-frequency tokens that must stay silent
+ * (ATTESTED at most, never promoted) rather than being guessed into a
+ * category on thin evidence. Each of these appears in the 59-document
+ * evaluation corpus fewer than the REVIEW floor requires.
+ */
+export const RARE_WORD_CASES: readonly { word: string; note: string }[] = [
+  { word: "хэрэгсэхгүй", note: "'disregard/dismiss' — appears exactly once in the evaluation corpus (in criminal.ts's case-study text). Correctly rejected as insufficient_evidence rather than promoted on a single sighting." },
+  { word: "нотлох", note: "'to prove' — already a hand-curated word, but its one occurrence in the evaluation corpus alone would not have been enough evidence to add it if it weren't already known; used here to confirm the floor applies uniformly, not just to words that happen to already be safe." },
+];
+
+/**
+ * H — morphology-stem safety: the specific failure modes Phase 4 of the
+ * classification-safety milestone asked to be tested directly, each
+ * tied to a concrete regression test in
+ * tests/unit/corpus-vocabulary-trust-levels.test.ts.
+ */
+export const MORPHOLOGY_STEM_SAFETY_CASES: readonly { description: string; note: string }[] = [
+  {
+    description: "One-character and two-character derived stems are never accepted, however frequent.",
+    note: "MIN_STEM_LENGTH = 3 in corpus-vocabulary.ts. Directly fixes the гэ (2 chars) false positive.",
+  },
+  {
+    description: "A single-letter suffix may never be the sole evidence for deriving a NEW stem.",
+    note: "longestNonTrivialSuffixMatch() excludes suffixes of length 1 entirely from stem discovery (still fine for matchesMorphology()'s runtime confirmation of an ALREADY-known stem, which is a lower-risk context: it can only confirm, never invent, new vocabulary).",
+  },
+  {
+    description: "Stem discovery must prefer the longest applicable suffix, not the first one in array order.",
+    note: "Fixed a real bug: 'хуульчид' previously matched bare 'д' (which appears earlier in MORPHOLOGICAL_SUFFIXES) instead of 'ид', fragmenting real stem evidence into a bogus 'хуульчи'.",
+  },
+  {
+    description: "TRUSTED for a stem requires 3+ independent surface forms, not just the 2 needed to be ATTESTED as a stem candidate.",
+    note: "An extra margin on top of the length/suffix fixes above, not a replacement for them.",
+  },
+];
