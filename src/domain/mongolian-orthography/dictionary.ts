@@ -3,7 +3,10 @@ import {
   LEGAL_LEXICON_STEMS,
   LEGAL_LEXICON_WORDS,
 } from "@/domain/mongolian-orthography/legal-lexicon";
-import { levenshteinDistance } from "@/domain/mongolian-orthography/levenshtein";
+import {
+  levenshteinDistance,
+  weightedLevenshteinDistance,
+} from "@/domain/mongolian-orthography/levenshtein";
 
 /** High-confidence typo to correction pairs (spellcheck.mn-style daily errors). */
 const COMMON_TYPO_CORRECTIONS: Record<string, string> = {
@@ -51,6 +54,7 @@ const CORE_DICTIONARY_WORDS = [
   "иргэн", "иргэд", "захиргаа", "захиргааны", "иргэний", "эрүүгийн", "мөнгө", "төлбөр",
   "үнэ", "үнэгүй", "төлбөртэй", "багц", "үйлчилгээ", "систем", "програм",
   "мэдээлэл", "технологи", "интернет", "файл", "хавсралт",
+  "ширхэг", "хаалт",
 ] as const;
 
 /** Longest-first suffixes for morphological recognition (not typo correction). */
@@ -68,12 +72,17 @@ const STEMS = new Set<string>();
  * pool fuzzy typo-matching may suggest from, so a suggestion is always a
  * real, complete word. */
 const COMPLETE_WORDS = new Set<string>();
+/** Everyday core vocabulary (as opposed to legal-domain-only terms) — a
+ * cheap commonness proxy used to break ties in candidate ranking, since we
+ * have no real corpus frequency data. */
+const COMMON_WORDS = new Set<string>();
 
-function addWord(raw: string) {
+function addWord(raw: string, options?: { common?: boolean }) {
   const normalized = normalizeMongolianWord(raw);
   if (normalized.length >= 2) {
     DICTIONARY.add(normalized);
     COMPLETE_WORDS.add(normalized);
+    if (options?.common) COMMON_WORDS.add(normalized);
   }
 }
 
@@ -87,7 +96,7 @@ function addStem(raw: string) {
 
 for (const raw of CORE_DICTIONARY_WORDS) {
   for (const part of raw.split(/\s+/u)) {
-    addWord(part);
+    addWord(part, { common: true });
   }
 }
 
@@ -118,7 +127,7 @@ for (const stem of STEM_EXPANSIONS) {
 }
 
 for (const [, correction] of Object.entries(COMMON_TYPO_CORRECTIONS)) {
-  addWord(correction);
+  addWord(correction, { common: true });
 }
 
 const ELISION_VOWELS = ["а", "о", "у", "ы", "э", "и", "ө", "ү"] as const;
@@ -193,53 +202,158 @@ export function isKnownMongolianWord(word: string): boolean {
 }
 
 const FUZZY_MIN_WORD_LENGTH = 4;
-const FUZZY_MAX_DISTANCE = 1;
+const FUZZY_MAX_DISTANCE = 2;
+const FUZZY_MAX_LENGTH_DIFF = 2;
+/** Minimum score (see {@link scoreCandidate}) for the *top* candidate before
+ * we suggest anything at all — below this we stay silent rather than risk
+ * an overcorrection (requirement: never guess when unsure). */
+const MIN_SUGGESTION_CONFIDENCE = 0.4;
+
+function commonPrefixLength(a: string, b: string): number {
+  const max = Math.min(a.length, b.length);
+  let i = 0;
+  while (i < max && a[i] === b[i]) i += 1;
+  return i;
+}
+
+/** Strip the longest known morphological suffix that matches the end of
+ * `word` (leaving at least a 2-letter stem); returns `word` unchanged if
+ * none match. */
+function stripKnownSuffix(word: string): string {
+  let bestSuffixLength = 0;
+  for (const suffix of MORPHOLOGICAL_SUFFIXES) {
+    if (
+      suffix.length > bestSuffixLength &&
+      word.endsWith(suffix) &&
+      word.length - suffix.length >= 2
+    ) {
+      bestSuffixLength = suffix.length;
+    }
+  }
+  return bestSuffixLength > 0 ? word.slice(0, -bestSuffixLength) : word;
+}
+
+/** True when both words reduce to the same known stem once a suffix is
+ * stripped — the strongest possible "same root" signal available from this
+ * hand-curated dictionary (no full morphological analyzer). */
+function sharesKnownStem(a: string, b: string): boolean {
+  if (a === b) return true;
+  const stemA = stripKnownSuffix(a);
+  const stemB = stripKnownSuffix(b);
+  if (stemA.length < 2 || stemB.length < 2) return false;
+  if (stemA === stemB) return true;
+  return stemA === b || stemB === a;
+}
+
+export type RankedCandidate = {
+  word: string;
+  /** 0..1, higher = more likely correction. See {@link scoreCandidate}. */
+  score: number;
+};
 
 /**
- * Single-edit ("one typo") fuzzy match against COMPLETE_WORDS only.
- * Deliberately narrow to keep false positives on legal terminology out:
- * distance must be exactly 1, the unknown word must be at least 4
- * characters (so short words like "тэр"/"тэс" never collide), and the
- * match must be unambiguous — if two dictionary words are both one edit
- * away, neither is suggested, since guessing wrong is worse than saying
- * nothing.
+ * Scores how plausible `candidate` is as the intended word for `input`,
+ * combining (in the order the product spec calls for):
+ *  1. edit distance (weighted: same-category letter slips are cheaper)
+ *  2. shared root/stem (suffix-stripped equality against known morphology)
+ *  3. common-prefix overlap — Mongolian roots are word-initial, so two
+ *     words that only agree on a *suffix* are usually unrelated, while
+ *     agreeing on a *prefix* usually means a shared stem
+ *  4. commonness (core-vocabulary vs. legal-jargon-only) as a cheap
+ *     frequency proxy
+ *  5. local-document context — a candidate already used elsewhere in the
+ *     same text is more likely the intended word than a coincidental
+ *     near-miss
+ * A candidate whose only resemblance to the input is a shared *tail*
+ * (e.g. "ирэх" inside "ширэх") gets no prefix credit and no stem credit,
+ * so it is heavily penalized even at edit distance 1 — this is what stops
+ * a structurally unrelated word from outranking a same-root candidate
+ * that happens to need a larger edit (e.g. "ширхэг" for "ширэх").
  */
-function fuzzyDictionaryMatch(normalized: string): readonly string[] {
-  if (normalized.length < FUZZY_MIN_WORD_LENGTH) return [];
+export function scoreCandidate(
+  input: string,
+  candidate: string,
+  context?: { documentWords?: ReadonlySet<string> },
+): number {
+  const distance = weightedLevenshteinDistance(input, candidate);
+  const maxLen = Math.max(input.length, candidate.length);
+  const distanceScore = Math.max(0, 1 - distance / maxLen);
 
-  let match: string | null = null;
-  for (const candidate of COMPLETE_WORDS) {
-    if (Math.abs(candidate.length - normalized.length) > FUZZY_MAX_DISTANCE) {
-      continue;
-    }
-    if (levenshteinDistance(normalized, candidate) !== FUZZY_MAX_DISTANCE) {
-      continue;
-    }
-    if (match && match !== candidate) {
-      return [];
-    }
-    match = candidate;
+  const prefixLen = commonPrefixLength(input, candidate);
+  const prefixRatio = prefixLen / Math.min(input.length, candidate.length);
+  const stemShared = sharesKnownStem(input, candidate);
+  const isCommon = COMMON_WORDS.has(candidate);
+  const inContext = context?.documentWords?.has(candidate) ?? false;
+
+  let score =
+    0.3 * distanceScore +
+    0.45 * prefixRatio +
+    (stemShared ? 0.15 : 0) +
+    (isCommon ? 0.07 : 0) +
+    (inContext ? 0.08 : 0);
+
+  // Mongolian roots are word-initial: a candidate that shares nothing with
+  // the input's first letter(s) and no known stem is very likely a
+  // different word entirely, whatever its raw edit distance is.
+  if (prefixLen === 0 && !stemShared) {
+    score *= 0.3;
   }
 
-  return match ? [match] : [];
+  return Math.min(1, Math.max(0, score));
 }
 
 /**
- * Suggest spelling fixes: the high-confidence typo map first, then (unless
- * `highConfidenceOnly` is set, e.g. the word already triggered a harmony
- * warning) a conservative single-edit fuzzy match against known complete
- * words. Fuzzy matching against the *full* legal lexicon used to be
- * disabled outright because it produced false positives like
- * нөхөн→хэрхэн; restricting it to distance-1 + unambiguous + complete
- * words only removes that failure mode (multi-edit or ambiguous pairs are
- * never suggested).
+ * Root/stem-aware fuzzy match against COMPLETE_WORDS: unlike a plain
+ * "closest edit distance" search, candidates are scored (see
+ * {@link scoreCandidate}) so a structurally related word that needs a
+ * larger edit can outrank a structurally unrelated word that needs a
+ * smaller one. Only returned when the best candidate clears
+ * {@link MIN_SUGGESTION_CONFIDENCE} — otherwise we say nothing rather than
+ * present a low-confidence guess.
+ */
+function rankFuzzyCandidates(
+  normalized: string,
+  limit: number,
+  context?: { documentWords?: ReadonlySet<string> },
+): readonly string[] {
+  if (normalized.length < FUZZY_MIN_WORD_LENGTH) return [];
+
+  const ranked: RankedCandidate[] = [];
+  for (const candidate of COMPLETE_WORDS) {
+    if (Math.abs(candidate.length - normalized.length) > FUZZY_MAX_LENGTH_DIFF) {
+      continue;
+    }
+    const distance = levenshteinDistance(normalized, candidate);
+    if (distance === 0 || distance > FUZZY_MAX_DISTANCE) continue;
+    ranked.push({ word: candidate, score: scoreCandidate(normalized, candidate, context) });
+  }
+
+  if (ranked.length === 0) return [];
+
+  ranked.sort((a, b) => b.score - a.score || a.word.localeCompare(b.word));
+  if ((ranked[0]?.score ?? 0) < MIN_SUGGESTION_CONFIDENCE) return [];
+
+  return ranked.slice(0, limit).map((item) => item.word);
+}
+
+/**
+ * Suggest spelling fixes, best candidate first: the high-confidence typo
+ * map takes priority, then (unless `highConfidenceOnly` is set, e.g. the
+ * word already triggered a harmony warning) root/stem-aware ranked fuzzy
+ * matching against known complete words. Fuzzy matching against the *full*
+ * legal lexicon used to be disabled outright because naive closest-edit
+ * matching produced false positives like нөхөн→хэрхэн; scoring by shared
+ * root/prefix instead of raw distance keeps that failure mode out while
+ * still allowing multi-edit, same-root corrections (e.g. ширэх→ширхэг).
  */
 export function suggestDictionaryWords(
   word: string,
-  limit = 5,
-  options?: { highConfidenceOnly?: boolean },
+  limit = 3,
+  options?: {
+    highConfidenceOnly?: boolean;
+    documentWords?: ReadonlySet<string>;
+  },
 ): readonly string[] {
-  void limit;
   const normalized = normalizeMongolianWord(word);
   if (!normalized || normalized.length < 2) return [];
   if (isKnownMongolianWord(normalized)) return [];
@@ -251,7 +365,9 @@ export function suggestDictionaryWords(
 
   if (options?.highConfidenceOnly) return [];
 
-  return fuzzyDictionaryMatch(normalized);
+  return rankFuzzyCandidates(normalized, limit, {
+    documentWords: options?.documentWords,
+  });
 }
 
 export function dictionarySizeForTests(): number {

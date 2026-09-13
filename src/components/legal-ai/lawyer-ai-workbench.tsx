@@ -50,7 +50,7 @@ import { useThinkingStageLabel } from "@/components/legal-ai/legal-ai-thinking-s
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
 import {
   OrthographyCheckButton,
-  OrthographySpellPanel,
+  OrthographyStatusBar,
   useOrthographyAutoCheck,
   useOrthographyCheck,
 } from "@/components/orthography/orthography-checker";
@@ -135,7 +135,6 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
     gateMessage: orthographyGate,
     needsBilling: orthographyNeedsBilling,
     open: orthographyOpen,
-    checkedText: orthographyCheckedText,
     includeLatinToCyrillic,
     setIncludeLatinToCyrillic,
     check: checkOrthography,
@@ -311,7 +310,17 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
                   )}
                 </div>
               </div>
-              {orthographyOpen || orthographyLoading ? <OrthographySpellPanel className="mt-3" text={orthographyCheckedText || draft.trim()} loading={orthographyLoading} result={orthographyResult} gateMessage={orthographyGate} needsBilling={orthographyNeedsBilling} billingHref="/legal-ai" includeLatinToCyrillic={includeLatinToCyrillic} onIncludeLatinChange={(value) => { setIncludeLatinToCyrillic(value); void checkOrthography(draft, { includeLatinToCyrillic: value, mode: "manual" }); }} onApplySuggestion={setDraft} onRecheck={(next) => void checkOrthography(next, { mode: "manual" })} onClose={clearOrthography} onCheck={() => void checkOrthography(draft, { mode: "manual" })} /> : null}
+              <OrthographyStatusBar
+                loading={orthographyLoading}
+                gateMessage={orthographyGate}
+                needsBilling={orthographyNeedsBilling}
+                billingHref="/legal-ai"
+                includeLatinToCyrillic={includeLatinToCyrillic}
+                onIncludeLatinChange={(value) => {
+                  setIncludeLatinToCyrillic(value);
+                  void checkOrthography(draft, { includeLatinToCyrillic: value, mode: "manual" });
+                }}
+              />
             </form>
           </div>
         </div>

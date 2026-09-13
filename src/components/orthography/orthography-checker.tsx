@@ -5,12 +5,9 @@ import Link from "next/link";
 import { Check, SpellCheck2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { OrthographySpellPanel } from "@/components/orthography/orthography-spell-panel";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { buildOrthographySuggestions } from "@/domain/mongolian-orthography/suggestions";
 import { cn } from "@/lib/utils";
-
-export { OrthographySpellPanel } from "@/components/orthography/orthography-spell-panel";
 
 export type OrthographySuggestionView = {
   kind: "ORTHOGRAPHY" | "LATIN_TO_CYRILLIC" | "SPELLING";
@@ -21,8 +18,8 @@ export type OrthographySuggestionView = {
   ruleTitle: string | null;
   start: number;
   end: number;
+  /** Ranked alternatives (best first) for the inline suggestion popup. */
   candidates?: readonly string[];
-  relatedWords?: readonly string[];
 };
 
 export type OrthographyCheckApiResult = {
@@ -220,15 +217,57 @@ export function OrthographyCheckButton({ onClick, loading, disabled, pressed }: 
   );
 }
 
-/** Standalone panel with auto-check while typing (Student draft pad). */
-export function OrthographyChecker({ text, onApplySuggestion, billingHref = "/#chat", disabled = false, className }: { text: string; onApplySuggestion: (nextText: string) => void; billingHref?: string; disabled?: boolean; className?: string }) {
-  const ortho = useOrthographyCheck();
-  useOrthographyAutoCheck(text, ortho.check, { enabled: !disabled, minLength: 10, clear: ortho.clear });
+/**
+ * Compact single-line status row shown under a `SpellcheckTextarea`
+ * composer — loading/gate/billing status and the Latin→Cyrillic opt-in
+ * toggle only. Deliberately does NOT render a list of detected errors:
+ * misspelled words are underlined inline in the textarea itself, and each
+ * one's ranked corrections live in that word's own click-to-open popup.
+ */
+export function OrthographyStatusBar({
+  loading,
+  gateMessage,
+  needsBilling,
+  billingHref = "/legal-ai",
+  includeLatinToCyrillic,
+  onIncludeLatinChange,
+  className,
+}: {
+  loading?: boolean;
+  gateMessage: string | null;
+  needsBilling?: boolean;
+  billingHref?: string;
+  includeLatinToCyrillic?: boolean;
+  onIncludeLatinChange?: (value: boolean) => void;
+  className?: string;
+}) {
+  if (!loading && !gateMessage && !onIncludeLatinChange) return null;
   return (
-    <div className={cn("mt-3", className)}>
-      <Button type="button" size="sm" variant="outline" className="border-[#0B1F3A]/15 text-[#0B1F3A] hover:bg-[#0B1F3A]/5" disabled={disabled || ortho.loading || !text.trim()} onClick={() => void ortho.check(text, { mode: "manual" })}>{ortho.loading ? "Шалгаж байна…" : "Одоо шалгах"}</Button>
-      {ortho.open || ortho.loading ? (
-        <OrthographySpellPanel className="mt-3" text={ortho.checkedText || text.trim()} loading={ortho.loading} result={ortho.result} gateMessage={ortho.gateMessage} needsBilling={ortho.needsBilling} billingHref={billingHref} includeLatinToCyrillic={ortho.includeLatinToCyrillic} onIncludeLatinChange={(value) => { ortho.setIncludeLatinToCyrillic(value); void ortho.check(text, { includeLatinToCyrillic: value, mode: "manual" }); }} onApplySuggestion={onApplySuggestion} onRecheck={(next) => void ortho.check(next, { mode: "manual" })} onClose={ortho.clear} onCheck={() => void ortho.check(text, { mode: "manual" })} />
+    <div className={cn("flex flex-wrap items-center gap-x-3 gap-y-1 px-1 pt-1 text-[11px] text-[#66717D]", className)}>
+      {loading ? <span>Зөв бичгийн алдаа шалгаж байна…</span> : null}
+      {onIncludeLatinChange ? (
+        <label className="flex cursor-pointer items-center gap-1.5">
+          <input
+            type="checkbox"
+            className="size-3.5"
+            checked={Boolean(includeLatinToCyrillic)}
+            onChange={(event) => onIncludeLatinChange(event.target.checked)}
+          />
+          <span>Латин үсгээр бичсэн монгол үгийг кириллээр санал болгох</span>
+        </label>
+      ) : null}
+      {gateMessage ? (
+        <span>
+          {gateMessage}
+          {needsBilling ? (
+            <>
+              {" "}
+              <Link href={billingHref} className="font-semibold text-[#1A7A72] hover:underline">
+                Багц идэвхжүүлэх
+              </Link>
+            </>
+          ) : null}
+        </span>
       ) : null}
     </div>
   );

@@ -19,7 +19,8 @@ import {
 export type OrthographySuggestion = {
   kind: "ORTHOGRAPHY" | "LATIN_TO_CYRILLIC" | "SPELLING";
   sourceWord: string;
-  /** Concrete correct / converted form — only emitted when known. */
+  /** Concrete correct / converted form — only emitted when known. Always
+   * equal to `candidates[0]` when `candidates` is present. */
   suggestedWord: string;
   suggestionLabel: string;
   ruleIds: readonly string[];
@@ -27,6 +28,9 @@ export type OrthographySuggestion = {
   /** Inclusive start, exclusive end in the checked text. */
   start: number;
   end: number;
+  /** Ranked alternatives (best first) for a popup with more than one
+   * option — only present for dictionary/fuzzy spelling suggestions. */
+  candidates?: readonly string[];
 };
 
 export type OrthographyCheckResult = {
@@ -162,12 +166,14 @@ function findDoubledLetterSuggestion(
   };
 }
 
+const MAX_SUGGESTED_CANDIDATES = 3;
+
 function suggestDictionaryForSpan(
   span: WordSpan,
-  options?: { highConfidenceOnly?: boolean },
+  options?: { highConfidenceOnly?: boolean; documentWords?: ReadonlySet<string> },
 ): OrthographySuggestion | null {
   if (isKnownMongolianWord(span.normalized)) return null;
-  const candidates = suggestDictionaryWords(span.normalized, 1, options);
+  const candidates = suggestDictionaryWords(span.normalized, MAX_SUGGESTED_CANDIDATES, options);
   const suggested = candidates[0];
   if (!suggested || suggested === span.normalized) return null;
   return {
@@ -179,6 +185,7 @@ function suggestDictionaryForSpan(
     ruleTitle: "Үгийн зөв бичлэг",
     start: span.start,
     end: span.end,
+    candidates,
   };
 }
 
@@ -225,6 +232,11 @@ export function buildOrthographySuggestions(
     orthography.push(suggestion);
   }
 
+  // Cheap, deterministic local-context signal: a candidate already used
+  // elsewhere in this same text is more likely the intended word than a
+  // coincidental near-miss. No LLM call, no cross-request state.
+  const documentWords = new Set(spans.map((span) => span.normalized));
+
   const spelling: OrthographySuggestion[] = [];
   for (const span of spans) {
     const key = `${span.start}:${span.end}`;
@@ -237,6 +249,7 @@ export function buildOrthographySuggestions(
     }
     const suggestion = suggestDictionaryForSpan(span, {
       highConfidenceOnly: harmonyOnlyWords.has(span.normalized),
+      documentWords,
     });
     if (!suggestion) continue;
     usedKeys.add(key);

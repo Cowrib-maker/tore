@@ -60,16 +60,16 @@ import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
 import {
   OrthographyCheckButton,
-  OrthographySpellPanel,
+  OrthographyStatusBar,
   useOrthographyAutoCheck,
   useOrthographyCheck,
 } from "@/components/orthography/orthography-checker";
+import { SpellcheckTextarea } from "@/components/orthography/spellcheck-textarea";
 import {
   LEGAL_AI_PATH,
   loginHrefForLegalAi,
   registerClientHrefForLegalAi,
 } from "@/domain/services/rbac";
-import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
 import { cn } from "@/lib/utils";
 
 type Message = {
@@ -166,7 +166,6 @@ export function LegalAiChat({
     gateMessage: orthographyGate,
     needsBilling: orthographyNeedsBilling,
     open: orthographyOpen,
-    checkedText: orthographyCheckedText,
     includeLatinToCyrillic,
     setIncludeLatinToCyrillic,
     check: checkOrthography,
@@ -190,8 +189,6 @@ export function LegalAiChat({
   useEffect(() => {
     conversationIdRef.current = conversationId;
   }, [conversationId]);
-
-  useAutoResizeTextarea(messageTextareaRef, message);
 
   useEffect(() => {
     transcriptRef.current?.scrollTo({
@@ -548,10 +545,11 @@ export function LegalAiChat({
               ) : null}
             </ul>
           ) : null}
-          <textarea
-            ref={messageTextareaRef}
+          <SpellcheckTextarea
+            inputRef={messageTextareaRef}
             value={message}
-            onChange={(event) => setMessage(event.target.value)}
+            suggestions={orthographyResult?.suggestions ?? []}
+            onChange={setMessage}
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
@@ -560,7 +558,7 @@ export function LegalAiChat({
             }}
             placeholder="Асуудлаа өөрийнхөөрөө бичээрэй. Хуулийн нэр томъёо мэдэх шаардлагагүй."
             rows={1}
-            className="min-h-12 w-full resize-none bg-transparent px-3 py-2 text-sm leading-6 text-[#0A0F14] outline-none placeholder:text-[#9AA3AD]"
+            className="min-h-12 w-full text-sm text-[#0A0F14]"
             disabled={loading || uploading}
           />
           <div className="flex items-center justify-between gap-2 px-1 pb-1">
@@ -617,31 +615,21 @@ export function LegalAiChat({
             )}
           </div>
         </div>
-        {orthographyOpen || orthographyLoading ? (
-          <OrthographySpellPanel
-            className="mt-2"
-            text={orthographyCheckedText || message.trim()}
-            loading={orthographyLoading}
-            result={orthographyResult}
-            gateMessage={orthographyGate}
-            needsBilling={orthographyNeedsBilling}
-            billingHref="/#chat"
-            includeLatinToCyrillic={includeLatinToCyrillic}
-            onIncludeLatinChange={(value) => {
-              setIncludeLatinToCyrillic(value);
-              void checkOrthography(message, {
-                includeLatinToCyrillic: value,
-                mode: "manual",
-              });
-            }}
-            onApplySuggestion={setMessage}
-            onRecheck={(next) =>
-              void checkOrthography(next, { mode: "manual" })
-            }
-            onClose={clearOrthography}
-            onCheck={() => void checkOrthography(message, { mode: "manual" })}
-          />
-        ) : null}
+        <OrthographyStatusBar
+          className="mt-2"
+          loading={orthographyLoading}
+          gateMessage={orthographyGate}
+          needsBilling={orthographyNeedsBilling}
+          billingHref="/#chat"
+          includeLatinToCyrillic={includeLatinToCyrillic}
+          onIncludeLatinChange={(value) => {
+            setIncludeLatinToCyrillic(value);
+            void checkOrthography(message, {
+              includeLatinToCyrillic: value,
+              mode: "manual",
+            });
+          }}
+        />
         <LegalAiDutyNotice variant="citizen" className="mt-2 px-1" />
       </div>
     </form>

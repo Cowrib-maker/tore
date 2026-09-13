@@ -6,11 +6,6 @@ import type { OrthographySuggestionView } from "@/components/orthography/orthogr
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
 import { cn } from "@/lib/utils";
 
-type SuggestionWithRelated = OrthographySuggestionView & {
-  relatedWords?: readonly string[];
-  candidates?: readonly string[];
-};
-
 type Props = {
   value: string;
   suggestions: OrthographySuggestionView[];
@@ -24,16 +19,37 @@ type Props = {
   maxHeightPx?: number;
 };
 
-function rangesForText(text: string, suggestions: OrthographySuggestionView[]): SuggestionWithRelated[] {
+/** Keep only suggestions with a valid span for `text`, sorted left to right
+ * (widest span first on a tie) so overlapping spans render deterministically. */
+export function rangesForText(
+  text: string,
+  suggestions: readonly OrthographySuggestionView[],
+): OrthographySuggestionView[] {
   return suggestions
     .filter((item) => item.start >= 0 && item.end > item.start && item.start < text.length && item.end <= text.length)
-    .sort((a, b) => a.start - b.start || b.end - a.end) as SuggestionWithRelated[];
+    .sort((a, b) => a.start - b.start || b.end - a.end);
+}
+
+/** Which flagged span (if any) the caret sits on/against — used to open the
+ * suggestion popup for exactly the token the user clicked, independent of
+ * every other flagged span in the text. Exported for unit testing. */
+export function findActiveRangeIndex(
+  ranges: readonly OrthographySuggestionView[],
+  caret: number,
+): number | null {
+  const index = ranges.findIndex(
+    (item) =>
+      (caret >= item.start && caret <= item.end) ||
+      (caret > 0 && caret - 1 >= item.start && caret - 1 < item.end),
+  );
+  return index >= 0 ? index : null;
 }
 
 export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, disabled, onChange, onKeyDown, inputRef, className, maxHeightPx }: Props) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const ranges = useMemo(() => rangesForText(value, suggestions), [value, suggestions]);
   const active = activeIndex == null ? null : ranges[activeIndex] ?? null;
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const localRef = useRef<HTMLTextAreaElement>(null);
   useAutoResizeTextarea(localRef, value, maxHeightPx);
@@ -44,6 +60,19 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
 
   useEffect(() => setActiveIndex(null), [value]);
 
+  // Clicking anywhere outside this composer (textarea + popup) closes the
+  // suggestion popup without touching the text.
+  useEffect(() => {
+    if (activeIndex == null) return;
+    function handleOutsideClick(event: PointerEvent) {
+      if (!containerRef.current) return;
+      if (event.target instanceof Node && containerRef.current.contains(event.target)) return;
+      setActiveIndex(null);
+    }
+    document.addEventListener("pointerdown", handleOutsideClick);
+    return () => document.removeEventListener("pointerdown", handleOutsideClick);
+  }, [activeIndex]);
+
   function syncScroll(event: UIEvent<HTMLTextAreaElement>) {
     const mirror = event.currentTarget.parentElement?.querySelector<HTMLDivElement>("[data-spellcheck-mirror]");
     if (!mirror) return;
@@ -53,12 +82,7 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
 
   function handleClick(event: MouseEvent<HTMLTextAreaElement>) {
     const caret = event.currentTarget.selectionStart;
-    const index = ranges.findIndex(
-      (item) =>
-        (caret >= item.start && caret <= item.end) ||
-        (caret > 0 && caret - 1 >= item.start && caret - 1 < item.end),
-    );
-    setActiveIndex(index >= 0 ? index : null);
+    setActiveIndex(findActiveRangeIndex(ranges, caret));
   }
 
   function apply(word: string) {
@@ -85,11 +109,13 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
   });
   if (cursor < value.length) parts.push(<span key={`tail-${cursor}`}>{value.slice(cursor)}</span>);
 
+  // Best candidate first: candidates already carries the ranked list with
+  // suggestedWord as its first entry, but fall back to suggestedWord alone
+  // for suggestion kinds (e.g. orthography-rule fixes) that never populate it.
   const candidates = Array.from(new Set([...(active?.candidates ?? []), ...(active?.suggestedWord ? [active.suggestedWord] : [])]));
-  const relatedWords = Array.from(new Set(active?.relatedWords ?? [])).filter((word) => !candidates.includes(word));
 
   return (
-    <div className="relative isolate">
+    <div ref={containerRef} className="relative isolate">
       <div
         data-spellcheck-mirror
         aria-hidden="true"
@@ -152,25 +178,7 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
             </div>
           ) : null}
 
-          {relatedWords.length ? (
-            <div className="mt-2 border-t border-[#0B1F3A]/8 pt-2">
-              <p className="text-[10px] font-medium text-[#66717D]">Үгийн үндэс / язгуураар төстэй үгс</p>
-              <div className="mt-1 flex flex-wrap gap-1">
-                {relatedWords.slice(0, 8).map((word) => (
-                  <button
-                    key={`related-${word}`}
-                    type="button"
-                    className="rounded border border-[#0B1F3A]/10 px-1.5 py-0.5 text-[10px] text-[#0B1F3A] hover:bg-[#F3F6F8]"
-                    onClick={() => apply(word)}
-                  >
-                    {word}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : null}
-
-          {!candidates.length && !relatedWords.length ? (
+          {!candidates.length ? (
             <p className="mt-1.5 text-[10px] text-[#66717D]">Энэ үгэнд найдвартай засварын санал одоогоор алга.</p>
           ) : null}
         </div>
