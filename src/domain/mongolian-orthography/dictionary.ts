@@ -54,16 +54,26 @@ const CORE_DICTIONARY_WORDS = [
   "иргэн", "иргэд", "захиргаа", "захиргааны", "иргэний", "эрүүгийн", "мөнгө", "төлбөр",
   "үнэ", "үнэгүй", "төлбөртэй", "багц", "үйлчилгээ", "систем", "програм",
   "мэдээлэл", "технологи", "интернет", "файл", "хавсралт",
-  "ширхэг", "хаалт",
+  "ширхэг", "хаалт", "хүүхэд", "миний",
 ] as const;
 
 /** Longest-first suffixes for morphological recognition (not typo correction). */
-const MORPHOLOGICAL_SUFFIXES = [
+export const MORPHOLOGICAL_SUFFIXES = [
   "аас", "ээс", "оос", "өөс", "оор", "өөр", "аар", "ээр", "гээр", "руу", "рүү",
   "лаас", "лээс", "гаар", "гээр", "тай", "тэй", "гүй", "гүйгээр", "гүйгээр",
   "ын", "ийн", "ны", "ний", "ыг", "ийг", "г", "г", "д", "т", "нд", "н", "с",
   "сэн", "сон", "сан", "дсон", "той", "ж", "в", "х", "өө", "өх",
   "л", "р", "м", "к", "даа", "дээ", "уу", "үү", "ууд", "үүд",
+  // Verb tense/converb suffixes (vowel-harmony variants of each) — closed-
+  // class Mongolian verbal morphology, not vocabulary: past perfective
+  // (-лаа/-лоо/-лээ/-лөө, e.g. явлаа), non-past (-на/-но/-нэ/-нө, e.g.
+  // явна), and the "until" converb (-тал/-тол/-тэл/-төл, e.g. явтал).
+  // Without these, a correctly conjugated verb on an already-known stem
+  // (e.g. "яв") registered as unknown and risked a wrong fuzzy "fix".
+  "лаа", "лоо", "лээ", "лөө", "на", "но", "нэ", "нө", "тал", "тол", "тэл", "төл",
+  // Plural for person-nouns after ч/ж/ш/г (e.g. хуульч→хуульчид,
+  // шүүгч→шүүгчид) — a standard, closed-class Mongolian plural marker.
+  "ид",
 ] as const;
 
 const DICTIONARY = new Set<string>();
@@ -108,6 +118,16 @@ for (const stem of LEGAL_LEXICON_STEMS) {
   addStem(stem);
 }
 
+/** Bare verb stems, registered separately from STEM_EXPANSIONS since noun
+ * case-suffixes (SHORT_SUFFIXES) don't apply to them — only the verb tense/
+ * converb suffixes above do. "явах"/"явсан"/etc. were already known as
+ * whole words, but "яв" itself wasn't, so any tense not already spelled
+ * out as a complete word (явлаа, явна, явтал, ...) registered as unknown. */
+const VERB_STEMS = ["яв"] as const;
+for (const stem of VERB_STEMS) {
+  addStem(stem);
+}
+
 const STEM_EXPANSIONS = [
   "гэр", "хүн", "хувцас", "хууль", "хуульч", "хэрэг", "баримт", "эрх", "асуудал",
   "шүүх", "гэрээ", "ажил", "бичиг", "асуулт", "хариулт", "шинжилгээ",
@@ -122,6 +142,12 @@ const SHORT_SUFFIXES = [
 for (const stem of STEM_EXPANSIONS) {
   addStem(stem);
   for (const suffix of SHORT_SUFFIXES) {
+    // Mongolian doesn't geminate a stem-final consonant with an
+    // identical-starting suffix (e.g. "хэрэг" + "г" is not a word:
+    // "хэрэгг"). Skipping this case is what caught it: without the guard,
+    // isKnownMongolianWord("хэрэгг") mechanically came back true, and the
+    // same non-word was eligible as a fuzzy-match suggestion target.
+    if (suffix && stem.endsWith(suffix[0]!)) continue;
     addWord(`${stem}${suffix}`);
   }
 }
@@ -161,6 +187,28 @@ function matchesElidedStem(stem: string): boolean {
   return found !== null;
 }
 
+/**
+ * The bare single-letter case markers in MORPHOLOGICAL_SUFFIXES (г/д/т/с/н)
+ * stand for dative-locative-type case allomorphs, and Mongolian always
+ * picks a *different* allomorph rather than doubling when the stem already
+ * ends in that exact consonant (there's no case ending "...тт" or "...гг").
+ * So if stripping one of these leaves a stem ending in the same letter,
+ * the match is coincidental, not genuine agglutination — "хэрэгг" isn't
+ * "хэрэг" + "г", it's "хэрэг" with a stray extra letter.
+ *
+ * This does NOT apply to longer, independent word-forming suffixes like
+ * the comitative "-тай/-тэй" ("has/with"), which freely attach regardless
+ * of the stem's final consonant and legitimately do double it: "хаалт"
+ * (a lock) + "тай" = "хаалттай" (locked) is a completely ordinary word,
+ * not a typo — narrowing this guard to length-1 suffixes is what keeps
+ * that case (the original false-positive report) working.
+ */
+export function boundaryWouldGeminate(stem: string, suffix: string): boolean {
+  if (suffix.length !== 1) return false;
+  const stemLast = stem[stem.length - 1];
+  return stemLast !== undefined && stemLast === suffix;
+}
+
 function matchesMorphology(word: string): boolean {
   if (DICTIONARY.has(word) || STEMS.has(word)) {
     return true;
@@ -171,6 +219,9 @@ function matchesMorphology(word: string): boolean {
       continue;
     }
     const stem = word.slice(0, -suffix.length);
+    if (boundaryWouldGeminate(stem, suffix)) {
+      continue;
+    }
     if (DICTIONARY.has(stem) || STEMS.has(stem)) {
       return true;
     }
@@ -182,6 +233,9 @@ function matchesMorphology(word: string): boolean {
         continue;
       }
       const stem2 = stem.slice(0, -suffix2.length);
+      if (boundaryWouldGeminate(stem2, suffix2)) {
+        continue;
+      }
       if (DICTIONARY.has(stem2) || STEMS.has(stem2)) {
         return true;
       }
@@ -225,7 +279,8 @@ function stripKnownSuffix(word: string): string {
     if (
       suffix.length > bestSuffixLength &&
       word.endsWith(suffix) &&
-      word.length - suffix.length >= 2
+      word.length - suffix.length >= 2 &&
+      !boundaryWouldGeminate(word.slice(0, -suffix.length), suffix)
     ) {
       bestSuffixLength = suffix.length;
     }
