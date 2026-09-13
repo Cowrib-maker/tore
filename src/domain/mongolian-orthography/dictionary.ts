@@ -156,6 +156,17 @@ for (const [, correction] of Object.entries(COMMON_TYPO_CORRECTIONS)) {
   addWord(correction, { common: true });
 }
 
+/** Frozen snapshot of every literal DICTIONARY word from hand-curation
+ * alone, taken once, right after the last hand-curated initialization
+ * loop above and before any generated-vocabulary registration can
+ * possibly run. registerGeneratedVocabulary's "did this already exist"
+ * check must use this fixed snapshot, not a live DICTIONARY.has() check —
+ * otherwise registering the same generated word twice would make the
+ * second call think it "already existed" (because the first call just
+ * added it) and wrongly treat it as hand-curated, so cleanup would never
+ * remove it. */
+const HAND_CURATED_WORDS = new Set(DICTIONARY);
+
 const ELISION_VOWELS = ["а", "о", "у", "ы", "э", "и", "ө", "ү"] as const;
 const ELISION_CONSONANT_PAIR_RE = /^[бвгджзклмнпрстфхцчшщ]{2}$/u;
 
@@ -427,4 +438,111 @@ export function suggestDictionaryWords(
 
 export function dictionarySizeForTests(): number {
   return DICTIONARY.size;
+}
+
+/** Minimal, structural shape a generated-vocabulary entry must have to be
+ * registered — deliberately not importing corpus-vocabulary.ts's
+ * `GeneratedVocabularyEntry` type here (that module imports *from*
+ * dictionary.ts already; importing back would be circular). Any object
+ * matching this shape — including a real `GeneratedVocabularyEntry` —
+ * satisfies it structurally. */
+export type RegisterableVocabularyEntry = {
+  word: string;
+  category: "COMMON" | "LEGAL" | "MORPHOLOGICAL_STEM";
+  occurrenceCount: number;
+  documentFrequency: number;
+};
+
+export type GeneratedVocabularyProvenance = {
+  category: RegisterableVocabularyEntry["category"];
+  occurrenceCount: number;
+  documentFrequency: number;
+  source: string;
+};
+
+type GeneratedProvenanceRecord = GeneratedVocabularyProvenance & {
+  /** True if this exact word was already a literal DICTIONARY entry
+   * (hand-curated, or from an earlier registration) before this
+   * registration ran. Lets clearGeneratedVocabularyForTests() avoid ever
+   * deleting a word that has hand-curated meaning too — re-registering an
+   * already-known word (harmless: addWord/addStem are idempotent) must
+   * never make cleanup erase the hand-curated original. */
+  existedBeforeRegistration: boolean;
+};
+
+/** Side-channel record of every word registered via
+ * {@link registerGeneratedVocabulary}, keyed by normalized word — kept
+ * separate from DICTIONARY/COMPLETE_WORDS/COMMON_WORDS so a generated
+ * word matches and ranks exactly like a hand-curated one (no special
+ * casing anywhere in matchesMorphology/scoreCandidate), while still
+ * letting a caller ask "where did this word come from?" without losing
+ * that provenance. Never read by the runtime matching/ranking path. */
+const GENERATED_PROVENANCE = new Map<string, GeneratedProvenanceRecord>();
+
+/**
+ * Merges reviewed, corpus-derived vocabulary into the same runtime
+ * structures hand-curated words live in (DICTIONARY/COMPLETE_WORDS, plus
+ * COMMON_WORDS for the COMMON category) — a registered word is
+ * indistinguishable from a hand-curated one to isKnownMongolianWord/
+ * suggestDictionaryWords, so it needs no separate matching or ranking
+ * logic. NOT called anywhere in this module or at import time: dictionary
+ * initialization stays exactly hand-curated-only unless a caller (a
+ * server bootstrap step, a test, a future opt-in) explicitly invokes
+ * this. Calling it twice with the same entries is safe (Set/Map
+ * semantics — no duplicate words, provenance is overwritten not
+ * appended).
+ */
+export function registerGeneratedVocabulary(
+  entries: readonly RegisterableVocabularyEntry[],
+  options?: { source?: string },
+): void {
+  const source = options?.source ?? "generated";
+  for (const entry of entries) {
+    const normalized = normalizeMongolianWord(entry.word);
+    if (!normalized || normalized.length < 2) continue;
+
+    const existedBeforeRegistration = HAND_CURATED_WORDS.has(normalized);
+
+    if (entry.category === "MORPHOLOGICAL_STEM") {
+      addStem(normalized);
+    } else {
+      addWord(normalized, { common: entry.category === "COMMON" });
+    }
+
+    GENERATED_PROVENANCE.set(normalized, {
+      category: entry.category,
+      occurrenceCount: entry.occurrenceCount,
+      documentFrequency: entry.documentFrequency,
+      source,
+      existedBeforeRegistration,
+    });
+  }
+}
+
+/** True only for words added via {@link registerGeneratedVocabulary} —
+ * never true for hand-curated dictionary words, even after the same word
+ * is also registered as generated (hand-curation isn't tracked here
+ * because it doesn't need a "why is this known" answer the way a
+ * corpus-derived word does). */
+export function generatedVocabularyProvenance(word: string): GeneratedVocabularyProvenance | null {
+  const normalized = normalizeMongolianWord(word);
+  return GENERATED_PROVENANCE.get(normalized) ?? null;
+}
+
+/** Test/introspection only — undoes every registration made via
+ * {@link registerGeneratedVocabulary} (removing the words from
+ * DICTIONARY/COMPLETE_WORDS/COMMON_WORDS/STEMS too, not just the
+ * provenance record), so tests in the same file can register, assert,
+ * and reset without leaking state into later tests. Skips any word that
+ * already had hand-curated (or earlier-registered) meaning before this
+ * registration, so cleanup can never erase real dictionary data. */
+export function clearGeneratedVocabularyForTests(): void {
+  for (const [word, record] of GENERATED_PROVENANCE) {
+    if (record.existedBeforeRegistration) continue;
+    DICTIONARY.delete(word);
+    COMPLETE_WORDS.delete(word);
+    COMMON_WORDS.delete(word);
+    STEMS.delete(word);
+  }
+  GENERATED_PROVENANCE.clear();
 }

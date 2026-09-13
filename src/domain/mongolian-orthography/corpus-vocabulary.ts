@@ -397,3 +397,68 @@ export function fromKnowledgeDocuments(
     text: document.articles.map((article) => stripHtml(article.text)).join("\n"),
   }));
 }
+
+/** Bumped whenever the extraction/classification rules change in a way
+ * that could change which words a past artifact would have produced —
+ * lets a loader (or a human) tell whether a committed artifact is stale
+ * relative to the current pipeline. */
+export const VOCABULARY_GENERATOR_VERSION = 1;
+
+/** One entry in a committed generated-vocabulary artifact. Deliberately a
+ * narrower shape than {@link VocabularyCandidate}: only what's needed to
+ * explain *why* a word was included (category, frequency, document
+ * count, generator version) travels with it. No document ids, no raw
+ * corpus text, no per-document breakdown — that provenance lives in the
+ * generation command that produced the file, not in the artifact
+ * consumers load at runtime. */
+export type GeneratedVocabularyEntry = {
+  word: string;
+  category: Extract<VocabularyCategory, "COMMON" | "LEGAL" | "MORPHOLOGICAL_STEM">;
+  occurrenceCount: number;
+  documentFrequency: number;
+};
+
+export type GeneratedVocabularyArtifact = {
+  schemaVersion: 1;
+  generatorVersion: number;
+  generatedAt: string;
+  /** Human-readable provenance for the whole file — which corpus, how
+   * many documents — not per-entry document ids. */
+  source: {
+    description: string;
+    documentCount: number;
+  };
+  /** Only entries a human has reviewed and approved for inclusion — this
+   * file is never the raw, unreviewed extraction output. Sorted the same
+   * way {@link extractVocabularyCandidates} sorts (category, then
+   * frequency desc, then alphabetically) for a stable, reviewable diff. */
+  entries: readonly GeneratedVocabularyEntry[];
+};
+
+/**
+ * Builds the committed-artifact shape from a set of *already
+ * human-approved* candidates (e.g. a reviewed subset of
+ * {@link selectSafeDictionaryEntries}'s output). Does not do any
+ * filtering or review itself — approval is a human decision made before
+ * calling this, not something this function can determine.
+ */
+export function buildGeneratedVocabularyArtifact(
+  approvedEntries: readonly VocabularyCandidate[],
+  source: { description: string; documentCount: number },
+  generatedAt: string,
+): GeneratedVocabularyArtifact {
+  const entries: GeneratedVocabularyEntry[] = approvedEntries
+    .filter(
+      (c): c is VocabularyCandidate & { category: GeneratedVocabularyEntry["category"] } =>
+        c.category === "COMMON" || c.category === "LEGAL" || c.category === "MORPHOLOGICAL_STEM",
+    )
+    .map((c) => ({
+      word: c.word,
+      category: c.category,
+      occurrenceCount: c.occurrenceCount,
+      documentFrequency: c.documentFrequency,
+    }))
+    .sort((a, b) => CATEGORY_ORDER[a.category] - CATEGORY_ORDER[b.category] || b.occurrenceCount - a.occurrenceCount || a.word.localeCompare(b.word));
+
+  return { schemaVersion: 1, generatorVersion: VOCABULARY_GENERATOR_VERSION, generatedAt, source, entries };
+}

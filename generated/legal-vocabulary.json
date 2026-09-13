@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "generatorVersion": 1,
+  "generatedAt": "2026-09-13T00:00:00.000Z",
+  "source": {
+    "description": "3 git-tracked legalinfo.mn HTML fixtures (tests/fixtures/legalinfo-367-constitution.html, legalinfo-439-bilingual.html, legalinfo-11634-dotted-articles.html), parsed with the production LegalInfoLawParser/LegalInfoKnowledgeParser. No production database or network access was used.",
+    "documentCount": 3
+  },
+  "entries": [
+    {
+      "word": "үндсэн",
+      "category": "COMMON",
+      "occurrenceCount": 6,
+      "documentFrequency": 2
+    },
+    {
+      "word": "дүгээр",
+      "category": "COMMON",
+      "occurrenceCount": 3,
+      "documentFrequency": 2
+    }
+  ]
+}
