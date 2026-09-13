@@ -37,6 +37,8 @@
     "extract:legal-vocabulary": "tsx scripts/extract-legal-vocabulary.ts",
     "build:evaluation-corpus": "tsx scripts/build-evaluation-corpus.ts",
     "measure:orthography-engine": "tsx scripts/measure-orthography-engine.ts",
+    "benchmark:orthography-engine": "tsx scripts/benchmark-orthography-engine.ts",
+    "evaluate:gold-set-metrics": "tsx scripts/compute-gold-set-metrics.ts",
     "postinstall": "prisma generate"
   },
   "prisma": { "seed": "tsx prisma/seed.ts" },

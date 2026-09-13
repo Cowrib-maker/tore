@@ -1,4 +1,4 @@
-﻿import { normalizeMongolianWord } from "@/domain/mongolian-orthography/engine";
+﻿import { inferWordGender, normalizeMongolianWord } from "@/domain/mongolian-orthography/engine";
 import {
   LEGAL_LEXICON_STEMS,
   LEGAL_LEXICON_WORDS,
@@ -140,14 +140,66 @@ const STEM_EXPANSIONS = [
   "заалт", "зүйл", "хэсэг", "ял", "хариуцлага", "хохирол", "нөхөн",
 ] as const;
 
-const SHORT_SUFFIXES = [
-  "", "т", "д", "аас", "ээс", "руу", "тай", "тэй", "ийн", "ын", "ийг", "ыг",
-  "д", "г", "с", "нд",
+/** Suffixes safe to attach to EVERY stem regardless of its own vowel
+ * class or final consonant: "" (the bare stem) always applies, and "руу"
+ * (directional) doesn't vary by harmony in this list. */
+const UNCONDITIONAL_SHORT_SUFFIXES = ["", "руу"];
+
+/**
+ * Harmony-paired case suffixes: only the variant matching the STEM's OWN
+ * vowel class is generated, reusing inferWordGender() (already the
+ * source of truth for vowel harmony elsewhere in this file) rather than
+ * inventing a new rule. Found via adversarial edit-distance-1 scanning
+ * of the shipped dictionary: blindly generating BOTH variants for every
+ * stem produced harmony-violating non-words for whichever variant didn't
+ * match a given stem (e.g. masculine "ажил" + feminine "ээс" = the
+ * non-word "ажилээс"; the real ablative is "ажлаас", already covered
+ * separately by the elided-vowel stem mechanism). Ambiguous/unknown
+ * gender falls back to generating both, same as before, so no coverage
+ * is lost for stems this heuristic can't classify.
+ *
+ * The bare single-letter allomorphs formerly in this list (т/д/г/с/нд)
+ * were removed entirely rather than gender-gated: they're conditioned by
+ * the stem's final CONSONANT, not its vowel class, and blindly applying
+ * either allomorph to every stem was wrong for most of them regardless
+ * of harmony (e.g. "ажил" + "г" = "ажилг", not a word — confirmed a real
+ * fuzzy-match suggestion target via "ажигл" -> ажилг). Removing them
+ * loses no *recognition* accuracy: matchesMorphology() already confirms
+ * a correctly-spelled case form of any registered stem generically at
+ * lookup time, independent of what's pre-generated into COMPLETE_WORDS —
+ * removing these allomorphs only stops mechanically pre-generating
+ * specific, often-wrong SUGGESTION targets for typos of those endings.
+ */
+const HARMONY_SUFFIX_PAIRS: readonly { masculine: string; feminine: string }[] = [
+  { masculine: "аас", feminine: "ээс" },
+  { masculine: "тай", feminine: "тэй" },
+  { masculine: "ын", feminine: "ийн" },
+  { masculine: "ыг", feminine: "ийг" },
 ];
+
+function shortSuffixesFor(stem: string): readonly string[] {
+  const gender = inferWordGender(stem);
+  const harmonySuffixes = HARMONY_SUFFIX_PAIRS.map((pair) => {
+    if (gender === "masculine") return pair.masculine;
+    if (gender === "feminine") return pair.feminine;
+    return null; // unknown gender: fall through to generating both below
+  });
+
+  const resolved: string[] = [...UNCONDITIONAL_SHORT_SUFFIXES];
+  harmonySuffixes.forEach((suffix, i) => {
+    if (suffix) {
+      resolved.push(suffix);
+    } else {
+      const pair = HARMONY_SUFFIX_PAIRS[i]!;
+      resolved.push(pair.masculine, pair.feminine);
+    }
+  });
+  return resolved;
+}
 
 for (const stem of STEM_EXPANSIONS) {
   addStem(stem);
-  for (const suffix of SHORT_SUFFIXES) {
+  for (const suffix of shortSuffixesFor(stem)) {
     // Mongolian doesn't geminate a stem-final consonant with an
     // identical-starting suffix (e.g. "хэрэг" + "г" is not a word:
     // "хэрэгг"). Skipping this case is what caught it: without the guard,
@@ -403,9 +455,18 @@ function rankFuzzyCandidates(
   if (ranked.length === 0) return [];
 
   ranked.sort((a, b) => b.score - a.score || a.word.localeCompare(b.word));
-  if ((ranked[0]?.score ?? 0) < MIN_SUGGESTION_CONFIDENCE) return [];
 
-  return ranked.slice(0, limit).map((item) => item.word);
+  // Every RETURNED candidate must individually clear the confidence floor,
+  // not just the top one: this list is shown to users as ranked
+  // alternatives in a popup (see spellcheck-textarea.tsx), so a 2nd/3rd
+  // slot filled by a low-confidence structural coincidence (found via this
+  // milestone's adversarial evaluation: "мэрэг" surfaced "хэрэг" at score
+  // 0.098 purely because the top candidate "мэдэх" cleared the bar) is a
+  // real, user-facing false suggestion, not a harmless internal detail.
+  const confident = ranked.filter((item) => item.score >= MIN_SUGGESTION_CONFIDENCE);
+  if (confident.length === 0) return [];
+
+  return confident.slice(0, limit).map((item) => item.word);
 }
 
 /**
@@ -444,6 +505,15 @@ export function suggestDictionaryWords(
 
 export function dictionarySizeForTests(): number {
   return DICTIONARY.size;
+}
+
+/** Test-only enumeration of every complete (fuzzy-matchable) word — i.e.
+ * exactly the pool suggestDictionaryWords() may draw a correction from.
+ * Exists so adversarial/near-neighbor tests can probe the REAL dictionary
+ * for dangerous pairs instead of a hand-picked or stale copy of it. Never
+ * used by runtime matching/ranking code. */
+export function completeWordsForTests(): readonly string[] {
+  return Array.from(COMPLETE_WORDS).sort();
 }
 
 /** Minimal, structural shape a generated-vocabulary entry must have to be
