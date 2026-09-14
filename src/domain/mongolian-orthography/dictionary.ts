@@ -27,7 +27,7 @@ const CORE_DICTIONARY_WORDS = [
   "би", "чи", "та", "тэр", "энэ", "тэд", "бид", "минь", "чинь", "нь",
   "намайг", "чамайг", "түүнийг", "биднийг", "танайг", "тэднийг",
   "надад", "чамд", "түүнд", "бидэнд", "танд", "тэдэнд",
-  "бол", "бай", "байна", "байсан", "байгаа", "байж", "байх", "болно", "болсон",
+  "бол", "бай", "байна", "байсан", "байгаа", "байж", "байх", "байхад", "болно", "болсон",
   "юм", "вэ", "уу", "үү", "бэ", "бүү", "ч", "харин", "гэхдээ", "учир нь",
   "мөн", "эсвэл", "болон", "тэгээд", "дараа", "өмнө", "одоо", "өнөөдөр",
   "өчигдөр", "маргааш", "яагаад", "хэрхэн", "хэн", "юу", "хаана",
@@ -35,7 +35,8 @@ const CORE_DICTIONARY_WORDS = [
   "хүн", "хүний", "хүнд", "хүнтэй", "хүмүүс", "хоёр", "гурав", "дөрөв",
   "анх", "удаа", "анх удаа", "танил", "танилцах", "танилцаж", "танилцсан",
   "хувцас", "солилцох", "солилцож", "солилцсон",
-  "явах", "яав", "яавч", "явсан", "ирэх", "ирсэн", "буцаж", "буцах",
+  "явах", "яав", "яавч", "явсан", "ирэх", "ирсэн", "ирээд", "буцаж", "буцах",
+  "засах", "засаж", "зассан",
   "өглөө", "орой", "шөнө", "өдөр", "цаг", "минут", "жил", "сар",
   "хууль", "хуулийн", "хууль зүй", "эрх", "эрх зүй", "эрх зүйн", "эрхтэй",
   "хэрэг", "хэргийн", "шүүх", "шүүгч", "шийдвэр", "нэхэмжлэл", "хариу",
@@ -47,7 +48,7 @@ const CORE_DICTIONARY_WORDS = [
   "бичих", "бичсэн", "унших", "уншсэн", "сурах", "сурсан", "ажиллах", "ажил",
   "олох", "олсон", "мэдэх", "мэдсэн", "харах", "харсан", "шалгах", "шалгаж",
   "зөв", "буруу", "сайн", "муу", "их", "бага", "шинэ", "хуучин", "том", "жижиг",
-  "улс", "хот", "аймаг", "сум", "байр", "зам", "гудамж",
+  "улс", "хот", "аймаг", "сум", "байр", "зам", "гудамж", "хоол",
   "нэг", "тав", "зургаа", "долоо", "найм", "ес", "арав",
   "асуудал", "асуулт", "хариулт", "тайлбар", "жишээ", "утга", "үг", "үгс",
   "өгүүлбэр", "бичиг", "ном", "сургалт", "сургууль", "багш", "оюутан",
@@ -81,6 +82,35 @@ export const MORPHOLOGICAL_SUFFIXES = [
   // "corrections" despite sitting on already-known stems.
   "даг", "дог", "дэг", "дөг",
 ] as const;
+
+/**
+ * Adding a reflexive-possessive suffix family ("аа"/"оо"/"ээ", the
+ * missing counterparts of the already-registered "уу"/"өө"/"үү") was
+ * investigated for both MORPHOLOGICAL_SUFFIXES (recognition) and a
+ * ranking-only variant, and reverted from both:
+ *  - In MORPHOLOGICAL_SUFFIXES: matchesMorphology() has no harmony-
+ *    consistency check, so the WRONG-harmony variant (e.g. "гэртаа",
+ *    masculine "-аа" on the feminine stem "гэрт") stripped successfully
+ *    and silently validated the MISSPELLING itself as "known" — worse
+ *    than the original bug, since a typo the user wants flagged would go
+ *    completely silent instead of getting corrected.
+ *  - As a ranking-only addition (consulted only by stripKnownSuffix, for
+ *    the +0.15 sharesKnownStem bonus, never by recognition): measured to
+ *    be a wash for exactly the case it targeted. For input "гэртаа",
+ *    stripping "-аа" yields stem "гэрт" — which is trivially the
+ *    candidate "гэрт" ITSELF, not just a shared root, so sharesKnownStem
+ *    returns true for BOTH "гэрт" and "гэртээ" against this input, and
+ *    both gain the identical +0.15 bump — confirmed empirically
+ *    (гэрт: 0.72→0.87, гэртээ: 0.60→0.75, an unchanged ~0.12 gap). The
+ *    real cause of "гэрт" outranking "гэртээ" is prefixRatio's
+ *    denominator (min(input.length, candidate.length)), which
+ *    structurally rewards shorter candidates that are pure prefixes of
+ *    the input — a global scoring-formula change carries far more
+ *    regression risk than this milestone's evidence justifies taking on;
+ *    documented as a known, undone limitation instead (see the final
+ *    report) — "гэртээ" still surfaces as a visible ranked alternative
+ *    (candidates[1] of 3), just not the top pick.
+ */
 
 const DICTIONARY = new Set<string>();
 const STEMS = new Set<string>();
@@ -128,7 +158,21 @@ for (const stem of LEGAL_LEXICON_STEMS) {
  * case-suffixes (SHORT_SUFFIXES) don't apply to them — only the verb tense/
  * converb suffixes above do. "явах"/"явсан"/etc. were already known as
  * whole words, but "яв" itself wasn't, so any tense not already spelled
- * out as a complete word (явлаа, явна, явтал, ...) registered as unknown. */
+ * out as a complete word (явлаа, явна, явтал, ...) registered as unknown.
+ *
+ * "зас" (to fix) and "ир" (to come) were tried here too, to generalize
+ * "засаж"/"ирээд" recognition the same way — reverted after testing: with
+ * only "яв" already using MORPHOLOGICAL_SUFFIXES' harmony-unchecked
+ * suffix-stripping, the risk was narrow and apparently never triggered a
+ * real false-negative-turned-silent-typo; adding two more short stems
+ * meaningfully widened the same class of wrong-harmony-silently-valid
+ * defect documented on RANKING_ONLY_SUFFIXES above (e.g. "засэж" itself,
+ * the WRONG spelling, would validate as "known" via "зас"+"эж", the
+ * feminine suffix variant on a masculine stem). "засаж"/"ирээд" are
+ * instead added as literal complete words below (CORE_DICTIONARY_WORDS),
+ * the same safe, already-proven mechanism "хийж" uses (see the "хииж"
+ * regression test) — recognized/suggested via fuzzy matching against a
+ * real dictionary entry, never via unchecked-harmony suffix generation. */
 const VERB_STEMS = ["яв"] as const;
 for (const stem of VERB_STEMS) {
   addStem(stem);
@@ -438,7 +482,7 @@ export function scoreCandidate(
 function rankFuzzyCandidates(
   normalized: string,
   limit: number,
-  context?: { documentWords?: ReadonlySet<string> },
+  context?: { documentWords?: ReadonlySet<string>; minConfidence?: number },
 ): readonly string[] {
   if (normalized.length < FUZZY_MIN_WORD_LENGTH) return [];
 
@@ -463,7 +507,14 @@ function rankFuzzyCandidates(
   // milestone's adversarial evaluation: "мэрэг" surfaced "хэрэг" at score
   // 0.098 purely because the top candidate "мэдэх" cleared the bar) is a
   // real, user-facing false suggestion, not a harmless internal detail.
-  const confident = ranked.filter((item) => item.score >= MIN_SUGGESTION_CONFIDENCE);
+  //
+  // `context.minConfidence`, when supplied, can only RAISE this floor,
+  // never lower it (Math.max with the module default) — a caller with
+  // independent evidence a word is suspicious (e.g. it already tripped
+  // the §8 vowel-harmony rule) can ask for a stricter bar before it
+  // trusts a fuzzy guess, but nothing can weaken the global default.
+  const floor = Math.max(MIN_SUGGESTION_CONFIDENCE, context?.minConfidence ?? 0);
+  const confident = ranked.filter((item) => item.score >= floor);
   if (confident.length === 0) return [];
 
   return confident.slice(0, limit).map((item) => item.word);
@@ -471,11 +522,13 @@ function rankFuzzyCandidates(
 
 /**
  * Suggest spelling fixes, best candidate first: the high-confidence typo
- * map takes priority, then (unless `highConfidenceOnly` is set, e.g. the
- * word already triggered a harmony warning) root/stem-aware ranked fuzzy
- * matching against known complete words. Fuzzy matching against the *full*
- * legal lexicon used to be disabled outright because naive closest-edit
- * matching produced false positives like нөхөн→хэрхэн; scoring by shared
+ * map takes priority, then (unless `highConfidenceOnly` is set, in which
+ * case ONLY that exact map may answer) root/stem-aware ranked fuzzy
+ * matching against known complete words, gated by `minConfidence` when a
+ * caller supplies one (see rankFuzzyCandidates — can only raise the
+ * floor, never lower it). Fuzzy matching against the *full* legal lexicon
+ * used to be disabled outright because naive closest-edit matching
+ * produced false positives like нөхөн→хэрхэн; scoring by shared
  * root/prefix instead of raw distance keeps that failure mode out while
  * still allowing multi-edit, same-root corrections (e.g. ширэх→ширхэг).
  */
@@ -485,6 +538,7 @@ export function suggestDictionaryWords(
   options?: {
     highConfidenceOnly?: boolean;
     documentWords?: ReadonlySet<string>;
+    minConfidence?: number;
   },
 ): readonly string[] {
   const normalized = normalizeMongolianWord(word);
@@ -500,7 +554,76 @@ export function suggestDictionaryWords(
 
   return rankFuzzyCandidates(normalized, limit, {
     documentWords: options?.documentWords,
+    minConfidence: options?.minConfidence,
   });
+}
+
+/**
+ * Closed, hand-curated set of short Mongolian particles/clitics that
+ * commonly get typed glued onto an adjacent word without a space (e.g.
+ * "биздээ" -> "биз дээ": "биз", a modal particle ~"surely", + "дээ", a
+ * sentence-final particle ~"isn't it", commonly said/written together).
+ *
+ * Deliberately NEVER fed into DICTIONARY/COMPLETE_WORDS/STEMS — only
+ * suggestPhraseSplit() below consults this set. Adding "биз"/"дээ" to
+ * the general dictionary was tried first and reverted after testing
+ * showed a real defect: "дээ" already exists as an ordinary
+ * MORPHOLOGICAL_SUFFIXES entry (used elsewhere), so a general-dictionary
+ * "биз" made matchesMorphology() strip "-дээ" from "биздээ" itself and
+ * silently validate the *misspelling* as a known word — silencing
+ * exactly the typo this milestone needs flagged. Keeping these particles
+ * in an isolated set outside the general recognition machinery avoids
+ * that entire class of collision, current and future.
+ */
+const PHRASE_BOUNDARY_PARTICLES = new Set(["биз", "дээ"].map((w) => normalizeMongolianWord(w)));
+
+const MIN_PHRASE_SPLIT_PART_LENGTH = 2;
+
+/**
+ * Fallback for a token that is unknown, and has no useful single-word
+ * fuzzy suggestion, but is actually two words glued together without a
+ * space — a real Mongolian clitic/particle boundary slip. Deliberately
+ * conservative in two independent ways:
+ *  1. Both halves must be valid words (a recognized boundary particle,
+ *     see {@link PHRASE_BOUNDARY_PARTICLES}, or an ordinary already-known
+ *     dictionary word) — never a fabricated split.
+ *  2. At LEAST ONE half must specifically be a recognized boundary
+ *     particle. Two ordinary dictionary words merely happening to
+ *     concatenate into some unknown token is not, on its own, evidence
+ *     of a missing-space typo — that heuristic alone would "aggressively
+ *     split arbitrary words" (the exact failure mode this milestone was
+ *     warned against). A closed-class particle on one side is the actual
+ *     linguistic signal that this is a clitic-boundary slip, not a
+ *     coincidence.
+ * Returns a correction ONLY when EXACTLY ONE split point satisfies both
+ * conditions — multiple valid splits mean genuine ambiguity this
+ * function must not guess through (silence, not a coin-flip).
+ */
+export function suggestPhraseSplit(word: string): string | null {
+  const normalized = normalizeMongolianWord(word);
+  if (normalized.length < MIN_PHRASE_SPLIT_PART_LENGTH * 2) return null;
+  if (isKnownMongolianWord(normalized)) return null;
+
+  function isValidHalf(half: string): boolean {
+    return PHRASE_BOUNDARY_PARTICLES.has(half) || isKnownMongolianWord(half);
+  }
+
+  const matches: string[] = [];
+  for (
+    let i = MIN_PHRASE_SPLIT_PART_LENGTH;
+    i <= normalized.length - MIN_PHRASE_SPLIT_PART_LENGTH;
+    i += 1
+  ) {
+    const left = normalized.slice(0, i);
+    const right = normalized.slice(i);
+    const isParticleBoundary =
+      PHRASE_BOUNDARY_PARTICLES.has(left) || PHRASE_BOUNDARY_PARTICLES.has(right);
+    if (isParticleBoundary && isValidHalf(left) && isValidHalf(right)) {
+      matches.push(`${left} ${right}`);
+    }
+  }
+
+  return matches.length === 1 ? matches[0]! : null;
 }
 
 export function dictionarySizeForTests(): number {

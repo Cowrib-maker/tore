@@ -6,6 +6,7 @@ import {
 import {
   isKnownMongolianWord,
   suggestDictionaryWords,
+  suggestPhraseSplit,
 } from "@/domain/mongolian-orthography/dictionary";
 import {
   normalizeMongolianWord,
@@ -166,11 +167,47 @@ function findDoubledLetterSuggestion(
   };
 }
 
+/**
+ * Fallback for an unknown token with no useful single-word fuzzy
+ * suggestion: two known words run together without a space (e.g.
+ * "биздээ" -> "биз дээ"). See suggestPhraseSplit's own doc comment for
+ * the safety design (exactly-one-valid-split, both halves independently
+ * already known). Only reached after suggestDictionaryForSpan already
+ * found nothing for this span — a real single-word correction always
+ * takes priority over a phrase-boundary guess.
+ */
+function findPhraseSplitSuggestion(span: WordSpan): OrthographySuggestion | null {
+  const suggested = suggestPhraseSplit(span.normalized);
+  if (!suggested) return null;
+  return {
+    kind: "SPELLING",
+    sourceWord: span.surface,
+    suggestedWord: suggested,
+    suggestionLabel: `Хоёр үг холбогдсон бололтой: «${suggested}»`,
+    ruleIds: ["§1"],
+    ruleTitle: "Үгийн зөв бичлэг",
+    start: span.start,
+    end: span.end,
+  };
+}
+
 const MAX_SUGGESTED_CANDIDATES = 3;
+
+/** Stricter-than-default confidence floor (module default: 0.4) applied
+ * only to a word that already independently tripped the §8 vowel-harmony
+ * rule — see the call site's own comment for why this replaced an
+ * outright "only the exact typo map may answer" gate. Chosen with
+ * margin above every real correction this milestone verified needs it
+ * (0.598 for "надэд"/"засэж"), not tuned to a single case. */
+const HARMONY_FLAGGED_MIN_CONFIDENCE = 0.55;
 
 function suggestDictionaryForSpan(
   span: WordSpan,
-  options?: { highConfidenceOnly?: boolean; documentWords?: ReadonlySet<string> },
+  options?: {
+    highConfidenceOnly?: boolean;
+    documentWords?: ReadonlySet<string>;
+    minConfidence?: number;
+  },
 ): OrthographySuggestion | null {
   if (isKnownMongolianWord(span.normalized)) return null;
   const candidates = suggestDictionaryWords(span.normalized, MAX_SUGGESTED_CANDIDATES, options);
@@ -213,7 +250,16 @@ export function buildOrthographySuggestions(
   }
 
   const rawIssues = dedupeHarmonyWhenYiFixable(scanMongolianText(checkableText));
-  const harmonyOnlyWords = new Set(
+  // A word that already tripped the independent §8 vowel-harmony rule is
+  // treated as more suspicious than an ordinary unknown token — but NOT
+  // silenced down to "only the exact hardcoded typo map may answer"
+  // (that used to be the behavior here, and it meant a real, well-scored
+  // fuzzy correction — e.g. "надэд" -> "надад" at 0.60, well above the
+  // ordinary 0.4 floor — was never surfaced just because the input also
+  // happened to mix masculine/feminine vowels). Fuzzy ranking still runs,
+  // gated by a STRICTER floor than the module default (never a looser
+  // one) — see HARMONY_FLAGGED_MIN_CONFIDENCE below.
+  const harmonyFlaggedWords = new Set(
     rawIssues
       .filter((item) => item.code === "VOWEL_HARMONY")
       .map((item) => item.word),
@@ -248,12 +294,20 @@ export function buildOrthographySuggestions(
       continue;
     }
     const suggestion = suggestDictionaryForSpan(span, {
-      highConfidenceOnly: harmonyOnlyWords.has(span.normalized),
+      minConfidence: harmonyFlaggedWords.has(span.normalized)
+        ? HARMONY_FLAGGED_MIN_CONFIDENCE
+        : undefined,
       documentWords,
     });
-    if (!suggestion) continue;
+    if (suggestion) {
+      usedKeys.add(key);
+      spelling.push(suggestion);
+      continue;
+    }
+    const phraseSplit = findPhraseSplitSuggestion(span);
+    if (!phraseSplit) continue;
     usedKeys.add(key);
-    spelling.push(suggestion);
+    spelling.push(phraseSplit);
   }
 
   const digitGlued = findDigitGlueSuggestions(checkableText);
