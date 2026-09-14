@@ -448,17 +448,44 @@ export function scoreCandidate(
   const distanceScore = Math.max(0, 1 - distance / maxLen);
 
   const prefixLen = commonPrefixLength(input, candidate);
-  const prefixRatio = prefixLen / Math.min(input.length, candidate.length);
+  let prefixRatio = prefixLen / Math.min(input.length, candidate.length);
+
+  // When a candidate is a pure, complete prefix-truncation of a LONGER
+  // input (it contributes zero characters of its own beyond the shared
+  // prefix), the ratio above always evaluates to 1.0 regardless of how
+  // many trailing input characters the candidate leaves unexplained,
+  // because its denominator is the candidate's own short length. Measure
+  // coverage against the full input length in that one case instead, so
+  // an unexplained tail is visible in the score (e.g. "гэрт" against
+  // "гэртаа" leaves "аа" completely unaccounted for).
+  if (candidate.length < input.length && prefixLen === candidate.length) {
+    prefixRatio = prefixLen / input.length;
+  }
+
   const stemShared = sharesKnownStem(input, candidate);
   const isCommon = COMMON_WORDS.has(candidate);
   const inContext = context?.documentWords?.has(candidate) ?? false;
+
+  // Among candidates that already agree with the input everywhere except
+  // its last two letters (same length, divergence confined to the tail —
+  // e.g. "гэртаа" vs "гэртээ"/"гэртэй"), prefer one that also preserves
+  // the input's doubled-final-letter shape (a long vowel, e.g. "-аа"
+  // ending explained by another "-VV" ending) over one that changes that
+  // structure (e.g. a diphthong-like "-эй" ending). Scoped tightly to
+  // tail-only divergence so it never reaches unrelated words that merely
+  // happen to both end in a doubled letter (e.g. "өрөө" vs "өглөө", which
+  // diverge from the first letter on).
+  const isTailOnlyDivergence = input.length === candidate.length && prefixLen >= candidate.length - 2;
+  const preservesDoubledFinalShape =
+    isTailOnlyDivergence && hasDoubledFinalChar(input) && hasDoubledFinalChar(candidate);
 
   let score =
     0.3 * distanceScore +
     0.45 * prefixRatio +
     (stemShared ? 0.15 : 0) +
     (isCommon ? 0.07 : 0) +
-    (inContext ? 0.08 : 0);
+    (inContext ? 0.08 : 0) +
+    (preservesDoubledFinalShape ? 0.08 : 0);
 
   // Mongolian roots are word-initial: a candidate that shares nothing with
   // the input's first letter(s) and no known stem is very likely a
@@ -468,6 +495,10 @@ export function scoreCandidate(
   }
 
   return Math.min(1, Math.max(0, score));
+}
+
+function hasDoubledFinalChar(word: string): boolean {
+  return word.length >= 2 && word[word.length - 1] === word[word.length - 2];
 }
 
 /**

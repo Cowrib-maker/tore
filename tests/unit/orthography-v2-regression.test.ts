@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   isKnownMongolianWord,
+  scoreCandidate,
   suggestDictionaryWords,
   suggestPhraseSplit,
 } from "@/domain/mongolian-orthography/dictionary";
@@ -11,7 +12,6 @@ import {
   PHRASE_CORRECTIONS,
   PHRASE_SPLIT_NEGATIVE_CASES,
   PHRASE_SPLIT_ORDER_NOT_VALIDATED_CASE,
-  RANKING_KNOWN_GAPS,
   TYPO_CORRECTIONS,
   VALID_WORDS,
 } from "../evaluation/orthography-v2-gold-set";
@@ -60,17 +60,58 @@ describe("PHRASE / TOKEN-BOUNDARY CORRECTIONS", () => {
   }
 });
 
-describe("KNOWN, DOCUMENTED, NOT-FULLY-FIXED case (case #6) — honestly disclosed, not hidden", () => {
-  for (const { input, reportedExpectedCorrection, actualTopCandidate, correctCandidateStillOffered, note } of RANKING_KNOWN_GAPS) {
-    it(`"${input}": top-1 is still "${actualTopCandidate}", not the reported-expected "${reportedExpectedCorrection}" — ${note}`, () => {
-      const result = buildOrthographySuggestions(input);
-      expect(result.suggestions[0]?.suggestedWord).toBe(actualTopCandidate);
-      expect(result.suggestions[0]?.suggestedWord).not.toBe(reportedExpectedCorrection);
-      if (correctCandidateStillOffered) {
-        expect(result.suggestions[0]?.candidates).toContain(reportedExpectedCorrection);
-      }
-    });
-  }
+describe("FOLLOW-UP FIX — case #6 ranking ('гэртаа' -> 'гэртээ' must be top-1)", () => {
+  it("reproduces the exact before-fix root cause: 'гэрт' had a perfect 1.0 prefixRatio purely because it is a pure prefix-truncation of the longer input, leaving 'аа' completely unexplained", () => {
+    // Documents the root cause investigated for this fix (not a live
+    // assertion about the unfixed formula, which no longer exists) —
+    // recomputing prefixRatio's old min(input.length, candidate.length)
+    // denominator by hand for "гэрт" against "гэртаа".
+    const input = "гэртаа";
+    const candidate = "гэрт";
+    const prefixLen = 4; // "гэрт" shares its entire own length as a prefix
+    const oldPrefixRatio = prefixLen / Math.min(input.length, candidate.length);
+    expect(oldPrefixRatio).toBe(1);
+  });
+
+  it("scoreCandidate ranks 'гэртээ' above both 'гэрт' (pure prefix-truncation, unexplained 'аа') and 'гэртэй' (same edit distance, different tail shape)", () => {
+    const input = "гэртаа";
+    const scoreGert = scoreCandidate(input, "гэрт");
+    const scoreGertei = scoreCandidate(input, "гэртэй");
+    const scoreGertee = scoreCandidate(input, "гэртээ");
+    expect(scoreGertee).toBeGreaterThan(scoreGert);
+    expect(scoreGertee).toBeGreaterThan(scoreGertei);
+  });
+
+  it("the full pipeline now returns 'гэртээ' as the top-1 suggestion for 'гэртаа', with 'гэрт' and 'гэртэй' still offered as ranked alternatives", () => {
+    const result = buildOrthographySuggestions("гэртаа");
+    expect(result.suggestions[0]?.suggestedWord).toBe("гэртээ");
+    expect(result.suggestions[0]?.candidates).toContain("гэрт");
+    expect(result.suggestions[0]?.candidates).toContain("гэртэй");
+  });
+
+  it("NEGATIVE CONTROL: does not incorrectly promote an unrelated short-prefix candidate — 'Өрөө' (1 shared prefix char with 'өглөө') must stay unflagged, not newly cross the confidence floor", () => {
+    // This is the exact regression this fix's first attempt introduced
+    // (a too-broad doubled-final-letter bonus tipped "Өрөө" -> "өглөө"
+    // over MIN_SUGGESTION_CONFIDENCE) and had to be scoped away by
+    // requiring same-length, tail-only divergence. Pinned here, in
+    // addition to the pre-existing mongolian-spellcheck-ranking.test.ts
+    // case that originally caught it, for direct traceability to this
+    // milestone's fix.
+    const result = buildOrthographySuggestions("Өрөө хаалттай байсан.");
+    expect(result.suggestionCount).toBe(0);
+  });
+
+  it("NEGATIVE CONTROL: the doubled-final-letter bonus never applies across a length mismatch or non-tail divergence — 'ширэх'/'ирэх' ranking invariant (unrelated case) is unaffected", () => {
+    const input = "ширэх";
+    expect(scoreCandidate(input, "ширхэг")).toBeGreaterThan(scoreCandidate(input, "ирэх"));
+    const candidates = suggestDictionaryWords(input);
+    expect(candidates[0]).toBe("ширхэг");
+    expect(candidates).not.toContain("ирэх");
+  });
+
+  it("NEGATIVE CONTROL: existing same-length ranking cases (no prefix-truncation candidate involved) are byte-for-byte unaffected — 'мэрэг' still resolves only to 'мэдэх'", () => {
+    expect(suggestDictionaryWords("мэрэг")).toEqual(["мэдэх"]);
+  });
 });
 
 describe("Phase 7 safety: dangerous near-neighbors of the NEW correction rules", () => {

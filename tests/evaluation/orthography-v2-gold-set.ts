@@ -49,6 +49,11 @@ export const TYPO_CORRECTIONS: readonly TypoCase[] = [
     expectedCorrection: "хийж",
     note: "Case #8, the control case — already worked before this milestone via plain fuzzy matching against the literal 'хийж' entry. Re-verified unchanged.",
   },
+  {
+    input: "гэртаа",
+    expectedCorrection: "гэртээ",
+    note: "Case #6, follow-up fix. Root cause: scoreCandidate's prefixRatio divided by min(input.length, candidate.length), so a candidate that is a pure, complete prefix-truncation of the input ('гэрт') always scored a perfect 1.0 prefix ratio regardless of unexplained trailing input characters. Fixed by measuring prefix coverage against the full input length in that specific case, plus a narrowly-scoped bonus (tail-only divergence, same length) for a candidate that preserves the input's doubled-final-letter shape, which was needed to also break the exact tie between 'гэртэй' and 'гэртээ' (both differ from 'гэртаа' by two same-category vowel substitutions under weightedLevenshteinDistance, since 'й' is classified as a vowel). See dictionary.ts's scoreCandidate for the exact change.",
+  },
 ];
 
 export type PhraseCase = { input: string; expectedCorrection: string; note: string };
@@ -63,42 +68,11 @@ export const PHRASE_CORRECTIONS: readonly PhraseCase[] = [
   },
 ];
 
-export type RankingKnownGapCase = {
-  input: string;
-  reportedExpectedCorrection: string;
-  actualTopCandidate: string;
-  correctCandidateStillOffered: boolean;
-  note: string;
-};
-
-/**
- * Case #6 ("гэртаа" -> reported expected "гэртээ") — NOT fully fixed.
- * Documented honestly here rather than silently dropped, per the
- * milestone's explicit "Do not hide remaining limitations" instruction.
- * Root cause: scoreCandidate's prefixRatio term divides by
- * min(input.length, candidate.length), which structurally rewards a
- * SHORTER candidate that happens to be a pure prefix of the input (here,
- * "гэрт") over a LONGER, linguistically-correct candidate ("гэртээ") that
- * shares the same prefix but needs a larger edit to reach. A ranking-only
- * suffix-bonus fix was investigated and found to be a wash (see
- * dictionary.ts's own comment at the removed RANKING_ONLY_SUFFIXES
- * block); a global prefixRatio formula change was assessed as carrying
- * more regression risk than this milestone's evidence justifies (it would
- * touch every existing ranking test, several of which pin exact score
- * values). "гэртээ" DOES still appear in the candidates array (position
- * 3 of 3) even though it isn't the default top pick, so a UI that shows
- * ranked alternatives (this app's spellcheck popup already does) still
- * lets the user pick the right one.
- */
-export const RANKING_KNOWN_GAPS: readonly RankingKnownGapCase[] = [
-  {
-    input: "гэртаа",
-    reportedExpectedCorrection: "гэртээ",
-    actualTopCandidate: "гэрт",
-    correctCandidateStillOffered: true,
-    note: "Not fixed — documented limitation, not a hidden regression. See this file's own doc comment.",
-  },
-];
+// Case #6 ("гэртаа" -> "гэртээ") was the last entry ever held here (a
+// ranking gap disclosed rather than hidden, per this milestone's "do not
+// hide remaining limitations" convention) — it was fixed in the follow-up
+// milestone; see the "гэртаа" entry in TYPO_CORRECTIONS above and
+// scoreCandidate in dictionary.ts.
 
 export type DangerousPairCase = { wordA: string; wordB: string; note: string };
 
