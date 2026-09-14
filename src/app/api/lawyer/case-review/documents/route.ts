@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
     if (!(file instanceof File) || file.size === 0) {
       return NextResponse.json(
-        { error: "PDF файл шаардлагатай.", code: "VALIDATION_ERROR" },
+        { error: "Файл шаардлагатай.", code: "VALIDATION_ERROR" },
         { status: 400 },
       );
     }
@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     const payload = await attachCasePdfForLawyer(actor, {
       caseId,
       expectedVersion,
-      fileName: file.name || "document.pdf",
+      fileName: file.name || "evidence",
       contentType: file.type,
       body,
     });

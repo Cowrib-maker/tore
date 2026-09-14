@@ -37,6 +37,7 @@ import {
 } from "@/infrastructure/security/rate-limiter";
 import { signIn, signOut, auth } from "@/lib/auth";
 import { env } from "@/lib/env";
+import { getAppUrl } from "@/lib/app-url";
 import { getEmailSender } from "@/infrastructure/email";
 import { emailVerificationTokenRepository } from "@/infrastructure/repositories";
 import {
@@ -358,7 +359,7 @@ function getPasswordResetDeps() {
     userRepository,
     emailVerificationTokenRepository,
     emailSender: getEmailSender(),
-    appUrl: env.NEXT_PUBLIC_APP_URL,
+    appUrl: getAppUrl(),
     appName: env.NEXT_PUBLIC_APP_NAME,
   };
 }

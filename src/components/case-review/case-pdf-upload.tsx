@@ -12,6 +12,19 @@ type Props = {
   expectedVersion: number;
 };
 
+/**
+ * PDF or photo (JPEG/PNG/WEBP). The `accept` attribute is the actual
+ * mobile-camera fix: `accept="application/pdf"` alone makes iOS/Android
+ * native file pickers hide the Camera/Photos options entirely, so a
+ * lawyer could not attach a photo of a document from their phone at all.
+ * Listing image MIME types here restores those options in the OS
+ * picker — deliberately no `capture` attribute, so the picker still
+ * offers BOTH "choose from gallery" and "take photo" rather than forcing
+ * the camera to launch directly.
+ */
+const ACCEPTED_MIME_TYPES = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
+const ACCEPTED_FILE_ACCEPT = ACCEPTED_MIME_TYPES.join(",");
+
 export function CasePdfUpload({ caseId, expectedVersion }: Props) {
   const router = useRouter();
   const [error, setError] = useState("");
@@ -30,8 +43,8 @@ export function CasePdfUpload({ caseId, expectedVersion }: Props) {
 
   async function upload(file: File) {
     setError("");
-    if (file.type !== "application/pdf") {
-      setError("Зөвхөн PDF файл хавсаргана уу.");
+    if (!ACCEPTED_MIME_TYPES.includes(file.type)) {
+      setError("Зөвхөн PDF эсвэл зураг (JPEG, PNG, WEBP) хавсаргана уу.");
       return;
     }
     if (file.size > LEGAL_AI_DOCUMENT_MAX_BYTES) {
@@ -71,10 +84,10 @@ export function CasePdfUpload({ caseId, expectedVersion }: Props) {
           uploading && "pointer-events-none opacity-60",
         )}
       >
-        {uploading ? "Хуулж байна…" : "PDF хуулах"}
+        {uploading ? "Хуулж байна…" : "Файл хавсаргах"}
         <input
           type="file"
-          accept="application/pdf"
+          accept={ACCEPTED_FILE_ACCEPT}
           className="sr-only"
           disabled={uploading}
           onChange={onFile}
@@ -85,7 +98,7 @@ export function CasePdfUpload({ caseId, expectedVersion }: Props) {
           {error}
         </p>
       ) : (
-        <p className="text-xs text-[#5C6570]">Зөвхөн уншигдах тексттэй PDF. 10MB хүртэл.</p>
+        <p className="text-xs text-[#5C6570]">PDF эсвэл зураг (камераар авсан ч болно). 10MB хүртэл.</p>
       )}
       <Button type="submit" className="hidden" disabled>
         Хуулах

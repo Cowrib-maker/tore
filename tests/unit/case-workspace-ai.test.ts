@@ -24,6 +24,7 @@ import {
 import { loadLawyerAiWorkbench } from "@/application/use-cases/ai/load-lawyer-ai-workbench";
 import { runPersistedCaseAnalysis } from "@/application/use-cases/case-review/deps";
 import { LegalQuestionStatus, UserRole } from "@/domain/enums";
+import { CaseEvidenceType } from "@/domain/entities/case-file";
 import { ForbiddenError } from "@/domain/errors/domain-error";
 import { LegalDomain } from "@/engine/doctrine";
 import {
@@ -458,6 +459,37 @@ describe("case workspace AI integration", () => {
         { ...caseDeps, fileStorage },
       ),
     ).rejects.toBeInstanceOf(ForbiddenError);
+  });
+
+  it("stores a camera photo as case evidence (mobile-upload fix, Phase 2) with the correct evidence type and content type", async () => {
+    const file = await ownedCase();
+    const uploadedContentTypes: string[] = [];
+    const fileStorage = createStorage();
+    const trackedFileStorage: FileStorage = {
+      ...fileStorage,
+      upload: async (input) => {
+        uploadedContentTypes.push(input.contentType);
+        return fileStorage.upload(input);
+      },
+    };
+    const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xe0]);
+
+    const payload = await attachCasePdfForLawyer(
+      lawyerA,
+      {
+        caseId: file.id,
+        expectedVersion: file.version,
+        fileName: "photo.jpg",
+        contentType: "image/jpeg",
+        body: jpeg,
+      },
+      { ...caseDeps, fileStorage: trackedFileStorage },
+    );
+
+    expect(payload.caseEvidence).toHaveLength(1);
+    expect(payload.caseEvidence[0]?.evidenceType).toBe(CaseEvidenceType.PHOTO);
+    expect(payload.caseEvidence[0]?.description).toContain("Зураг");
+    expect(uploadedContentTypes).toEqual(["image/jpeg"]);
   });
 
   it("derives activity from existing timestamps only", async () => {

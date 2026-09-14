@@ -1,9 +1,8 @@
 import type { ActorContext } from "@/application/common/actor-context";
-import { assertValidPdfUpload } from "@/application/ai/pdf-upload-validation";
+import { assertValidCaseEvidenceUpload } from "@/application/ai/case-evidence-upload-validation";
 import { CaseEvidenceType } from "@/domain/entities/case-file";
 import type { FileStorage } from "@/domain/ports/file-storage";
 import type { CaseReviewWorkspacePayload } from "@/engine/doctrine";
-import { LEGAL_AI_DOCUMENT_MIME } from "@/application/ai/legal-ai-document.constants";
 
 import { requireOwnedCaseFile } from "./assert-access";
 import type { CaseFileDeps } from "./deps";
@@ -39,9 +38,20 @@ export function formatPdfSize(sizeBytes: number): string {
   return `${Math.round((sizeBytes / (1024 * 1024)) * 10) / 10} MB`;
 }
 
+const EVIDENCE_LABEL_BY_FORMAT: Record<string, string> = {
+  pdf: "PDF",
+  jpeg: "Зураг",
+  png: "Зураг",
+  webp: "Зураг",
+};
+
 /**
- * Store a native-text PDF on an owned CaseFile using FileStorage.
- * Does not run OCR, OpenAI, or document intelligence.
+ * Store a case-evidence file (PDF or photo — see
+ * case-evidence-upload-validation.ts) on an owned CaseFile using
+ * FileStorage. Does not run OCR, OpenAI, or document intelligence — a
+ * photo is stored exactly as-is, the same "store, don't analyze"
+ * behavior a PDF already had (name kept for backward compatibility with
+ * existing call sites/tests; it now covers photos too, not just PDFs).
  */
 export async function attachCasePdfForLawyer(
   actor: ActorContext,
@@ -49,7 +59,7 @@ export async function attachCasePdfForLawyer(
   deps: AttachCasePdfDeps = defaultAttachCasePdfDeps(),
 ): Promise<CaseReviewWorkspacePayload> {
   await requireOwnedCaseFile(actor, input.caseId, deps.repository);
-  assertValidPdfUpload({
+  const validated = assertValidCaseEvidenceUpload({
     fileName: input.fileName,
     contentType: input.contentType,
     body: input.body,
@@ -59,7 +69,7 @@ export async function attachCasePdfForLawyer(
     purpose: "evidence",
     ownerId: actor.userId,
     fileName: input.fileName,
-    contentType: LEGAL_AI_DOCUMENT_MIME,
+    contentType: validated.mimeType,
     body: input.body,
   });
 
@@ -70,8 +80,9 @@ export async function attachCasePdfForLawyer(
         caseId: input.caseId,
         expectedVersion: input.expectedVersion,
         title: stored.originalFileName || input.fileName,
-        description: `PDF · ${formatPdfSize(stored.sizeBytes)}`,
-        evidenceType: CaseEvidenceType.DOCUMENT,
+        description: `${EVIDENCE_LABEL_BY_FORMAT[validated.format]} · ${formatPdfSize(stored.sizeBytes)}`,
+        evidenceType:
+          validated.format === "pdf" ? CaseEvidenceType.DOCUMENT : CaseEvidenceType.PHOTO,
         fileReference: stored.key,
         sourceReference: stored.originalFileName || input.fileName,
       },

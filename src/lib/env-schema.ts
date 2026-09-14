@@ -25,7 +25,26 @@ export const envSchema = z.object({
       : z.string().min(32, "AUTH_SECRET must be at least 32 characters"),
   AUTH_URL: z.string().url().optional(),
   NEXT_PUBLIC_APP_NAME: z.string().default("TORE"),
-  NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
+  /**
+   * Canonical app origin — read only via getAppUrl() (src/lib/app-url.ts),
+   * never `env.NEXT_PUBLIC_APP_URL` directly, so every URL-building call
+   * site (password reset, and any future link-based flow) goes through
+   * one place.
+   *
+   * REQUIRED in production, with NO default: a silent `http://localhost:3000`
+   * fallback here previously let a production deploy that simply forgot to
+   * set this var boot successfully and then email real users a dead
+   * localhost password-reset link (assertProductionEnvGuards below still
+   * catches a WRONG value, e.g. an explicit localhost URL, but only when
+   * TORE_ALLOW_INSECURE_URLS isn't set for that deploy — it can't catch a
+   * MISSING one once a default exists to silently fall back to). Making it
+   * required here fails at boot, unconditionally, independent of that
+   * bypass flag, for exactly the "forgot to set it at all" case.
+   */
+  NEXT_PUBLIC_APP_URL:
+    nodeEnv === "production"
+      ? z.string().url("NEXT_PUBLIC_APP_URL is required in production (e.g. https://tore.mn)")
+      : z.string().url().default("http://localhost:3000"),
   NODE_ENV: z
     .enum(["development", "test", "production"])
     .default("development"),
