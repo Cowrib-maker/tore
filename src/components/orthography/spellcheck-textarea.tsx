@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEventHandler, RefObject, ReactNode, UIEvent, MouseEvent } from "react";
+import { Menu } from "@base-ui/react/menu";
 import type { OrthographySuggestionView } from "@/components/orthography/orthography-checker";
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
 import { cn } from "@/lib/utils";
@@ -31,7 +32,7 @@ export function rangesForText(
 }
 
 /** Which flagged span (if any) the caret sits on/against — used to open the
- * suggestion popup for exactly the token the user clicked, independent of
+ * suggestion menu for exactly the token the user clicked, independent of
  * every other flagged span in the text. Exported for unit testing. */
 export function findActiveRangeIndex(
   ranges: readonly OrthographySuggestionView[],
@@ -45,11 +46,65 @@ export function findActiveRangeIndex(
   return index >= 0 ? index : null;
 }
 
+/** Identifies one specific occurrence of a flagged span by text range (not
+ * just the word), since the same misspelling can occur multiple times.
+ * Exported for unit testing. */
+export function rangeKey(item: Pick<OrthographySuggestionView, "start" | "end" | "sourceWord">): string {
+  return `${item.start}:${item.end}:${item.sourceWord}`;
+}
+
+/** Which flagged span (if any) a screen point falls inside, by testing it
+ * against each span's real rendered client rects — `getClientRects()`
+ * rather than `getBoundingClientRect()` so a span that itself wraps across
+ * lines is tested per line-fragment, not against one bounding box spanning
+ * the gap between them. Used for right-click, where `selectionStart` is not
+ * a reliable stand-in for "where the user clicked" (see handleContextMenu).
+ * Exported for unit testing. */
+export function findRangeIndexAtPoint(
+  ranges: readonly OrthographySuggestionView[],
+  spanEls: ReadonlyMap<number, HTMLSpanElement>,
+  clientX: number,
+  clientY: number,
+): number | null {
+  for (let index = 0; index < ranges.length; index += 1) {
+    const el = spanEls.get(index);
+    if (!el) continue;
+    const rects = el.getClientRects();
+    for (let i = 0; i < rects.length; i += 1) {
+      const rect = rects[i]!;
+      if (clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom) {
+        return index;
+      }
+    }
+  }
+  return null;
+}
+
 export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, disabled, onChange, onKeyDown, inputRef, className, maxHeightPx }: Props) {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const ranges = useMemo(() => rangesForText(value, suggestions), [value, suggestions]);
-  const active = activeIndex == null ? null : ranges[activeIndex] ?? null;
+  // Tracked by STABLE KEY (start:end:sourceWord), not array index: if
+  // `suggestions` changes shape while a menu is open (e.g. an external
+  // re-check re-runs on unchanged text) without `value` itself changing,
+  // an index could silently point at a different span after the array
+  // shifts. Re-deriving the index from the key against the CURRENT
+  // `ranges` every render means the menu only ever shows the span it was
+  // actually opened for, or closes if that exact span is gone.
+  const [activeKey, setActiveKey] = useState<string | null>(null);
+  // Session-local "ignore this occurrence" set — never persisted, never
+  // mutates the dictionary. Keyed by exact text range + word, so an edit
+  // that shifts positions naturally drops an ignore rather than silencing
+  // the wrong span.
+  const [ignoredKeys, setIgnoredKeys] = useState<ReadonlySet<string>>(() => new Set());
+
+  const allRanges = useMemo(() => rangesForText(value, suggestions), [value, suggestions]);
+  const ranges = useMemo(
+    () => allRanges.filter((item) => !ignoredKeys.has(rangeKey(item))),
+    [allRanges, ignoredKeys],
+  );
+  const activeIndex = activeKey == null ? -1 : ranges.findIndex((item) => rangeKey(item) === activeKey);
+  const active = activeIndex >= 0 ? ranges[activeIndex]! : null;
+
   const containerRef = useRef<HTMLDivElement>(null);
+  const spanRefs = useRef<Map<number, HTMLSpanElement>>(new Map());
 
   const localRef = useRef<HTMLTextAreaElement>(null);
   useAutoResizeTextarea(localRef, value, maxHeightPx);
@@ -58,20 +113,14 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
     if (inputRef) inputRef.current = el;
   }
 
-  useEffect(() => setActiveIndex(null), [value]);
+  useEffect(() => setActiveKey(null), [value]);
 
-  // Clicking anywhere outside this composer (textarea + popup) closes the
-  // suggestion popup without touching the text.
-  useEffect(() => {
-    if (activeIndex == null) return;
-    function handleOutsideClick(event: PointerEvent) {
-      if (!containerRef.current) return;
-      if (event.target instanceof Node && containerRef.current.contains(event.target)) return;
-      setActiveIndex(null);
-    }
-    document.addEventListener("pointerdown", handleOutsideClick);
-    return () => document.removeEventListener("pointerdown", handleOutsideClick);
-  }, [activeIndex]);
+  const closeMenu = useCallback(() => setActiveKey(null), []);
+
+  function openForCaret(caret: number) {
+    const index = findActiveRangeIndex(ranges, caret);
+    setActiveKey(index == null ? null : rangeKey(ranges[index]!));
+  }
 
   function syncScroll(event: UIEvent<HTMLTextAreaElement>) {
     const mirror = event.currentTarget.parentElement?.querySelector<HTMLDivElement>("[data-spellcheck-mirror]");
@@ -80,17 +129,65 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
     mirror.scrollLeft = event.currentTarget.scrollLeft;
   }
 
+  // Left click: the browser has already moved the caret by the time this
+  // fires, so normal cursor placement/selection is never touched — we only
+  // check afterwards whether the caret landed inside a flagged span.
   function handleClick(event: MouseEvent<HTMLTextAreaElement>) {
-    const caret = event.currentTarget.selectionStart;
-    setActiveIndex(findActiveRangeIndex(ranges, caret));
+    openForCaret(event.currentTarget.selectionStart);
+  }
+
+  // Right click: unlike left click, `selectionStart` is NOT a reliable proxy
+  // for "where the user clicked" here — if the user already had a text range
+  // selected (e.g. spanning past a flagged word) and right-clicks inside
+  // that selection, browsers preserve the selection instead of collapsing
+  // the caret to the click point, so `selectionStart` would silently
+  // describe the wrong position. Hit-test the actual click point against
+  // the flagged mirror spans' real screen rects instead — correct
+  // regardless of selection state, focus history, wrapping, scroll, or zoom.
+  function handleContextMenu(event: MouseEvent<HTMLTextAreaElement>) {
+    const index = findRangeIndexAtPoint(ranges, spanRefs.current, event.clientX, event.clientY);
+    if (index == null) {
+      // Right-clicking plain text must never leave a stale menu (from a
+      // previously flagged word) open behind the native context menu.
+      closeMenu();
+      return;
+    }
+    event.preventDefault();
+    setActiveKey(rangeKey(ranges[index]!));
   }
 
   function apply(word: string) {
     if (!active) return;
     const next = `${value.slice(0, active.start)}${word}${value.slice(active.end)}`;
     onChange(next);
-    setActiveIndex(null);
+    closeMenu();
   }
+
+  function ignoreActive() {
+    if (!active) return;
+    const key = rangeKey(active);
+    setIgnoredKeys((prev) => {
+      const next = new Set(prev);
+      next.add(key);
+      return next;
+    });
+    closeMenu();
+  }
+
+  // A floating-ui "virtual element": getBoundingClientRect is read live off
+  // the corresponding invisible mirror span, so the menu tracks the actual
+  // on-screen token position (including textarea-internal scroll, since the
+  // mirror's scroll is kept in sync with the textarea in syncScroll) without
+  // any manual character-to-pixel math. contextElement lets floating-ui find
+  // the textarea's scroll ancestors for auto-repositioning.
+  const anchor = useMemo(() => {
+    if (activeIndex < 0) return null;
+    const index = activeIndex;
+    return {
+      getBoundingClientRect: () => spanRefs.current.get(index)?.getBoundingClientRect() ?? new DOMRect(),
+      contextElement: localRef.current ?? undefined,
+    };
+  }, [activeIndex]);
 
   const parts: ReactNode[] = [];
   let cursor = 0;
@@ -100,6 +197,10 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
     parts.push(
       <span
         key={`error-${item.start}-${item.end}-${index}`}
+        ref={(el) => {
+          if (el) spanRefs.current.set(index, el);
+          else spanRefs.current.delete(index);
+        }}
         className="text-transparent underline decoration-wavy decoration-2 decoration-[#DC2626] underline-offset-[3px]"
       >
         {value.slice(item.start, item.end)}
@@ -134,55 +235,80 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={onKeyDown}
         onClick={handleClick}
+        onContextMenu={handleContextMenu}
         onScroll={syncScroll}
         placeholder={placeholder}
         rows={rows}
         disabled={disabled}
         spellCheck={false}
         className={cn(
-          "relative z-10 min-h-16 w-full resize-none bg-transparent px-3 py-2 text-[15px] leading-6 text-[#0B1F3A] caret-[#0B1F3A] outline-none selection:bg-[#0F3D33]/15",
+          // `block` (textareas default to inline-block) removes it from an
+          // inline formatting context: an inline-block's `vertical-align:
+          // baseline` otherwise leaves a font-descender gap below it in its
+          // line box, making the container (and so the inset-0 mirror,
+          // which stretches to match) a few pixels taller than the
+          // textarea's own rendered height. Harmless while at rest, but
+          // that gap becomes a real bug once the textarea scrolls
+          // internally: the mirror's own max scrollTop would then be a few
+          // pixels short of the textarea's, so syncScroll's 1:1 assignment
+          // clamps short and the underline drifts from the real text near
+          // the bottom of a scrolled block.
+          "relative z-10 block min-h-16 w-full resize-none bg-transparent px-3 py-2 text-[15px] leading-6 text-[#0B1F3A] caret-[#0B1F3A] outline-none selection:bg-[#0F3D33]/15",
           className,
         )}
       />
 
-      {active ? (
-        <div
-          className="pointer-events-auto absolute left-3 right-3 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-lg border border-[#0B1F3A]/15 bg-white p-2 shadow-xl"
-          role="dialog"
-          aria-label={`${active.sourceWord} үгийн санал`}
-        >
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs">
-              <span className="font-semibold text-[#991B1B]">{active.sourceWord}</span>
-            </p>
-            <button type="button" className="text-[11px] text-[#66717D]" onClick={() => setActiveIndex(null)}>
-              Хаах
-            </button>
-          </div>
+      <Menu.Root
+        open={active != null}
+        onOpenChange={(open) => {
+          if (!open) closeMenu();
+        }}
+        modal={false}
+      >
+        <Menu.Portal>
+          <Menu.Positioner
+            className="isolate z-50 outline-none"
+            anchor={anchor}
+            side="bottom"
+            align="start"
+            sideOffset={4}
+            collisionPadding={8}
+          >
+            <Menu.Popup
+              finalFocus={localRef}
+              aria-label={active ? `${active.sourceWord} үгийн санал` : undefined}
+              className="min-w-40 max-w-72 rounded-lg border border-[#0B1F3A]/15 bg-white p-1.5 shadow-xl outline-none"
+            >
+              {active ? (
+                <div className="px-1.5 py-1 text-xs font-semibold text-[#991B1B]">{active.sourceWord}</div>
+              ) : null}
 
-          {candidates.length ? (
-            <div className="mt-1.5">
-              <p className="text-[10px] font-medium text-[#66717D]">Зөв бичих санал</p>
-              <div className="mt-1 flex flex-wrap gap-1">
-                {candidates.slice(0, 6).map((word) => (
-                  <button
+              {candidates.length ? (
+                candidates.slice(0, 6).map((word) => (
+                  <Menu.Item
                     key={`candidate-${word}`}
-                    type="button"
-                    className="rounded-md border border-[#1A7A72]/25 bg-[#F2FAF7] px-2 py-1 text-[11px] font-semibold text-[#0F3D33] hover:bg-[#E5F4EE]"
+                    className="cursor-default rounded-md px-1.5 py-1.5 text-[13px] font-medium text-[#0F3D33] outline-none data-[highlighted]:bg-[#E5F4EE]"
                     onClick={() => apply(word)}
                   >
                     {word}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : null}
+                  </Menu.Item>
+                ))
+              ) : (
+                <p className="px-1.5 py-1.5 text-[11px] text-[#66717D]">Энэ үгэнд найдвартай засварын санал одоогоор алга.</p>
+              )}
 
-          {!candidates.length ? (
-            <p className="mt-1.5 text-[10px] text-[#66717D]">Энэ үгэнд найдвартай засварын санал одоогоор алга.</p>
-          ) : null}
-        </div>
-      ) : null}
+              <Menu.Separator className="my-1 h-px bg-[#0B1F3A]/10" />
+
+              <Menu.Item
+                className="cursor-default rounded-md px-1.5 py-1.5 text-[12px] text-[#66717D] outline-none data-[highlighted]:bg-[#0B1F3A]/6"
+                onClick={ignoreActive}
+              >
+                Алдаа биш — үл хэрэгсэх
+              </Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>
     </div>
   );
 }
