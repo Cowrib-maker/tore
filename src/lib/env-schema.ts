@@ -31,20 +31,26 @@ export const envSchema = z.object({
    * site (password reset, and any future link-based flow) goes through
    * one place.
    *
-   * REQUIRED in production, with NO default: a silent `http://localhost:3000`
-   * fallback here previously let a production deploy that simply forgot to
-   * set this var boot successfully and then email real users a dead
-   * localhost password-reset link (assertProductionEnvGuards below still
-   * catches a WRONG value, e.g. an explicit localhost URL, but only when
-   * TORE_ALLOW_INSECURE_URLS isn't set for that deploy — it can't catch a
-   * MISSING one once a default exists to silently fall back to). Making it
-   * required here fails at boot, unconditionally, independent of that
-   * bypass flag, for exactly the "forgot to set it at all" case.
+   * Always parses successfully, in every NODE_ENV, with the same
+   * `http://localhost:3000` default it has always had — this schema is
+   * evaluated eagerly at module-import time (env.ts's top-level
+   * `export const env = validateEnv()`), and that module is pulled in
+   * during `next build`'s static page-data collection (confirmed: it
+   * runs for `/_not-found`, which NODE_ENV=production for the whole
+   * build regardless of what the deploy's runtime env exposes). A
+   * previous fix made this field required-with-no-default specifically
+   * in production, which correctly rejected a deploy that forgot to set
+   * it — but it did so unconditionally, with no bypass, and fired during
+   * the BUILD's module evaluation, not just at actual server runtime,
+   * breaking `npm run build` on any environment that doesn't expose this
+   * var at build time even when it's supplied later at runtime. The
+   * "must not silently be localhost in production" requirement now lives
+   * in getAppUrl() itself (a lazy, call-time check — see its own doc
+   * comment) instead of here, so a missing/wrong value only ever breaks
+   * the one feature that needs it (password-reset link construction),
+   * the moment it's actually used, not the entire build or boot.
    */
-  NEXT_PUBLIC_APP_URL:
-    nodeEnv === "production"
-      ? z.string().url("NEXT_PUBLIC_APP_URL is required in production (e.g. https://tore.mn)")
-      : z.string().url().default("http://localhost:3000"),
+  NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
   NODE_ENV: z
     .enum(["development", "test", "production"])
     .default("development"),
