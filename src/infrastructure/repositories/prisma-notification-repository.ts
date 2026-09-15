@@ -103,10 +103,14 @@ export class PrismaNotificationRepository implements NotificationRepository {
     return mapNotification(record);
   }
 
-  async markRead(ids: string[], readAt: Date = new Date()): Promise<void> {
+  async markRead(
+    userId: string,
+    ids: string[],
+    readAt: Date = new Date(),
+  ): Promise<void> {
     if (ids.length === 0) return;
     await this.db.notification.updateMany({
-      where: { id: { in: ids } },
+      where: { id: { in: ids }, userId },
       data: { readAt },
     });
   }

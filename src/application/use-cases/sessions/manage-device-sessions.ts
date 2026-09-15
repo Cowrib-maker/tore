@@ -67,7 +67,7 @@ export async function revokeOwnDeviceSession(
   if (session.status === DeviceSessionStatus.REVOKED) {
     return;
   }
-  await deps.deviceSessionRepository.revoke(session.id, now);
+  await deps.deviceSessionRepository.revoke(actor.userId, session.id, now);
 }
 
 export async function revokeOtherDeviceSessions(

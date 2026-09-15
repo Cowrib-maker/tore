@@ -42,7 +42,7 @@ export async function markNotificationReadAction(
     if (!note || note.userId !== actor.userId) {
       return { error: "Notification not found" };
     }
-    await notificationRepository.markRead([id]);
+    await notificationRepository.markRead(actor.userId, [id]);
     revalidatePath("/client/notifications");
     revalidatePath("/lawyer/notifications");
     return { success: true };

@@ -22,6 +22,10 @@ import {
 import type { LawyerCredential, LawyerProfile } from "@/domain/entities/profile";
 import type { PracticeArea } from "@/domain/entities/taxonomy";
 import { CredentialReviewStatus, UserRole } from "@/domain/enums";
+import {
+  SessionReplacedError,
+  UnauthorizedError,
+} from "@/domain/errors/domain-error";
 import { canSubmitCredentials } from "@/domain/services/lawyer-eligibility";
 import { unitOfWork } from "@/infrastructure/database/prisma-unit-of-work";
 import {
@@ -292,11 +296,15 @@ export async function getAdminLawyerVerificationQueue(): Promise<
       directory: AdminLawyerDirectoryItem[];
     }
 > {
-  const session = await getSessionUser();
-  if (!session?.user?.id) {
-    return { status: "unauthenticated" };
-  }
-  if (session.user.role !== UserRole.ADMIN) {
+  // requireActor() re-reads role/status from the database on every call —
+  // unlike a plain session.user.role check, a just-revoked admin cannot
+  // keep reading this queue off a JWT that hasn't refreshed yet.
+  try {
+    await requireActor(UserRole.ADMIN);
+  } catch (error) {
+    if (error instanceof UnauthorizedError || error instanceof SessionReplacedError) {
+      return { status: "unauthenticated" };
+    }
     return { status: "forbidden" };
   }
 

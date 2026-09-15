@@ -54,6 +54,10 @@ import {
   verifyEmailOtpSchema,
 } from "@/application/validators/auth.schema";
 import { UserRole, UserStatus } from "@/domain/enums";
+import {
+  generateActiveSessionId,
+  hashActiveSessionId,
+} from "@/domain/services/active-session";
 import { getPostAuthRedirect } from "@/domain/services/rbac";
 import {
   platformSettingRepository,
@@ -430,5 +434,35 @@ export async function resetPasswordAction(
 }
 
 export async function logoutAction() {
+  // Revoke the server-side active session BEFORE signOut() clears the
+  // client's cookie — read the session while it's still available, and
+  // rotate (not clear) activeSessionIdHash to a fresh, unpredictable value.
+  // Clearing it to null would NOT work: the JWT's own `sid` would still be
+  // present on any retained copy of the cookie, and nodeAuthCallbacks.jwt's
+  // "bind-token" branch (decideActiveSession's `sid && !hash` case) would
+  // silently re-legitimize that exact sid on its very next use — the same
+  // mechanism that lets a pre-feature legacy JWT bind on first request.
+  // Rotating to a new random value (the same primitive password-reset
+  // already uses) guarantees any retained sid can never match again.
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (userId) {
+    try {
+      await userRepository.rotateActiveSessionIdHash(
+        userId,
+        hashActiveSessionId(generateActiveSessionId()),
+      );
+    } catch (error) {
+      // Best-effort: even if server-side revocation fails, still fall
+      // through to clear the client's cookie below rather than leaving the
+      // user stuck signed in from their own perspective. A retained copy of
+      // the JWT elsewhere remains valid until natural expiry in this one
+      // failure case — the same exposure that already existed before this
+      // change, not a new regression.
+      console.error("[auth:logout] failed to revoke active session", error);
+    }
+  }
+
   await signOut({ redirectTo: "/login" });
 }

@@ -10,7 +10,9 @@ export interface DeviceSessionRepository {
   listByUserId(userId: string): Promise<DeviceSession[]>;
   listActiveByUserId(userId: string): Promise<DeviceSession[]>;
   touch(id: string, input: TouchDeviceSessionInput): Promise<DeviceSession>;
-  revoke(id: string, revokedAt: Date): Promise<DeviceSession>;
+  /** Scoped by userId at the query level — a foreign or nonexistent id
+   * revokes nothing and returns null, never throws. */
+  revoke(userId: string, id: string, revokedAt: Date): Promise<DeviceSession | null>;
   revokeAllForUser(
     userId: string,
     revokedAt: Date,

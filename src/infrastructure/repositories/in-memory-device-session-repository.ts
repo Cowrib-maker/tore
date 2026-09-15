@@ -83,9 +83,13 @@ export class InMemoryDeviceSessionRepository implements DeviceSessionRepository 
     return clone(next);
   }
 
-  async revoke(id: string, revokedAt: Date): Promise<DeviceSession> {
+  async revoke(
+    userId: string,
+    id: string,
+    revokedAt: Date,
+  ): Promise<DeviceSession | null> {
     const current = this.rows.get(id);
-    if (!current) throw new Error("Device session not found");
+    if (!current || current.userId !== userId) return null;
     const next: DeviceSession = {
       ...current,
       status: DeviceSessionStatus.REVOKED,

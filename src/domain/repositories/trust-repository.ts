@@ -27,6 +27,8 @@ export interface NotificationRepository {
     options?: ListPageOptions,
   ): Promise<ListPage<Notification>>;
   create(input: CreateNotificationInput): Promise<Notification>;
-  markRead(ids: string[], readAt?: Date): Promise<void>;
+  /** Scoped by userId at the query level — a foreign id in `ids` is silently
+   * excluded, never marked read, regardless of caller-side checks. */
+  markRead(userId: string, ids: string[], readAt?: Date): Promise<void>;
   markAllReadForUser(userId: string): Promise<void>;
 }

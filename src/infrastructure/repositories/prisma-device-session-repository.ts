@@ -71,12 +71,18 @@ export class PrismaDeviceSessionRepository implements DeviceSessionRepository {
     return mapDeviceSession(record);
   }
 
-  async revoke(id: string, revokedAt: Date): Promise<DeviceSession> {
-    const record = await this.db.deviceSession.update({
-      where: { id },
+  async revoke(
+    userId: string,
+    id: string,
+    revokedAt: Date,
+  ): Promise<DeviceSession | null> {
+    const result = await this.db.deviceSession.updateMany({
+      where: { id, userId },
       data: { status: DeviceSessionStatus.REVOKED, revokedAt },
     });
-    return mapDeviceSession(record);
+    if (result.count === 0) return null;
+    const record = await this.db.deviceSession.findUnique({ where: { id } });
+    return record ? mapDeviceSession(record) : null;
   }
 
   async revokeAllForUser(
