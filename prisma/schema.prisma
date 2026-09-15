@@ -229,64 +229,63 @@ enum DeviceSessionStatus {
 // ─── Identity & Authentication (Auth.js) ─────────────────────────────────────
 
 model User {
-  id                String     @id @default(cuid())
+  id                  String     @id @default(cuid())
   /// Uniqueness for active users enforced by partial index `users_email_active_unique`.
-  email             String
-  emailVerified     DateTime?  @map("email_verified_at")
-  passwordHash      String?    @map("password_hash")
-  name              String?
-  image             String?    @map("image_url")
-  role              UserRole
-  status            UserStatus @default(ACTIVE)
-  preferredLanguage String     @default("mn") @map("preferred_language")
+  email               String
+  emailVerified       DateTime?  @map("email_verified_at")
+  passwordHash        String?    @map("password_hash")
+  name                String?
+  image               String?    @map("image_url")
+  role                UserRole
+  status              UserStatus @default(ACTIVE)
+  preferredLanguage   String     @default("mn") @map("preferred_language")
   /// Personal isolation tenant (ADR-001). Nullable until backfill / flag-enabled provisioning.
-  personalTenantId  String?    @unique @map("personal_tenant_id")
+  personalTenantId    String?    @unique @map("personal_tenant_id")
   /// SHA-256 hex of the current JWT session identifier. Null = legacy session not yet bound.
-  activeSessionIdHash String?  @map("active_session_id_hash")
-  deletedAt         DateTime?  @map("deleted_at")
-  createdAt         DateTime   @default(now()) @map("created_at")
-  updatedAt         DateTime   @updatedAt @map("updated_at")
+  activeSessionIdHash String?    @map("active_session_id_hash")
+  deletedAt           DateTime?  @map("deleted_at")
+  createdAt           DateTime   @default(now()) @map("created_at")
+  updatedAt           DateTime   @updatedAt @map("updated_at")
 
-  accounts  Account[]
-  sessions  Session[]
-  terms     TermsAcceptance[]
+  accounts Account[]
+  sessions Session[]
+  terms    TermsAcceptance[]
 
   personalTenant Tenant? @relation("UserPersonalTenant", fields: [personalTenantId], references: [id], onDelete: SetNull)
 
   clientProfile ClientProfile?
   lawyerProfile LawyerProfile?
 
-  clientBookings           Booking[]              @relation("ClientBookings")
-  cancelledBookings        Booking[]              @relation("BookingCancelledBy")
-  bookingStatusChanges     BookingStatusHistory[] @relation("BookingStatusChangedBy")
-  clientPayments           Payment[]              @relation("ClientPayments")
-  messages                 Message[]              @relation("MessageSender")
-  reviewsWritten           Review[]               @relation("ReviewAuthor")
-  notifications            Notification[]
-  auditLogs                AuditLog[]             @relation("AuditActor")
-  credentialsReviewed      LawyerCredential[]     @relation("CredentialReviewer")
-  payoutsProcessed         Payout[]               @relation("PayoutProcessor")
-  refundsRequested         Refund[]               @relation("RefundRequester")
-  refundsProcessed         Refund[]               @relation("RefundProcessor")
-  disputesRaised           Dispute[]              @relation("DisputeRaiser")
-  disputesResolved         Dispute[]              @relation("DisputeResolver")
-  platformSettingsUpdated  PlatformSetting[]      @relation("PlatformSettingUpdater")
-  homepageSectionsUpdated  HomepageSection[]      @relation("HomepageSectionUpdater")
-  homepageContentsUpdated  HomepageContent[]      @relation("HomepageContentUpdater")
-  reviewsModerated         Review[]               @relation("ReviewModerator")
-  organizationMemberships  OrganizationMembership[]
-  aiConversations AIConversation[]
-  aiConversationDocuments AIConversationDocument[]
-  aiUsage        AIUsage[]
-  caseFiles      CaseFile[] @relation("LawyerCaseFiles")
-  ownedSubscriptions Subscription[] @relation("SubscriptionOwner")
-  subscriptionSeats  SubscriptionSeat[]
-  deviceSessions     DeviceSession[]
-  entitlementUsages  EntitlementUsage[]
-  billingInvoices    Invoice[]
-  guestSessions      GuestSession[] @relation("GuestSessionClaimedBy")
+  clientBookings                  Booking[]                        @relation("ClientBookings")
+  cancelledBookings               Booking[]                        @relation("BookingCancelledBy")
+  bookingStatusChanges            BookingStatusHistory[]           @relation("BookingStatusChangedBy")
+  clientPayments                  Payment[]                        @relation("ClientPayments")
+  messages                        Message[]                        @relation("MessageSender")
+  reviewsWritten                  Review[]                         @relation("ReviewAuthor")
+  notifications                   Notification[]
+  auditLogs                       AuditLog[]                       @relation("AuditActor")
+  credentialsReviewed             LawyerCredential[]               @relation("CredentialReviewer")
+  payoutsProcessed                Payout[]                         @relation("PayoutProcessor")
+  refundsRequested                Refund[]                         @relation("RefundRequester")
+  refundsProcessed                Refund[]                         @relation("RefundProcessor")
+  disputesRaised                  Dispute[]                        @relation("DisputeRaiser")
+  disputesResolved                Dispute[]                        @relation("DisputeResolver")
+  platformSettingsUpdated         PlatformSetting[]                @relation("PlatformSettingUpdater")
+  homepageSectionsUpdated         HomepageSection[]                @relation("HomepageSectionUpdater")
+  homepageContentsUpdated         HomepageContent[]                @relation("HomepageContentUpdater")
+  reviewsModerated                Review[]                         @relation("ReviewModerator")
+  organizationMemberships         OrganizationMembership[]
+  aiConversations                 AIConversation[]
+  aiConversationDocuments         AIConversationDocument[]
+  aiUsage                         AIUsage[]
+  caseFiles                       CaseFile[]                       @relation("LawyerCaseFiles")
+  ownedSubscriptions              Subscription[]                   @relation("SubscriptionOwner")
+  subscriptionSeats               SubscriptionSeat[]
+  deviceSessions                  DeviceSession[]
+  entitlementUsages               EntitlementUsage[]
+  billingInvoices                 Invoice[]
+  guestSessions                   GuestSession[]                   @relation("GuestSessionClaimedBy")
   unpaidCitizenLegalQuestionUsage UnpaidCitizenLegalQuestionUsage?
-
 
   @@index([role, status])
   @@index([email])
@@ -337,12 +336,12 @@ model VerificationToken {
 }
 
 model TermsAcceptance {
-  id            String    @id @default(cuid())
-  userId        String    @map("user_id")
-  termsType     TermsType @map("terms_type")
-  termsVersion  String    @map("terms_version")
-  acceptedAt    DateTime  @default(now()) @map("accepted_at")
-  ipAddress     String?   @map("ip_address")
+  id           String    @id @default(cuid())
+  userId       String    @map("user_id")
+  termsType    TermsType @map("terms_type")
+  termsVersion String    @map("terms_version")
+  acceptedAt   DateTime  @default(now()) @map("accepted_at")
+  ipAddress    String?   @map("ip_address")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -362,7 +361,7 @@ model Tenant {
   updatedAt DateTime     @updatedAt @map("updated_at")
 
   /// Inverse of User.personalTenantId (Individual tenants only).
-  personalUser User? @relation("UserPersonalTenant")
+  personalUser User?         @relation("UserPersonalTenant")
   /// Inverse of Organization.tenantId (Organization tenants only).
   organization Organization?
 
@@ -392,13 +391,13 @@ model Organization {
 }
 
 model OrganizationMembership {
-  id             String                        @id @default(cuid())
-  organizationId String                        @map("organization_id")
-  userId         String                        @map("user_id")
-  orgRole        OrganizationRole              @map("org_role")
-  status         OrganizationMembershipStatus  @default(ACTIVE)
-  createdAt      DateTime                      @default(now()) @map("created_at")
-  updatedAt      DateTime                      @updatedAt @map("updated_at")
+  id             String                       @id @default(cuid())
+  organizationId String                       @map("organization_id")
+  userId         String                       @map("user_id")
+  orgRole        OrganizationRole             @map("org_role")
+  status         OrganizationMembershipStatus @default(ACTIVE)
+  createdAt      DateTime                     @default(now()) @map("created_at")
+  updatedAt      DateTime                     @updatedAt @map("updated_at")
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   /// RESTRICT: deleting a User that still holds a seat (e.g. last ACTIVE OWNER) must fail.
@@ -451,15 +450,15 @@ model LawyerProfile {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  credentials  LawyerCredential[]
-  practiceAreas LawyerPracticeArea[]
-  languages    LawyerLanguage[]
-  offerings    ConsultationOffering[]
+  credentials            LawyerCredential[]
+  practiceAreas          LawyerPracticeArea[]
+  languages              LawyerLanguage[]
+  offerings              ConsultationOffering[]
   availabilityRules      AvailabilityRule[]
   availabilityExceptions AvailabilityException[]
-  bookings     Booking[]
-  reviews      Review[]
-  payouts      Payout[]
+  bookings               Booking[]
+  reviews                Review[]
+  payouts                Payout[]
 
   @@index([verificationStatus])
   @@index([isListed, verificationStatus, position])
@@ -558,18 +557,18 @@ model LawyerLanguage {
 // ─── Offerings & Availability ─────────────────────────────────────────────────
 
 model ConsultationOffering {
-  id              String    @id @default(cuid())
-  lawyerProfileId String    @map("lawyer_profile_id")
-  titleMn         String    @map("title_mn")
-  titleEn         String?   @map("title_en")
-  descriptionMn   String?   @map("description_mn") @db.Text
-  durationMinutes Int       @map("duration_minutes")
-  priceMnt        Int       @map("price_mnt")
+  id              String               @id @default(cuid())
+  lawyerProfileId String               @map("lawyer_profile_id")
+  titleMn         String               @map("title_mn")
+  titleEn         String?              @map("title_en")
+  descriptionMn   String?              @map("description_mn") @db.Text
+  durationMinutes Int                  @map("duration_minutes")
+  priceMnt        Int                  @map("price_mnt")
   modality        ConsultationModality @default(ONLINE)
-  isActive        Boolean   @default(true) @map("is_active")
-  deletedAt       DateTime? @map("deleted_at")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  isActive        Boolean              @default(true) @map("is_active")
+  deletedAt       DateTime?            @map("deleted_at")
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @updatedAt @map("updated_at")
 
   lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
   bookings      Booking[]
@@ -616,42 +615,42 @@ model AvailabilityException {
 // ─── Bookings & Transactions ──────────────────────────────────────────────────
 
 model Booking {
-  id                   String        @id @default(cuid())
-  bookingNumber        String        @unique @map("booking_number")
-  clientUserId         String        @map("client_user_id")
-  lawyerProfileId      String        @map("lawyer_profile_id")
-  offeringId           String        @map("offering_id")
-  practiceAreaId       String?       @map("practice_area_id")
-  status               BookingStatus
-  issueSummary         String        @map("issue_summary") @db.Text
-  scheduledStartAt     DateTime      @map("scheduled_start_at")
-  scheduledEndAt       DateTime      @map("scheduled_end_at")
-  meetingUrl           String?       @map("meeting_url")
-  meetingInstructions  String?       @map("meeting_instructions") @db.Text
-  version              Int           @default(1)
-  acceptedAt           DateTime?     @map("accepted_at")
-  declinedAt           DateTime?     @map("declined_at")
-  declineReason        String?       @map("decline_reason") @db.Text
-  completedAt          DateTime?     @map("completed_at")
-  cancelledAt          DateTime?     @map("cancelled_at")
-  cancellationReason   String?       @map("cancellation_reason") @db.Text
-  cancelledByUserId    String?       @map("cancelled_by_user_id")
-  createdAt            DateTime      @default(now()) @map("created_at")
-  updatedAt            DateTime      @updatedAt @map("updated_at")
+  id                  String        @id @default(cuid())
+  bookingNumber       String        @unique @map("booking_number")
+  clientUserId        String        @map("client_user_id")
+  lawyerProfileId     String        @map("lawyer_profile_id")
+  offeringId          String        @map("offering_id")
+  practiceAreaId      String?       @map("practice_area_id")
+  status              BookingStatus
+  issueSummary        String        @map("issue_summary") @db.Text
+  scheduledStartAt    DateTime      @map("scheduled_start_at")
+  scheduledEndAt      DateTime      @map("scheduled_end_at")
+  meetingUrl          String?       @map("meeting_url")
+  meetingInstructions String?       @map("meeting_instructions") @db.Text
+  version             Int           @default(1)
+  acceptedAt          DateTime?     @map("accepted_at")
+  declinedAt          DateTime?     @map("declined_at")
+  declineReason       String?       @map("decline_reason") @db.Text
+  completedAt         DateTime?     @map("completed_at")
+  cancelledAt         DateTime?     @map("cancelled_at")
+  cancellationReason  String?       @map("cancellation_reason") @db.Text
+  cancelledByUserId   String?       @map("cancelled_by_user_id")
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
 
-  clientUser    User           @relation("ClientBookings", fields: [clientUserId], references: [id], onDelete: Restrict)
-  lawyerProfile LawyerProfile  @relation(fields: [lawyerProfileId], references: [id], onDelete: Restrict)
+  clientUser    User                 @relation("ClientBookings", fields: [clientUserId], references: [id], onDelete: Restrict)
+  lawyerProfile LawyerProfile        @relation(fields: [lawyerProfileId], references: [id], onDelete: Restrict)
   offering      ConsultationOffering @relation(fields: [offeringId], references: [id], onDelete: Restrict)
-  practiceArea  PracticeArea?  @relation(fields: [practiceAreaId], references: [id], onDelete: SetNull)
-  cancelledBy   User?          @relation("BookingCancelledBy", fields: [cancelledByUserId], references: [id], onDelete: SetNull)
+  practiceArea  PracticeArea?        @relation(fields: [practiceAreaId], references: [id], onDelete: SetNull)
+  cancelledBy   User?                @relation("BookingCancelledBy", fields: [cancelledByUserId], references: [id], onDelete: SetNull)
 
-  statusHistory BookingStatusHistory[]
-  payment       Payment?
+  statusHistory  BookingStatusHistory[]
+  payment        Payment?
   billingInvoice Invoice?
-  messageThread MessageThread?
-  review        Review?
-  dispute       Dispute?
-  refunds       Refund[]
+  messageThread  MessageThread?
+  review         Review?
+  dispute        Dispute?
+  refunds        Refund[]
 
   @@index([clientUserId, status])
   @@index([lawyerProfileId, status])
@@ -706,17 +705,17 @@ model Payment {
 }
 
 model Payout {
-  id                 String       @id @default(cuid())
-  paymentId          String       @unique @map("payment_id")
-  lawyerProfileId    String       @map("lawyer_profile_id")
-  amountMnt          Int          @map("amount_mnt")
-  status             PayoutStatus @default(PENDING)
-  processedByUserId  String?      @map("processed_by_user_id")
-  processedAt        DateTime?    @map("processed_at")
-  payoutReference    String?      @map("payout_reference")
-  notes              String?      @db.Text
-  createdAt          DateTime     @default(now()) @map("created_at")
-  updatedAt          DateTime     @updatedAt @map("updated_at")
+  id                String       @id @default(cuid())
+  paymentId         String       @unique @map("payment_id")
+  lawyerProfileId   String       @map("lawyer_profile_id")
+  amountMnt         Int          @map("amount_mnt")
+  status            PayoutStatus @default(PENDING)
+  processedByUserId String?      @map("processed_by_user_id")
+  processedAt       DateTime?    @map("processed_at")
+  payoutReference   String?      @map("payout_reference")
+  notes             String?      @db.Text
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
 
   payment       Payment       @relation(fields: [paymentId], references: [id], onDelete: Restrict)
   lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Restrict)
@@ -727,18 +726,18 @@ model Payout {
 }
 
 model Refund {
-  id                 String       @id @default(cuid())
-  paymentId          String       @map("payment_id")
-  bookingId          String       @map("booking_id")
-  amountMnt          Int          @map("amount_mnt")
-  status             RefundStatus
-  reason             String       @db.Text
-  requestedByUserId  String       @map("requested_by_user_id")
-  processedByUserId  String?      @map("processed_by_user_id")
-  processedAt        DateTime?    @map("processed_at")
-  providerRefundId   String?      @map("provider_refund_id")
-  createdAt          DateTime     @default(now()) @map("created_at")
-  updatedAt          DateTime     @updatedAt @map("updated_at")
+  id                String       @id @default(cuid())
+  paymentId         String       @map("payment_id")
+  bookingId         String       @map("booking_id")
+  amountMnt         Int          @map("amount_mnt")
+  status            RefundStatus
+  reason            String       @db.Text
+  requestedByUserId String       @map("requested_by_user_id")
+  processedByUserId String?      @map("processed_by_user_id")
+  processedAt       DateTime?    @map("processed_at")
+  providerRefundId  String?      @map("provider_refund_id")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
 
   payment     Payment @relation(fields: [paymentId], references: [id], onDelete: Restrict)
   booking     Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
@@ -793,8 +792,8 @@ model Message {
   deletedAt    DateTime? @map("deleted_at")
   createdAt    DateTime  @default(now()) @map("created_at")
 
-  thread      MessageThread      @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  sender      User               @relation("MessageSender", fields: [senderUserId], references: [id], onDelete: Restrict)
+  thread      MessageThread       @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender      User                @relation("MessageSender", fields: [senderUserId], references: [id], onDelete: Restrict)
   attachments MessageAttachment[]
 
   @@index([threadId, createdAt])
@@ -821,17 +820,17 @@ model MessageAttachment {
 // ─── Trust & Reputation ───────────────────────────────────────────────────────
 
 model Review {
-  id                 String    @id @default(cuid())
-  bookingId          String    @unique @map("booking_id")
-  clientUserId       String    @map("client_user_id")
-  lawyerProfileId    String    @map("lawyer_profile_id")
-  rating             Int
-  comment            String?   @db.Text
-  isVisible          Boolean   @default(true) @map("is_visible")
-  moderatedByUserId  String?   @map("moderated_by_user_id")
-  deletedAt          DateTime? @map("deleted_at")
-  createdAt          DateTime  @default(now()) @map("created_at")
-  updatedAt          DateTime  @updatedAt @map("updated_at")
+  id                String    @id @default(cuid())
+  bookingId         String    @unique @map("booking_id")
+  clientUserId      String    @map("client_user_id")
+  lawyerProfileId   String    @map("lawyer_profile_id")
+  rating            Int
+  comment           String?   @db.Text
+  isVisible         Boolean   @default(true) @map("is_visible")
+  moderatedByUserId String?   @map("moderated_by_user_id")
+  deletedAt         DateTime? @map("deleted_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
 
   booking       Booking       @relation(fields: [bookingId], references: [id], onDelete: Restrict)
   client        User          @relation("ReviewAuthor", fields: [clientUserId], references: [id], onDelete: Restrict)
@@ -864,15 +863,15 @@ model Notification {
 }
 
 model AuditLog {
-  id           String      @id @default(cuid())
-  actorUserId  String?     @map("actor_user_id")
-  action       AuditAction
-  entityType   String      @map("entity_type")
-  entityId     String?     @map("entity_id")
-  metadata     Json?
-  ipAddress    String?     @map("ip_address")
-  userAgent    String?     @map("user_agent") @db.Text
-  createdAt    DateTime    @default(now()) @map("created_at")
+  id          String      @id @default(cuid())
+  actorUserId String?     @map("actor_user_id")
+  action      AuditAction
+  entityType  String      @map("entity_type")
+  entityId    String?     @map("entity_id")
+  metadata    Json?
+  ipAddress   String?     @map("ip_address")
+  userAgent   String?     @map("user_agent") @db.Text
+  createdAt   DateTime    @default(now()) @map("created_at")
 
   actor User? @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
 
@@ -883,12 +882,12 @@ model AuditLog {
 }
 
 model PlatformSetting {
-  key              String   @id
-  value            String   @db.Text
-  description      String?  @db.Text
-  updatedByUserId  String?  @map("updated_by_user_id")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  key             String   @id
+  value           String   @db.Text
+  description     String?  @db.Text
+  updatedByUserId String?  @map("updated_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   updatedBy User? @relation("PlatformSettingUpdater", fields: [updatedByUserId], references: [id], onDelete: SetNull)
 
@@ -916,6 +915,7 @@ model HomepageContent {
 
   @@map("homepage_contents")
 }
+
 // ─── TORE Legal AI ────────────────────────────────────────────────────────────
 
 enum AIProvider {
@@ -945,7 +945,7 @@ model GuestSession {
   createdAt              DateTime @default(now()) @map("created_at")
   lastSeenAt             DateTime @default(now()) @map("last_seen_at")
 
-  claimedBy     User?             @relation("GuestSessionClaimedBy", fields: [claimedByUserId], references: [id], onDelete: SetNull)
+  claimedBy     User?            @relation("GuestSessionClaimedBy", fields: [claimedByUserId], references: [id], onDelete: SetNull)
   conversations AIConversation[]
 
   @@index([expiresAt])
@@ -953,20 +953,20 @@ model GuestSession {
 }
 
 model AIConversation {
-  id                  String               @id @default(cuid())
-  userId              String?              @map("user_id")
-  guestSessionId      String?              @map("guest_session_id")
+  id                  String              @id @default(cuid())
+  userId              String?             @map("user_id")
+  guestSessionId      String?             @map("guest_session_id")
   /// Nullable so existing threads stay valid. Set only after CaseFile ownership is verified.
-  caseFileId          String?              @map("case_file_id")
+  caseFileId          String?             @map("case_file_id")
   title               String?
-  questionStatus      LegalQuestionStatus  @default(NEW) @map("question_status")
-  billedQuestionCount Int                  @default(0) @map("billed_question_count")
-  createdAt           DateTime             @default(now()) @map("created_at")
-  updatedAt           DateTime             @updatedAt @map("updated_at")
+  questionStatus      LegalQuestionStatus @default(NEW) @map("question_status")
+  billedQuestionCount Int                 @default(0) @map("billed_question_count")
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
 
-  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  guestSession GuestSession? @relation(fields: [guestSessionId], references: [id], onDelete: SetNull)
-  caseFile     CaseFile?     @relation(fields: [caseFileId], references: [id], onDelete: SetNull)
+  user         User?                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guestSession GuestSession?            @relation(fields: [guestSessionId], references: [id], onDelete: SetNull)
+  caseFile     CaseFile?                @relation(fields: [caseFileId], references: [id], onDelete: SetNull)
   messages     AIMessage[]
   documents    AIConversationDocument[]
 
@@ -985,7 +985,6 @@ model AIConversation {
  * allowance — reusing it (even with a sentinel periodStart) would either
  * silently turn a one-time allowance into a monthly one or require a
  * fragile special case in shared subscription-period logic.
- *
  * AIConversation.billedQuestionCount remains the historical/audit trail
  * of which conversations were billed; this table is the live,
  * atomically-updated gate checked before starting a new question.
@@ -1003,18 +1002,18 @@ model UnpaidCitizenLegalQuestionUsage {
 /// User-uploaded Legal AI attachments (PDF, DOCX, images). Multiple per conversation.
 /// Raw bytes live in FileStorage; extracted text (or empty NEEDS_OCR/FAILED) is persisted here.
 model AIConversationDocument {
-  id             String                   @id @default(cuid())
-  conversationId String                   @map("conversation_id")
-  userId         String                   @map("user_id")
-  storageKey     String                   @unique @map("storage_key")
-  fileName       String                   @map("file_name")
-  mimeType       String                   @map("mime_type")
-  sizeBytes      Int                      @map("size_bytes")
-  extractedText  String                   @map("extracted_text") @db.Text
-  pageCount      Int?                     @map("page_count")
-  extractStatus  AIDocumentExtractStatus  @map("extract_status")
-  createdAt      DateTime                 @default(now()) @map("created_at")
-  updatedAt      DateTime                 @updatedAt @map("updated_at")
+  id             String                  @id @default(cuid())
+  conversationId String                  @map("conversation_id")
+  userId         String                  @map("user_id")
+  storageKey     String                  @unique @map("storage_key")
+  fileName       String                  @map("file_name")
+  mimeType       String                  @map("mime_type")
+  sizeBytes      Int                     @map("size_bytes")
+  extractedText  String                  @map("extracted_text") @db.Text
+  pageCount      Int?                    @map("page_count")
+  extractStatus  AIDocumentExtractStatus @map("extract_status")
+  createdAt      DateTime                @default(now()) @map("created_at")
+  updatedAt      DateTime                @updatedAt @map("updated_at")
 
   conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -1025,15 +1024,15 @@ model AIConversationDocument {
 }
 
 model AIMessage {
-  id             String         @id @default(cuid())
-  conversationId String         @map("conversation_id")
+  id             String        @id @default(cuid())
+  conversationId String        @map("conversation_id")
   role           AIMessageRole
-  content        String         @db.Text
+  content        String        @db.Text
   provider       AIProvider?
   model          String?
-  inputTokens    Int?           @map("input_tokens")
-  outputTokens   Int?           @map("output_tokens")
-  createdAt      DateTime       @default(now()) @map("created_at")
+  inputTokens    Int?          @map("input_tokens")
+  outputTokens   Int?          @map("output_tokens")
+  createdAt      DateTime      @default(now()) @map("created_at")
 
   conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   citations    AICitation[]
@@ -1059,14 +1058,14 @@ model AICitation {
 }
 
 model AIUsage {
-  id            String      @id @default(cuid())
-  userId        String      @map("user_id")
+  id            String     @id @default(cuid())
+  userId        String     @map("user_id")
   provider      AIProvider
   model         String
-  inputTokens   Int         @default(0) @map("input_tokens")
-  outputTokens  Int         @default(0) @map("output_tokens")
-  estimatedCost Decimal?    @map("estimated_cost") @db.Decimal(12, 6)
-  createdAt     DateTime    @default(now()) @map("created_at")
+  inputTokens   Int        @default(0) @map("input_tokens")
+  outputTokens  Int        @default(0) @map("output_tokens")
+  estimatedCost Decimal?   @map("estimated_cost") @db.Decimal(12, 6)
+  createdAt     DateTime   @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -1082,17 +1081,17 @@ model AIUsage {
  * entitlements are calculated from this record, never from the client.
  */
 model Subscription {
-  id                 String             @id @default(cuid())
-  ownerUserId        String             @map("owner_user_id")
+  id                 String               @id @default(cuid())
+  ownerUserId        String               @map("owner_user_id")
   planCode           SubscriptionPlanCode @map("plan_code")
   status             SubscriptionStatus
-  seatLimit          Int                @map("seat_limit")
-  currentPeriodStart DateTime           @map("current_period_start")
-  currentPeriodEnd   DateTime           @map("current_period_end")
+  seatLimit          Int                  @map("seat_limit")
+  currentPeriodStart DateTime             @map("current_period_start")
+  currentPeriodEnd   DateTime             @map("current_period_end")
   /// Payment-provider invoice id when billed. Not an entitlement input.
-  providerInvoiceId  String?            @map("provider_invoice_id")
-  createdAt          DateTime           @default(now()) @map("created_at")
-  updatedAt          DateTime           @updatedAt @map("updated_at")
+  providerInvoiceId  String?              @map("provider_invoice_id")
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
 
   owner          User               @relation("SubscriptionOwner", fields: [ownerUserId], references: [id], onDelete: Restrict)
   seats          SubscriptionSeat[]
@@ -1152,16 +1151,16 @@ model DeviceSession {
 
 /// Monthly feature-quota ledger. Token columns are backend-only.
 model EntitlementUsage {
-  id                     String   @id @default(cuid())
-  userId                 String   @map("user_id")
-  subscriptionId         String?  @map("subscription_id")
-  periodStart            DateTime @map("period_start") @db.Date
-  caseAnalysisCount      Int      @default(0) @map("case_analysis_count")
-  documentAnalysisCount  Int      @default(0) @map("document_analysis_count")
-  legalAiQueryCount      Int      @default(0) @map("legal_ai_query_count")
-  inputTokens            Int      @default(0) @map("input_tokens")
-  outputTokens           Int      @default(0) @map("output_tokens")
-  updatedAt              DateTime @default(now()) @updatedAt @map("updated_at")
+  id                    String   @id @default(cuid())
+  userId                String   @map("user_id")
+  subscriptionId        String?  @map("subscription_id")
+  periodStart           DateTime @map("period_start") @db.Date
+  caseAnalysisCount     Int      @default(0) @map("case_analysis_count")
+  documentAnalysisCount Int      @default(0) @map("document_analysis_count")
+  legalAiQueryCount     Int      @default(0) @map("legal_ai_query_count")
+  inputTokens           Int      @default(0) @map("input_tokens")
+  outputTokens          Int      @default(0) @map("output_tokens")
+  updatedAt             DateTime @default(now()) @updatedAt @map("updated_at")
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
@@ -1176,27 +1175,27 @@ model EntitlementUsage {
  * Subscription is linked only after verified payment (or reused on renewal).
  */
 model Invoice {
-  id                String               @id @default(cuid())
-  userId            String               @map("user_id")
-  subscriptionId    String?              @map("subscription_id")
-  bookingId         String?              @unique @map("booking_id")
+  id                String                @id @default(cuid())
+  userId            String                @map("user_id")
+  subscriptionId    String?               @map("subscription_id")
+  bookingId         String?               @unique @map("booking_id")
   planCode          SubscriptionPlanCode? @map("plan_code")
-  amountMnt         Int                  @map("amount_mnt")
-  currency          String               @default("MNT")
+  amountMnt         Int                   @map("amount_mnt")
+  currency          String                @default("MNT")
   provider          String
-  providerInvoiceId String?              @unique @map("provider_invoice_id")
+  providerInvoiceId String?               @unique @map("provider_invoice_id")
   status            BillingInvoiceStatus
-  expiresAt         DateTime             @map("expires_at")
-  qrText            String?              @map("qr_text") @db.Text
-  qrImage           String?              @map("qr_image") @db.Text
-  shortUrl          String?              @map("short_url")
-  deeplinksJson     Json?                @map("deeplinks_json")
-  createdAt         DateTime             @default(now()) @map("created_at")
-  updatedAt         DateTime             @updatedAt @map("updated_at")
+  expiresAt         DateTime              @map("expires_at")
+  qrText            String?               @map("qr_text") @db.Text
+  qrImage           String?               @map("qr_image") @db.Text
+  shortUrl          String?               @map("short_url")
+  deeplinksJson     Json?                 @map("deeplinks_json")
+  createdAt         DateTime              @default(now()) @map("created_at")
+  updatedAt         DateTime              @updatedAt @map("updated_at")
 
-  user         User                  @relation(fields: [userId], references: [id], onDelete: Restrict)
-  subscription Subscription?         @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
-  booking      Booking?              @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Restrict)
+  subscription Subscription?        @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  booking      Booking?             @relation(fields: [bookingId], references: [id], onDelete: Restrict)
   payments     PaymentTransaction[]
 
   @@index([userId, status])
@@ -1205,17 +1204,17 @@ model Invoice {
 }
 
 model PaymentTransaction {
-  id                 String               @id @default(cuid())
-  invoiceId          String               @unique @map("invoice_id")
-  provider           String
-  providerPaymentId  String               @unique @map("provider_payment_id")
-  amountMnt          Int                  @map("amount_mnt")
-  currency           String               @default("MNT")
-  status             BillingPaymentStatus
-  paidAt             DateTime?            @map("paid_at")
-  metadataJson       Json?                @map("metadata_json")
-  createdAt          DateTime             @default(now()) @map("created_at")
-  updatedAt          DateTime             @updatedAt @map("updated_at")
+  id                String               @id @default(cuid())
+  invoiceId         String               @unique @map("invoice_id")
+  provider          String
+  providerPaymentId String               @unique @map("provider_payment_id")
+  amountMnt         Int                  @map("amount_mnt")
+  currency          String               @default("MNT")
+  status            BillingPaymentStatus
+  paidAt            DateTime?            @map("paid_at")
+  metadataJson      Json?                @map("metadata_json")
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
 
   invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
 
@@ -1238,9 +1237,13 @@ model LegalSourceArchive {
   sourceType       String   @map("source_type")
   originalUrl      String   @map("original_url")
   fetchedAt        DateTime @map("fetched_at")
-  /** SHA-256 of the exact stored HTTP bytes. Integrity checks use this. */
+  /**
+   * SHA-256 of the exact stored HTTP bytes. Integrity checks use this.
+   */
   sha256           String   @unique
-  /** SHA-256 of canonical legal source bytes (captcha nonce removed). */
+  /**
+   * SHA-256 of canonical legal source bytes (captcha nonce removed).
+   */
   contentSha256    String   @unique @map("content_sha256")
   checksumVerified Boolean  @map("checksum_verified")
   mimeType         String   @map("mime_type")
@@ -1263,13 +1266,12 @@ model LegalSourceArchive {
 /**
  * Structured legal knowledge document linked to a verified archive snapshot.
  * A row must never exist without a verifiable LegalSourceArchive.
- *
  * Uniqueness:
  * - (sourceUrl, contentSha256): same official URL + same canonical legal
- *   content is idempotent.
+ * content is idempotent.
  * - contentSha256: identical canonical legal content creates one knowledge
- *   row even when sourceUrl or raw HTTP bytes (captcha nonce) differ.
- *   The first ingested URL and archive provenance are preserved.
+ * row even when sourceUrl or raw HTTP bytes (captcha nonce) differ.
+ * The first ingested URL and archive provenance are preserved.
  * Historical rows are never overwritten when legal text actually changes;
  * a new contentSha256 inserts a new versioned row.
  */
@@ -1288,9 +1290,13 @@ model LegalKnowledgeDocument {
   contentSha256 String   @map("content_sha256")
   archiveId     String   @map("archive_id")
   version       Int      @default(1)
-  /** ISO date — instrument validity start when known from catalog. */
+  /**
+   * ISO date — instrument validity start when known from catalog.
+   */
   validFrom     String?  @map("valid_from")
-  /** ISO date — end bound when the source supplied one. Null means missing, not in force. */
+  /**
+   * ISO date — end bound when the source supplied one. Null means missing, not in force.
+   */
   validTo       String?  @map("valid_to")
   sourceVersion String?  @map("source_version")
   ingestedAt    DateTime @map("ingested_at")
@@ -1354,10 +1360,13 @@ model CaseFile {
   createdAt         DateTime  @default(now()) @map("created_at")
   updatedAt         DateTime  @updatedAt @map("updated_at")
 
-  owner User @relation("LawyerCaseFiles", fields: [ownerLawyerId], references: [id], onDelete: Restrict)
+  owner           User                @relation("LawyerCaseFiles", fields: [ownerLawyerId], references: [id], onDelete: Restrict)
   facts           CaseFact[]
   evidence        CaseEvidence[]
   aiConversations AIConversation[]
+  aiAnalyses      CaseAiAnalysis[]
+  timelineEntries CaseTimelineEntry[]
+  drafts          CaseDraft[]
 
   @@index([ownerLawyerId, updatedAt(sort: Desc)])
   @@map("case_files")
@@ -1382,31 +1391,51 @@ model CaseFact {
 }
 
 model CaseEvidence {
-  id              String   @id @default(cuid())
-  caseFileId      String   @map("case_file_id")
+  id              String                   @id @default(cuid())
+  caseFileId      String                   @map("case_file_id")
   title           String
-  description     String?  @db.Text
-  evidenceType    String   @map("evidence_type")
+  description     String?                  @db.Text
+  evidenceType    String                   @map("evidence_type")
   /// Nullable until the document-upload milestone. Not an archive/R2 key in this slice.
-  fileReference   String?  @map("file_reference")
-  sourceReference String?  @map("source_reference")
-  createdByUserId String   @map("created_by_user_id")
-  updatedByUserId String   @map("updated_by_user_id")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  fileReference   String?                  @map("file_reference")
+  sourceReference String?                  @map("source_reference")
+  /// Text pulled from fileReference via the shared LegalAiDocumentExtractor/
+  /// OcrEngine stack (same one the Legal AI conversation pipeline uses).
+  /// Empty string until extraction has run.
+  extractedText   String                   @default("") @map("extracted_text") @db.Text
+  /// Null = never processed (no fileReference yet, or extraction not run).
+  extractStatus   AIDocumentExtractStatus? @map("extract_status")
+  pageCount       Int?                     @map("page_count")
+  createdByUserId String                   @map("created_by_user_id")
+  updatedByUserId String                   @map("updated_by_user_id")
+  createdAt       DateTime                 @default(now()) @map("created_at")
+  updatedAt       DateTime                 @updatedAt @map("updated_at")
 
-  caseFile CaseFile           @relation(fields: [caseFileId], references: [id], onDelete: Cascade)
-  links    CaseFactEvidence[]
+  caseFile        CaseFile            @relation(fields: [caseFileId], references: [id], onDelete: Cascade)
+  links           CaseFactEvidence[]
+  timelineEntries CaseTimelineEntry[]
+  citations       CaseAiCitation[]
 
   @@index([caseFileId, createdAt])
+  @@index([caseFileId, extractStatus])
   @@map("case_evidence")
 }
 
+enum CaseFactEvidenceRelation {
+  SUPPORTS
+  CONTRADICTS
+  RELATES_TO
+}
+
 model CaseFactEvidence {
-  caseFactId      String   @map("case_fact_id")
-  caseEvidenceId  String   @map("case_evidence_id")
-  createdByUserId String   @map("created_by_user_id")
-  createdAt       DateTime @default(now()) @map("created_at")
+  caseFactId      String                   @map("case_fact_id")
+  caseEvidenceId  String                   @map("case_evidence_id")
+  /// Default RELATES_TO preserves the meaning of every link created before
+  /// this field existed (a plain, untyped association) — only new/explicit
+  /// user actions may set SUPPORTS/CONTRADICTS.
+  relationType    CaseFactEvidenceRelation @default(RELATES_TO) @map("relation_type")
+  createdByUserId String                   @map("created_by_user_id")
+  createdAt       DateTime                 @default(now()) @map("created_at")
 
   fact     CaseFact     @relation(fields: [caseFactId], references: [id], onDelete: Cascade)
   evidence CaseEvidence @relation(fields: [caseEvidenceId], references: [id], onDelete: Cascade)
@@ -1414,6 +1443,143 @@ model CaseFactEvidence {
   @@id([caseFactId, caseEvidenceId])
   @@index([caseEvidenceId])
   @@map("case_fact_evidence")
+}
+
+/// A run of the LLM-grounded "Case Analysis V1" pipeline (Sprint 13).
+/// Deliberately separate from CaseFile.reviewJson, which is the
+/// deterministic doctrine-engine's own output (src/engine/doctrine/**) —
+/// this is an additive, narrative capability grounded in case documents +
+/// verified legal authorities, never a replacement for the engine's
+/// reproducible rule-based review.
+model CaseAiAnalysis {
+  id              String               @id @default(cuid())
+  caseFileId      String               @map("case_file_id")
+  status          CaseAiAnalysisStatus @default(PENDING)
+  /// Structured CaseAiAnalysisSections (10 Mongolian sections), null until OK.
+  sections        Json?
+  provider        String?
+  model           String?
+  failureReason   String?              @map("failure_reason") @db.Text
+  createdByUserId String               @map("created_by_user_id")
+  createdAt       DateTime             @default(now()) @map("created_at")
+
+  caseFile  CaseFile         @relation(fields: [caseFileId], references: [id], onDelete: Cascade)
+  citations CaseAiCitation[]
+
+  @@index([caseFileId, createdAt(sort: Desc)])
+  @@map("case_ai_analyses")
+}
+
+enum CaseAiAnalysisStatus {
+  PENDING
+  OK
+  FAILED
+}
+
+/// citationType discriminates the UI-critical distinction from Phase 7:
+/// a verified legal authority is never rendered or treated the same as a
+/// user-uploaded case document.
+enum CaseAiCitationType {
+  VERIFIED_LEGAL_SOURCE
+  USER_DOCUMENT
+}
+
+/// Client-safe citation shape, deliberately mirroring LegalAiSafeCitation
+/// (src/application/ai/legal-ai-citation.ts) — never stores archive
+/// hashes, engine tokens, or storage keys, only what the citation panel
+/// may display.
+model CaseAiCitation {
+  id                String             @id @default(cuid())
+  analysisId        String             @map("analysis_id")
+  citationType      CaseAiCitationType @map("citation_type")
+  title             String
+  reference         String?
+  excerpt           String?            @db.Text
+  sourceUrl         String?            @map("source_url")
+  sourceType        String?            @map("source_type")
+  /// Set only for VERIFIED_LEGAL_SOURCE citations.
+  documentId        String?            @map("document_id")
+  documentVersionId String?            @map("document_version_id")
+  nodeId            String?            @map("node_id")
+  /// Set only for USER_DOCUMENT citations — the owning CaseEvidence row.
+  caseEvidenceId    String?            @map("case_evidence_id")
+  createdAt         DateTime           @default(now()) @map("created_at")
+
+  analysis     CaseAiAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  caseEvidence CaseEvidence?  @relation(fields: [caseEvidenceId], references: [id], onDelete: SetNull)
+
+  @@index([analysisId])
+  @@index([caseEvidenceId])
+  @@map("case_ai_citations")
+}
+
+/// Deterministic (non-LLM) date/event extraction over case document text —
+/// see src/application/case-ai/case-timeline-extractor.ts. Regex-based by
+/// design so "never hallucinate a date" is structurally guaranteed, not a
+/// prompting convention.
+model CaseTimelineEntry {
+  id             String                 @id @default(cuid())
+  caseFileId     String                 @map("case_file_id")
+  caseEvidenceId String                 @map("case_evidence_id")
+  /// The literal date text as it appeared in the source (e.g. "2026 оны 3
+  /// сарын 4"), kept even when parsedDate could not be resolved.
+  rawDateText    String                 @map("raw_date_text")
+  /// Null when the raw text could not be parsed into a concrete date —
+  /// the entry is still kept (with LOW/UNCERTAIN confidence), never dropped
+  /// silently and never guessed into a fabricated date.
+  parsedDate     DateTime?              @map("parsed_date")
+  eventText      String                 @map("event_text") @db.Text
+  sourceExcerpt  String                 @map("source_excerpt") @db.Text
+  confidence     CaseTimelineConfidence @map("confidence")
+  createdAt      DateTime               @default(now()) @map("created_at")
+
+  caseFile     CaseFile     @relation(fields: [caseFileId], references: [id], onDelete: Cascade)
+  caseEvidence CaseEvidence @relation(fields: [caseEvidenceId], references: [id], onDelete: Cascade)
+
+  @@index([caseFileId, parsedDate])
+  @@map("case_timeline_entries")
+}
+
+enum CaseTimelineConfidence {
+  HIGH
+  MEDIUM
+  LOW
+  UNCERTAIN
+}
+
+/// Structured draft-generation foundation (Sprint 13 Phase 8). V1 fully
+/// implements LAWYER_POSITION only; the other two enum values exist so the
+/// domain model is complete, but their generators intentionally throw
+/// NotImplementedError rather than producing a shallow/fake draft — see
+/// the milestone's final report.
+model CaseDraft {
+  id              String          @id @default(cuid())
+  caseFileId      String          @map("case_file_id")
+  draftType       CaseDraftType   @map("draft_type")
+  status          CaseDraftStatus @default(PENDING)
+  /// Structured CaseDraftContent (sections + sourceFacts + sourceAuthorities
+  /// + uncertainties), null until OK.
+  content         Json?
+  failureReason   String?         @map("failure_reason") @db.Text
+  createdByUserId String          @map("created_by_user_id")
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  caseFile CaseFile @relation(fields: [caseFileId], references: [id], onDelete: Cascade)
+
+  @@index([caseFileId, createdAt(sort: Desc)])
+  @@map("case_drafts")
+}
+
+enum CaseDraftType {
+  LAWYER_POSITION
+  PROSECUTOR_CONCLUSION_STRUCTURE
+  COURT_QUESTIONS
+}
+
+enum CaseDraftStatus {
+  PENDING
+  OK
+  FAILED
 }
 
 model LegalKnowledgeChunk {
@@ -1430,4 +1596,3 @@ model LegalKnowledgeChunk {
   @@index([documentId, articleNumber])
   @@map("legal_knowledge_chunks")
 }
-

@@ -51,6 +51,19 @@ export type CaseFact = {
   updatedAt: Date;
 };
 
+/** Mirrors AIDocumentExtractStatus (prisma/schema.prisma) — reused, not
+ * redefined, so case evidence and Legal AI conversation documents share
+ * one extraction-status vocabulary. */
+export const CaseEvidenceExtractStatus = {
+  OK: "OK",
+  EMPTY: "EMPTY",
+  FAILED: "FAILED",
+  NEEDS_OCR: "NEEDS_OCR",
+} as const;
+
+export type CaseEvidenceExtractStatus =
+  (typeof CaseEvidenceExtractStatus)[keyof typeof CaseEvidenceExtractStatus];
+
 export type CaseEvidenceRecord = {
   id: string;
   caseFileId: string;
@@ -59,15 +72,34 @@ export type CaseEvidenceRecord = {
   evidenceType: string;
   fileReference: string | null;
   sourceReference: string | null;
+  /** "" until extraction has run (or the evidence type has no file). */
+  extractedText: string;
+  /** null = never processed. */
+  extractStatus: CaseEvidenceExtractStatus | null;
+  pageCount: number | null;
   createdByUserId: string;
   updatedByUserId: string;
   createdAt: Date;
   updatedAt: Date;
 };
 
+/** Evidence relationship foundation (Sprint 13 Phase 10). RELATES_TO is the
+ * default, preserving the meaning of every link created before this field
+ * existed — SUPPORTS/CONTRADICTS is only ever set by an explicit user
+ * action, never auto-assigned by AI. */
+export const CaseFactEvidenceRelation = {
+  SUPPORTS: "SUPPORTS",
+  CONTRADICTS: "CONTRADICTS",
+  RELATES_TO: "RELATES_TO",
+} as const;
+
+export type CaseFactEvidenceRelation =
+  (typeof CaseFactEvidenceRelation)[keyof typeof CaseFactEvidenceRelation];
+
 export type CaseFactEvidenceLink = {
   factId: string;
   evidenceId: string;
+  relationType: CaseFactEvidenceRelation;
   createdByUserId: string;
   createdAt: Date;
 };

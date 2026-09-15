@@ -16,12 +16,14 @@ export async function POST(request: Request) {
       expectedVersion?: number;
       factId?: string;
       evidenceId?: string;
+      relationType?: string;
     };
     const payload = await linkCaseFactEvidenceForLawyer(actor, {
       caseId: body.caseId ?? "",
       expectedVersion: Number(body.expectedVersion),
       factId: body.factId ?? "",
       evidenceId: body.evidenceId ?? "",
+      relationType: body.relationType,
     });
     return NextResponse.json(payload, { status: 201 });
   } catch (error) {

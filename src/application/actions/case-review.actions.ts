@@ -28,6 +28,21 @@ import {
 import { toWorkspacePayload } from "@/application/use-cases/case-review/payload";
 import type { CaseWorkspaceView } from "@/application/use-cases/case-review";
 import { parseEvidenceIds } from "@/application/use-cases/case-review/view-model";
+import {
+  generateCaseAiAnalysisForLawyer,
+  getLatestCaseAiAnalysisForLawyer,
+} from "@/application/use-cases/case-review/case-ai-analysis";
+import {
+  extractCaseTimelineForLawyer,
+  listCaseTimelineForLawyer,
+} from "@/application/use-cases/case-review/case-timeline";
+import {
+  generateCaseDraftForLawyer,
+  listCaseDraftsForLawyer,
+} from "@/application/use-cases/case-review/case-draft";
+import type { CaseAiAnalysisResult } from "@/domain/entities/case-ai-analysis";
+import type { CaseTimelineEntry } from "@/domain/entities/case-timeline";
+import { CaseDraftType, type CaseDraftResult } from "@/domain/entities/case-draft";
 import { EntitlementFeature, UserRole } from "@/domain/enums";
 import { ValidationError } from "@/domain/errors/domain-error";
 import type { CaseReviewWorkspacePayload } from "@/engine/doctrine";
@@ -130,6 +145,88 @@ export async function rerunCaseAnalysisAction(
   }
 }
 
+export type CaseAiAnalysisActionState = ActionState & {
+  analysis?: CaseAiAnalysisResult;
+  caseId?: string;
+};
+
+/**
+ * Sprint 13 Phase 6 — triggers one grounded Case Analysis V1 run for an
+ * owned case. Mirrors rerunCaseAnalysisAction's guard/entitlement pattern;
+ * unlike that action this never touches CaseFile.reviewJson, so it only
+ * needs to revalidate the analyze sub-page, not the whole workspace tree.
+ */
+export async function generateCaseAiAnalysisAction(
+  _prev: CaseAiAnalysisActionState,
+  formData: FormData,
+): Promise<CaseAiAnalysisActionState> {
+  const caseId = String(formData.get("caseId") ?? "");
+  try {
+    const actor = await requireActor(UserRole.LAWYER);
+    await assertEmailVerified(actor.userId);
+    const guard = await guardLawyerAiHttp(actor, EntitlementFeature.CASE_ANALYSIS);
+    const analysis = await generateCaseAiAnalysisForLawyer(actor, caseId);
+    if (analysis.status === "OK") {
+      await recordLawyerFeatureUsage(guard.usageId, EntitlementFeature.CASE_ANALYSIS);
+    }
+    revalidatePath(`${REVIEW_PATH}/analyze`);
+    return { success: analysis.status === "OK", analysis, caseId };
+  } catch (error) {
+    return { ...mapActionError(error), caseId };
+  }
+}
+
+export type CaseTimelineActionState = ActionState & {
+  entries?: CaseTimelineEntry[];
+  caseId?: string;
+};
+
+/** Sprint 13 Phase 9 — (re-)runs the deterministic timeline extractor. No
+ * entitlement guard: this never calls an LLM, so it costs nothing to run. */
+export async function extractCaseTimelineAction(
+  _prev: CaseTimelineActionState,
+  formData: FormData,
+): Promise<CaseTimelineActionState> {
+  const caseId = String(formData.get("caseId") ?? "");
+  try {
+    const actor = await requireActor(UserRole.LAWYER);
+    const entries = await extractCaseTimelineForLawyer(actor, caseId);
+    revalidatePath(`${REVIEW_PATH}/timeline`);
+    return { success: true, entries, caseId };
+  } catch (error) {
+    return { ...mapActionError(error), caseId };
+  }
+}
+
+export type CaseDraftActionState = ActionState & {
+  draft?: CaseDraftResult;
+  caseId?: string;
+};
+
+/** Sprint 13 Phase 8 — Draft Generator V1. Only LAWYER_POSITION is wired
+ * up on the form (see the draft page); any other draftType value still
+ * reaches generateCaseDraftForLawyer's own NotImplementedError guard. */
+export async function generateCaseDraftAction(
+  _prev: CaseDraftActionState,
+  formData: FormData,
+): Promise<CaseDraftActionState> {
+  const caseId = String(formData.get("caseId") ?? "");
+  const draftType = String(formData.get("draftType") ?? CaseDraftType.LAWYER_POSITION);
+  try {
+    const actor = await requireActor(UserRole.LAWYER);
+    await assertEmailVerified(actor.userId);
+    const guard = await guardLawyerAiHttp(actor, EntitlementFeature.CASE_ANALYSIS);
+    const draft = await generateCaseDraftForLawyer(actor, caseId, draftType as CaseDraftType);
+    if (draft.status === "OK") {
+      await recordLawyerFeatureUsage(guard.usageId, EntitlementFeature.CASE_ANALYSIS);
+    }
+    revalidatePath(`${REVIEW_PATH}/draft`);
+    return { success: draft.status === "OK", draft, caseId };
+  } catch (error) {
+    return { ...mapActionError(error), caseId };
+  }
+}
+
 export async function updateCaseTitleAction(
   _prev: CaseReviewActionState,
   formData: FormData,
@@ -170,6 +267,25 @@ export async function loadCaseWorkspaceForPage(
 ): Promise<CaseWorkspaceView> {
   const actor = await requireActor(UserRole.LAWYER);
   return loadCaseWorkspaceForLawyer(actor, caseId);
+}
+
+export async function loadCaseAiAnalysisForPage(
+  caseId: string,
+): Promise<CaseAiAnalysisResult | null> {
+  const actor = await requireActor(UserRole.LAWYER);
+  return getLatestCaseAiAnalysisForLawyer(actor, caseId);
+}
+
+export async function loadCaseTimelineForPage(
+  caseId: string,
+): Promise<CaseTimelineEntry[]> {
+  const actor = await requireActor(UserRole.LAWYER);
+  return listCaseTimelineForLawyer(actor, caseId);
+}
+
+export async function loadCaseDraftsForPage(caseId: string): Promise<CaseDraftResult[]> {
+  const actor = await requireActor(UserRole.LAWYER);
+  return listCaseDraftsForLawyer(actor, caseId);
 }
 
 export async function caseIntakeAction(

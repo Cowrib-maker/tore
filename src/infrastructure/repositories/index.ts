@@ -21,6 +21,9 @@ export {
 } from "./prisma-taxonomy-repository";
 export { emailVerificationTokenRepository } from "./prisma-email-verification-token-repository";
 export { caseFileRepository } from "./prisma-case-file-repository";
+export { caseAiAnalysisRepository } from "./prisma-case-ai-analysis-repository";
+export { caseTimelineRepository } from "./prisma-case-timeline-repository";
+export { caseDraftRepository } from "./prisma-case-draft-repository";
 export { subscriptionRepository } from "./prisma-subscription-repository";
 export { deviceSessionRepository } from "./prisma-device-session-repository";
 export { entitlementUsageRepository } from "./prisma-entitlement-usage-repository";

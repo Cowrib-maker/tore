@@ -3,6 +3,8 @@ import { assertValidCaseEvidenceUpload } from "@/application/ai/case-evidence-up
 import { CaseEvidenceType } from "@/domain/entities/case-file";
 import type { FileStorage } from "@/domain/ports/file-storage";
 import type { CaseReviewWorkspacePayload } from "@/engine/doctrine";
+import type { LegalAiDocumentExtractor } from "@/infrastructure/ai/document-text-extractor";
+import { logCaseAiEvent, withCaseAiLatency } from "@/infrastructure/observability/case-ai-metrics";
 
 import { requireOwnedCaseFile } from "./assert-access";
 import type { CaseFileDeps } from "./deps";
@@ -19,14 +21,18 @@ export type AttachCasePdfInput = {
 
 export type AttachCasePdfDeps = CaseFileDeps & {
   fileStorage: FileStorage;
+  extractor: LegalAiDocumentExtractor;
 };
 
 export function defaultAttachCasePdfDeps(): AttachCasePdfDeps {
   const { getFileStorage } =
     require("@/infrastructure/storage") as typeof import("@/infrastructure/storage");
+  const { getLegalAiDocumentExtractor } =
+    require("@/infrastructure/ai/document-text-extractor") as typeof import("@/infrastructure/ai/document-text-extractor");
   return {
     ...defaultCaseFileDeps(),
     fileStorage: getFileStorage(),
+    extractor: getLegalAiDocumentExtractor(),
   };
 }
 
@@ -48,10 +54,18 @@ const EVIDENCE_LABEL_BY_FORMAT: Record<string, string> = {
 /**
  * Store a case-evidence file (PDF or photo — see
  * case-evidence-upload-validation.ts) on an owned CaseFile using
- * FileStorage. Does not run OCR, OpenAI, or document intelligence — a
- * photo is stored exactly as-is, the same "store, don't analyze"
- * behavior a PDF already had (name kept for backward compatibility with
- * existing call sites/tests; it now covers photos too, not just PDFs).
+ * FileStorage, then run the same LegalAiDocumentExtractor/OcrEngine stack
+ * the Legal AI conversation-document pipeline already uses (Sprint 13
+ * Phase 2) to populate extractedText/extractStatus/pageCount.
+ *
+ * Unlike attachConversationDocumentUseCase, a failed/unreadable extraction
+ * never blocks the upload: case evidence is a record-keeping surface first
+ * (a lawyer may legitimately want to keep a low-quality scan on file even
+ * if nothing can be read from it), so the evidence row is always created —
+ * only extractStatus reflects the outcome. Downstream consumers (case
+ * document retrieval, grounded analysis, timeline) only ever read OK
+ * extracts, exactly like wrapUntrustedDocumentAttachments already treats
+ * non-OK statuses for Legal AI documents.
  */
 export async function attachCasePdfForLawyer(
   actor: ActorContext,
@@ -74,6 +88,31 @@ export async function attachCasePdfForLawyer(
   });
 
   try {
+    const { result: extracted, latencyMs } = await withCaseAiLatency(() =>
+      deps.extractor
+        .extract({ format: validated.format, body: input.body })
+        .catch((error: unknown) => {
+          console.error("[case-evidence] extraction threw, storing without text", {
+            caseId: input.caseId,
+            format: validated.format,
+          });
+          void error;
+          return { status: "FAILED" as const, text: "", pageCount: null };
+        }),
+    );
+    logCaseAiEvent({
+      operation: "documentExtraction",
+      outcome:
+        extracted.status === "OK"
+          ? "ok"
+          : extracted.status === "NEEDS_OCR"
+            ? "needs_ocr"
+            : extracted.status === "EMPTY"
+              ? "empty"
+              : "failed",
+      latencyMs,
+    });
+
     return await createCaseEvidenceForLawyer(
       actor,
       {
@@ -85,6 +124,11 @@ export async function attachCasePdfForLawyer(
           validated.format === "pdf" ? CaseEvidenceType.DOCUMENT : CaseEvidenceType.PHOTO,
         fileReference: stored.key,
         sourceReference: stored.originalFileName || input.fileName,
+        extraction: {
+          extractedText: extracted.status === "OK" ? extracted.text : "",
+          extractStatus: extracted.status,
+          pageCount: extracted.pageCount,
+        },
       },
       deps,
     );

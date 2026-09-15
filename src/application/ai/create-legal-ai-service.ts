@@ -44,7 +44,7 @@ let singleton: LegalAiService | undefined;
  * completion port as before this function existed, so existing behavior
  * is unchanged unless an operator opts in.
  */
-function createCompletion() {
+export function createCompletion() {
   const openAi = new OpenAiLegalAiCompletion(env.OPENAI_API_KEY);
   if (!env.ANTHROPIC_API_KEY) {
     return openAi;
@@ -67,7 +67,7 @@ function createRemoteCorpusRetriever(): LegalCorpusRetriever {
   );
 }
 
-function createCorpusRetriever(): LegalCorpusRetriever {
+export function createCorpusRetriever(): LegalCorpusRetriever {
   const local = new KnowledgeLegalCorpusRetriever(
     createReadOnlyKnowledgeRepository(),
   );

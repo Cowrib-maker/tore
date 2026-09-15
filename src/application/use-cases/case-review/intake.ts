@@ -9,6 +9,7 @@ import type {
 } from "@/domain/entities/case-file";
 import {
   CaseEvidenceType,
+  CaseFactEvidenceRelation,
   CaseFactSourceType,
   EVIDENCE_DESCRIPTION_MAX,
   EVIDENCE_TITLE_MAX,
@@ -251,6 +252,14 @@ export type CreateCaseEvidenceInput = {
   evidenceType: string;
   fileReference?: string | null;
   sourceReference?: string | null;
+  /** Result of running the shared LegalAiDocumentExtractor/OcrEngine stack
+   * against the uploaded file, when one was uploaded. Omitted (not just
+   * empty) for evidence with no extractable file. */
+  extraction?: {
+    extractedText: string;
+    extractStatus: CaseEvidenceRecord["extractStatus"];
+    pageCount: number | null;
+  };
 };
 
 export async function createCaseEvidenceForLawyer(
@@ -269,6 +278,9 @@ export async function createCaseEvidenceForLawyer(
     evidenceType: requireEvidenceType(input.evidenceType),
     fileReference: optionalReference(input.fileReference),
     sourceReference: optionalReference(input.sourceReference),
+    extractedText: input.extraction?.extractedText ?? "",
+    extractStatus: input.extraction?.extractStatus ?? null,
+    pageCount: input.extraction?.pageCount ?? null,
     createdByUserId: actor.userId,
     updatedByUserId: actor.userId,
     createdAt: now,
@@ -382,11 +394,26 @@ export async function deleteCaseEvidenceForLawyer(
   return toWorkspacePayload(updated);
 }
 
+const RELATION_TYPES = new Set<string>(Object.values(CaseFactEvidenceRelation));
+
+function requireRelationType(
+  value: string | null | undefined,
+): CaseFactEvidenceRelation {
+  const trimmed = (value ?? CaseFactEvidenceRelation.RELATES_TO).trim();
+  if (!RELATION_TYPES.has(trimmed)) {
+    throw new ValidationError("Холбооны төрөл буруу байна.");
+  }
+  return trimmed as CaseFactEvidenceRelation;
+}
+
 export type LinkCaseFactEvidenceInput = {
   caseId: string;
   expectedVersion: number;
   factId: string;
   evidenceId: string;
+  /** Defaults to RELATES_TO — SUPPORTS/CONTRADICTS is only ever set by this
+   * explicit call, never inferred or auto-assigned by AI. */
+  relationType?: string | null;
 };
 
 export async function linkCaseFactEvidenceForLawyer(
@@ -402,28 +429,37 @@ export async function linkCaseFactEvidenceForLawyer(
   if (!file.evidence.some((item) => item.id === input.evidenceId)) {
     throw new ValidationError("Үл мэдэгдэх нотлох баримт.");
   }
-  const alreadyLinked = file.factEvidenceLinks.some(
+  const relationType = requireRelationType(input.relationType);
+  const existingLink = file.factEvidenceLinks.find(
     (link) =>
       link.factId === input.factId && link.evidenceId === input.evidenceId,
   );
-  if (alreadyLinked) {
+  if (existingLink && existingLink.relationType === relationType) {
     return toWorkspacePayload(file);
   }
+  const nextLinks = existingLink
+    ? file.factEvidenceLinks.map((link) =>
+        link.factId === input.factId && link.evidenceId === input.evidenceId
+          ? { ...link, relationType }
+          : link,
+      )
+    : [
+        ...file.factEvidenceLinks,
+        {
+          factId: input.factId,
+          evidenceId: input.evidenceId,
+          relationType,
+          createdByUserId: actor.userId,
+          createdAt: new Date(),
+        },
+      ];
   const updated = await persistIntake(
     file,
     input.expectedVersion,
     {
       facts: file.facts,
       evidence: file.evidence,
-      factEvidenceLinks: [
-        ...file.factEvidenceLinks,
-        {
-          factId: input.factId,
-          evidenceId: input.evidenceId,
-          createdByUserId: actor.userId,
-          createdAt: new Date(),
-        },
-      ],
+      factEvidenceLinks: nextLinks,
     },
     deps,
   );

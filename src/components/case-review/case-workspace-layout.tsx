@@ -1,15 +1,24 @@
 import Link from "next/link";
 import {
+  Clock,
   FileText,
   FolderOpen,
   MessageSquare,
   PenLine,
   Search,
+  Sparkles,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-type NavKey = "chat" | "cases" | "documents" | "research" | "drafting";
+type NavKey =
+  | "chat"
+  | "cases"
+  | "documents"
+  | "analyze"
+  | "research"
+  | "drafting"
+  | "timeline";
 
 const NAV: Array<{
   key: NavKey;
@@ -31,19 +40,45 @@ const NAV: Array<{
     label: "Баримт бичиг",
     icon: FileText,
   },
+  {
+    key: "analyze",
+    label: "Хэрэг шинжлэх",
+    icon: Sparkles,
+    placeholder: true,
+  },
   { key: "research", label: "Судалгаа", icon: Search, placeholder: true },
-  { key: "drafting", label: "Боловсруулалт", icon: PenLine, placeholder: true },
+  {
+    key: "drafting",
+    label: "Боловсруулалт",
+    icon: PenLine,
+    placeholder: true,
+  },
+  { key: "timeline", label: "Хугацааны хэлхээс", icon: Clock, placeholder: true },
 ];
 
 export function CaseWorkspaceLayout({
   children,
   active,
   documentsHref = "#case-documents",
+  analyzeHref,
+  draftHref,
+  timelineHref,
 }: {
   children: React.ReactNode;
   active: NavKey;
   documentsHref?: string;
+  /** When set (a case is open), the "Хэрэг шинжлэх" tab becomes a real
+   * link instead of the pre-Sprint-13 "Удахгүй" placeholder. */
+  analyzeHref?: string;
+  draftHref?: string;
+  timelineHref?: string;
 }) {
+  const hrefOverride: Partial<Record<NavKey, string | undefined>> = {
+    documents: documentsHref,
+    analyze: analyzeHref,
+    drafting: draftHref,
+    timeline: timelineHref,
+  };
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
       <aside
@@ -56,17 +91,18 @@ export function CaseWorkspaceLayout({
         <nav className="mt-4 space-y-1" aria-label="Хэргийн ажлын орчин">
           {NAV.map((item) => {
             const Icon = item.icon;
-            const href =
-              item.key === "documents" ? documentsHref : item.href;
+            const resolvedHref = hrefOverride[item.key] ?? item.href;
+            const isPlaceholder = item.placeholder && !resolvedHref;
+            const href = resolvedHref;
             const className = cn(
               "flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition",
               item.key === active
                 ? "bg-white/10 text-white"
                 : "text-white/70 hover:bg-white/8 hover:text-white",
-              item.placeholder && "cursor-default opacity-55 hover:bg-transparent",
+              isPlaceholder && "cursor-default opacity-55 hover:bg-transparent",
             );
 
-            if (item.placeholder || !href) {
+            if (isPlaceholder || !href) {
               return (
                 <div key={item.key} className={className}>
                   <Icon className="size-4 shrink-0" />

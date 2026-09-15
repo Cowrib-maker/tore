@@ -1,8 +1,9 @@
-import type {
-  CaseEvidenceRecord,
-  CaseFact,
-  CaseFactEvidenceLink,
-  CaseFile,
+import {
+  CaseFactEvidenceRelation,
+  type CaseEvidenceRecord,
+  type CaseFact,
+  type CaseFactEvidenceLink,
+  type CaseFile,
 } from "@/domain/entities/case-file";
 import type {
   CaseAnalysisRequest,
@@ -105,6 +106,9 @@ export function intakeFromAnalysisRequest(
         evidenceType: "RECORD",
         fileReference: null,
         sourceReference: item.sourceId,
+        extractedText: "",
+        extractStatus: null,
+        pageCount: null,
         createdByUserId: actorUserId,
         updatedByUserId: actorUserId,
         createdAt: now,
@@ -114,6 +118,7 @@ export function intakeFromAnalysisRequest(
     factEvidenceLinks.push({
       factId: item.factId,
       evidenceId: item.id,
+      relationType: CaseFactEvidenceRelation.RELATES_TO,
       createdByUserId: actorUserId,
       createdAt: now,
     });

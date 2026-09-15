@@ -39,8 +39,14 @@ export default async function LawyerCaseReviewPage({
         </CaseWorkspaceLayout>
       );
     }
+    const caseIdParam = encodeURIComponent(caseId);
     return (
-      <CaseWorkspaceLayout active="cases">
+      <CaseWorkspaceLayout
+        active="cases"
+        analyzeHref={`/lawyer/workspace/case-review/analyze?caseId=${caseIdParam}`}
+        draftHref={`/lawyer/workspace/case-review/draft?caseId=${caseIdParam}`}
+        timelineHref={`/lawyer/workspace/case-review/timeline?caseId=${caseIdParam}`}
+      >
         <p className="mb-5 text-sm text-[#5C6570]">
           <a
             href="/lawyer/workspace"

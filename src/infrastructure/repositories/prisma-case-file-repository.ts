@@ -39,6 +39,7 @@ function mapLinks(row: CaseFileRow): CaseFactEvidenceLink[] {
     fact.links.map((link) => ({
       factId: link.caseFactId,
       evidenceId: link.caseEvidenceId,
+      relationType: link.relationType as CaseFactEvidenceLink["relationType"],
       createdByUserId: link.createdByUserId,
       createdAt: link.createdAt,
     })),
@@ -81,6 +82,10 @@ function mapCaseFile(row: CaseFileRow): CaseFile {
       evidenceType: item.evidenceType,
       fileReference: item.fileReference,
       sourceReference: item.sourceReference,
+      extractedText: item.extractedText,
+      extractStatus:
+        item.extractStatus as CaseEvidenceRecord["extractStatus"],
+      pageCount: item.pageCount,
       createdByUserId: item.createdByUserId,
       updatedByUserId: item.updatedByUserId,
       createdAt: item.createdAt,
@@ -130,6 +135,9 @@ async function replaceIntake(
         evidenceType: item.evidenceType,
         fileReference: item.fileReference,
         sourceReference: item.sourceReference,
+        extractedText: item.extractedText,
+        extractStatus: item.extractStatus ?? undefined,
+        pageCount: item.pageCount,
         createdByUserId: item.createdByUserId,
         updatedByUserId: item.updatedByUserId,
         createdAt: item.createdAt,
@@ -142,6 +150,7 @@ async function replaceIntake(
       data: links.map((link) => ({
         caseFactId: link.factId,
         caseEvidenceId: link.evidenceId,
+        relationType: link.relationType,
         createdByUserId: link.createdByUserId,
         createdAt: link.createdAt,
       })),

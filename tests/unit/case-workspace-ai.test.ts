@@ -265,6 +265,10 @@ function createService(store: LegalAiStore) {
   });
 }
 
+const stubExtractor = {
+  extract: async () => ({ status: "OK" as const, text: "stub extracted text", pageCount: null }),
+};
+
 describe("case workspace AI integration", () => {
   let repository: InMemoryCaseFileRepository;
   let store: ReturnType<typeof createAiStore>;
@@ -432,7 +436,7 @@ describe("case workspace AI integration", () => {
         contentType: "application/pdf",
         body: buildMinimalPdf("contract text"),
       },
-      { ...caseDeps, fileStorage },
+      { ...caseDeps, fileStorage, extractor: stubExtractor },
     );
 
     expect(payload.caseEvidence).toHaveLength(1);
@@ -456,7 +460,7 @@ describe("case workspace AI integration", () => {
           contentType: "application/pdf",
           body: buildMinimalPdf("no"),
         },
-        { ...caseDeps, fileStorage },
+        { ...caseDeps, fileStorage, extractor: stubExtractor },
       ),
     ).rejects.toBeInstanceOf(ForbiddenError);
   });
@@ -483,7 +487,7 @@ describe("case workspace AI integration", () => {
         contentType: "image/jpeg",
         body: jpeg,
       },
-      { ...caseDeps, fileStorage: trackedFileStorage },
+      { ...caseDeps, fileStorage: trackedFileStorage, extractor: stubExtractor },
     );
 
     expect(payload.caseEvidence).toHaveLength(1);

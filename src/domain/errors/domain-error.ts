@@ -98,3 +98,13 @@ export class EmailDeliveryError extends DomainError {
     this.name = "EmailDeliveryError";
   }
 }
+
+/** A recognized enum value with no real implementation yet — e.g. a
+ * CaseDraftType this milestone deliberately did not build a generator for.
+ * Never used to paper over a genuine bug; only for a documented gap. */
+export class NotImplementedError extends DomainError {
+  constructor(message: string) {
+    super(message, "NOT_IMPLEMENTED", 501);
+    this.name = "NotImplementedError";
+  }
+}
