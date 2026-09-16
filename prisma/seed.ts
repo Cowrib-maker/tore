@@ -5,10 +5,22 @@ import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
+import { assertPrismaInvocationIsSafe } from "../scripts/lib/database-url-safety";
+
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
   throw new Error("DATABASE_URL is not set");
 }
+
+// `npm run db:seed` invokes this file directly via tsx, bypassing
+// prisma.config.ts's guard entirely — `import "dotenv/config"` above has
+// the exact same .env-only blind spot that caused the Sprint 14 incident,
+// so this script needs its own check rather than relying on the Prisma CLI
+// chokepoint. Seeding is treated as a `db seed` mutation for this purpose.
+assertPrismaInvocationIsSafe({
+  argv: ["db", "seed"],
+  databaseUrl,
+});
 
 const pool = new Pool({ connectionString: databaseUrl });
 const adapter = new PrismaPg(pool);

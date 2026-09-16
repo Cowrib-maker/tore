@@ -3,6 +3,19 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+import { assertPrismaInvocationIsSafe } from "./scripts/lib/database-url-safety";
+
+// `dotenv/config` above only loads `.env` — never `.env.local` — so this is
+// the one place every `prisma` CLI invocation (migrate/db push/db seed/etc,
+// however it was launched: npm script or raw `npx prisma ...`) resolves its
+// DATABASE_URL. Guarding here, before defineConfig even returns, is what
+// makes it a real chokepoint instead of something an individual npm script
+// could bypass. See scripts/lib/database-url-safety.ts for why this exists.
+assertPrismaInvocationIsSafe({
+  argv: process.argv.slice(2),
+  databaseUrl: process.env["DATABASE_URL"],
+});
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
