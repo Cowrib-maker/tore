@@ -4,6 +4,8 @@ import type { CaseTimelineEntry } from "@/domain/entities/case-timeline";
 import type { CaseFileRepository } from "@/domain/repositories/case-file-repository";
 import type { CaseTimelineRepository } from "@/domain/repositories/case-timeline-repository";
 import { logCaseAiEvent } from "@/infrastructure/observability/case-ai-metrics";
+import { caseFileRepository } from "@/infrastructure/repositories/prisma-case-file-repository";
+import { caseTimelineRepository } from "@/infrastructure/repositories/prisma-case-timeline-repository";
 
 import { requireOwnedCaseFile } from "./assert-access";
 
@@ -12,11 +14,13 @@ export type CaseTimelineDeps = {
   timelineRepository: CaseTimelineRepository;
 };
 
+/**
+ * Concrete static imports, not a runtime `require()` against the
+ * `@/infrastructure/repositories` barrel — see the matching comment in
+ * case-ai-analysis.ts for why that pattern resolved `caseFileRepository`
+ * to `undefined` at runtime.
+ */
 export function defaultCaseTimelineDeps(): CaseTimelineDeps {
-  const {
-    caseFileRepository,
-    caseTimelineRepository,
-  } = require("@/infrastructure/repositories") as typeof import("@/infrastructure/repositories");
   return { caseFileRepository, timelineRepository: caseTimelineRepository };
 }
 

@@ -15,6 +15,8 @@ import type { CaseFileRepository } from "@/domain/repositories/case-file-reposit
 import type { CaseDraftRepository } from "@/domain/repositories/case-draft-repository";
 import { NotImplementedError } from "@/domain/errors/domain-error";
 import { logCaseAiEvent } from "@/infrastructure/observability/case-ai-metrics";
+import { caseFileRepository } from "@/infrastructure/repositories/prisma-case-file-repository";
+import { caseDraftRepository } from "@/infrastructure/repositories/prisma-case-draft-repository";
 
 import { requireOwnedCaseFile } from "./assert-access";
 
@@ -28,11 +30,13 @@ export type CaseDraftDeps = {
   completion: LegalAiCompletionPort;
 };
 
+/**
+ * Concrete static imports, not a runtime `require()` against the
+ * `@/infrastructure/repositories` barrel — see the matching comment in
+ * case-ai-analysis.ts for why that pattern resolved `caseFileRepository`
+ * to `undefined` at runtime.
+ */
 export function defaultCaseDraftDeps(): CaseDraftDeps {
-  const {
-    caseFileRepository,
-    caseDraftRepository,
-  } = require("@/infrastructure/repositories") as typeof import("@/infrastructure/repositories");
   return {
     caseFileRepository,
     draftRepository: caseDraftRepository,

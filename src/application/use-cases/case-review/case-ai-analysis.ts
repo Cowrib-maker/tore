@@ -18,6 +18,8 @@ import type { CaseFileRepository } from "@/domain/repositories/case-file-reposit
 import type { CaseAiAnalysisRepository } from "@/domain/repositories/case-ai-analysis-repository";
 import type { LegalAiCompletionPort } from "@/application/ai/legal-ai.types";
 import { logCaseAiEvent } from "@/infrastructure/observability/case-ai-metrics";
+import { caseFileRepository } from "@/infrastructure/repositories/prisma-case-file-repository";
+import { caseAiAnalysisRepository } from "@/infrastructure/repositories/prisma-case-ai-analysis-repository";
 
 import { requireOwnedCaseFile } from "./assert-access";
 
@@ -31,11 +33,16 @@ export type CaseAiAnalysisDeps = {
   completion: LegalAiCompletionPort;
 };
 
+/**
+ * Concrete static imports, not a runtime `require()` against the
+ * `@/infrastructure/repositories` barrel: that barrel is also reached via
+ * `create-legal-ai-service.ts`'s own static imports above, and a runtime
+ * `require()` re-entering it mid-initialization can hand back a stale/
+ * partial exports snapshot under Turbopack's CJS/ESM interop — confirmed
+ * in browser QA as the cause of `caseFileRepository` resolving to
+ * `undefined` here. Mirrors the working pattern in prod-wiring.ts.
+ */
 export function defaultCaseAiAnalysisDeps(): CaseAiAnalysisDeps {
-  const {
-    caseFileRepository,
-    caseAiAnalysisRepository,
-  } = require("@/infrastructure/repositories") as typeof import("@/infrastructure/repositories");
   return {
     caseFileRepository,
     analysisRepository: caseAiAnalysisRepository,
