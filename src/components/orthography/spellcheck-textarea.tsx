@@ -3,9 +3,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEventHandler, RefObject, ReactNode, UIEvent, MouseEvent } from "react";
 import { Menu } from "@base-ui/react/menu";
+import { ChevronDown } from "lucide-react";
 import type { OrthographySuggestionView } from "@/components/orthography/orthography-checker";
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
+import { shouldShowScrollToBottom } from "@/lib/scroll-position";
 import { cn } from "@/lib/utils";
+
+/** Below this distance (px) from the true bottom, the textarea counts as
+ * "at bottom" — hides the scroll-to-bottom control and matches what a user
+ * would perceive as already caught up. */
+const NEAR_BOTTOM_THRESHOLD_PX = 24;
 
 type Props = {
   value: string;
@@ -113,6 +120,34 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
     if (inputRef) inputRef.current = el;
   }
 
+  // Whether the textarea has scrollable overflow and the user isn't already
+  // near the bottom of it — drives the floating "scroll to bottom" control.
+  // Kept in a ref alongside the state so the scroll handler can skip
+  // setState entirely when the boolean hasn't actually changed, instead of
+  // triggering a re-render on every scroll tick.
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+  const showScrollToBottomRef = useRef(false);
+
+  const checkScrollAffordance = useCallback(() => {
+    const el = localRef.current;
+    if (!el) return;
+    const shouldShow = shouldShowScrollToBottom(el, NEAR_BOTTOM_THRESHOLD_PX);
+    if (shouldShow !== showScrollToBottomRef.current) {
+      showScrollToBottomRef.current = shouldShow;
+      setShowScrollToBottom(shouldShow);
+    }
+  }, []);
+
+  // Re-check after every value change too: typing can grow/shrink content
+  // (and so scrollHeight) without necessarily firing a scroll event.
+  useEffect(() => {
+    checkScrollAffordance();
+  }, [value, checkScrollAffordance]);
+
+  function scrollTextareaToBottom() {
+    localRef.current?.scrollTo({ top: localRef.current.scrollHeight, behavior: "smooth" });
+  }
+
   useEffect(() => setActiveKey(null), [value]);
 
   const closeMenu = useCallback(() => setActiveKey(null), []);
@@ -124,9 +159,11 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
 
   function syncScroll(event: UIEvent<HTMLTextAreaElement>) {
     const mirror = event.currentTarget.parentElement?.querySelector<HTMLDivElement>("[data-spellcheck-mirror]");
-    if (!mirror) return;
-    mirror.scrollTop = event.currentTarget.scrollTop;
-    mirror.scrollLeft = event.currentTarget.scrollLeft;
+    if (mirror) {
+      mirror.scrollTop = event.currentTarget.scrollTop;
+      mirror.scrollLeft = event.currentTarget.scrollLeft;
+    }
+    checkScrollAffordance();
   }
 
   // Left click: the browser has already moved the caret by the time this
@@ -201,7 +238,7 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
           if (el) spanRefs.current.set(index, el);
           else spanRefs.current.delete(index);
         }}
-        className="text-transparent underline decoration-wavy decoration-2 decoration-[#DC2626] underline-offset-[3px]"
+        className="text-transparent underline decoration-wavy decoration-2 decoration-destructive underline-offset-[3px]"
       >
         {value.slice(item.start, item.end)}
       </span>,
@@ -225,7 +262,7 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
           className,
         )}
       >
-        {value ? parts : <span className="text-[#9AA3AD]">{placeholder}</span>}
+        {value ? parts : <span className="text-muted-foreground">{placeholder}</span>}
         {value.endsWith("\n") ? " " : null}
       </div>
 
@@ -253,10 +290,31 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
           // pixels short of the textarea's, so syncScroll's 1:1 assignment
           // clamps short and the underline drifts from the real text near
           // the bottom of a scrolled block.
-          "relative z-10 block min-h-16 w-full resize-none bg-transparent px-3 py-2 text-[15px] leading-6 text-[#0B1F3A] caret-[#0B1F3A] outline-none selection:bg-[#0F3D33]/15",
+          "relative z-10 block min-h-16 w-full resize-none bg-transparent px-3 py-2 text-[15px] leading-6 text-foreground caret-foreground outline-none selection:bg-primary/15",
           className,
         )}
       />
+
+      {showScrollToBottom ? (
+        <button
+          type="button"
+          aria-label="Бичвэрийн төгсгөл рүү гүйлгэх"
+          title="Бичвэрийн төгсгөл рүү гүйлгэх"
+          // Prevents the button from ever taking focus away from the
+          // textarea, so clicking it can never move or lose the cursor —
+          // the textarea's selection is simply never touched.
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={scrollTextareaToBottom}
+          className={cn(
+            "absolute right-2 bottom-2 z-20 inline-flex size-7 items-center justify-center rounded-full",
+            "border border-border bg-popover text-muted-foreground shadow-md",
+            "transition hover:bg-accent hover:text-foreground",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+          )}
+        >
+          <ChevronDown className="size-4" aria-hidden="true" />
+        </button>
+      ) : null}
 
       <Menu.Root
         open={active != null}
@@ -277,30 +335,30 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
             <Menu.Popup
               finalFocus={localRef}
               aria-label={active ? `${active.sourceWord} үгийн санал` : undefined}
-              className="min-w-40 max-w-72 rounded-lg border border-[#0B1F3A]/15 bg-white p-1.5 shadow-xl outline-none"
+              className="min-w-40 max-w-72 rounded-lg border border-border bg-popover p-1.5 shadow-xl outline-none"
             >
               {active ? (
-                <div className="px-1.5 py-1 text-xs font-semibold text-[#991B1B]">{active.sourceWord}</div>
+                <div className="px-1.5 py-1 text-xs font-semibold text-destructive">{active.sourceWord}</div>
               ) : null}
 
               {candidates.length ? (
                 candidates.slice(0, 6).map((word) => (
                   <Menu.Item
                     key={`candidate-${word}`}
-                    className="cursor-default rounded-md px-1.5 py-1.5 text-[13px] font-medium text-[#0F3D33] outline-none data-[highlighted]:bg-[#E5F4EE]"
+                    className="cursor-default rounded-md px-1.5 py-1.5 text-[13px] font-medium text-primary outline-none data-[highlighted]:bg-accent"
                     onClick={() => apply(word)}
                   >
                     {word}
                   </Menu.Item>
                 ))
               ) : (
-                <p className="px-1.5 py-1.5 text-[11px] text-[#66717D]">Энэ үгэнд найдвартай засварын санал одоогоор алга.</p>
+                <p className="px-1.5 py-1.5 text-[11px] text-muted-foreground">Энэ үгэнд найдвартай засварын санал одоогоор алга.</p>
               )}
 
-              <Menu.Separator className="my-1 h-px bg-[#0B1F3A]/10" />
+              <Menu.Separator className="my-1 h-px bg-border" />
 
               <Menu.Item
-                className="cursor-default rounded-md px-1.5 py-1.5 text-[12px] text-[#66717D] outline-none data-[highlighted]:bg-[#0B1F3A]/6"
+                className="cursor-default rounded-md px-1.5 py-1.5 text-[12px] text-muted-foreground outline-none data-[highlighted]:bg-accent"
                 onClick={ignoreActive}
               >
                 Алдаа биш — үл хэрэгсэх

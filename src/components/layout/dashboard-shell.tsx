@@ -4,6 +4,7 @@ import { logoutAction } from "@/application/actions/auth.actions";
 import { BRAND_LOGO_SHELL, BRAND_NAME } from "@/components/brand/tokens";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { BrandLink } from "@/components/layout/brand-link";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { DashboardMobileNav } from "@/components/layout/dashboard-mobile-nav";
 import { DashboardNavLinks } from "@/components/layout/dashboard-nav-links";
 import { buttonVariants } from "@/components/ui/button";
@@ -79,6 +80,7 @@ export function DashboardShell({
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <LanguageSwitcher locale={locale} label={languageLabel} />
+            <ThemeToggle />
             {profileHref ? (
               <Link
                 href={profileHref}

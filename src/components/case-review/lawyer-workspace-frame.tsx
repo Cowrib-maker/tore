@@ -20,6 +20,7 @@ import {
 import { logoutAction } from "@/application/actions/auth.actions";
 import { ToreLogo } from "@/components/brand/tore-logo";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -108,7 +109,7 @@ export function LawyerWorkspaceFrame({
         />
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <div className="flex items-center justify-between gap-3 border-b border-[#0B1F3A]/8 bg-[#F4F2EE] px-4 py-3 lg:hidden">
           <Button
             type="button"
@@ -236,11 +237,14 @@ function WorkspaceSidebar({
       </nav>
 
       <div className="mt-auto space-y-3 pt-6">
-        <div className="px-1">
+        <div className="flex items-center gap-2 px-1">
           <LanguageSwitcher
             locale={locale}
             label={languageLabel}
-            className="w-full justify-start text-[#F7FAF8]"
+            className="min-w-0 flex-1 justify-start text-[#F7FAF8]"
+          />
+          <ThemeToggle
+            buttonClassName="border-white/12 bg-white/8 text-[#F7FAF8] hover:border-white/25 hover:bg-white/14"
           />
         </div>
         <Link

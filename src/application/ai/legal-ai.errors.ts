@@ -1,4 +1,4 @@
-export type LegalAiErrorCode = "AI_NOT_CONFIGURED" | "AI_UNAVAILABLE";
+export type LegalAiErrorCode = "AI_NOT_CONFIGURED" | "AI_UNAVAILABLE" | "AI_ABORTED";
 
 export class LegalAiError extends Error {
   constructor(

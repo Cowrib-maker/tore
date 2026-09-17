@@ -242,19 +242,69 @@ async function resolveExactCitation(input: {
   locator: string | null;
   retriever: LegalCorpusRetriever;
 }): Promise<ResolveLegalAuthoritiesResult> {
-  const { result: retrieved, latencyMs: retrieveExactCitationLatencyMs } =
-    await withLatency(() =>
-      input.retriever.retrieveExactCitation({
+  // Bind to the retriever instance before detaching — this is a method
+  // reference, and calling it as a bare function (as the `combined(...)`
+  // call below does) would otherwise run with `this` undefined.
+  // Bind to the retriever instance before detaching — this is a method
+  // reference, and calling it as a bare function (as the `combined(...)`
+  // call below does) would otherwise run with `this` undefined.
+  const combined = input.retriever.retrieveAndVerifyExactCitation?.bind(
+    input.retriever,
+  );
+
+  let retrieved: LegalCorpusRetrieveResult;
+  let verification: LegalCitationVerifyResult;
+
+  if (combined) {
+    // Single-pass path: retriever can derive both outputs from one lookup
+    // instead of the two independent calls below running the same search
+    // twice (see KnowledgeLegalCorpusRetriever.retrieveAndVerifyExactCitation).
+    const { result, latencyMs } = await withLatency(() =>
+      combined({
         question: input.question,
         query: input.query,
         locator: input.locator,
       }),
     );
-  logRetrieveOutcome(
-    "retrieveExactCitation",
-    retrieved,
-    retrieveExactCitationLatencyMs,
-  );
+    retrieved = result.retrieved;
+    verification = result.verification;
+    logRetrieveOutcome("retrieveExactCitation", retrieved, latencyMs);
+    if (retrieved.kind === "retrieved") {
+      logVerifyOutcome(verification, 0);
+    }
+  } else {
+    const { result, latencyMs: retrieveExactCitationLatencyMs } =
+      await withLatency(() =>
+        input.retriever.retrieveExactCitation({
+          question: input.question,
+          query: input.query,
+          locator: input.locator,
+        }),
+      );
+    retrieved = result;
+    logRetrieveOutcome(
+      "retrieveExactCitation",
+      retrieved,
+      retrieveExactCitationLatencyMs,
+    );
+
+    if (retrieved.kind === "retrieved") {
+      const { result: verifyResult, latencyMs: verifyCitationLatencyMs } =
+        await withLatency(() =>
+          input.retriever.verifyCitation({
+            question: input.question,
+            query: input.query,
+            ...verifyHintFromRetrieved(retrieved.authorities),
+          }),
+        );
+      verification = verifyResult;
+      logVerifyOutcome(verification, verifyCitationLatencyMs);
+    } else {
+      // No verification call needed — retrieval already refused/unavailable;
+      // the shared refusal check below handles this from `retrieved` alone.
+      verification = { ok: false, reason: "not_found" };
+    }
+  }
 
   const retrieveRefusal = retrieveRefusalMessage(retrieved);
   if (retrieveRefusal) {
@@ -271,16 +321,6 @@ async function resolveExactCitation(input: {
       retrievalInvoked: true,
     };
   }
-
-  const { result: verification, latencyMs: verifyCitationLatencyMs } =
-    await withLatency(() =>
-      input.retriever.verifyCitation({
-        question: input.question,
-        query: input.query,
-        ...verifyHintFromRetrieved(retrieved.authorities),
-      }),
-    );
-  logVerifyOutcome(verification, verifyCitationLatencyMs);
 
   if (!verification.ok) {
     return {

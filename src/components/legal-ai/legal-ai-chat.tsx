@@ -11,6 +11,7 @@ import {
 } from "react";
 import Link from "next/link";
 import {
+  ChevronDown,
   FileText,
   Menu,
   Mic,
@@ -24,6 +25,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import { toast } from "sonner";
 
 import { ToreLogo } from "@/components/brand/tore-logo";
@@ -65,6 +67,8 @@ import {
   useOrthographyCheck,
 } from "@/components/orthography/orthography-checker";
 import { SpellcheckTextarea } from "@/components/orthography/spellcheck-textarea";
+import { parseSseStream } from "@/lib/parse-sse-stream";
+import { isNearBottom } from "@/lib/scroll-position";
 import {
   LEGAL_AI_PATH,
   loginHrefForLegalAi,
@@ -99,6 +103,10 @@ type LegalAiChatProps = {
   getStartedLabel: string;
   dashboardLabel: string;
 };
+
+/** Below this distance (px) from the true bottom, the transcript counts as
+ * "at bottom" for auto-follow purposes. */
+const TRANSCRIPT_NEAR_BOTTOM_THRESHOLD_PX = 48;
 
 const QUICK_ACTIONS = [
   {
@@ -186,15 +194,52 @@ export function LegalAiChat({
   const conversationIdRef = useRef(conversationId);
   const abortRef = useRef<AbortController | null>(null);
 
+  // Whether the transcript is scrolled near its bottom — drives whether new
+  // content auto-follows (scrolls down with it) or, if the user has
+  // scrolled up to read earlier messages, is left alone with a "new
+  // response" affordance instead of yanking their scroll position.
+  const isNearBottomRef = useRef(true);
+  const [showJumpToLatest, setShowJumpToLatest] = useState(false);
+  const prevMessageCountRef = useRef(messages.length);
+
   useEffect(() => {
     conversationIdRef.current = conversationId;
   }, [conversationId]);
 
+  const scrollTranscriptToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    const el = transcriptRef.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior });
+    isNearBottomRef.current = true;
+    setShowJumpToLatest(false);
+  }, []);
+
+  const handleTranscriptScroll = useCallback(() => {
+    const el = transcriptRef.current;
+    if (!el) return;
+    const nearBottom = isNearBottom(el, TRANSCRIPT_NEAR_BOTTOM_THRESHOLD_PX);
+    if (nearBottom !== isNearBottomRef.current) {
+      isNearBottomRef.current = nearBottom;
+    }
+    if (nearBottom) {
+      setShowJumpToLatest(false);
+    }
+  }, []);
+
   useEffect(() => {
-    transcriptRef.current?.scrollTo({
-      top: transcriptRef.current.scrollHeight,
-      behavior: "smooth",
-    });
+    const grew = messages.length > prevMessageCountRef.current;
+    prevMessageCountRef.current = messages.length;
+
+    if (isNearBottomRef.current) {
+      transcriptRef.current?.scrollTo({
+        top: transcriptRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    } else if (grew) {
+      // A new message landed while the user was reading further up —
+      // surface it via the floating control instead of forcing their view.
+      setShowJumpToLatest(true);
+    }
   }, [messages, loading]);
 
   useEffect(() => {
@@ -404,6 +449,45 @@ export function LegalAiChat({
 
     const controller = new AbortController();
     abortRef.current = controller;
+    // Set once the streaming assistant placeholder has been appended, so
+    // the catch/finally paths know whether there's a partial bubble to
+    // clean up on error/abort — an incomplete turn must never linger as a
+    // visible (and un-persisted) "successful" message.
+    let streamingMessageAdded = false;
+
+    const removeStreamingPlaceholder = () => {
+      if (!streamingMessageAdded) return;
+      setMessages((current) => current.slice(0, -1));
+      streamingMessageAdded = false;
+    };
+
+    const appendStreamingDelta = (delta: string) => {
+      if (!streamingMessageAdded) {
+        streamingMessageAdded = true;
+        setMessages((current) => [...current, { role: "ASSISTANT", content: delta }]);
+        return;
+      }
+      setMessages((current) => {
+        const next = current.slice();
+        const last = next[next.length - 1];
+        if (!last || last.role !== "ASSISTANT") return current;
+        next[next.length - 1] = { ...last, content: last.content + delta };
+        return next;
+      });
+    };
+
+    const finalizeStreamingMessage = (finalMessage: Message) => {
+      if (streamingMessageAdded) {
+        setMessages((current) => {
+          const next = current.slice();
+          next[next.length - 1] = finalMessage;
+          return next;
+        });
+      } else {
+        setMessages((current) => [...current, finalMessage]);
+      }
+      streamingMessageAdded = false;
+    };
 
     try {
       const response = await fetch("/api/ai/chat", {
@@ -419,53 +503,69 @@ export function LegalAiChat({
         signal: controller.signal,
       });
 
-      const data = (await response.json()) as {
-        error?: string;
-        code?: string;
-        conversationId?: string;
-        message?: { content?: string; citations?: unknown };
-      };
+      const contentType = response.headers.get("content-type") ?? "";
+      if (!contentType.includes("text/event-stream")) {
+        // Every non-streaming response is a pre-LLM failure (auth/billing/
+        // rate-limit/validation) — same JSON contract as before streaming
+        // existed, handled exactly the same way.
+        const data = (await response.json()) as {
+          error?: string;
+          code?: string;
+          conversationId?: string;
+          message?: { content?: string; citations?: unknown };
+        };
 
-      const interpreted = interpretLegalAiChatAccess({
-        status: response.status,
-        body: data,
-        question: text,
-      });
+        const interpreted = interpretLegalAiChatAccess({
+          status: response.status,
+          body: data,
+          question: text,
+        });
 
-      if (interpreted.type === "auth") {
-        setAccessGate(interpreted.gate);
-        setMessage(text);
+        if (interpreted.type === "auth" || interpreted.type === "billing") {
+          setAccessGate(interpreted.gate);
+          setMessage(text);
+          return;
+        }
+        if (interpreted.type === "error") {
+          throw new Error(interpreted.message);
+        }
         return;
       }
 
-      if (interpreted.type === "billing") {
-        setAccessGate(interpreted.gate);
-        setMessage(text);
-        return;
+      if (!response.body) {
+        throw new Error("empty stream body");
       }
 
-      if (interpreted.type === "error") {
-        throw new Error(interpreted.message);
+      for await (const frame of parseSseStream(response.body)) {
+        if (frame.event === "delta") {
+          const { text: delta } = frame.data as { text: string };
+          if (delta) appendStreamingDelta(delta);
+        } else if (frame.event === "done") {
+          const payload = frame.data as {
+            conversationId?: string;
+            message?: { id?: string; content?: string; citations?: unknown };
+          };
+          setConversationId(payload.conversationId);
+          conversationIdRef.current = payload.conversationId;
+          finalizeStreamingMessage({
+            role: "ASSISTANT",
+            content: payload.message?.content ?? "",
+            citations: parseSafeCitationsFromUnknown(payload.message?.citations),
+          });
+          // The composer's attachment strip is a "what I'm about to send"
+          // tray, not a running list of everything ever attached to this
+          // conversation — clear it once the turn lands (resumed turns
+          // included). The document itself stays attached server-side (its
+          // extracted text keeps being re-injected on every later turn);
+          // only the composer chip goes away.
+          setAttachedDocuments([]);
+        } else if (frame.event === "error") {
+          removeStreamingPlaceholder();
+          throw new Error("stream error");
+        }
       }
-
-      setConversationId(data.conversationId);
-      conversationIdRef.current = data.conversationId;
-      setMessages((current) => [
-        ...current,
-        {
-          role: "ASSISTANT",
-          content: data.message?.content ?? "",
-          citations: parseSafeCitationsFromUnknown(data.message?.citations),
-        },
-      ]);
-      // The composer's attachment strip is a "what I'm about to send" tray,
-      // not a running list of everything ever attached to this conversation
-      // — clear it once the turn lands (resumed turns included). The
-      // document itself stays attached server-side (its extracted text
-      // keeps being re-injected on every later turn); only the composer
-      // chip goes away.
-      setAttachedDocuments([]);
     } catch (err) {
+      removeStreamingPlaceholder();
       if (err instanceof DOMException && err.name === "AbortError") {
         // Cancelled by the user via the Stop button — no error to show.
       } else {
@@ -505,11 +605,11 @@ export function LegalAiChat({
       className={cn(
         isEmpty
           ? "mt-5 w-full"
-          : "border-t border-[#0B1F3A]/8 bg-white px-3 py-3 sm:px-6 sm:py-4",
+          : "border-t border-ai-border bg-ai-surface px-3 py-3 sm:px-6 sm:py-4",
       )}
     >
       <div className={cn(isEmpty ? "w-full" : "mx-auto w-full max-w-3xl")}>
-        <div className="rounded-2xl border border-[#D9DEE5] bg-[#F8FAFC] p-2 shadow-[0_12px_32px_-24px_rgba(11,31,58,0.45)] focus-within:border-[#0B1F3A]/35">
+        <div className="rounded-2xl border border-ai-border-strong bg-ai-surface-muted p-2 shadow-[0_12px_32px_-24px_rgba(11,31,58,0.45)] focus-within:border-ai-accent/35">
           {attachedDocuments.length || uploading ? (
             <ul className="mb-2 flex max-h-24 flex-wrap gap-2 overflow-y-auto px-0.5 pt-0.5">
               {attachedDocuments.map((document) => {
@@ -517,19 +617,19 @@ export function LegalAiChat({
                 return (
                   <li
                     key={document.id}
-                    className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-white py-1 pr-1.5 pl-2.5 text-xs text-[#3F4852]"
+                    className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-ai-border bg-ai-surface py-1 pr-1.5 pl-2.5 text-xs text-ai-text"
                   >
                     <Paperclip className="size-3.5 shrink-0" />
                     <span className="truncate">{document.fileName}</span>
                     {hint ? (
-                      <span className="shrink-0 text-[10px] text-amber-700">
+                      <span className="shrink-0 text-[10px] text-amber-700 dark:text-amber-500">
                         {hint}
                       </span>
                     ) : null}
                     <button
                       type="button"
                       aria-label={`${document.fileName} хасах`}
-                      className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[#66717D] hover:bg-[#0B1F3A]/8 hover:text-[#0B1F3A]"
+                      className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-ai-text-subtle hover:bg-ai-accent/8 hover:text-ai-accent"
                       onClick={() => removeAttachedDocument(document.id)}
                     >
                       <X className="size-3" />
@@ -538,7 +638,7 @@ export function LegalAiChat({
                 );
               })}
               {uploading ? (
-                <li className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-white py-1 pr-2.5 pl-2.5 text-xs text-[#3F4852]">
+                <li className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-ai-border bg-ai-surface py-1 pr-2.5 pl-2.5 text-xs text-ai-text">
                   <Paperclip className="size-3.5 shrink-0" />
                   <span>Файл хавсаргаж байна...</span>
                 </li>
@@ -558,7 +658,7 @@ export function LegalAiChat({
             }}
             placeholder="Асуудлаа өөрийнхөөрөө бичээрэй. Хуулийн нэр томъёо мэдэх шаардлагагүй."
             rows={1}
-            className="min-h-12 w-full text-sm text-[#0A0F14]"
+            className="min-h-12 w-full text-sm text-ai-text"
             disabled={loading || uploading}
           />
           <div className="flex items-center justify-between gap-2 px-1 pb-1">
@@ -597,7 +697,7 @@ export function LegalAiChat({
                 type="button"
                 size="sm"
                 onClick={stopGeneration}
-                className="gap-1.5 bg-[#0B1F3A] text-white hover:bg-[#173A66]"
+                className="gap-1.5 bg-ai-accent text-ai-accent-foreground hover:opacity-90"
               >
                 <Square className="size-3 fill-current" />
                 Зогсоох
@@ -607,7 +707,7 @@ export function LegalAiChat({
                 type="submit"
                 size="sm"
                 disabled={!message.trim() || uploading}
-                className="gap-1.5 bg-[#0B1F3A] text-white hover:bg-[#173A66]"
+                className="gap-1.5 bg-ai-accent text-ai-accent-foreground hover:opacity-90"
               >
                 <Send className="size-3.5" />
                 Илгээх
@@ -636,7 +736,7 @@ export function LegalAiChat({
   );
 
   return (
-    <div className="flex h-svh min-h-0 flex-1 overflow-hidden bg-[#FAF9F7] text-[#0A0F14]">
+    <div className="flex h-svh min-h-0 flex-1 overflow-hidden bg-ai-canvas text-ai-text">
       <aside className="hidden w-[17.5rem] shrink-0 lg:flex">{sidebar}</aside>
 
       <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
@@ -652,8 +752,8 @@ export function LegalAiChat({
         </SheetContent>
       </Sheet>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[#0B1F3A]/8 bg-white/90 px-3 backdrop-blur-sm sm:px-5">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-ai-border bg-ai-surface/90 px-3 backdrop-blur-sm sm:px-5">
           <div className="flex min-w-0 items-center gap-2">
             <Button
               type="button"
@@ -666,10 +766,10 @@ export function LegalAiChat({
               <Menu className="size-4" />
             </Button>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold tracking-[0.16em] text-[#8A6B2A]">
+              <p className="text-[11px] font-semibold tracking-[0.16em] text-ai-gold">
                 TORE Chat
               </p>
-              <p className="truncate text-sm font-medium text-[#0A0F14]">
+              <p className="truncate text-sm font-medium text-ai-text">
                 Таны асуудлыг ойлгож, хуульд тулгуурлан дараагийн алхмыг
                 тодорхойлоход тусална.
               </p>
@@ -687,7 +787,7 @@ export function LegalAiChat({
               <>
                 <Link
                   href={loginHrefForLegalAi()}
-                  className="hidden cursor-pointer text-[#5C6570] hover:text-[#0B1F3A] sm:inline"
+                  className="hidden cursor-pointer text-ai-text-muted hover:text-ai-accent sm:inline"
                 >
                   {signInLabel}
                 </Link>
@@ -713,14 +813,14 @@ export function LegalAiChat({
               />
               <LegalAiEntitlementBanner />
               {initialQuestion.trim() && !accessGate ? (
-                <p className="mt-4 text-sm text-[#5C6570]">
+                <p className="mt-4 text-sm text-ai-text-muted">
                   Асуултаа илгээхийн тулд Илгээх дарна уу. Автоматаар илгээгдэхгүй.
                 </p>
               ) : null}
               {error ? (
                 <div
                   role="alert"
-                  className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                  className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300"
                 >
                   {error}
                 </div>
@@ -736,38 +836,59 @@ export function LegalAiChat({
           </div>
         ) : (
           <>
-            <div
-              ref={transcriptRef}
-              className="min-h-0 flex-1 overflow-y-auto"
-            >
-              <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-8 sm:px-6">
-                {messages.map((item, index) => (
-                  <MessageBubble key={`${item.role}-${index}`} message={item} />
-                ))}
-                {loading ? (
-                  <div className="flex items-start gap-3">
-                    <WorkspaceMark />
-                    <div className="rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-white px-4 py-3 text-sm text-[#66717D] shadow-[0_8px_24px_-16px_rgba(11,31,58,0.35)]">
-                      {thinkingStageLabel}
+            <div className="relative min-h-0 flex-1">
+              <div
+                ref={transcriptRef}
+                onScroll={handleTranscriptScroll}
+                className="h-full overflow-y-auto"
+              >
+                <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-8 sm:px-6">
+                  {messages.map((item, index) => (
+                    <MessageBubble key={`${item.role}-${index}`} message={item} />
+                  ))}
+                  {loading && messages[messages.length - 1]?.role !== "ASSISTANT" ? (
+                    <div className="flex items-start gap-3">
+                      <WorkspaceMark />
+                      <div className="rounded-2xl rounded-tl-md border border-ai-border bg-ai-surface px-4 py-3 text-sm text-ai-text-subtle shadow-[0_8px_24px_-16px_rgba(11,31,58,0.35)]">
+                        {thinkingStageLabel}
+                      </div>
                     </div>
-                  </div>
-                ) : null}
-                {error ? (
-                  <div
-                    role="alert"
-                    className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-                  >
-                    {error}
-                  </div>
-                ) : null}
-                <LegalAiEntitlementBanner />
-                {accessGate ? (
-                  <LegalAiAccessGateCard
-                    gate={accessGate}
-                    onPaid={resumeAfterAccessGate}
-                  />
-                ) : null}
+                  ) : null}
+                  {error ? (
+                    <div
+                      role="alert"
+                      className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300"
+                    >
+                      {error}
+                    </div>
+                  ) : null}
+                  <LegalAiEntitlementBanner />
+                  {accessGate ? (
+                    <LegalAiAccessGateCard
+                      gate={accessGate}
+                      onPaid={resumeAfterAccessGate}
+                    />
+                  ) : null}
+                </div>
               </div>
+
+              {showJumpToLatest ? (
+                <button
+                  type="button"
+                  aria-label="Шинэ хариулт руу гүйлгэх"
+                  title="Шинэ хариулт"
+                  onClick={() => scrollTranscriptToBottom()}
+                  className={cn(
+                    "absolute bottom-3 left-1/2 z-20 -translate-x-1/2",
+                    "inline-flex items-center gap-1.5 rounded-full border border-ai-border-strong bg-ai-surface px-3.5 py-1.5 text-xs font-medium text-ai-accent shadow-lg",
+                    "transition hover:bg-ai-surface-muted",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-accent/40",
+                  )}
+                >
+                  <ChevronDown className="size-3.5" aria-hidden="true" />
+                  Шинэ хариулт
+                </button>
+              ) : null}
             </div>
             {composer}
           </>
@@ -820,7 +941,7 @@ function LegalAiSidebar({
         </nav>
 
         <div className="mt-auto rounded-xl border border-white/10 bg-white/5 px-3 py-3">
-          <p className="text-[11px] font-semibold tracking-[0.14em] text-[#C8A45D]">
+          <p className="text-[11px] font-semibold tracking-[0.14em] text-gold">
             LEGAL. AI. CONNECTED.
           </p>
           <p className="mt-1.5 text-xs leading-5 text-white/65">
@@ -866,19 +987,20 @@ function EmptyWorkspace({
 }: {
   onQuickAction: (prompt: string) => void;
 }) {
+  const tone = useLogoTone();
   return (
     <div className="w-full">
       <div className="text-center">
-        <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-[#0B1F3A]/8 bg-white shadow-[0_12px_32px_-18px_rgba(11,31,58,0.4)]">
-          <ToreLogo variant="mark" tone="on-light" markClassName="size-8" />
+        <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-ai-border bg-ai-surface shadow-[0_12px_32px_-18px_rgba(11,31,58,0.4)]">
+          <ToreLogo variant="mark" tone={tone} markClassName="size-8" />
         </div>
-        <p className="mt-6 text-[11px] font-semibold tracking-[0.18em] text-[#8A6B2A]">
+        <p className="mt-6 text-[11px] font-semibold tracking-[0.18em] text-ai-gold">
           TORE Chat
         </p>
-        <h1 className="mt-2 text-[1.75rem] font-semibold leading-[1.2] tracking-[-0.03em] text-[#0A0F14] sm:text-[2rem]">
+        <h1 className="mt-2 text-[1.75rem] font-semibold leading-[1.2] tracking-[-0.03em] text-ai-text sm:text-[2rem]">
           Танд юу тохиолдсон бэ?
         </h1>
-        <p className="mx-auto mt-3 max-w-lg text-[15px] leading-[1.6] text-[#5C6570]">
+        <p className="mx-auto mt-3 max-w-lg text-[15px] leading-[1.6] text-ai-text-muted">
           Таны асуудлыг ойлгож, хуульд тулгуурлан дараагийн алхмыг тодорхойлоход
           тусална.
         </p>
@@ -890,9 +1012,9 @@ function EmptyWorkspace({
             key={action.id}
             type="button"
             onClick={() => onQuickAction(action.prompt)}
-            className="flex items-start gap-3 rounded-2xl border border-[#0B1F3A]/10 bg-white px-4 py-3.5 text-left text-sm text-[#3F4852] shadow-[0_10px_24px_-20px_rgba(11,31,58,0.45)] transition hover:border-[#0B1F3A]/25 hover:bg-[#F8FAFC]"
+            className="flex items-start gap-3 rounded-2xl border border-ai-border-strong bg-ai-surface px-4 py-3.5 text-left text-sm text-ai-text shadow-[0_10px_24px_-20px_rgba(11,31,58,0.45)] transition hover:border-ai-accent/25 hover:bg-ai-surface-muted"
           >
-            <action.icon className="mt-0.5 size-4 shrink-0 text-[#0B1F3A]" />
+            <action.icon className="mt-0.5 size-4 shrink-0 text-ai-accent" />
             <span className="font-medium leading-5">{action.label}</span>
           </button>
         ))}
@@ -905,7 +1027,7 @@ function MessageBubble({ message }: { message: Message }) {
   if (message.role === "USER") {
     return (
       <div className="flex justify-end">
-        <div className="max-w-[85%] rounded-2xl rounded-br-md bg-[#0B1F3A] px-4 py-3 text-sm leading-6 whitespace-pre-wrap text-white">
+        <div className="max-w-[85%] rounded-2xl rounded-br-md bg-ai-accent px-4 py-3 text-sm leading-6 whitespace-pre-wrap text-ai-accent-foreground">
           {message.content}
         </div>
       </div>
@@ -915,8 +1037,8 @@ function MessageBubble({ message }: { message: Message }) {
   return (
     <div className="flex items-start gap-3">
       <WorkspaceMark />
-      <div className="max-w-[85%] rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-white px-4 py-4 text-sm leading-6 whitespace-pre-wrap text-[#3F4852] shadow-[0_10px_28px_-20px_rgba(11,31,58,0.4)]">
-        <p className="mb-2 text-[11px] font-semibold tracking-[0.12em] text-[#8A6B2A]">
+      <div className="max-w-[85%] rounded-2xl rounded-tl-md border border-ai-border bg-ai-surface px-4 py-4 text-sm leading-6 whitespace-pre-wrap text-ai-text shadow-[0_10px_28px_-20px_rgba(11,31,58,0.4)]">
+        <p className="mb-2 text-[11px] font-semibold tracking-[0.12em] text-ai-gold">
           TORE-ийн дүгнэлт
         </p>
         {message.content}
@@ -926,10 +1048,20 @@ function MessageBubble({ message }: { message: Message }) {
   );
 }
 
+/** Tracks resolved theme for logo tone only — defaults to "on-light" until
+ * mounted so this never disagrees with the server-rendered markup. */
+function useLogoTone(): "on-light" | "on-dark" {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  return mounted && resolvedTheme === "dark" ? "on-dark" : "on-light";
+}
+
 function WorkspaceMark() {
+  const tone = useLogoTone();
   return (
-    <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl border border-[#0B1F3A]/8 bg-white">
-      <ToreLogo variant="mark" tone="on-light" markClassName="size-5" />
+    <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl border border-ai-border bg-ai-surface">
+      <ToreLogo variant="mark" tone={tone} markClassName="size-5" />
     </div>
   );
 }
@@ -953,8 +1085,9 @@ function ComposerIconButton({
       aria-pressed={pressed}
       onClick={onClick}
       className={cn(
-        "inline-flex size-9 items-center justify-center rounded-lg text-[#5C6570] transition hover:bg-[#0B1F3A]/8 hover:text-[#0B1F3A]",
-        pressed && "bg-[#0B1F3A]/10 text-[#0B1F3A]",
+        "inline-flex size-9 items-center justify-center rounded-lg text-ai-text-muted transition hover:bg-ai-accent/8 hover:text-ai-accent",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ai-accent/40",
+        pressed && "bg-ai-accent/10 text-ai-accent",
       )}
     >
       {children}

@@ -260,6 +260,12 @@ export interface IKnowledgeChunker {
 export interface IKnowledgeRepository {
   save(document: StoredKnowledgeDocument): Promise<StoredKnowledgeDocument>;
   findById(id: string): Promise<StoredKnowledgeDocument | null>;
+  /**
+   * Batched form of {@link findById}. Order of the result is NOT guaranteed
+   * to match `ids`; callers that need positional order must re-map by id.
+   * Missing ids are simply absent from the result (never null placeholders).
+   */
+  findByIds(ids: readonly string[]): Promise<StoredKnowledgeDocument[]>;
   findBySourceUrl(sourceUrl: string): Promise<StoredKnowledgeDocument | null>;
   /**
    * Every stored snapshot for an official URL.

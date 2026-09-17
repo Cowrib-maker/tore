@@ -5,7 +5,10 @@ import type {
   LegalCorpusRetrieveResult,
   LegalCorpusVerifyInput,
 } from "@/application/ai/legal-corpus";
-import { LegalCorpusSource } from "@/application/ai/legal-corpus";
+import {
+  LegalCorpusSource,
+  verifyHintFromRetrieved,
+} from "@/application/ai/legal-corpus";
 
 function hasRetrievedAuthorities(
   result: LegalCorpusRetrieveResult,
@@ -92,5 +95,60 @@ export class FallbackLegalCorpusRetriever implements LegalCorpusRetriever {
       return local;
     }
     return this.remote.verifyCitation(input);
+  }
+
+  /**
+   * Single-pass retrieve+verify when the wrapped local retriever supports
+   * it (see LegalCorpusRetriever.retrieveAndVerifyExactCitation). Falls
+   * back to the ordinary two-call sequence — each already local-then-remote
+   * aware — when it does not, so behavior for any retriever without the
+   * optimization is completely unchanged.
+   */
+  async retrieveAndVerifyExactCitation(input: LegalCorpusRetrieveInput): Promise<{
+    retrieved: LegalCorpusRetrieveResult;
+    verification: LegalCitationVerifyResult;
+  }> {
+    if (!this.local.retrieveAndVerifyExactCitation) {
+      const retrieved = await this.retrieveExactCitation(input);
+      const verification = await this.verifyCitation({
+        query: input.query,
+        question: input.question,
+        explicitRelations: input.explicitRelations,
+        ...verifyHintFromRetrieved(
+          retrieved.kind === "retrieved" ? retrieved.authorities : [],
+        ),
+      });
+      return { retrieved, verification };
+    }
+
+    const local = await this.local.retrieveAndVerifyExactCitation(input);
+    if (local.retrieved.kind === "as_of_unavailable") {
+      return local;
+    }
+    if (hasRetrievedAuthorities(local.retrieved)) {
+      return {
+        retrieved: withSource(
+          local.retrieved,
+          LegalCorpusSource.FALLBACK_LOCAL_CORPUS,
+        ),
+        verification: local.verification,
+      };
+    }
+
+    // Local missed — fall through to remote for both steps, matching the
+    // existing local-then-remote behavior of the separate calls above.
+    const remoteRetrieved = await this.remote.retrieveExactCitation(input);
+    const remoteVerification = await this.remote.verifyCitation({
+      query: input.query,
+      question: input.question,
+      explicitRelations: input.explicitRelations,
+      ...verifyHintFromRetrieved(
+        remoteRetrieved.kind === "retrieved" ? remoteRetrieved.authorities : [],
+      ),
+    });
+    return {
+      retrieved: withSource(remoteRetrieved, LegalCorpusSource.LEGAL_DATA_ENGINE),
+      verification: remoteVerification,
+    };
   }
 }

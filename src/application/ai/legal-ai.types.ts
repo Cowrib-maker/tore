@@ -50,6 +50,13 @@ export type LegalAiCreateTurnInput = {
    * {@link actorRole}. Kept so old clients sending `mode` do not fail JSON parse.
    */
   mode?: LegalAiMode;
+  /** Forwarded to the completion port's `onDelta` for real token streaming.
+   * Omitting it keeps createTurn's fully non-streaming behavior unchanged. */
+  onDelta?: (delta: string) => void;
+  /** Forwarded to the completion port so an aborted HTTP request (client
+   * disconnect, Stop button) cancels the underlying provider call instead
+   * of letting it run to completion unobserved. */
+  signal?: AbortSignal;
 };
 
 export type LegalAiCreateTurnResult = {
@@ -193,13 +200,28 @@ export type LegalAiCompletionResult = {
   outputTokens: number;
 };
 
+export type LegalAiCompletionInput = {
+  systemPrompt: string;
+  messages: Array<{
+    role: "user" | "assistant" | "system";
+    content: string;
+  }>;
+  /**
+   * When provided, the port streams incremental text chunks as they arrive
+   * from the provider instead of only resolving once at the end. The
+   * resolved LegalAiCompletionResult is unchanged either way — `content` is
+   * always the full accumulated text, so every existing caller that omits
+   * this keeps working exactly as before (fully non-streaming).
+   */
+  onDelta?: (delta: string) => void;
+  /** Lets the caller cancel an in-flight request (client disconnect, stop
+   * button). Providers must abort their underlying HTTP call, not just stop
+   * reading it, so a cancelled request doesn't keep billing/consuming
+   * provider-side resources after the caller has moved on. */
+  signal?: AbortSignal;
+};
+
 export type LegalAiCompletionPort = {
   isConfigured(): boolean;
-  complete(input: {
-    systemPrompt: string;
-    messages: Array<{
-      role: "user" | "assistant" | "system";
-      content: string;
-    }>;
-  }): Promise<LegalAiCompletionResult>;
+  complete(input: LegalAiCompletionInput): Promise<LegalAiCompletionResult>;
 };

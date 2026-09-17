@@ -5,6 +5,7 @@ import {
   missingSourceUserMessage,
   resolveLegalAuthorities,
 } from "@/application/ai/resolve-legal-authorities";
+import { FallbackLegalCorpusRetriever } from "@/application/ai/fallback-legal-corpus-retriever";
 import {
   LegalCorpusSource,
   type LegalCitationVerifyResult,
@@ -126,6 +127,63 @@ describe("resolveLegalAuthorities — exact citation grounding", () => {
     );
 
     logSpy.mockRestore();
+  });
+
+  it("resolves an exact citation through a retriever whose optional retrieveAndVerifyExactCitation relies on `this` (regression: detached-call `this` loss)", async () => {
+    // Reproduces the real production shape: createCorpusRetriever() always
+    // wraps the local/remote retrievers in FallbackLegalCorpusRetriever,
+    // whose retrieveAndVerifyExactCitation reads `this.local`/`this.remote`.
+    // resolveExactCitation() previously extracted that method as a bare
+    // reference (`const combined = input.retriever.retrieveAndVerifyExactCitation`)
+    // and invoked it detached (`combined(...)`), which runs with `this`
+    // undefined and throws `Cannot read properties of undefined (reading
+    // 'local')` before ever reaching local/remote lookup. A hand-written
+    // StubRetriever without that optional method (as used elsewhere in this
+    // file) can never exercise this path, since `combined` is simply
+    // undefined for it — only a real FallbackLegalCorpusRetriever instance
+    // reproduces the failure.
+    const local = new StubRetriever(
+      {
+        kind: "retrieved",
+        status: "ok",
+        authorities: [authority],
+        retrievedAt: "2026-08-17T00:00:00.000Z",
+      },
+      {
+        ok: true,
+        verdict: {
+          query: "17.1",
+          status: "VALID",
+          nodeId: "node-1",
+          documentVersionId: "ver-1",
+          locator: "art-17/p-1",
+          reasons: ["citation_unique"],
+        },
+      },
+    );
+    const remote = new StubRetriever({
+      kind: "unavailable",
+      reason: "not_found",
+      authorities: [],
+      retrievedAt: null,
+    });
+    const retriever = new FallbackLegalCorpusRetriever(local, remote);
+
+    const result = await resolveLegalAuthorities({
+      question: EXACT_CITATION_QUESTION,
+      retriever,
+      requireRetrieval: true,
+    });
+
+    expect(result.kind).toBe("verified");
+    if (result.kind === "verified") {
+      expect(result.source).toBe("exact");
+      expect(result.authorities).toHaveLength(1);
+      expect(result.authorities[0]?.nodeId).toBe("node-1");
+    }
+    expect(local.retrieveExactCitationCalls).toBe(1);
+    expect(local.verifyCitationCalls).toBe(1);
+    expect(remote.retrieveExactCitationCalls).toBe(0);
   });
 
   it("refuses on CONFLICT without inventing which source applies", async () => {

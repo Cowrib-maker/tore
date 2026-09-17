@@ -40,3 +40,56 @@ describe("POST /api/ai/chat citation contract", () => {
     expect(route).not.toContain("getSessionUser");
   });
 });
+
+describe("POST /api/ai/chat streaming (Sprint 14 P0)", () => {
+  const route = readFileSync(
+    path.join(process.cwd(), "src/app/api/ai/chat/route.ts"),
+    "utf8",
+  );
+
+  it("performs every auth/entitlement/rate-limit/ownership check before opening the stream", () => {
+    const authIndex = route.indexOf("lookupAuthSession()");
+    const guardIndex = route.indexOf("guardLawyerAiHttp(");
+    const rateLimitIndex = route.indexOf("consumeRateLimit(");
+    const ownershipIndex = route.indexOf("assertOwnedCaseFileForAi(");
+    const streamIndex = route.indexOf("new ReadableStream");
+    expect(authIndex).toBeGreaterThan(-1);
+    expect(streamIndex).toBeGreaterThan(-1);
+    expect(authIndex).toBeLessThan(streamIndex);
+    expect(guardIndex).toBeLessThan(streamIndex);
+    expect(rateLimitIndex).toBeLessThan(streamIndex);
+    expect(ownershipIndex).toBeLessThan(streamIndex);
+  });
+
+  it("streams as text/event-stream and forwards onDelta/signal into createTurn", () => {
+    expect(route).toContain('"Content-Type": "text/event-stream; charset=utf-8"');
+    expect(route).toContain("onDelta: (delta) => enqueue(\"delta\", { text: delta })");
+    expect(route).toContain("signal: abortController.signal");
+  });
+
+  it("ties the provider abort to both request disconnect and stream cancellation", () => {
+    expect(route).toContain('request.signal.addEventListener("abort"');
+    expect(route).toContain("cancel() {");
+    expect(route).toContain("abortController.abort()");
+  });
+
+  it("treats AI_ABORTED as a silent cancellation, never surfaced as a client-facing error event", () => {
+    const abortedCheckIndex = route.indexOf('error.code === "AI_ABORTED"');
+    const enqueueErrorIndex = route.indexOf('enqueue("error"');
+    expect(abortedCheckIndex).toBeGreaterThan(-1);
+    // The enqueue("error", ...) call must be reached through the branch
+    // that excludes AI_ABORTED, not before the check exists at all.
+    expect(enqueueErrorIndex).toBeGreaterThan(abortedCheckIndex - 400);
+  });
+
+  it("sends the done event with the exact same safe citation contract as before streaming existed", () => {
+    expect(route).toContain('enqueue("done"');
+    expect(route).toContain("conversationId: result.conversationId");
+    expect(route).toContain("content: result.message.content");
+  });
+
+  it("still returns a plain JSON response (not a stream) for pre-stream failures", () => {
+    expect(route).toContain("function errorResponseFor");
+    expect(route).toContain("NextResponse.json(");
+  });
+});

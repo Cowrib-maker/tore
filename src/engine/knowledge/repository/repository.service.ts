@@ -38,6 +38,19 @@ export class InMemoryKnowledgeRepository implements IKnowledgeRepository {
     return this.documents.get(id) ?? null;
   }
 
+  async findByIds(
+    ids: readonly string[],
+  ): Promise<StoredKnowledgeDocument[]> {
+    const out: StoredKnowledgeDocument[] = [];
+    for (const id of new Set(ids)) {
+      const document = this.documents.get(id);
+      if (document) {
+        out.push(document);
+      }
+    }
+    return out;
+  }
+
   async findBySourceUrl(sourceUrl: string): Promise<StoredKnowledgeDocument | null> {
     for (const document of this.documents.values()) {
       if (document.sourceUrl === sourceUrl) {

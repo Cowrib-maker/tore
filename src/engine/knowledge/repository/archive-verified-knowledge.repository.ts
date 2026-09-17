@@ -72,6 +72,10 @@ export class ArchiveVerifiedKnowledgeRepository
     return this.inner.findById(id);
   }
 
+  findByIds(ids: readonly string[]) {
+    return this.inner.findByIds(ids);
+  }
+
   findBySourceUrl(sourceUrl: string) {
     return this.inner.findBySourceUrl(sourceUrl);
   }

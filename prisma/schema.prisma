@@ -1317,6 +1317,13 @@ model LegalKnowledgeDocument {
   @@map("legal_knowledge_documents")
 }
 
+/// Sprint 14: a hand-written migration
+/// (20260917010000_legal_knowledge_trgm_search_indexes) additionally adds
+/// GIN pg_trgm indexes on `text`, `title`, and `article_number` to support
+/// the ILIKE '%term%' search in prisma-legal-knowledge-repository.ts.
+/// Not expressible in this schema without enabling the
+/// postgresqlExtensions preview feature, so it is not declared here —
+/// do not let a future `prisma migrate dev` drop those indexes as "drift".
 model LegalKnowledgeArticle {
   id            String  @id @default(cuid())
   documentId    String  @map("document_id")
@@ -1582,6 +1589,9 @@ enum CaseDraftStatus {
   FAILED
 }
 
+/// Sprint 14: see the matching note on LegalKnowledgeArticle — the same
+/// hand-written migration adds GIN pg_trgm indexes on `text` and
+/// `article_number` here too.
 model LegalKnowledgeChunk {
   id            String  @id
   documentId    String  @map("document_id")

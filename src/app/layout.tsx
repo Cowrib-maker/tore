@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { LocalePersistence } from "@/components/i18n/locale-persistence";
 import { ImpersonationBannerHost } from "@/components/admin/impersonation-banner-host";
 import { FloatingLegalAiWidget } from "@/components/legal-ai/floating-legal-ai-widget";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { getDictionary } from "@/i18n/get-dictionary";
@@ -70,15 +71,18 @@ export default async function RootLayout({
     <html
       lang={htmlLang}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
-        <TooltipProvider>
-          <LocalePersistence locale={locale} />
-          <ImpersonationBannerHost />
-          {children}
-          <FloatingLegalAiWidget />
-          <Toaster richColors closeButton />
-        </TooltipProvider>
+      <body className="h-full flex flex-col">
+        <ThemeProvider>
+          <TooltipProvider>
+            <LocalePersistence locale={locale} />
+            <ImpersonationBannerHost />
+            {children}
+            <FloatingLegalAiWidget />
+            <Toaster richColors closeButton />
+          </TooltipProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

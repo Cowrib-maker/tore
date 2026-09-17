@@ -1,4 +1,5 @@
 import type {
+  LegalAiCompletionInput,
   LegalAiCompletionPort,
   LegalAiCompletionResult,
 } from "@/application/ai/legal-ai.types";
@@ -28,15 +29,29 @@ export class FallbackLegalAiCompletion implements LegalAiCompletionPort {
     return this.primary.isConfigured() || this.secondary.isConfigured();
   }
 
-  async complete(input: {
-    systemPrompt: string;
-    messages: Array<{ role: "user" | "assistant" | "system"; content: string }>;
-  }): Promise<LegalAiCompletionResult> {
+  async complete(input: LegalAiCompletionInput): Promise<LegalAiCompletionResult> {
     if (this.primary.isConfigured()) {
+      // Streaming: falling back mid-stream would mix two providers' text in
+      // front of the user (primary's partial output followed by secondary
+      // restarting from scratch). Only fall back if primary fails before it
+      // ever emitted a delta — a clean handoff, not a corrupted one. Once
+      // any text has reached the caller, a primary failure is a failed
+      // turn, same as the non-streaming case, not a fallback trigger.
+      let emittedAny = false;
+      const wrappedInput: LegalAiCompletionInput = input.onDelta
+        ? {
+            ...input,
+            onDelta: (delta) => {
+              emittedAny = true;
+              input.onDelta!(delta);
+            },
+          }
+        : input;
+
       try {
-        return await this.primary.complete(input);
+        return await this.primary.complete(wrappedInput);
       } catch (error) {
-        if (!this.secondary.isConfigured()) {
+        if (!this.secondary.isConfigured() || emittedAny) {
           throw error;
         }
         console.error(

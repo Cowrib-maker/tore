@@ -159,6 +159,20 @@ export class PrismaKnowledgeRepository implements IKnowledgeRepository {
     return row ? fromRow(row) : null;
   }
 
+  async findByIds(
+    ids: readonly string[],
+  ): Promise<StoredKnowledgeDocument[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+    const uniqueIds = [...new Set(ids)];
+    const rows = await this.db.legalKnowledgeDocument.findMany({
+      where: { id: { in: uniqueIds } },
+      include: DOCUMENT_INCLUDE,
+    });
+    return rows.map(fromRow);
+  }
+
   async findBySourceUrl(
     sourceUrl: string,
   ): Promise<StoredKnowledgeDocument | null> {

@@ -272,6 +272,192 @@ describe("KnowledgeLegalCorpusRetriever", () => {
   });
 });
 
+describe("KnowledgeLegalCorpusRetriever.retrieveAndVerifyExactCitation (Sprint 14 dedup)", () => {
+  it("returns the same VALID verdict and authorities as the separate retrieveExactCitation + verifyCitation calls", async () => {
+    const knowledge = new InMemoryKnowledgeRepository();
+    await knowledge.save(goldenDocument());
+    const retriever = new KnowledgeLegalCorpusRetriever(knowledge);
+
+    const retrieved = await retriever.retrieveExactCitation({
+      question: GOLDEN_QUERY,
+      query: GOLDEN_QUERY,
+      locator: "art-17/p-1",
+    });
+    const verified = await retriever.verifyCitation({
+      query: GOLDEN_QUERY,
+      ...(retrieved.kind === "retrieved"
+        ? { nodeId: retrieved.authorities[0]?.nodeId }
+        : {}),
+    });
+
+    const combined = await retriever.retrieveAndVerifyExactCitation({
+      question: GOLDEN_QUERY,
+      query: GOLDEN_QUERY,
+      locator: "art-17/p-1",
+    });
+
+    // retrievedAt is independently generated per call (new Date().toISOString())
+    // — comparing it for exact equality across two separate calls is flaky by
+    // construction, so it's checked for shape only; everything else must match.
+    expect(combined.retrieved).toEqual({
+      ...retrieved,
+      retrievedAt: expect.any(String),
+    });
+    if (combined.retrieved.kind === "retrieved") {
+      expect(combined.retrieved.retrievedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    }
+    expect(combined.verification).toEqual(verified);
+    expect(combined.verification).toMatchObject({
+      ok: true,
+      verdict: { status: CitationVerificationStatus.VALID },
+    });
+  });
+
+  it("still returns CONFLICT for a citation with two provenance-backed matches", async () => {
+    const knowledge = new InMemoryKnowledgeRepository();
+    await knowledge.save(goldenDocument());
+    await knowledge.save(
+      goldenDocument({
+        id: "doc-criminal-17-1-b",
+        articleId: "art-17-1-b",
+        sourceUrl: "https://legalinfo.mn/mn/detail?lawId=fixture-criminal-b",
+        provenance: {
+          archiveId: "arch-b",
+          sha256: "sha-b",
+          originalUrl: "https://legalinfo.mn/mn/detail?lawId=fixture-criminal-b",
+          lawId: "11634",
+        },
+      }),
+    );
+    const retriever = new KnowledgeLegalCorpusRetriever(knowledge);
+
+    const combined = await retriever.retrieveAndVerifyExactCitation({
+      question: GOLDEN_QUERY,
+      query: GOLDEN_QUERY,
+      locator: "art-17/p-1",
+    });
+
+    expect(combined.retrieved.kind).toBe("retrieved");
+    if (combined.retrieved.kind === "retrieved") {
+      expect(combined.retrieved.authorities.length).toBeGreaterThan(1);
+    }
+    expect(combined.verification).toMatchObject({
+      ok: true,
+      verdict: { status: CitationVerificationStatus.CONFLICT },
+    });
+  });
+
+  it("still returns not-found when nothing matches, without inventing a provision", async () => {
+    const retriever = new KnowledgeLegalCorpusRetriever(
+      new InMemoryKnowledgeRepository(),
+    );
+    const combined = await retriever.retrieveAndVerifyExactCitation({
+      question: GOLDEN_QUERY,
+      query: GOLDEN_QUERY,
+      locator: "art-17/p-1",
+    });
+    expect(combined.retrieved).toMatchObject({
+      kind: "unavailable",
+      reason: "not_found",
+    });
+    expect(combined.verification).toMatchObject({
+      ok: true,
+      verdict: { status: CitationVerificationStatus.UNRESOLVED },
+    });
+  });
+
+  it("runs the underlying corpus search only once, instead of twice (the confirmed duplicate-work finding)", async () => {
+    const knowledge = new InMemoryKnowledgeRepository();
+    await knowledge.save(goldenDocument());
+    const searchSpy = vi.spyOn(knowledge, "searchArticles");
+    const retriever = new KnowledgeLegalCorpusRetriever(knowledge);
+
+    searchSpy.mockClear();
+    await retriever.retrieveExactCitation({
+      question: GOLDEN_QUERY,
+      query: GOLDEN_QUERY,
+      locator: "art-17/p-1",
+    });
+    await retriever.verifyCitation({ query: GOLDEN_QUERY });
+    const separateCallCount = searchSpy.mock.calls.length;
+
+    searchSpy.mockClear();
+    await retriever.retrieveAndVerifyExactCitation({
+      question: GOLDEN_QUERY,
+      query: GOLDEN_QUERY,
+      locator: "art-17/p-1",
+    });
+    const combinedCallCount = searchSpy.mock.calls.length;
+
+    expect(combinedCallCount).toBeLessThan(separateCallCount);
+    expect(combinedCallCount).toBe(separateCallCount / 2);
+  });
+});
+
+describe("KnowledgeLegalCorpusRetriever N+1 elimination (Sprint 14)", () => {
+  it("batches document hydration via findByIds instead of one findById per hit", async () => {
+    const knowledge = new InMemoryKnowledgeRepository();
+    await knowledge.save(goldenDocument());
+    await knowledge.save(
+      goldenDocument({
+        id: "doc-criminal-17-1-b",
+        articleId: "art-17-1-b",
+        sourceUrl: "https://legalinfo.mn/mn/detail?lawId=fixture-criminal-b",
+        provenance: {
+          archiveId: "arch-b",
+          sha256: "sha-b",
+          originalUrl: "https://legalinfo.mn/mn/detail?lawId=fixture-criminal-b",
+          lawId: "11634",
+        },
+      }),
+    );
+    const findByIdSpy = vi.spyOn(knowledge, "findById");
+    const findByIdsSpy = vi.spyOn(knowledge, "findByIds");
+    const retriever = new KnowledgeLegalCorpusRetriever(knowledge);
+
+    const result = await retriever.retrieveExactCitation({
+      question: GOLDEN_QUERY,
+      query: GOLDEN_QUERY,
+      locator: "art-17/p-1",
+    });
+
+    expect(result.kind).toBe("retrieved");
+    if (result.kind === "retrieved") {
+      expect(result.authorities.length).toBeGreaterThan(1);
+    }
+    // Both matching documents were hydrated in one batched call, not one
+    // sequential findById round-trip per hit.
+    expect(findByIdsSpy).toHaveBeenCalledTimes(1);
+    expect(findByIdSpy).not.toHaveBeenCalled();
+  });
+
+  it("open-question requiresProof fallback reuses the already-fetched documents instead of re-fetching", async () => {
+    const knowledge = new InMemoryKnowledgeRepository();
+    await knowledge.save(
+      goldenDocument({
+        id: "civil-undated",
+        articleId: "civil-undated-1",
+        articleNumber: "1",
+      }),
+    );
+    const findByIdSpy = vi.spyOn(knowledge, "findById");
+    const retriever = new KnowledgeLegalCorpusRetriever(knowledge);
+
+    await retriever.retrieveLegalQuestion({
+      question: "Хуулийн 1 дүгээр зүйлд юу заасан бэ?",
+      query: "Хуулийн 1 дүгээр зүйлд юу заасан бэ?",
+      locator: null,
+    });
+
+    // findById is still called once per unique hit to build documentById —
+    // the fix is that the requiresProof fallback branch must NOT call it a
+    // second time for the same ids.
+    const idsRequested = findByIdSpy.mock.calls.map((call) => call[0]);
+    const uniqueIdsRequested = new Set(idsRequested);
+    expect(idsRequested.length).toBe(uniqueIdsRequested.size);
+  });
+});
+
 describe("FallbackLegalCorpusRetriever", () => {
   it("uses local structured retrieval when the golden provision is verified locally", async () => {
     const knowledge = new InMemoryKnowledgeRepository();

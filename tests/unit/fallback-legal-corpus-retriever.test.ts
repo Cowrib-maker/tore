@@ -390,3 +390,120 @@ describe("FallbackLegalCorpusRetriever.verifyCitation — fail-closed behavior",
     expect(result).toEqual({ ok: false, reason: "network" });
   });
 });
+
+describe("FallbackLegalCorpusRetriever.retrieveAndVerifyExactCitation (Sprint 14)", () => {
+  it("falls back to two separate calls when the wrapped local retriever has no combined method, and behaves identically", async () => {
+    const remoteFetch = vi.fn();
+    const remote = httpRetrieverWithFetch(remoteFetch as unknown as typeof fetch);
+    const localVerify: LegalCitationVerifyResult = {
+      ok: true,
+      verdict: {
+        query: "q",
+        status: "VALID",
+        nodeId: "local-node",
+        documentVersionId: "local-ver",
+        locator: "art-1",
+        reasons: ["citation_unique", "local_provenance"],
+      },
+    };
+    const fallback = new FallbackLegalCorpusRetriever(
+      new StubLocalRetriever(localHit, localVerify),
+      remote,
+    );
+
+    const result = await fallback.retrieveAndVerifyExactCitation({
+      question: "q",
+      query: "q",
+      locator: "art-1",
+    });
+
+    expect(result.retrieved.kind).toBe("retrieved");
+    if (result.retrieved.kind === "retrieved") {
+      expect(result.retrieved.source).toBe(LegalCorpusSource.FALLBACK_LOCAL_CORPUS);
+    }
+    expect(result.verification).toEqual(localVerify);
+    expect(remoteFetch).not.toHaveBeenCalled();
+  });
+
+  it("uses the local retriever's combined method (single lookup) when available, and never touches remote on a local hit", async () => {
+    const remoteFetch = vi.fn();
+    const remote = httpRetrieverWithFetch(remoteFetch as unknown as typeof fetch);
+    const combinedSpy = vi.fn(async () => ({
+      retrieved: localHit,
+      verification: {
+        ok: true as const,
+        verdict: {
+          query: "q",
+          status: "VALID" as const,
+          nodeId: "local-node",
+          documentVersionId: "local-ver",
+          locator: "art-1",
+          reasons: ["citation_unique", "local_provenance"],
+        },
+      },
+    }));
+    class CombinedStubLocalRetriever extends StubLocalRetriever {
+      retrieveAndVerifyExactCitation = combinedSpy;
+    }
+    const fallback = new FallbackLegalCorpusRetriever(
+      new CombinedStubLocalRetriever(localHit),
+      remote,
+    );
+
+    const result = await fallback.retrieveAndVerifyExactCitation({
+      question: "q",
+      query: "q",
+      locator: "art-1",
+    });
+
+    expect(combinedSpy).toHaveBeenCalledTimes(1);
+    expect(result.retrieved.kind).toBe("retrieved");
+    if (result.retrieved.kind === "retrieved") {
+      expect(result.retrieved.source).toBe(LegalCorpusSource.FALLBACK_LOCAL_CORPUS);
+    }
+    expect(result.verification.ok).toBe(true);
+    expect(remoteFetch).not.toHaveBeenCalled();
+  });
+
+  it("falls through to remote for both retrieve and verify when the local combined method misses", async () => {
+    const remoteFetch = vi.fn(async () =>
+      jsonResponse(200, {
+        authorities: [remoteAuthority],
+        retrievedAt: "2026-08-17T00:00:00.000Z",
+        status: "ok",
+      }),
+    );
+    const remote = httpRetrieverWithFetch(remoteFetch as unknown as typeof fetch);
+    const combinedSpy = vi.fn(async () => ({
+      retrieved: localMiss,
+      verification: { ok: true as const, verdict: {
+        query: "q",
+        status: "UNRESOLVED" as const,
+        nodeId: null,
+        documentVersionId: null,
+        locator: null,
+        reasons: ["citation_not_in_local_corpus"],
+      } },
+    }));
+    class CombinedStubLocalRetriever extends StubLocalRetriever {
+      retrieveAndVerifyExactCitation = combinedSpy;
+    }
+    const fallback = new FallbackLegalCorpusRetriever(
+      new CombinedStubLocalRetriever(localMiss),
+      remote,
+    );
+
+    const result = await fallback.retrieveAndVerifyExactCitation({
+      question: "q",
+      query: "q",
+      locator: "art-2",
+    });
+
+    expect(combinedSpy).toHaveBeenCalledTimes(1);
+    expect(result.retrieved.kind).toBe("retrieved");
+    if (result.retrieved.kind === "retrieved") {
+      expect(result.retrieved.source).toBe(LegalCorpusSource.LEGAL_DATA_ENGINE);
+      expect(result.retrieved.authorities).toEqual([remoteAuthority]);
+    }
+  });
+});

@@ -128,6 +128,20 @@ export interface LegalCorpusRetriever {
   verifyCitation(
     input: LegalCorpusVerifyInput,
   ): Promise<LegalCitationVerifyResult>;
+
+  /**
+   * Optional single-pass combination of retrieveExactCitation + verifyCitation
+   * for retrievers that can avoid re-running the same underlying lookup
+   * twice for one exact-citation question. Callers MUST fall back to the two
+   * separate calls when a retriever does not implement this — it is an
+   * optimization, never a required part of the contract, and every
+   * implementer that omits it keeps its exact current (already-correct)
+   * verification behavior.
+   */
+  retrieveAndVerifyExactCitation?(input: LegalCorpusRetrieveInput): Promise<{
+    retrieved: LegalCorpusRetrieveResult;
+    verification: LegalCitationVerifyResult;
+  }>;
 }
 /**
  * Maps retrieve HTTP shape only. Never declares a citation VALID.

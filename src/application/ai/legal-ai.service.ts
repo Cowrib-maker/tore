@@ -293,6 +293,8 @@ export class LegalAiService {
           userContext: input.userContext,
           userId: input.userId,
           capability,
+          onDelta: input.onDelta,
+          signal: input.signal,
         }),
       );
     }
@@ -310,6 +312,11 @@ export class LegalAiService {
           userId: input.userId,
           actorRole: input.actorRole,
           capability,
+          // No onDelta here deliberately: this path can rewrite the model's
+          // output after the fact (duplicate-clarification detection below)
+          // — tokens already streamed to the client can't be un-sent, so
+          // this turn kind stays non-streaming. Abort still works.
+          signal: input.signal,
         }),
         { questionStatus: LegalQuestionStatus.CLARIFYING },
       );
@@ -349,6 +356,11 @@ export class LegalAiService {
           userId: input.userId,
           actorRole: input.actorRole,
           capability,
+          // No onDelta here deliberately: this path can rewrite the model's
+          // output after the fact (duplicate-clarification detection below)
+          // — tokens already streamed to the client can't be un-sent, so
+          // this turn kind stays non-streaming. Abort still works.
+          signal: input.signal,
         }),
         { questionStatus: LegalQuestionStatus.CLARIFYING },
       );
@@ -369,6 +381,11 @@ export class LegalAiService {
           userId: input.userId,
           actorRole: input.actorRole,
           capability,
+          // No onDelta here deliberately: this path can rewrite the model's
+          // output after the fact (duplicate-clarification detection below)
+          // — tokens already streamed to the client can't be un-sent, so
+          // this turn kind stays non-streaming. Abort still works.
+          signal: input.signal,
         }),
         { questionStatus: LegalQuestionStatus.CLARIFYING },
       );
@@ -492,6 +509,8 @@ export class LegalAiService {
     const completion = await this.dependencies.completion.complete({
       systemPrompt: prompt.systemPrompt,
       messages: toModelHistory(history),
+      onDelta: input.onDelta,
+      signal: input.signal,
     });
 
     const assistantMessage =
@@ -593,6 +612,8 @@ export class LegalAiService {
     userContext: LegalAiCreateTurnInput["userContext"];
     userId?: string;
     capability: LegalAiCapability;
+    onDelta?: (delta: string) => void;
+    signal?: AbortSignal;
   }): Promise<LegalAiCreateTurnResult> {
     const history = await this.dependencies.store.listMessages(
       input.conversationId,
@@ -626,6 +647,8 @@ export class LegalAiService {
     const completion = await this.dependencies.completion.complete({
       systemPrompt: prompt.systemPrompt,
       messages: toModelHistory(history),
+      onDelta: input.onDelta,
+      signal: input.signal,
     });
     const assistantMessage =
       await this.dependencies.store.createAssistantMessage({
@@ -670,6 +693,8 @@ export class LegalAiService {
     userId?: string;
     actorRole?: LegalAiCreateTurnInput["actorRole"];
     capability: LegalAiCapability;
+    onDelta?: (delta: string) => void;
+    signal?: AbortSignal;
   }): Promise<LegalAiCreateTurnResult> {
     const history = await this.dependencies.store.listMessages(
       input.conversationId,
@@ -699,6 +724,8 @@ export class LegalAiService {
     const completion = await this.dependencies.completion.complete({
       systemPrompt: prompt.systemPrompt,
       messages: toModelHistory(history),
+      onDelta: input.onDelta,
+      signal: input.signal,
     });
 
     let content =

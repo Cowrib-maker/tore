@@ -51,7 +51,7 @@ export function LandingPage({
   return (
     <div
       className={cn(
-        "landing-page min-h-screen bg-[#F7F6F2] text-[#0A0F14] antialiased",
+        "landing-page min-h-screen bg-[var(--landing-canvas)] text-[var(--landing-ink)] antialiased",
       )}
     >
       <LandingNav dict={dict} locale={locale} authUser={authUser} />

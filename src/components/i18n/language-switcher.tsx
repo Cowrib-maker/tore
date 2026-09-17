@@ -123,16 +123,16 @@ export function LanguageSwitcher({
         }}
         onKeyDown={onTriggerKeyDown}
         className={cn(
-          "group inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-[#0F3D33]/12 bg-white/90 px-2.5 text-[#0F3D33]",
+          "group inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 text-foreground",
           "transition-[border-color,background-color,box-shadow] duration-200",
-          "hover:border-[#0F3D33]/28 hover:bg-[#F4F8F6]",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D33]/25",
-          open && "border-[#0F3D33]/28 bg-[#F4F8F6]",
+          "hover:border-ring/40 hover:bg-accent",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+          open && "border-ring/40 bg-accent",
           pending && "opacity-70",
         )}
       >
         <Globe2
-          className="size-3.5 shrink-0 text-[#0F3D33]/70 transition-colors group-hover:text-[#0F3D33]"
+          className="size-3.5 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground"
           strokeWidth={1.75}
         />
         <span className="min-w-0 text-sm font-medium tracking-tight">
@@ -141,7 +141,7 @@ export function LanguageSwitcher({
         </span>
         <ChevronDown
           className={cn(
-            "size-3.5 shrink-0 text-[#0F3D33]/45 transition-transform duration-200",
+            "size-3.5 shrink-0 text-muted-foreground/70 transition-transform duration-200",
             open && "rotate-180",
           )}
           strokeWidth={1.75}
@@ -158,12 +158,12 @@ export function LanguageSwitcher({
           onKeyDown={onListKeyDown}
           className={cn(
             "absolute right-0 z-50 mt-2 w-[min(12.5rem,calc(100vw-1.5rem))] overflow-hidden",
-            "rounded-xl border border-[#0F3D33]/12 bg-white py-1.5",
-            "shadow-[0_16px_40px_-28px_rgba(15,61,51,0.55)]",
+            "rounded-xl border border-border bg-popover py-1.5",
+            "shadow-[0_16px_40px_-28px_rgba(15,61,51,0.55)] dark:shadow-[0_16px_40px_-28px_rgba(0,0,0,0.6)]",
             "animate-in fade-in-0 zoom-in-95 origin-top-right duration-150",
           )}
         >
-          <li className="px-3 pb-1.5 pt-1 text-[10px] font-semibold tracking-[0.12em] text-[#5A6B64] uppercase">
+          <li className="px-3 pb-1.5 pt-1 text-[10px] font-semibold tracking-[0.12em] text-muted-foreground uppercase">
             {label}
           </li>
           {localeMenuOrder.map((code, index) => {
@@ -179,9 +179,8 @@ export function LanguageSwitcher({
                   aria-selected={selected}
                   className={cn(
                     "flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm transition-colors",
-                    highlighted && "bg-[#F4F8F6]",
-                    selected && "text-[#0F3D33]",
-                    !selected && "text-[#0A0F14]",
+                    highlighted && "bg-accent",
+                    selected ? "text-foreground" : "text-foreground/80",
                   )}
                   onMouseEnter={() => setActiveIndex(index)}
                   onClick={() => select(code)}
@@ -191,8 +190,8 @@ export function LanguageSwitcher({
                   </span>
                   <span
                     className={cn(
-                      "tabular-nums text-[11px] font-medium tracking-wide text-[#5A6B64]",
-                      selected && "text-[#0F3D33]/70",
+                      "tabular-nums text-[11px] font-medium tracking-wide text-muted-foreground",
+                      selected && "text-foreground/70",
                     )}
                   >
                     {meta.code}
@@ -200,7 +199,7 @@ export function LanguageSwitcher({
                   <span className="flex size-4 items-center justify-center">
                     {selected && (
                       <Check
-                        className="size-3.5 text-[#0F3D33]"
+                        className="size-3.5 text-foreground"
                         strokeWidth={2.5}
                       />
                     )}

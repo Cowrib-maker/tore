@@ -6,7 +6,10 @@ import type {
   LegalCorpusRetrieveResult,
   LegalCorpusVerifyInput,
 } from "@/application/ai/legal-corpus";
-import { CitationVerificationStatus } from "@/application/ai/legal-corpus";
+import {
+  CitationVerificationStatus,
+  verifyHintFromRetrieved,
+} from "@/application/ai/legal-corpus";
 import { detectExactCitation } from "@/engine/citation";
 import { resolveCanonicalLawIdentity } from "@/engine/citation/canonical-law-titles";
 import { extractConstitutionParagraph } from "@/engine/knowledge/repository/constitution-paragraph";
@@ -31,6 +34,13 @@ import type {
 
 export const LOCAL_LEGAL_SOURCE_TYPE = "legal-knowledge";
 const MAX_OPEN_QUESTION_AUTHORITIES = 3;
+
+type LookupHitsResult =
+  | {
+      kind: "hits";
+      hits: Array<{ hit: KnowledgeArticleHit; authority: LegalCorpusAuthority }>;
+    }
+  | { kind: "as_of_unavailable" };
 
 function unavailableNotFound(): LegalCorpusRetrieveResult {
   return {
@@ -149,13 +159,49 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
       query: input.query || input.question,
       explicitRelations: input.explicitRelations ?? [],
     });
+    return this.hitsToRetrieveResult(hits);
+  }
+
+  /**
+   * Single-pass combination of retrieveExactCitation + verifyCitation for
+   * this in-process retriever. resolve-legal-authorities.ts previously
+   * called both methods back to back with the same effective inputs, which
+   * ran the full lookupVerifiedHits search (including its DB round-trips)
+   * twice for one exact-citation question. Here the search runs once and
+   * both outputs are derived from that single result — the verification
+   * logic itself (VALID/CONFLICT/UNRESOLVED derivation, nodeId hint check)
+   * is unchanged, just no longer re-fetched from scratch.
+   */
+  async retrieveAndVerifyExactCitation(input: LegalCorpusRetrieveInput): Promise<{
+    retrieved: LegalCorpusRetrieveResult;
+    verification: LegalCitationVerifyResult;
+  }> {
+    const hits = await this.lookupVerifiedHits({
+      question: input.question,
+      query: input.query || input.question,
+      explicitRelations: input.explicitRelations ?? [],
+    });
+    const retrieved = this.hitsToRetrieveResult(hits);
+    const hint =
+      retrieved.kind === "retrieved"
+        ? verifyHintFromRetrieved(retrieved.authorities)
+        : {};
+    const verification = this.hitsToVerifyResult(hits, {
+      query: input.query,
+      nodeId: hint.nodeId ?? null,
+    });
+    return { retrieved, verification };
+  }
+
+  private hitsToRetrieveResult(
+    hits: LookupHitsResult,
+  ): LegalCorpusRetrieveResult {
     if (hits.kind === "as_of_unavailable") {
       return asOfUnavailable();
     }
     if (hits.hits.length === 0) {
       return unavailableNotFound();
     }
-
     return {
       kind: "retrieved",
       status: "ok",
@@ -247,16 +293,16 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
       const requiresProof =
         intent.kind === "HISTORICAL" || intent.kind === "CURRENT";
 
-      if (requiresProof && uniqueHits.length > 0) {
-        const documents = await Promise.all(
-          uniqueHits.map((hit) => this.knowledge.findById(hit.documentId)),
-        );
-
-        if (
-          documents.some((document) => hasVerifiedProvenance(document))
-        ) {
-          return asOfUnavailable();
-        }
+      // Reuses documentById (already hydrated above) instead of re-fetching
+      // the same documents a second time.
+      if (
+        requiresProof &&
+        uniqueHits.length > 0 &&
+        uniqueHits.some((hit) =>
+          hasVerifiedProvenance(documentById.get(hit.documentId) ?? null),
+        )
+      ) {
+        return asOfUnavailable();
       }
 
       return unavailableNotFound();
@@ -277,6 +323,16 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
       query: input.query,
       explicitRelations: input.explicitRelations ?? [],
     });
+    return this.hitsToVerifyResult(hits, {
+      query: input.query,
+      nodeId: input.nodeId ?? null,
+    });
+  }
+
+  private hitsToVerifyResult(
+    hits: LookupHitsResult,
+    input: { query: string; nodeId: string | null | undefined },
+  ): LegalCitationVerifyResult {
     if (hits.kind === "as_of_unavailable") {
       return {
         ok: true,
@@ -350,16 +406,7 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
     question?: string;
     query: string;
     explicitRelations: readonly LegalTemporalExplicitRelation[];
-  }): Promise<
-    | {
-        kind: "hits";
-        hits: Array<{
-          hit: KnowledgeArticleHit;
-          authority: LegalCorpusAuthority;
-        }>;
-      }
-    | { kind: "as_of_unavailable" }
-  > {
+  }): Promise<LookupHitsResult> {
     const temporalText = [input.question, input.query]
       .filter((part) => part?.trim())
       .join(" ");
@@ -414,13 +461,24 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
     );
     const preferred = preferDottedHits(exact, citation);
 
+    // Batched hydration instead of one findById round-trip per hit —
+    // preferred.length is typically small but each findById was a
+    // sequential DB round-trip; findByIds does it in one query, and
+    // documentById restores the per-hit lookup preferred's loop needs.
+    const preferredDocuments = await this.knowledge.findByIds(
+      preferred.map((hit) => hit.documentId),
+    );
+    const preferredDocumentById = new Map(
+      preferredDocuments.map((document) => [document.id, document] as const),
+    );
+
     const verified: Array<{
       hit: KnowledgeArticleHit;
       authority: LegalCorpusAuthority;
     }> = [];
 
     for (const hit of preferred) {
-      const document = await this.knowledge.findById(hit.documentId);
+      const document = preferredDocumentById.get(hit.documentId) ?? null;
       if (!hasVerifiedProvenance(document)) {
         continue;
       }
@@ -445,13 +503,15 @@ export class KnowledgeLegalCorpusRetriever implements LegalCorpusRetriever {
 
     const requiresProof =
       intent.kind === "HISTORICAL" || intent.kind === "CURRENT";
-    if (requiresProof && preferred.length > 0 && verified.length === 0) {
-      const documents = await Promise.all(
-        preferred.map((hit) => this.knowledge.findById(hit.documentId)),
-      );
-      if (documents.some((document) => hasVerifiedProvenance(document))) {
-        return { kind: "as_of_unavailable" };
-      }
+    if (
+      requiresProof &&
+      preferred.length > 0 &&
+      verified.length === 0 &&
+      preferred.some((hit) =>
+        hasVerifiedProvenance(preferredDocumentById.get(hit.documentId) ?? null),
+      )
+    ) {
+      return { kind: "as_of_unavailable" };
     }
 
     return { kind: "hits", hits: verified };

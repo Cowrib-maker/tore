@@ -52,7 +52,7 @@ export function HeroLegalAiComposer({
       {messages.length > 0 ? (
         <div
           ref={transcriptRef}
-          className="max-h-80 space-y-3 overflow-y-auto rounded-3xl border border-[#0B1F3A]/10 bg-white p-4 text-left shadow-[0_20px_50px_-24px_rgba(11,31,58,0.28)]"
+          className="max-h-80 space-y-3 overflow-y-auto rounded-3xl border border-ai-border bg-ai-surface p-4 text-left shadow-[0_20px_50px_-24px_rgba(11,31,58,0.28)]"
         >
           {messages.map((item, index) => (
             <div
@@ -64,8 +64,8 @@ export function HeroLegalAiComposer({
               <div
                 className={
                   item.role === "USER"
-                    ? "max-w-[85%] rounded-2xl rounded-br-md bg-[#0B1F3A] px-3 py-2 text-[13px] leading-5 whitespace-pre-wrap text-white"
-                    : "max-w-[85%] rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-[#E8F4F1] px-3 py-2 text-[13px] leading-5 whitespace-pre-wrap text-[#0A0F14]"
+                    ? "max-w-[85%] rounded-2xl rounded-br-md bg-ai-accent px-3 py-2 text-[13px] leading-5 whitespace-pre-wrap text-ai-accent-foreground"
+                    : "max-w-[85%] rounded-2xl rounded-tl-md border border-ai-border bg-ai-surface-muted px-3 py-2 text-[13px] leading-5 whitespace-pre-wrap text-ai-text"
                 }
               >
                 {item.content}
@@ -73,7 +73,7 @@ export function HeroLegalAiComposer({
             </div>
           ))}
           {loading ? (
-            <p className="text-xs text-[#8A939D]">{typingLabel}</p>
+            <p className="text-xs text-ai-text-subtle">{typingLabel}</p>
           ) : null}
           {error ? (
             <p role="alert" className="text-xs text-red-600">
@@ -93,7 +93,7 @@ export function HeroLegalAiComposer({
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-3xl border border-[#0B1F3A]/10 bg-white p-3 shadow-[0_22px_50px_-24px_rgba(11,31,58,0.32)] transition focus-within:border-[#1A7A72]/45"
+        className="rounded-3xl border border-ai-border bg-ai-surface p-3 shadow-[0_22px_50px_-24px_rgba(11,31,58,0.32)] transition focus-within:border-[#1A7A72]/45"
       >
         <textarea
           ref={textareaRef}
@@ -108,14 +108,14 @@ export function HeroLegalAiComposer({
           placeholder={placeholder}
           disabled={loading}
           rows={1}
-          className="min-h-12 w-full resize-none bg-transparent px-3 py-2 text-[15px] leading-6 text-[#0A0F14] outline-none placeholder:text-[#9AA3AD]"
+          className="min-h-12 w-full resize-none bg-transparent px-3 py-2 text-[15px] leading-6 text-ai-text outline-none placeholder:text-ai-text-subtle"
         />
         <div className="flex items-center justify-end pt-1">
           <button
             type="submit"
             aria-label={submitLabel}
             disabled={!question.trim() || loading}
-            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#0B1F3A] text-white transition hover:bg-[#173A66] disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-ai-accent text-ai-accent-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ArrowUp className="size-4" />
           </button>

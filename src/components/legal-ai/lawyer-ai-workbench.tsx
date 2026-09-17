@@ -45,6 +45,7 @@ import type { LegalAiAccessGate } from "@/components/legal-ai/interpret-legal-ai
 import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
 import { requestLawyerCheckout } from "@/components/legal-ai/request-lawyer-checkout";
 import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-list";
+import { LEGAL_AI_CHAT_RETRY_MESSAGE } from "@/components/legal-ai/legal-ai-chat-errors";
 import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { useThinkingStageLabel } from "@/components/legal-ai/legal-ai-thinking-stages";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
@@ -55,6 +56,7 @@ import {
   useOrthographyCheck,
 } from "@/components/orthography/orthography-checker";
 import { SpellcheckTextarea } from "@/components/orthography/spellcheck-textarea";
+import { parseSseStream } from "@/lib/parse-sse-stream";
 import { ToreLogo } from "@/components/brand/tore-logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -200,24 +202,87 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
     setLoading(true);
     const controller = new AbortController();
     abortRef.current = controller;
+
+    // Set once the streaming assistant placeholder has been appended, so
+    // the catch path knows whether there's a partial bubble to clean up on
+    // error/abort — an incomplete turn must never linger as a visible (and
+    // un-persisted) "successful" message. Mirrors legal-ai-chat.tsx.
+    let streamingMessageAdded = false;
+    const removeStreamingPlaceholder = () => {
+      if (!streamingMessageAdded) return;
+      setMessages((current) => current.slice(0, -1));
+      streamingMessageAdded = false;
+    };
+    const appendStreamingDelta = (delta: string) => {
+      if (!streamingMessageAdded) {
+        streamingMessageAdded = true;
+        setMessages((current) => [...current, { role: "ASSISTANT", content: delta }]);
+        return;
+      }
+      setMessages((current) => {
+        const next = current.slice();
+        const last = next[next.length - 1];
+        if (!last || last.role !== "ASSISTANT") return current;
+        next[next.length - 1] = { ...last, content: last.content + delta };
+        return next;
+      });
+    };
+    const finalizeStreamingMessage = (finalMessage: Message) => {
+      if (streamingMessageAdded) {
+        setMessages((current) => {
+          const next = current.slice();
+          next[next.length - 1] = finalMessage;
+          return next;
+        });
+      } else {
+        setMessages((current) => [...current, finalMessage]);
+      }
+      streamingMessageAdded = false;
+    };
+
     try {
       const response = await fetch("/api/ai/chat", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: text, conversationId, caseFileId: conversationId ? undefined : caseFileId }), signal: controller.signal });
-      const data = (await response.json()) as { error?: string; conversationId?: string; message?: { content?: string; citations?: unknown }; code?: string };
-      const interpreted = interpretLegalAiChatAccess({ status: response.status, body: data, question: text });
-      if (interpreted.type === "auth") { setAccessGate(interpreted.gate); setDraft(text); return; }
-      if (interpreted.type === "billing") { const checkout = await requestLawyerCheckout(); setAccessGate({ ...interpreted.gate, checkout: checkout.view, checkoutError: checkout.error }); if (!options?.resume) setDraft(text); return; }
-      if (interpreted.type === "error") throw new Error(interpreted.message);
-      setConversationId(data.conversationId);
-      setMessages((current) => [...current, { role: "ASSISTANT", content: data.message?.content ?? "", citations: parseSafeCitationsFromUnknown(data.message?.citations) }]);
-      // Composer's attachment strip is a "about to send" tray, not a running
-      // list — clear it once the turn lands. The document stays attached to
-      // the conversation server-side either way.
-      setAttachedDocuments([]);
+
+      const contentType = response.headers.get("content-type") ?? "";
+      if (!contentType.includes("text/event-stream")) {
+        // Every non-streaming response is a pre-LLM failure (auth/billing/
+        // entitlement/case-ownership/validation) — same JSON contract this
+        // route used before streaming existed, handled exactly the same way.
+        const data = (await response.json()) as { error?: string; conversationId?: string; message?: { content?: string; citations?: unknown }; code?: string };
+        const interpreted = interpretLegalAiChatAccess({ status: response.status, body: data, question: text });
+        if (interpreted.type === "auth") { setAccessGate(interpreted.gate); setDraft(text); return; }
+        if (interpreted.type === "billing") { const checkout = await requestLawyerCheckout(); setAccessGate({ ...interpreted.gate, checkout: checkout.view, checkoutError: checkout.error }); if (!options?.resume) setDraft(text); return; }
+        if (interpreted.type === "error") throw new Error(interpreted.message);
+        return;
+      }
+
+      if (!response.body) {
+        throw new Error("empty stream body");
+      }
+
+      for await (const frame of parseSseStream(response.body)) {
+        if (frame.event === "delta") {
+          const { text: delta } = frame.data as { text: string };
+          if (delta) appendStreamingDelta(delta);
+        } else if (frame.event === "done") {
+          const payload = frame.data as { conversationId?: string; message?: { id?: string; content?: string; citations?: unknown } };
+          setConversationId(payload.conversationId);
+          finalizeStreamingMessage({ role: "ASSISTANT", content: payload.message?.content ?? "", citations: parseSafeCitationsFromUnknown(payload.message?.citations) });
+          // Composer's attachment strip is a "about to send" tray, not a
+          // running list — clear it once the turn lands. The document stays
+          // attached to the conversation server-side either way.
+          setAttachedDocuments([]);
+        } else if (frame.event === "error") {
+          removeStreamingPlaceholder();
+          throw new Error("stream error");
+        }
+      }
     } catch (err) {
+      removeStreamingPlaceholder();
       if (err instanceof DOMException && err.name === "AbortError") {
         // Cancelled by the user via the Stop button — no error to show.
       } else {
-        setError(err instanceof Error ? err.message : "AI үйлчилгээтэй холбогдоход алдаа гарлаа.");
+        setError(LEGAL_AI_CHAT_RETRY_MESSAGE);
       }
     }
     finally { abortRef.current = null; setLoading(false); }
@@ -240,7 +305,7 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
 
   return (
     <div className="flex min-h-0 flex-1 overflow-hidden bg-[#F4F2EE]" data-testid="lawyer-ai-workbench">
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <header className="flex shrink-0 items-center justify-between gap-3 border-b border-[#0B1F3A]/8 px-4 py-3 sm:px-6">
           <div className="min-w-0">
             {caseContext ? (
