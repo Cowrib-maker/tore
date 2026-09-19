@@ -16,7 +16,7 @@ export default async function LawyerCaseReviewPage({
 }: {
   searchParams: SearchParams;
 }) {
-  await requireActor(UserRole.LAWYER);
+  await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
   const params = await searchParams;
   const caseId =
     (typeof params.caseId === "string" && params.caseId) ||

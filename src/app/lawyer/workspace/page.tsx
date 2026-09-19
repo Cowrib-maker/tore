@@ -5,7 +5,7 @@ import { LawyerWorkspaceHome } from "@/components/case-review/lawyer-workspace-h
 import { UserRole } from "@/domain/enums";
 
 export default async function LawyerWorkspacePage() {
-  const actor = await requireActor(UserRole.LAWYER);
+  const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
   const view = await loadLawyerWorkspaceHome(actor, productionCaseAiDeps());
   return <LawyerWorkspaceHome view={view} />;
 }

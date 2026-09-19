@@ -5,7 +5,11 @@ import { LawyerAppChrome } from "@/components/layout/lawyer-app-chrome";
 import { AccountSharingBanner } from "@/components/account/account-sharing-banner";
 import { DeviceSessionBeacon } from "@/components/account/device-session-beacon";
 import { UserRole } from "@/domain/enums";
-import { getDashboardPath, getProfilePath } from "@/domain/services/rbac";
+import {
+  canActAsLawyer,
+  getDashboardPath,
+  getProfilePath,
+} from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 
 export default async function LawyerLayout({
@@ -14,7 +18,7 @@ export default async function LawyerLayout({
   children: React.ReactNode;
 }) {
   const session = await requirePageSession();
-  if (session.user.role !== UserRole.LAWYER) {
+  if (!canActAsLawyer(session.user.role as UserRole)) {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 

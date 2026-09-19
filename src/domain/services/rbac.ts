@@ -19,6 +19,18 @@ export function getDashboardPath(role: UserRole): string {
   return DASHBOARD_PATH[role];
 }
 
+/**
+ * ADMIN can act as LAWYER for the /lawyer/workspace case-review surface
+ * (matches canAccessRoute's existing "ADMIN reaches every route" policy).
+ * Scoped narrowly to that surface at each call site — this is not a
+ * blanket "ADMIN == LAWYER" grant, and does not affect ownership checks
+ * (assertLawyerReviewer / requireOwnedCaseFile) or any other LAWYER-only
+ * gate that doesn't explicitly call this.
+ */
+export function canActAsLawyer(role: UserRole): boolean {
+  return role === UserRole.LAWYER || role === UserRole.ADMIN;
+}
+
 /** Self-service profile page, where one exists for the role. */
 export const PROFILE_PATH: Partial<Record<UserRole, string>> = {
   [UserRole.CLIENT]: "/client/profile",

@@ -17,8 +17,15 @@ function formatStamp(value: string | null): string {
 }
 
 export default async function LawyerCasesPage() {
-  const actor = await requireActor(UserRole.LAWYER);
-  const cases = await listCaseReviewsForLawyer(actor);
+  const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
+  // listCaseReviewsForLawyer enforces LAWYER-only ownership (assertLawyerReviewer,
+  // shared with lawyer-only APIs outside this workspace — intentionally untouched).
+  // An ADMIN visiting this page owns no case files, so the correct list is empty;
+  // skip the LAWYER-only call rather than widen that shared assertion.
+  const cases =
+    actor.role === UserRole.LAWYER
+      ? await listCaseReviewsForLawyer(actor)
+      : [];
   const showSamples = process.env.NODE_ENV !== "production";
 
   return (

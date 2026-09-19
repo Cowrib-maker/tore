@@ -15,8 +15,14 @@ const ROLE_VALUES = new Set<string>(Object.values(UserRole));
 /**
  * Require an authenticated ACTIVE principal.
  * Authorization trusts the current database role/status (not only JWT claims).
+ *
+ * `role` accepts a single role (existing call sites, unchanged behavior) or
+ * an explicit array of allowed roles. Passing an array is opt-in per call
+ * site — it never implicitly widens what a single-role call accepts.
  */
-export async function requireActor(role?: UserRole): Promise<ActorContext> {
+export async function requireActor(
+  role?: UserRole | UserRole[],
+): Promise<ActorContext> {
   const { session, replaced } = await lookupAuthSession();
   if (replaced) {
     throw new SessionReplacedError();
@@ -34,8 +40,11 @@ export async function requireActor(role?: UserRole): Promise<ActorContext> {
     throw new ForbiddenError();
   }
 
-  if (role !== undefined && record.role !== role) {
-    throw new ForbiddenError();
+  if (role !== undefined) {
+    const allowed = Array.isArray(role) ? role : [role];
+    if (!allowed.includes(record.role)) {
+      throw new ForbiddenError();
+    }
   }
 
   return { userId: record.id, role: record.role };

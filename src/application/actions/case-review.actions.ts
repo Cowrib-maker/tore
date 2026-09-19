@@ -62,7 +62,7 @@ export async function createCaseFileAction(
 ): Promise<ActionState> {
   let caseId: string;
   try {
-    const actor = await requireActor(UserRole.LAWYER);
+    const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
     const file = await createCaseFileForLawyer(actor, {
       title: String(formData.get("title") ?? ""),
       description: String(formData.get("description") ?? ""),
@@ -79,7 +79,7 @@ export async function createCaseFileAction(
 }
 
 export async function openSampleCaseAction(formData: FormData): Promise<void> {
-  const actor = await requireActor(UserRole.LAWYER);
+  const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
   const guard = await guardLawyerAiHttp(
     actor,
     EntitlementFeature.CASE_ANALYSIS,
@@ -97,7 +97,7 @@ export async function submitManualMappingAction(
   formData: FormData,
 ): Promise<CaseReviewActionState> {
   try {
-    const actor = await requireActor(UserRole.LAWYER);
+    const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
     const payload = await submitManualMappingForLawyer(actor, {
       caseId: String(formData.get("caseId") ?? ""),
       expectedVersion: Number(formData.get("expectedVersion") ?? NaN),
@@ -120,7 +120,7 @@ export async function rerunCaseAnalysisAction(
   formData: FormData,
 ): Promise<CaseReviewActionState> {
   try {
-    const actor = await requireActor(UserRole.LAWYER);
+    const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
     await assertEmailVerified(actor.userId);
     const guard = await guardLawyerAiHttp(
       actor,
@@ -162,7 +162,7 @@ export async function generateCaseAiAnalysisAction(
 ): Promise<CaseAiAnalysisActionState> {
   const caseId = String(formData.get("caseId") ?? "");
   try {
-    const actor = await requireActor(UserRole.LAWYER);
+    const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
     await assertEmailVerified(actor.userId);
     const guard = await guardLawyerAiHttp(actor, EntitlementFeature.CASE_ANALYSIS);
     const analysis = await generateCaseAiAnalysisForLawyer(actor, caseId);
@@ -189,7 +189,7 @@ export async function extractCaseTimelineAction(
 ): Promise<CaseTimelineActionState> {
   const caseId = String(formData.get("caseId") ?? "");
   try {
-    const actor = await requireActor(UserRole.LAWYER);
+    const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
     const entries = await extractCaseTimelineForLawyer(actor, caseId);
     revalidatePath(`${REVIEW_PATH}/timeline`);
     return { success: true, entries, caseId };
@@ -213,7 +213,7 @@ export async function generateCaseDraftAction(
   const caseId = String(formData.get("caseId") ?? "");
   const draftType = String(formData.get("draftType") ?? CaseDraftType.LAWYER_POSITION);
   try {
-    const actor = await requireActor(UserRole.LAWYER);
+    const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
     await assertEmailVerified(actor.userId);
     const guard = await guardLawyerAiHttp(actor, EntitlementFeature.CASE_ANALYSIS);
     const draft = await generateCaseDraftForLawyer(actor, caseId, draftType as CaseDraftType);
@@ -232,7 +232,7 @@ export async function updateCaseTitleAction(
   formData: FormData,
 ): Promise<CaseReviewActionState> {
   try {
-    const actor = await requireActor(UserRole.LAWYER);
+    const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
     const updated = await updateCaseFileForLawyer(actor, {
       caseId: String(formData.get("caseId") ?? ""),
       expectedVersion: Number(formData.get("expectedVersion") ?? NaN),
@@ -252,7 +252,7 @@ export async function updateCaseTitleAction(
 }
 
 export async function startCaseChatAction(formData: FormData): Promise<void> {
-  const actor = await requireActor(UserRole.LAWYER);
+  const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
   const caseId = String(formData.get("caseId") ?? "");
   const started = await startCaseConversationForLawyer(actor, caseId);
   revalidatePath(REVIEW_PATH);
@@ -265,26 +265,26 @@ export async function startCaseChatAction(formData: FormData): Promise<void> {
 export async function loadCaseWorkspaceForPage(
   caseId: string,
 ): Promise<CaseWorkspaceView> {
-  const actor = await requireActor(UserRole.LAWYER);
+  const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
   return loadCaseWorkspaceForLawyer(actor, caseId);
 }
 
 export async function loadCaseAiAnalysisForPage(
   caseId: string,
 ): Promise<CaseAiAnalysisResult | null> {
-  const actor = await requireActor(UserRole.LAWYER);
+  const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
   return getLatestCaseAiAnalysisForLawyer(actor, caseId);
 }
 
 export async function loadCaseTimelineForPage(
   caseId: string,
 ): Promise<CaseTimelineEntry[]> {
-  const actor = await requireActor(UserRole.LAWYER);
+  const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
   return listCaseTimelineForLawyer(actor, caseId);
 }
 
 export async function loadCaseDraftsForPage(caseId: string): Promise<CaseDraftResult[]> {
-  const actor = await requireActor(UserRole.LAWYER);
+  const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
   return listCaseDraftsForLawyer(actor, caseId);
 }
 
@@ -293,7 +293,7 @@ export async function caseIntakeAction(
   formData: FormData,
 ): Promise<CaseReviewActionState> {
   try {
-    const actor = await requireActor(UserRole.LAWYER);
+    const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
     const intent = String(formData.get("intent") ?? "");
     const caseId = String(formData.get("caseId") ?? "");
     const expectedVersion = Number(formData.get("expectedVersion") ?? NaN);

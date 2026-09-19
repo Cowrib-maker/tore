@@ -18,7 +18,7 @@ export default async function CaseAiAnalyzePage({
 }: {
   searchParams: SearchParams;
 }) {
-  await requireActor(UserRole.LAWYER);
+  await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
   const params = await searchParams;
   const caseId = typeof params.caseId === "string" ? params.caseId : "";
   if (!caseId) {

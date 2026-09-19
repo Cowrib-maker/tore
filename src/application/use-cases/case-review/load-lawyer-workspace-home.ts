@@ -1,5 +1,5 @@
 import type { ActorContext } from "@/application/common/actor-context";
-import { UserRole } from "@/domain/enums";
+import { canActAsLawyer } from "@/domain/services/rbac";
 import { ForbiddenError } from "@/domain/errors/domain-error";
 
 import { CaseFileAnalysisStatus } from "@/domain/entities/case-file";
@@ -56,7 +56,7 @@ export async function loadLawyerWorkspaceHome(
   actor: ActorContext,
   deps: CaseAiDeps,
 ): Promise<LawyerWorkspaceHomeView> {
-  if (actor.role !== UserRole.LAWYER) {
+  if (!canActAsLawyer(actor.role)) {
     throw new ForbiddenError("Зөвхөн өмгөөлөгч энэ ажлын орчныг нээж болно.");
   }
 
