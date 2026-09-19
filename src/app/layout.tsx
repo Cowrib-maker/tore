@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { LocalePersistence } from "@/components/i18n/locale-persistence";
 import { ImpersonationBannerHost } from "@/components/admin/impersonation-banner-host";
+import { SessionSyncBeacon } from "@/components/account/session-sync-beacon";
 import { FloatingLegalAiWidget } from "@/components/legal-ai/floating-legal-ai-widget";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -77,6 +78,7 @@ export default async function RootLayout({
         <ThemeProvider>
           <TooltipProvider>
             <LocalePersistence locale={locale} />
+            <SessionSyncBeacon />
             <ImpersonationBannerHost />
             {children}
             <FloatingLegalAiWidget />

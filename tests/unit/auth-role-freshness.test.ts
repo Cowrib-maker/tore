@@ -206,6 +206,66 @@ describe("JWT single active session", () => {
     expect(previous).toEqual({ sessionReplaced: true });
   });
 
+  it("reproduces the RSC auth() cookie-drop: a bind-new that never reaches the browser looks like a replacement on the next request", async () => {
+    // Request 1: a legacy JWT with no sid, decoded during a Server Component
+    // auth() call. decideActiveSession resolves "bind-new": the DB hash is
+    // rotated immediately, and the callback's *returned* token carries the
+    // new sid. In production this is the token an RSC render can never turn
+    // into a Set-Cookie header, so the browser's cookie is left unchanged.
+    findAuthPrincipal.mockResolvedValueOnce({
+      id: "u1",
+      role: UserRole.CLIENT,
+      status: UserStatus.ACTIVE,
+      activeSessionIdHash: null,
+    });
+
+    const jwt = nodeAuthCallbacks.jwt!;
+    const bound = await jwt(
+      jwtArgs({
+        token: {
+          id: "u1",
+          role: UserRole.CLIENT,
+          status: UserStatus.ACTIVE,
+          statusCheckedAt: Date.now(),
+        },
+      }),
+    );
+
+    expect(bound?.sessionReplaced).toBeUndefined();
+    expect(typeof bound?.sid).toBe("string");
+    expect(rotateActiveSessionIdHash).toHaveBeenCalledTimes(1);
+    const [, rotatedHash] = rotateActiveSessionIdHash.mock.calls[0] as [
+      string,
+      string,
+    ];
+
+    // Request 2: the browser replays its still-stale, still-sid-less cookie
+    // (the Set-Cookie from request 1 never arrived). The DB now holds the
+    // hash rotated in request 1, so decideActiveSession sees no sid against
+    // a bound hash and — correctly, per its own contract — reports the
+    // session as replaced. This is the defect: a legitimate, never-replaced
+    // session gets signed out.
+    findAuthPrincipal.mockResolvedValueOnce({
+      id: "u1",
+      role: UserRole.CLIENT,
+      status: UserStatus.ACTIVE,
+      activeSessionIdHash: rotatedHash,
+    });
+
+    const replayed = await jwt(
+      jwtArgs({
+        token: {
+          id: "u1",
+          role: UserRole.CLIENT,
+          status: UserStatus.ACTIVE,
+          statusCheckedAt: Date.now(),
+        },
+      }),
+    );
+
+    expect(replayed).toEqual({ sessionReplaced: true });
+  });
+
   it.each([UserRole.CLIENT, UserRole.LAWYER, UserRole.ADMIN] as const)(
     "rejects a replaced %s session",
     async (role) => {
