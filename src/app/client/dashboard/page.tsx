@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { UserRole } from "@/domain/enums";
-import { getDashboardPath } from "@/domain/services/rbac";
+import { canActAsClient, getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 import { cn } from "@/lib/utils";
 
@@ -26,7 +26,7 @@ export default async function ClientDashboardPage() {
     redirect("/login");
   }
 
-  if (session.user.role !== UserRole.CLIENT) {
+  if (!canActAsClient(session.user.role as UserRole)) {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 

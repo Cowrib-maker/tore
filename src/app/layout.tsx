@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { LocalePersistence } from "@/components/i18n/locale-persistence";
+import { AdminSurfaceSwitcherHost } from "@/components/admin/admin-surface-switcher-host";
 import { ImpersonationBannerHost } from "@/components/admin/impersonation-banner-host";
 import { SessionSyncBeacon } from "@/components/account/session-sync-beacon";
 import { FloatingLegalAiWidget } from "@/components/legal-ai/floating-legal-ai-widget";
@@ -81,6 +82,7 @@ export default async function RootLayout({
             <SessionSyncBeacon />
             <ImpersonationBannerHost />
             {children}
+            <AdminSurfaceSwitcherHost />
             <FloatingLegalAiWidget />
             <Toaster richColors closeButton />
           </TooltipProvider>

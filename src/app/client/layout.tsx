@@ -3,7 +3,11 @@ import { redirect } from "next/navigation";
 import { requirePageSession } from "@/application/common/session";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { UserRole } from "@/domain/enums";
-import { getDashboardPath, getProfilePath } from "@/domain/services/rbac";
+import {
+  canActAsClient,
+  getDashboardPath,
+  getProfilePath,
+} from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 
 export default async function ClientLayout({
@@ -12,7 +16,7 @@ export default async function ClientLayout({
   children: React.ReactNode;
 }) {
   const session = await requirePageSession();
-  if (session.user.role !== UserRole.CLIENT) {
+  if (!canActAsClient(session.user.role as UserRole)) {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 

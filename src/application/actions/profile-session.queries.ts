@@ -11,6 +11,7 @@ import { getSessionUser } from "@/application/common/session";
 import type { ClientProfile, LawyerProfile } from "@/domain/entities/profile";
 import type { User } from "@/domain/entities/user";
 import { UserRole } from "@/domain/enums";
+import { canActAsClient } from "@/domain/services/rbac";
 import {
   clientProfileRepository,
   lawyerProfileRepository,
@@ -37,7 +38,10 @@ export type LawyerProfileSessionResult =
 export const getClientProfileForSession = cache(
   async (): Promise<ClientProfileSessionResult> => {
     const session = await getSessionUser();
-    if (!session?.user?.id || session.user.role !== UserRole.CLIENT) {
+    if (
+      !session?.user?.id ||
+      !canActAsClient(session.user.role as UserRole)
+    ) {
       return { status: "unauthenticated" };
     }
 

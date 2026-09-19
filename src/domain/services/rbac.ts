@@ -31,6 +31,16 @@ export function canActAsLawyer(role: UserRole): boolean {
   return role === UserRole.LAWYER || role === UserRole.ADMIN;
 }
 
+/**
+ * ADMIN can act as CLIENT for the /client/dashboard surface, mirroring
+ * canActAsLawyer. Scoped narrowly at each call site — does not widen
+ * client operational endpoints (billing, bookings, notifications), which
+ * keep their own independent CLIENT-only checks.
+ */
+export function canActAsClient(role: UserRole): boolean {
+  return role === UserRole.CLIENT || role === UserRole.ADMIN;
+}
+
 /** Self-service profile page, where one exists for the role. */
 export const PROFILE_PATH: Partial<Record<UserRole, string>> = {
   [UserRole.CLIENT]: "/client/profile",
