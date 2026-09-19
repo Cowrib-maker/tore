@@ -184,3 +184,42 @@ export {
   createDoctrineEngine,
 } from "./doctrine.service";
 export type { DoctrineEngineDependenciesWithCaseAnalysis } from "./doctrine.service";
+
+// checkAdministrativeAdmissibility is deliberately NOT exported —
+// analyzeAdministrativeCase is the only public entry point for
+// administrative case analysis (see admissibility-check.ts).
+export {
+  ADMINISTRATIVE_DEFECT_CONSEQUENCES,
+  ADMINISTRATIVE_DISPUTE_SUBJECT_LABELS,
+  ADMINISTRATIVE_REMEDY_CLAIMS,
+  ADMISSIBILITY_ALL_ELEMENTS,
+  ADMISSIBILITY_CONDITIONAL_ELEMENTS,
+  ADMISSIBILITY_MANDATORY_ELEMENTS,
+  ADMISSIBILITY_TEST_ID,
+  ACT_CLASSIFICATION_TEST_ID,
+  AdministrativeDefectKind,
+  AdministrativeDisputeSubject,
+  AdministrativeRemedyClaimKind,
+  COMPETENCE_CONCEPT,
+  FORMAL_LEGALITY_CATEGORIES,
+  FORMAL_LEGALITY_ELEMENTS,
+  FORMAL_LEGALITY_TEST_ID,
+  METHODOLOGY_SOURCE_ID,
+  SUBSTANTIVE_LEGALITY_ELEMENTS,
+  SUBSTANTIVE_LEGALITY_TEST_ID,
+  SourceBackedAdministrativeDoctrineFramework,
+  analyzeAdministrativeCase,
+  createActClassificationTest,
+  createAdmissibilityTest,
+  createFormalLegalityTest,
+  createSubstantiveLegalityTest,
+  findDefectConsequence,
+  methodologyProvenance,
+  type AdministrativeAdmissibilityRequest,
+  type AdministrativeAdmissibilityResult,
+  type AdministrativeCaseAnalysisRequest,
+  type AdministrativeCaseAnalysisResult,
+  type AdministrativeDefectConsequence,
+  type AdministrativeRemedyClaim,
+  type FormalLegalityCategory,
+} from "./frameworks/administrative";

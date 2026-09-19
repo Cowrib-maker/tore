@@ -22,10 +22,10 @@ import {
   type IRuleRetriever,
 } from "./case-analysis";
 import {
-  EmptyAdministrativeDoctrineFramework,
   EmptyCivilDoctrineFramework,
   EmptyCriminalDoctrineFramework,
 } from "./frameworks";
+import { SourceBackedAdministrativeDoctrineFramework } from "./frameworks/administrative";
 import {
   InMemoryDoctrineRepository,
   type DoctrineEngineDependencies,
@@ -133,7 +133,7 @@ export function createDoctrineEngine(
     overrides.civilFramework ?? new EmptyCivilDoctrineFramework();
   const administrativeFramework =
     overrides.administrativeFramework ??
-    new EmptyAdministrativeDoctrineFramework();
+    new SourceBackedAdministrativeDoctrineFramework();
 
   const ruleRetriever =
     overrides.ruleRetriever ??
