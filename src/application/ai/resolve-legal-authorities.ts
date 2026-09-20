@@ -18,7 +18,30 @@ import {
   logLegalCorpusEvent,
   withLatency,
   type LegalCorpusLogOperation,
+  type LegalCorpusLogOutcome,
 } from "@/infrastructure/observability/legal-corpus-metrics";
+
+/**
+ * Maps a `LegalCorpusSource` to its telemetry outcome label. Previously a
+ * two-way ternary that only recognized LEGAL_DATA_ENGINE and mislabeled
+ * every other source (including the newer OFFICIAL_WEB tier) as
+ * "local_fallback" — fixed to a switch so adding a source can't silently
+ * fall through to the wrong label again.
+ */
+function outcomeForRetrievedSource(
+  source: LegalCorpusSource | undefined,
+): LegalCorpusLogOutcome {
+  switch (source) {
+    case LegalCorpusSource.LEGAL_DATA_ENGINE:
+      return "engine_success";
+    case LegalCorpusSource.OFFICIAL_WEB:
+      return "official_web_success";
+    case LegalCorpusSource.LOCAL_CORPUS:
+    case LegalCorpusSource.FALLBACK_LOCAL_CORPUS:
+    default:
+      return "local_fallback";
+  }
+}
 
 /**
  * HTTP/engine-only failure reasons — as opposed to `not_found` (local or
@@ -46,10 +69,7 @@ function logRetrieveOutcome(
   if (retrieved.kind === "retrieved") {
     logLegalCorpusEvent({
       operation,
-      outcome:
-        retrieved.source === LegalCorpusSource.LEGAL_DATA_ENGINE
-          ? "engine_success"
-          : "local_fallback",
+      outcome: outcomeForRetrievedSource(retrieved.source),
       source: retrieved.source,
       latencyMs,
     });
@@ -114,8 +134,17 @@ function logVerifyOutcome(
 export const MISSING_LEGAL_SOURCE_MESSAGE =
   "Холбогдох эрх зүйн зохицуулалт одоогоор баталгаатай эх сурвалжаас олдсонгүй.";
 
+/**
+ * The terminal, honest refusal when an exact citation could not be
+ * confirmed after trying every tier — local corpus, the internal engine,
+ * AND a live official-source lookup (legalinfo.mn — see
+ * OfficialWebLegalCorpusRetriever). This is deliberately never "энэ хууль
+ * надад байхгvй тул зохиохгvй" (a claim that the law doesn't exist) —
+ * TORE does not know that; it only knows it could not verify the citation
+ * against an official source this time.
+ */
 const UNVERIFIED_CITATION_MESSAGE =
-  "Энэ заалтыг TORE-ийн баталгаатай эрх зүйн эх сурвалжаас одоогоор баталгаажуулж чадсангүй. Тиймээс заалтын агуулгыг таамгаар тайлбарлахгүй.";
+  "Албан ёсны эх сурвалжаас баталгаажуулж чадсангүй. Энэ заалтыг TORE-ийн баталгаатай эрх зүйн эх сурвалжаас (локал сан, дотоод хөдөлгүүр, мөн legalinfo.mn) одоогоор баталгаажуулж чадсангүй. Тиймээс заалтын агуулгыг таамгаар тайлбарлахгүй.";
 
 const CONFLICT_CITATION_MESSAGE =
   "Энэ ишлэлийг нэг утгатай баталгаажуулж чадсангүй. Тиймээс аль эх нь хамаарахыг таамгаар сонгохгүй, заалтын агуулгыг таамгаар тайлбарлахгүй.";

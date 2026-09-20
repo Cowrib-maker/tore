@@ -53,6 +53,14 @@ export class LegalInfoListClient {
   async fetchPage(
     categoryId: string,
     page: number,
+    /**
+     * Optional single-Cyrillic-letter alphabet filter (as used by the
+     * official site's own "А Б В..." heading navigation, confirmed live —
+     * `useg="З"` narrows a 956-law category to the ~50 laws starting with
+     * "З"). Lets title discovery scan a handful of pages instead of the
+     * whole category.
+     */
+    useg?: string,
   ): Promise<LegalInfoListPage> {
     const id = categoryId.trim();
     if (!id) {
@@ -65,13 +73,17 @@ export class LegalInfoListClient {
     const endpoint = assertHttpsLegalInfoUrl(
       legalInfoAjaxListUrl(this.locale),
     ).toString();
-    const body = new URLSearchParams({
+    const params: Record<string, string> = {
       filtercategorytypeid: id,
       isactive: "1",
       page: String(page),
       sort: "title",
       sortType: "asc",
-    });
+    };
+    if (useg?.trim()) {
+      params.useg = useg.trim();
+    }
+    const body = new URLSearchParams(params);
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.timeoutMs);

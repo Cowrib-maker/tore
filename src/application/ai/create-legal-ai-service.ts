@@ -1,5 +1,7 @@
-import { FallbackLegalCorpusRetriever } from "@/application/ai/fallback-legal-corpus-retriever";
-import type { LegalCorpusRetriever } from "@/application/ai/legal-corpus";
+import { LegalCorpusSource, type LegalCorpusRetriever } from "@/application/ai/legal-corpus";
+import { TieredLegalCorpusRetriever } from "@/application/ai/tiered-legal-corpus-retriever";
+import { OfficialWebLegalCorpusRetriever } from "@/infrastructure/legal-web-research/official-web-legal-corpus-retriever";
+import { createLegalArchiveStack } from "@/infrastructure/archive";
 import { LegalAiService } from "@/application/ai/legal-ai.service";
 import { createOwnedCaseContextLoader } from "@/application/ai/load-owned-legal-ai-case-context";
 import {
@@ -67,11 +69,36 @@ function createRemoteCorpusRetriever(): LegalCorpusRetriever {
   );
 }
 
+/**
+ * Third (last-resort) tier: an exact citation local + the internal engine
+ * both missed is looked up live on legalinfo.mn, verified, and — best
+ * effort — cached back into the same corpus tables the local tier reads,
+ * via the shared read repository (writes through it succeed once a real
+ * ArchiveService is supplied; only the placeholder archive used
+ * elsewhere for reads refuses writes — see read-only-knowledge-repository.ts).
+ */
+function createOfficialWebCorpusRetriever(): LegalCorpusRetriever {
+  return new OfficialWebLegalCorpusRetriever({
+    timeoutMs: env.LEGAL_WEB_RETRIEVAL_TIMEOUT_MS,
+    maxDiscoveryPages: env.LEGAL_WEB_RETRIEVAL_MAX_DISCOVERY_PAGES,
+    overallDeadlineMs: env.LEGAL_WEB_RETRIEVAL_OVERALL_DEADLINE_MS,
+    rateLimitPerMinute: env.LEGAL_WEB_RETRIEVAL_RATE_LIMIT_PER_MINUTE,
+    cache: async () => ({
+      archive: (await createLegalArchiveStack({ env, usePostgresMetadata: true })).archive,
+      repository: createReadOnlyKnowledgeRepository(),
+    }),
+  });
+}
+
 export function createCorpusRetriever(): LegalCorpusRetriever {
   const local = new KnowledgeLegalCorpusRetriever(
     createReadOnlyKnowledgeRepository(),
   );
-  return new FallbackLegalCorpusRetriever(local, createRemoteCorpusRetriever());
+  return new TieredLegalCorpusRetriever([
+    { retriever: local, source: LegalCorpusSource.LOCAL_CORPUS },
+    { retriever: createRemoteCorpusRetriever(), source: LegalCorpusSource.LEGAL_DATA_ENGINE },
+    { retriever: createOfficialWebCorpusRetriever(), source: LegalCorpusSource.OFFICIAL_WEB },
+  ]);
 }
 
 /**

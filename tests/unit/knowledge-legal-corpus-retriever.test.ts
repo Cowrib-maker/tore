@@ -266,7 +266,7 @@ describe("KnowledgeLegalCorpusRetriever", () => {
     expect(source).toContain("No embeddings");
     expect(source).toContain("searchArticles");
     expect(composition).toContain("KnowledgeLegalCorpusRetriever");
-    expect(composition).toContain("FallbackLegalCorpusRetriever");
+    expect(composition).toContain("TieredLegalCorpusRetriever");
     expect(composition).toContain("HttpLegalCorpusRetriever");
     expect(composition).not.toMatch(/embed|vector|pinecone|chroma/i);
   });

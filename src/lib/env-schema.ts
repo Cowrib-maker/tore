@@ -112,6 +112,24 @@ export const envSchema = z.object({
   ENGINE_SERVICE_TOKEN: z.string().min(8).optional(),
   ENGINE_TIMEOUT_MS: z.coerce.number().int().min(1000).max(30_000).default(8000),
   /**
+   * Live official-source fallback (legalinfo.mn) for an exact citation the
+   * local corpus and the internal engine both missed. Per-request HTTP
+   * timeout for each fetch (detail page or discovery list page).
+   */
+  LEGAL_WEB_RETRIEVAL_TIMEOUT_MS: z.coerce.number().int().min(1000).max(20_000).default(6000),
+  /** Max LegalInfo category-list pages scanned when discovering an unknown law's page by title. */
+  LEGAL_WEB_RETRIEVAL_MAX_DISCOVERY_PAGES: z.coerce.number().int().min(1).max(10).default(4),
+  /** Global (all callers) live-fetch budget per minute — protects legalinfo.mn from being hammered, not a per-user chat rate limit. */
+  LEGAL_WEB_RETRIEVAL_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).max(120).default(20),
+  /**
+   * Overall wall-clock budget for one exact-citation discovery+fetch
+   * attempt, independent of the per-call timeout above. Bounds worst-case
+   * latency so a multi-page discovery scan can never block a chat turn
+   * past the platform's own request timeout — keep this comfortably
+   * under that timeout.
+   */
+  LEGAL_WEB_RETRIEVAL_OVERALL_DEADLINE_MS: z.coerce.number().int().min(2000).max(30_000).default(12_000),
+  /**
    * OpenAI. Server-only. Optional at boot — required when a legal AI completion
    * runs. Never prefix with NEXT_PUBLIC_.
    */

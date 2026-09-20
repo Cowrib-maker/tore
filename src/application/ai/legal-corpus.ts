@@ -47,11 +47,15 @@ export type LegalCorpusUnavailableReason =
  *   chain — i.e. the remote engine was never called because local already
  *   had a verified hit.
  * - LEGAL_DATA_ENGINE: the remote tore-legal-data-engine service.
+ * - OFFICIAL_WEB: a live, verified fetch from an allowlisted official
+ *   source (legalinfo.mn) — only reached when both LOCAL_CORPUS and
+ *   LEGAL_DATA_ENGINE missed. See OfficialWebLegalCorpusRetriever.
  */
 export const LegalCorpusSource = {
   LEGAL_DATA_ENGINE: "LEGAL_DATA_ENGINE",
   LOCAL_CORPUS: "LOCAL_CORPUS",
   FALLBACK_LOCAL_CORPUS: "FALLBACK_LOCAL_CORPUS",
+  OFFICIAL_WEB: "OFFICIAL_WEB",
 } as const;
 
 export type LegalCorpusSource =
