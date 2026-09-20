@@ -127,6 +127,21 @@ export class PrismaBookingRepository implements BookingRepository {
     return records.map(mapBooking);
   }
 
+  async countByStatus(): Promise<Record<BookingStatus, number>> {
+    const rows = await this.db.booking.groupBy({
+      by: ["status"],
+      _count: { _all: true },
+    });
+
+    const counts = Object.fromEntries(
+      Object.values(BookingStatus).map((status) => [status, 0]),
+    ) as Record<BookingStatus, number>;
+    for (const row of rows) {
+      counts[row.status as BookingStatus] = row._count._all;
+    }
+    return counts;
+  }
+
   async bookingNumberExists(bookingNumber: string): Promise<boolean> {
     const count = await this.db.booking.count({ where: { bookingNumber } });
     return count > 0;

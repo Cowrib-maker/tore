@@ -669,6 +669,7 @@ export const en: Dictionary = {
     navTaxonomy: "Taxonomy",
     navSettings: "Settings",
     navHomepage: "Homepage",
+    navAudit: "Audit log",
     navAdminDev: "Dev tools",
     navOrganizations: "Organizations",
     pageOfferings: "Consultation offerings",

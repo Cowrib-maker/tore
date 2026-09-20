@@ -608,6 +608,7 @@ export const ko: Dictionary = {
     navTaxonomy: "분류",
     navSettings: "설정",
     navHomepage: "홈페이지",
+    navAudit: "감사 로그",
     navAdminDev: "Dev tools",
     navOrganizations: "조직",
     pageOfferings: "상담 서비스",

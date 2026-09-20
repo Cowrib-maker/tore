@@ -65,6 +65,11 @@ export function formatNotificationType(
   return map[type] ?? humanize(type);
 }
 
+export function formatAuditAction(action: string, locale?: Locale): string {
+  const map = labels(locale).status.auditAction as Record<string, string>;
+  return map[action] ?? humanize(action);
+}
+
 export function formatDateTimeUtc(date: Date, locale?: Locale): string {
   const tag =
     locale === "mn"

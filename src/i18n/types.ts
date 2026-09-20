@@ -321,6 +321,7 @@ export type Dictionary = {
     navTaxonomy: string;
     navSettings: string;
     navHomepage: string;
+    navAudit: string;
     navAdminDev: string;
     navOrganizations: string;
     pageOfferings: string;

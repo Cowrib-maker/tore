@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
 import { getAdminLawyerVerificationQueue } from "@/application/actions/verification.actions";
+import { AdminLawyerAccountActions } from "@/components/admin/admin-lawyer-account-actions";
 import { AdminListingActions } from "@/components/admin/admin-listing-actions";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { ReviewCredentialActions } from "@/components/verification/review-credential-actions";
@@ -216,12 +217,19 @@ export default async function AdminLawyersPage() {
                   {item.lawyer.isListed ? m.common.yes : m.common.no}
                 </p>
               </div>
-              <AdminListingActions
-                lawyerProfileId={item.lawyer.id}
-                isListed={item.lawyer.isListed}
-                canList={isLawyerVerified(item.lawyer)}
-                copy={a}
-              />
+              <div className="flex flex-col items-start gap-2">
+                <AdminListingActions
+                  lawyerProfileId={item.lawyer.id}
+                  isListed={item.lawyer.isListed}
+                  canList={isLawyerVerified(item.lawyer)}
+                  copy={a}
+                />
+                <AdminLawyerAccountActions
+                  lawyerProfileId={item.lawyer.id}
+                  verificationStatus={item.lawyer.verificationStatus}
+                  copy={a}
+                />
+              </div>
             </CardContent>
           </Card>
         ))}

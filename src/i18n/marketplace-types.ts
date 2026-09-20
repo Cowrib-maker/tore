@@ -71,6 +71,17 @@ export type MarketplaceDictionary = {
       REVIEW_REQUESTED: string;
       PAYOUT_PROCESSED: string;
     };
+    auditAction: {
+      CREATE: string;
+      UPDATE: string;
+      DELETE: string;
+      LOGIN: string;
+      LOGOUT: string;
+      APPROVE: string;
+      REJECT: string;
+      SUSPEND: string;
+      REFUND: string;
+    };
   };
   weekdays: {
     MONDAY: string;
@@ -458,6 +469,8 @@ export type MarketplaceDictionary = {
     directoryTitle: string;
     directoryHelp: string;
     openDocument: string;
+    suspendLawyer: string;
+    reinstateLawyer: string;
   };
   adminUsers: {
     pageTitle: string;
@@ -481,6 +494,7 @@ export type MarketplaceDictionary = {
     prev: string;
     next: string;
     pageOf: string;
+    forceLogout: string;
   };
   adminTaxonomy: {
     pageTitle: string;
@@ -529,5 +543,41 @@ export type MarketplaceDictionary = {
       how: string;
       faq: string;
     };
+  };
+  adminDashboard: {
+    overviewTitle: string;
+    totalUsers: string;
+    activeUsers: string;
+    suspendedUsers: string;
+    pendingVerifications: string;
+    bookingsTitle: string;
+    bookingsEmpty: string;
+    recentActivityTitle: string;
+    recentActivityCount: string;
+    recentActivityEmpty: string;
+    viewAuditLog: string;
+  };
+  adminAudit: {
+    pageTitle: string;
+    pageHelp: string;
+    filterActor: string;
+    filterEntityType: string;
+    filterAction: string;
+    filterFrom: string;
+    filterTo: string;
+    entityTypeAll: string;
+    actionAll: string;
+    apply: string;
+    clear: string;
+    columnActor: string;
+    columnAction: string;
+    columnEntity: string;
+    columnTimestamp: string;
+    columnDetails: string;
+    systemActor: string;
+    empty: string;
+    prev: string;
+    next: string;
+    pageOf: string;
   };
 };

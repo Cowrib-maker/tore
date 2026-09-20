@@ -2,6 +2,7 @@ import type { User } from "@/domain/entities/user";
 import type {
   ListUsersInput,
   ListUsersResult,
+  PlatformUserCounts,
   UserRepository,
   AuthPrincipal,
 } from "@/domain/repositories/user-repository";
@@ -9,8 +10,7 @@ import type {
   CreateUserInput,
   UpdateUserProfileInput,
 } from "@/domain/entities/user";
-import { UserStatus } from "@/domain/enums";
-import type { UserRole } from "@/domain/enums";
+import { UserRole, UserStatus } from "@/domain/enums";
 import { mapUser, userSelect } from "@/infrastructure/mappers/user.mapper";
 import {
   getPrismaClient,
@@ -181,6 +181,39 @@ export class PrismaUserRepository implements UserRepository {
     ]);
 
     return { items: records.map(mapUser), total };
+  }
+
+  async getPlatformUserCounts(): Promise<PlatformUserCounts> {
+    const where = { deletedAt: null };
+    const [total, byRoleRaw, byStatusRaw] = await Promise.all([
+      this.db.user.count({ where }),
+      this.db.user.groupBy({
+        by: ["role"],
+        where,
+        _count: { _all: true },
+      }),
+      this.db.user.groupBy({
+        by: ["status"],
+        where,
+        _count: { _all: true },
+      }),
+    ]);
+
+    const byRole = Object.fromEntries(
+      Object.values(UserRole).map((role) => [role, 0]),
+    ) as Record<UserRole, number>;
+    for (const row of byRoleRaw) {
+      byRole[row.role as UserRole] = row._count._all;
+    }
+
+    const byStatus = Object.fromEntries(
+      Object.values(UserStatus).map((status) => [status, 0]),
+    ) as Record<UserStatus, number>;
+    for (const row of byStatusRaw) {
+      byStatus[row.status as UserStatus] = row._count._all;
+    }
+
+    return { total, byRole, byStatus };
   }
 
   async updateStatus(userId: string, status: UserStatus): Promise<User> {

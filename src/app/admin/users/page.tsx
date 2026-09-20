@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
 import { getAdminUsersList } from "@/application/actions/admin-users.actions";
+import { AdminForceLogoutButton } from "@/components/admin/admin-force-logout-button";
 import { AdminUserStatusButton } from "@/components/admin/admin-user-status-button";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { Badge } from "@/components/ui/badge";
@@ -177,12 +178,18 @@ export default async function AdminUsersPage({
                   {au.joined} {user.createdAt.toISOString().slice(0, 10)}
                 </p>
                 {user.id !== session.user.id ? (
-                  <AdminUserStatusButton
-                    userId={user.id}
-                    status={user.status}
-                    suspendLabel={au.suspend}
-                    activateLabel={au.activate}
-                  />
+                  <div className="flex items-center gap-2">
+                    <AdminUserStatusButton
+                      userId={user.id}
+                      status={user.status}
+                      suspendLabel={au.suspend}
+                      activateLabel={au.activate}
+                    />
+                    <AdminForceLogoutButton
+                      userId={user.id}
+                      label={au.forceLogout}
+                    />
+                  </div>
                 ) : null}
               </CardContent>
             </Card>

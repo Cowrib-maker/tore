@@ -18,6 +18,13 @@ export type ListUsersResult = {
   total: number;
 };
 
+/** Platform-wide counts for the admin dashboard. Excludes soft-deleted users. */
+export type PlatformUserCounts = {
+  total: number;
+  byRole: Record<UserRole, number>;
+  byStatus: Record<UserStatus, number>;
+};
+
 export type AuthPrincipal = {
   id: string;
   role: UserRole;
@@ -42,6 +49,7 @@ export interface UserRepository {
   /** Sets a new email and resets verification (the new address is unverified). */
   updateEmail(userId: string, email: string): Promise<User>;
   listUsers(input: ListUsersInput): Promise<ListUsersResult>;
+  getPlatformUserCounts(): Promise<PlatformUserCounts>;
   updateStatus(userId: string, status: UserStatus): Promise<User>;
   findAuthPrincipal(id: string): Promise<AuthPrincipal | null>;
   rotateActiveSessionIdHash(userId: string, sessionIdHash: string): Promise<void>;

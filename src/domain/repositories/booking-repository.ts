@@ -34,6 +34,8 @@ export interface BookingRepository {
     excludeBookingId?: string,
   ): Promise<Booking[]>;
   bookingNumberExists(bookingNumber: string): Promise<boolean>;
+  /** Platform-wide count per status, for the admin dashboard. Zero-filled for every status. */
+  countByStatus(): Promise<Record<BookingStatus, number>>;
   create(input: CreateBookingInput): Promise<Booking>;
   updateStatus(id: string, status: BookingStatus): Promise<Booking>;
   accept(id: string): Promise<Booking>;

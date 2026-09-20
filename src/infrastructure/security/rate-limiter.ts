@@ -168,6 +168,18 @@ export const CREDENTIAL_REVIEW_RATE_LIMIT = {
   windowMs: 15 * 60 * 1000,
 };
 
+/** Admin force-logout: 30 / 15 minutes / admin user */
+export const ADMIN_FORCE_LOGOUT_RATE_LIMIT = {
+  limit: 30,
+  windowMs: 15 * 60 * 1000,
+};
+
+/** Admin lawyer account suspend/reinstate: 60 / 15 minutes / admin user */
+export const ADMIN_LAWYER_ACCOUNT_RATE_LIMIT = {
+  limit: 60,
+  windowMs: 15 * 60 * 1000,
+};
+
 /** Notification mark-read: 60 / 15 minutes / user */
 export const NOTIFICATION_WRITE_RATE_LIMIT = {
   limit: 60,
