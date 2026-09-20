@@ -99,7 +99,7 @@ export async function extractVerifiedLegalInfoArticle(input: {
   const matchedNumber = article.articleNumber ?? input.article;
 
   const struckLocators = collectStruckLocators(input.html);
-  if (struckLocators.has(matchedNumber) || struckLocators.has(input.article)) {
+  if (isArticleNumberStruck(matchedNumber, struckLocators)) {
     return { kind: "repealed", articleNumber: matchedNumber };
   }
 
@@ -138,8 +138,15 @@ const STRUCK_PARAGRAPH_PATTERN = /<s[^>]*>\s*(\d+\.\d+)\s*\./g;
  * own convention for showing a repealed provision inline. Regex over raw
  * HTML, not the parsed tree, because the shared parser deliberately
  * strips all markup (including `<s>`) before this module ever sees text.
+ *
+ * Exported so cache-verified-web-document.ts can apply the exact same
+ * detection at the cache boundary — the shared LegalInfoKnowledgeParser
+ * (batch ingestion's parser, reused for validation before a cache write)
+ * has already lost the `<s>` markers by the time it produces
+ * `KnowledgeArticle[]`, so caching must scan the same raw HTML
+ * independently rather than trust the parser's output.
  */
-function collectStruckLocators(html: string): Set<string> {
+export function collectStruckLocators(html: string): Set<string> {
   const struck = new Set<string>();
   for (const pattern of [STRUCK_HEADING_PATTERN, STRUCK_PARAGRAPH_PATTERN]) {
     pattern.lastIndex = 0;
@@ -149,4 +156,22 @@ function collectStruckLocators(html: string): Set<string> {
     }
   }
   return struck;
+}
+
+/**
+ * True when `articleNumber` (e.g. "40" or a dotted paragraph "40.1") is
+ * struck through — either directly, or because its parent article's own
+ * heading is struck (a repealed article's paragraphs are repealed with
+ * it, even on the rare page where a child paragraph isn't individually
+ * re-wrapped in its own `<s>`).
+ */
+export function isArticleNumberStruck(
+  articleNumber: string,
+  struckLocators: ReadonlySet<string>,
+): boolean {
+  if (struckLocators.has(articleNumber)) {
+    return true;
+  }
+  const base = articleNumber.split(".")[0]!;
+  return base !== articleNumber && struckLocators.has(base);
 }

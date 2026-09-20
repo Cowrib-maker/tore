@@ -17,6 +17,19 @@
  * of a successful live verification, never a precondition for answering
  * the student/lawyer's actual question — a cache failure must never turn
  * an otherwise-successful citation answer into an error.
+ *
+ * Repealed-article safety (post-audit fix): the shared
+ * `LegalInfoKnowledgeParser` used for validation below strips `<s>`
+ * (struck-through) markup before producing `KnowledgeArticle[]`, so a
+ * repealed article elsewhere on the SAME page as the one just verified
+ * would otherwise be cached as an ordinary, unflagged article — and the
+ * local-corpus retrieval path has no repeal check of its own, unlike the
+ * live web path (see legalinfo-article-extraction.ts). Before persisting,
+ * this module independently re-scans the raw HTML for struck locators
+ * (the exact same detection the live path uses) and drops any matching
+ * article from what gets saved. The document and every non-repealed
+ * article on the page are still cached normally — only struck locators
+ * are excluded.
  */
 import type { ArchiveService } from "@/engine/data/archive";
 import {
@@ -31,6 +44,7 @@ import {
   UnicodeKnowledgeNormalizer,
 } from "@/engine/knowledge";
 import type { IKnowledgeRepository, RawKnowledgeDocument } from "@/engine/knowledge/types";
+import { collectStruckLocators, isArticleNumberStruck } from "./legalinfo-article-extraction";
 
 export type CacheVerifiedWebDocumentInput = {
   html: string;
@@ -100,8 +114,21 @@ export async function cacheVerifiedWebDocument(
       return { cached: false };
     }
 
+    // Drop any struck-through (repealed) article before it ever reaches
+    // the repository — never cache a repealed provision as a normal,
+    // valid article. The emptiness guard above already ran against the
+    // unfiltered parse, so it still genuinely proves the parser worked;
+    // filtering here only removes provisions this module has independent
+    // raw-HTML evidence are repealed.
+    const struckLocators = collectStruckLocators(input.html);
+    const articles = stored.articles.filter(
+      (article) =>
+        !article.articleNumber || !isArticleNumberStruck(article.articleNumber, struckLocators),
+    );
+
     await input.repository.save({
       ...stored,
+      articles,
       provenance: {
         archiveId: archiveRecord.archiveId,
         sha256: archiveRecord.sha256,
