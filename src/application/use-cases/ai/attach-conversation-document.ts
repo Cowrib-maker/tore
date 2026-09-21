@@ -69,9 +69,15 @@ export async function attachConversationDocumentUseCase(
     body: input.body,
   });
 
+  // Extractors (e.g. unpdf/pdf.js for PDFs) may detach or transfer the
+  // underlying ArrayBuffer as a side effect of parsing. `input.body` must
+  // still be valid for the storage write further down, so the extractor
+  // gets its own independent copy — `Uint8Array.prototype.slice()`, never
+  // `subarray()`, which would still share the same buffer — regardless of
+  // what any given extractor implementation does internally.
   const extracted = await deps.extractor.extract({
     format: validated.format,
-    body: input.body,
+    body: input.body.slice(),
   });
 
   const normalized = normalizeExtract(validated.format, extracted);

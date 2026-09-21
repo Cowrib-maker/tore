@@ -165,6 +165,70 @@ describe("attachConversationDocumentUseCase", () => {
     expect(fileStorage.keys[0]).not.toMatch(/C:\\|\.\./);
   });
 
+  it("persists the original, untouched bytes to storage even when the extractor detaches its own copy of the buffer (regression for the unpdf/pdf.js detached-ArrayBuffer bug)", async () => {
+    const store = createStore();
+    const originalBytes = buildMinimalPdf("clause");
+
+    let capturedStorageBody: Uint8Array | undefined;
+    const fileStorage: FileStorage = {
+      async upload(input) {
+        capturedStorageBody = input.body;
+        return {
+          key: `legal-ai-document/${input.ownerId}/uuid-${input.fileName}`,
+          contentType: input.contentType,
+          sizeBytes: input.body.byteLength,
+          originalFileName: input.fileName,
+        };
+      },
+      async delete() {},
+      async getObject() {
+        throw new Error("unused");
+      },
+      async getUrl() {
+        return "/api/files/legal-ai-document/x/y.pdf";
+      },
+    };
+
+    // Real extractors (unpdf/pdf.js for PDFs) detach or transfer the
+    // ArrayBuffer they're handed as a side effect of parsing — simulated
+    // here via a transferred MessageChannel postMessage, the standard way
+    // to genuinely detach an ArrayBuffer in Node.
+    const extractor: LegalAiDocumentExtractor = {
+      async extract({ body }) {
+        const { MessageChannel } = await import("node:worker_threads");
+        const channel = new MessageChannel();
+        const buffer = body.buffer as ArrayBuffer;
+        channel.port1.postMessage(buffer, [buffer]);
+        channel.port1.close();
+        channel.port2.close();
+        // Sanity check the simulation actually detached the extractor's
+        // own copy — otherwise this test would not exercise the bug at all.
+        expect(body.buffer.byteLength).toBe(0);
+        return { status: "OK", text: "Extracted clause", pageCount: 1 };
+      },
+    };
+
+    const result = await attachConversationDocumentUseCase(
+      {
+        userId: "lawyer-1",
+        conversationId: "conv-owner",
+        fileName: "contract.pdf",
+        contentType: "application/pdf",
+        body: originalBytes,
+      },
+      { store, fileStorage, extractor },
+    );
+
+    // PDF extraction still succeeded.
+    expect(result.extractStatus).toBe("OK");
+    // The bytes that reached storage are still a live, readable buffer —
+    // not the detached one the extractor was given — and are byte-identical
+    // to what was actually uploaded.
+    expect(capturedStorageBody).toBeDefined();
+    expect(capturedStorageBody!.buffer.byteLength).toBeGreaterThan(0);
+    expect(Array.from(capturedStorageBody!)).toEqual(Array.from(originalBytes));
+  });
+
   it("does not store invalid files", async () => {
     const store = createStore();
     const fileStorage = createStorage();

@@ -11,12 +11,17 @@ import {
 } from "react";
 import Link from "next/link";
 import {
+  AlertCircle,
   ChevronDown,
+  FileImage,
+  FileSpreadsheet,
   FileText,
+  Loader2,
   Menu,
   Mic,
   Paperclip,
   Plus,
+  RefreshCw,
   Scale,
   Send,
   Shield,
@@ -42,10 +47,7 @@ import {
   LEGAL_AI_DOCUMENT_FILE_ACCEPT,
   LEGAL_AI_NEEDS_OCR_WARNING,
 } from "@/application/ai/legal-ai-document.constants";
-import {
-  clientRejectLegalAiDocument,
-  legalAiExtractStatusHint,
-} from "@/application/ai/legal-ai-document-file";
+import { clientRejectLegalAiDocument } from "@/application/ai/legal-ai-document-file";
 import {
   parseSafeCitationsFromUnknown,
   type LegalAiSafeCitation,
@@ -89,6 +91,15 @@ type AttachedDocument = {
   sizeBytes: number;
   extractStatus: "OK" | "EMPTY" | "FAILED" | "NEEDS_OCR";
   pageCount: number | null;
+};
+
+/** The single in-flight (or just-failed) upload shown as its own attachment
+ * card — distinct from `attachedDocuments`, which only ever holds documents
+ * the server has already accepted. */
+type PendingUpload = {
+  file: File;
+  status: "uploading" | "error";
+  errorMessage?: string;
 };
 
 type LegalAiChatProps = {
@@ -160,7 +171,8 @@ export function LegalAiChat({
   );
   const [loading, setLoading] = useState(false);
   const thinkingStageLabel = useThinkingStageLabel(loading);
-  const [uploading, setUploading] = useState(false);
+  const [pendingUpload, setPendingUpload] = useState<PendingUpload | null>(null);
+  const uploading = pendingUpload?.status === "uploading";
   const [error, setError] = useState("");
   const [attachedDocuments, setAttachedDocuments] = useState<AttachedDocument[]>(
     initialAttachedDocuments,
@@ -193,6 +205,7 @@ export function LegalAiChat({
   const recognitionRef = useRef<{ stop: () => void } | null>(null);
   const conversationIdRef = useRef(conversationId);
   const abortRef = useRef<AbortController | null>(null);
+  const uploadAbortRef = useRef<AbortController | null>(null);
 
   // Whether the transcript is scrolled near its bottom — drives whether new
   // content auto-follows (scrolls down with it) or, if the user has
@@ -250,11 +263,13 @@ export function LegalAiChat({
 
   const resetConversation = useCallback(() => {
     recognitionRef.current?.stop();
+    uploadAbortRef.current?.abort();
     setMessages([]);
     setConversationId(undefined);
     setError("");
     setAccessGate(null);
     setAttachedDocuments([]);
+    setPendingUpload(null);
     setMessage("");
     setListening(false);
     setMobileNavOpen(false);
@@ -276,6 +291,16 @@ export function LegalAiChat({
     setAttachedDocuments((current) =>
       current.filter((document) => document.id !== documentId),
     );
+  }
+
+  function cancelPendingUpload() {
+    uploadAbortRef.current?.abort();
+    setPendingUpload(null);
+  }
+
+  function retryPendingUpload() {
+    if (!pendingUpload) return;
+    void uploadDocument(pendingUpload.file);
   }
 
   function resumeAfterAccessGate() {
@@ -301,17 +326,23 @@ export function LegalAiChat({
 
   async function uploadDocument(file: File) {
     if (!documentUploadEnabled) {
-      setError("Файл хавсаргахын тулд нэвтэрнэ үү.");
+      setPendingUpload({
+        file,
+        status: "error",
+        errorMessage: "Файл хавсаргахын тулд нэвтэрнэ үү.",
+      });
       return;
     }
     const rejected = clientRejectLegalAiDocument(file);
     if (rejected) {
-      setError(rejected);
+      setPendingUpload({ file, status: "error", errorMessage: rejected });
       return;
     }
 
     setError("");
-    setUploading(true);
+    setPendingUpload({ file, status: "uploading" });
+    const controller = new AbortController();
+    uploadAbortRef.current = controller;
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -322,6 +353,7 @@ export function LegalAiChat({
       const response = await fetch("/api/ai/documents", {
         method: "POST",
         body: formData,
+        signal: controller.signal,
       });
       const data = (await response.json()) as {
         error?: string;
@@ -343,6 +375,7 @@ export function LegalAiChat({
 
       if (response.status === 402) {
         pendingUploadRef.current = file;
+        setPendingUpload(null);
         setAccessGate({
           kind: "billing",
           question: "",
@@ -378,15 +411,23 @@ export function LegalAiChat({
           pageCount: data.pageCount ?? null,
         },
       ]);
-      if (extractStatus === "NEEDS_OCR") {
-        setError(LEGAL_AI_NEEDS_OCR_WARNING);
-      }
+      // The hint (e.g. NEEDS_OCR) now renders directly on the attached
+      // document's own card — no separate top-level banner needed.
+      setPendingUpload(null);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Баримт хавсаргахад алдаа гарлаа.",
-      );
+      if (err instanceof DOMException && err.name === "AbortError") {
+        // Cancelled by the user via the card's remove button —
+        // pendingUpload was already cleared by cancelPendingUpload().
+        return;
+      }
+      setPendingUpload({
+        file,
+        status: "error",
+        errorMessage:
+          err instanceof Error ? err.message : "Баримт хавсаргахад алдаа гарлаа.",
+      });
     } finally {
-      setUploading(false);
+      uploadAbortRef.current = null;
     }
   }
 
@@ -610,40 +651,42 @@ export function LegalAiChat({
     >
       <div className={cn(isEmpty ? "w-full" : "mx-auto w-full max-w-3xl")}>
         <div className="rounded-2xl border border-ai-border-strong bg-ai-surface-muted p-2 shadow-[0_12px_32px_-24px_rgba(11,31,58,0.45)] focus-within:border-ai-accent/35">
-          {attachedDocuments.length || uploading ? (
-            <ul className="mb-2 flex max-h-24 flex-wrap gap-2 overflow-y-auto px-0.5 pt-0.5">
-              {attachedDocuments.map((document) => {
-                const hint = legalAiExtractStatusHint(document.extractStatus);
-                return (
-                  <li
-                    key={document.id}
-                    className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-ai-border bg-ai-surface py-1 pr-1.5 pl-2.5 text-xs text-ai-text"
-                  >
-                    <Paperclip className="size-3.5 shrink-0" />
-                    <span className="truncate">{document.fileName}</span>
-                    {hint ? (
-                      <span className="shrink-0 text-[10px] text-amber-700 dark:text-amber-500">
-                        {hint}
-                      </span>
-                    ) : null}
-                    <button
-                      type="button"
-                      aria-label={`${document.fileName} хасах`}
-                      className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-ai-text-subtle hover:bg-ai-accent/8 hover:text-ai-accent"
-                      onClick={() => removeAttachedDocument(document.id)}
-                    >
-                      <X className="size-3" />
-                    </button>
-                  </li>
-                );
-              })}
-              {uploading ? (
-                <li className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-ai-border bg-ai-surface py-1 pr-2.5 pl-2.5 text-xs text-ai-text">
-                  <Paperclip className="size-3.5 shrink-0" />
-                  <span>Файл хавсаргаж байна...</span>
-                </li>
+          {attachedDocuments.length || pendingUpload ? (
+            <div
+              className="mb-2 flex gap-2 overflow-x-auto px-0.5 pt-0.5 pb-1"
+              aria-label="Хавсаргасан баримт"
+            >
+              {attachedDocuments.map((document) => (
+                <AttachedDocumentCard
+                  key={document.id}
+                  fileName={document.fileName}
+                  mimeType={document.mimeType}
+                  sizeBytes={document.sizeBytes}
+                  status="ready"
+                  warningMessage={
+                    document.extractStatus === "NEEDS_OCR"
+                      ? LEGAL_AI_NEEDS_OCR_WARNING
+                      : null
+                  }
+                  onRemove={() => removeAttachedDocument(document.id)}
+                />
+              ))}
+              {pendingUpload ? (
+                <AttachedDocumentCard
+                  fileName={pendingUpload.file.name}
+                  mimeType={pendingUpload.file.type}
+                  sizeBytes={pendingUpload.file.size}
+                  status={pendingUpload.status}
+                  errorMessage={pendingUpload.errorMessage}
+                  onRemove={cancelPendingUpload}
+                  onRetry={
+                    pendingUpload.status === "error"
+                      ? retryPendingUpload
+                      : undefined
+                  }
+                />
               ) : null}
-            </ul>
+            </div>
           ) : null}
           <SpellcheckTextarea
             inputRef={messageTextareaRef}
@@ -1062,6 +1105,173 @@ function WorkspaceMark() {
   return (
     <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl border border-ai-border bg-ai-surface">
       <ToreLogo variant="mark" tone={tone} markClassName="size-5" />
+    </div>
+  );
+}
+
+/** Short uppercase type label for the attachment card — from MIME first,
+ * falling back to the filename's own extension for a generic/unknown MIME. */
+function attachmentTypeLabel(mimeType: string, fileName: string): string {
+  const byMime: Record<string, string> = {
+    "application/pdf": "PDF",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+      "DOCX",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+      "XLSX",
+    "image/jpeg": "JPG",
+    "image/jpg": "JPG",
+    "image/png": "PNG",
+    "image/webp": "WEBP",
+    "text/plain": "TXT",
+    "text/csv": "CSV",
+  };
+  const normalizedMime = mimeType.split(";")[0]?.trim().toLowerCase() ?? "";
+  if (byMime[normalizedMime]) {
+    return byMime[normalizedMime];
+  }
+  const extension = fileName.includes(".") ? fileName.split(".").pop() : "";
+  return extension ? extension.toUpperCase() : "FILE";
+}
+
+/** lucide-react's own `File` icon is deliberately not used here — it would
+ * shadow the Web `File` type this component relies on elsewhere. */
+function AttachmentTypeIcon({
+  mimeType,
+  fileName,
+  className,
+}: {
+  mimeType: string;
+  fileName: string;
+  className?: string;
+}) {
+  if (mimeType.startsWith("image/")) {
+    return <FileImage className={className} />;
+  }
+  const label = attachmentTypeLabel(mimeType, fileName);
+  if (label === "XLSX") {
+    return <FileSpreadsheet className={className} />;
+  }
+  return <FileText className={className} />;
+}
+
+function formatAttachmentSize(bytes: number): string {
+  if (!bytes || bytes <= 0) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  const kb = bytes / 1024;
+  if (kb < 1024) return `${kb.toFixed(kb < 10 ? 1 : 0)} KB`;
+  const mb = kb / 1024;
+  return `${mb.toFixed(mb < 10 ? 1 : 0)} MB`;
+}
+
+/**
+ * The composer's document attachment card — covers all three states an
+ * attachment can be in: "uploading" (in flight), "ready" (server-accepted,
+ * still shown until the message is sent), and "error" (rejected or failed,
+ * removable and retryable in place). Cards sit in a horizontally-scrolling
+ * row so the composer's own height never grows past one row of cards,
+ * regardless of how many are attached.
+ */
+function AttachedDocumentCard({
+  fileName,
+  mimeType,
+  sizeBytes,
+  status,
+  warningMessage,
+  errorMessage,
+  onRemove,
+  onRetry,
+}: {
+  fileName: string;
+  mimeType: string;
+  sizeBytes?: number;
+  status: "uploading" | "ready" | "error";
+  warningMessage?: string | null;
+  errorMessage?: string;
+  onRemove: () => void;
+  onRetry?: () => void;
+}) {
+  const isError = status === "error";
+  const sizeLabel = sizeBytes ? formatAttachmentSize(sizeBytes) : null;
+  const typeLabel = attachmentTypeLabel(mimeType, fileName);
+
+  const statusLine =
+    status === "uploading"
+      ? "TORE боловсруулж байна…"
+      : isError
+        ? errorMessage
+        : [typeLabel, sizeLabel].filter(Boolean).join(" · ");
+
+  return (
+    <div
+      role="group"
+      aria-label={fileName}
+      className={cn(
+        "flex w-44 shrink-0 items-start gap-2 rounded-xl border bg-ai-surface p-2 shadow-[0_6px_16px_-14px_rgba(11,31,58,0.4)] sm:w-52",
+        isError
+          ? "border-red-300 dark:border-red-900/60"
+          : "border-ai-border",
+      )}
+    >
+      <div
+        className={cn(
+          "flex size-8 shrink-0 items-center justify-center rounded-lg",
+          isError
+            ? "bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-400"
+            : "bg-ai-accent/10 text-ai-accent",
+        )}
+      >
+        {status === "uploading" ? (
+          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+        ) : isError ? (
+          <AlertCircle className="size-4" aria-hidden="true" />
+        ) : (
+          <AttachmentTypeIcon
+            mimeType={mimeType}
+            fileName={fileName}
+            className="size-4"
+          />
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-xs font-medium text-ai-text" title={fileName}>
+          {fileName}
+        </p>
+        <p
+          className={cn(
+            "mt-0.5 line-clamp-2 text-[11px] leading-4",
+            isError ? "text-red-600 dark:text-red-400" : "text-ai-text-subtle",
+          )}
+        >
+          {statusLine}
+        </p>
+        {!isError && warningMessage ? (
+          <p className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-amber-700 dark:text-amber-500">
+            {warningMessage}
+          </p>
+        ) : null}
+      </div>
+      <div className="flex shrink-0 flex-col items-center gap-0.5">
+        {isError && onRetry ? (
+          <button
+            type="button"
+            aria-label={`${fileName} дахин оролдох`}
+            title="Дахин оролдох"
+            className="inline-flex size-5 items-center justify-center rounded-full text-ai-text-subtle hover:bg-ai-accent/8 hover:text-ai-accent"
+            onClick={onRetry}
+          >
+            <RefreshCw className="size-3" aria-hidden="true" />
+          </button>
+        ) : null}
+        <button
+          type="button"
+          aria-label={`${fileName} хасах`}
+          title="Хасах"
+          className="inline-flex size-5 items-center justify-center rounded-full text-ai-text-subtle hover:bg-ai-accent/8 hover:text-ai-accent"
+          onClick={onRemove}
+        >
+          <X className="size-3" aria-hidden="true" />
+        </button>
+      </div>
     </div>
   );
 }

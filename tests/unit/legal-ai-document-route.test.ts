@@ -74,7 +74,7 @@ describe("citizen legal AI document upload route contracts", () => {
   );
 
   it("is client-only, email-verified, billed, and rate-limited", () => {
-    expect(route).toContain("requireActor(UserRole.CLIENT)");
+    expect(route).toContain("requireActor([UserRole.CLIENT, UserRole.ADMIN])");
     expect(route).toContain("assertEmailVerified");
     expect(route).toContain("EntitlementFeature.DOCUMENT_ANALYSIS");
     expect(route).toContain("recordCitizenFeatureUsage");
@@ -87,5 +87,13 @@ describe("citizen legal AI document upload route contracts", () => {
     const usageCall = route.indexOf("await recordCitizenFeatureUsage");
     expect(attachCall).toBeGreaterThan(0);
     expect(usageCall).toBeGreaterThan(attachCall);
+  });
+
+  it("also allows ADMIN, but skips the citizen entitlement guard for ADMIN", () => {
+    expect(route).toContain("UserRole.ADMIN");
+    const roleCheck = route.indexOf("actor.role === UserRole.CLIENT");
+    const guardCall = route.indexOf("assertCitizenAiOperation(");
+    expect(roleCheck).toBeGreaterThan(0);
+    expect(guardCall).toBeGreaterThan(roleCheck);
   });
 });
