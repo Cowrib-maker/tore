@@ -29,6 +29,46 @@ export {
   documentGraphId,
   externalGraphId,
   graphEdgeId,
+  parseGraphNodeId,
   provisionGraphId,
   unresolvedGraphId,
+  type ParsedGraphNodeId,
 } from "./ids";
+
+export type {
+  AsyncGraphRepository,
+  GraphEdgeUpsertInput,
+  GraphEdgeUpsertSummary,
+} from "./async-graph-repository";
+
+export {
+  AuthorityPrecedenceBasis,
+  AuthorityPrecedenceConfidence,
+  AuthorityPrecedenceOutcome,
+  DEFAULT_AUTHORITY_PRECEDENCE_TIERS,
+  compareAuthorityPrecedence,
+  defaultAuthorityPrecedencePolicy,
+  type AuthorityForceStatus,
+  type AuthorityPrecedenceCandidate,
+  type AuthorityPrecedencePolicy,
+  type AuthorityPrecedenceResult,
+  type DocumentLevelGraphNodeType,
+} from "./authority-precedence";
+
+export {
+  AuthorityComparisonResolution,
+  COMPARABLE_EDGE_TYPES,
+  batchDirectRelations,
+  compareAuthoritiesByGraph,
+  type AuthorityComparison,
+  type AuthorityComparisonSide,
+  type GraphRelationEvidence,
+} from "./authority-comparison";
+
+export {
+  ConflictFindingType,
+  ConflictResolutionStatus,
+  detectAuthorityConflicts,
+  type ConflictCandidate,
+  type ConflictFinding,
+} from "./conflict-detection";

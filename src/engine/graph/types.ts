@@ -28,6 +28,8 @@ export const GraphEdgeType = {
   REFERS_TO: "REFERS_TO",
   AMENDS: "AMENDS",
   REPEALS: "REPEALS",
+  /** Matches LegalRelationType.SUPERSEDES (engine/knowledge/schema.ts) — a distinct instrument replaces another without a formal REPEALS declaration. */
+  SUPERSEDES: "SUPERSEDES",
   IMPLEMENTS: "IMPLEMENTS",
   INTERPRETS: "INTERPRETS",
   APPLIES: "APPLIES",

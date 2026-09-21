@@ -1606,3 +1606,43 @@ model LegalKnowledgeChunk {
   @@index([documentId, articleNumber])
   @@map("legal_knowledge_chunks")
 }
+
+/**
+ * Persisted projection of src/engine/graph's domain graph (see
+ * GraphEdgeType) onto existing legal-knowledge rows. Stores EDGES only —
+ * this is not a second legal-knowledge store. Nodes are derived at read
+ * time from LegalKnowledgeDocument/LegalKnowledgeArticle by the same
+ * deterministic ids GraphBuilder already uses (src/engine/graph/ids.ts).
+ *
+ * No foreign key to LegalKnowledgeDocument on either side, deliberately:
+ * an edge may cite a law TORE has not ingested yet (a forward reference).
+ * fromLabel/toLabel are a denormalized fallback so such an edge still
+ * renders a readable node before the target is ever ingested.
+ *
+ * Idempotency: id is the same deterministic `graph:edge:{from}:{type}:{to}`
+ * scheme graphEdgeId() already produces, so re-running a projection is a
+ * pure upsert with no duplicate-edge risk.
+ */
+model LegalKnowledgeGraphEdge {
+  id             String   @id
+  edgeType       String   @map("edge_type")
+  fromNodeId     String   @map("from_node_id")
+  toNodeId       String   @map("to_node_id")
+  /** Owning document for cleanup/versioning when a document is re-ingested. Null for edges seeded before either side existed. */
+  fromDocumentId String?  @map("from_document_id")
+  toDocumentId   String?  @map("to_document_id")
+  fromLabel      String   @map("from_label")
+  toLabel        String   @map("to_label")
+  /** Provenance of the EXTRACTION method, e.g. "LEGALINFO_CROSS_REFERENCE" or "DOCUMENT_STRUCTURE" — not the legal source itself. */
+  sourceKind     String   @map("source_kind")
+  evidence       String?  @db.Text
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@unique([fromNodeId, edgeType, toNodeId])
+  @@index([fromNodeId])
+  @@index([toNodeId])
+  @@index([fromDocumentId])
+  @@index([toDocumentId])
+  @@map("legal_knowledge_graph_edges")
+}

@@ -17,6 +17,8 @@ import {
   stagesForTask,
 } from "@/application/ai/legal-ai-task";
 import { detectForeignLegalScope } from "@/engine/relevance";
+import type { AsyncGraphRepository, ConflictFinding } from "@/engine/graph";
+import { formatAuthorityConflictBlock } from "@/application/ai/legal-ai-authority-conflict-block";
 import {
   MISSING_LEGAL_SOURCE_MESSAGE,
   resolveLegalAuthorities,
@@ -79,6 +81,13 @@ export type LegalAiServiceDependencies = {
   corpusRetriever: LegalCorpusRetriever;
   legalQuestionAccess?: LegalQuestionAccessPort;
   caseContextLoader?: LegalAiCaseContextLoader;
+  /**
+   * Optional: enables deterministic, evidence-based conflict detection
+   * among this turn's verified authorities (src/engine/graph). Omitting
+   * it is always safe — resolveLegalAuthorities degrades to an empty
+   * conflicts list, identical to today's behavior.
+   */
+  graphRepository?: AsyncGraphRepository;
 };
 
 /**
@@ -419,6 +428,7 @@ export class LegalAiService {
         retriever: this.dependencies.corpusRetriever,
         requireRetrieval:
           !foreignLegalScope || foreignLegalScope.comparativeWithMn,
+        graphRepository: this.dependencies.graphRepository,
       }),
       capability === LegalAiCapability.LAWYER &&
       ownedCaseFileId &&
@@ -471,6 +481,9 @@ export class LegalAiService {
 
     const verifiedAuthorities =
       authorities.kind === "verified" ? authorities.authorities : undefined;
+    const authorityConflicts: ConflictFinding[] =
+      authorities.kind === "verified" ? authorities.conflicts : [];
+    const authorityConflictBlock = formatAuthorityConflictBlock(authorityConflicts);
     const missingLegalSourceMessage =
       foreignLegalScope && !foreignLegalScope.comparativeWithMn
         ? undefined
@@ -501,6 +514,7 @@ export class LegalAiService {
       corpusAvailable: Boolean(verifiedAuthorities?.length),
       verifiedAuthorities,
       caseContextBlock,
+      authorityConflictBlock,
       documentContextBlock,
       hasReadableDocumentText: documents.length > 0 ? hasDocumentText : undefined,
       foreignLegalScope,

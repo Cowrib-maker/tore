@@ -73,6 +73,8 @@ export function edgeTypeFromRelation(
       return GraphEdgeType.AMENDS;
     case LegalRelationType.REPEALS:
       return GraphEdgeType.REPEALS;
+    case LegalRelationType.SUPERSEDES:
+      return GraphEdgeType.SUPERSEDES;
     case LegalRelationType.IMPLEMENTS:
       return GraphEdgeType.IMPLEMENTS;
     case LegalRelationType.INTERPRETS:

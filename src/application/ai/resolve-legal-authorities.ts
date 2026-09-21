@@ -5,6 +5,12 @@ import {
 } from "@/application/ai/legal-ai-citation";
 import type { LegalCorpusRetriever } from "@/application/ai/legal-corpus";
 import {
+  detectAuthorityConflicts,
+  provisionGraphId,
+  type AsyncGraphRepository,
+  type ConflictFinding,
+} from "@/engine/graph";
+import {
   CitationVerificationStatus,
   LegalCorpusSource,
   selectOfficiallyVerifiedAuthorities,
@@ -180,6 +186,15 @@ export type ResolveLegalAuthoritiesResult =
       source: "exact" | "question";
       authorities: ResolvedLegalAuthority[];
       retrievalInvoked: true;
+      /**
+       * Deterministic, evidence-based conflicts among THIS turn's verified
+       * authorities (src/engine/graph/conflict-detection.ts) — never a
+       * semantic-contradiction claim. Empty whenever graphRepository was
+       * not supplied, fewer than two authorities were verified, or (today,
+       * always, since the graph has no persisted edges yet) no explicit
+       * REPEALS/SUPERSEDES relation or opposite temporal force was found.
+       */
+      conflicts: ConflictFinding[];
     }
   | {
       kind: "refused";
@@ -205,6 +220,13 @@ export async function resolveLegalAuthorities(input: {
   question: string;
   retriever: LegalCorpusRetriever;
   requireRetrieval: boolean;
+  /**
+   * Optional: when supplied, verified authorities are additionally
+   * checked for deterministic graph-backed conflicts (see
+   * ResolveLegalAuthoritiesResult.conflicts). Omitting it is always safe
+   * — every "verified" result still has a `conflicts` field, just empty.
+   */
+  graphRepository?: AsyncGraphRepository;
 }): Promise<ResolveLegalAuthoritiesResult> {
   if (!input.requireRetrieval) {
     return { kind: "empty", reason: "not_found", retrievalInvoked: false };
@@ -217,6 +239,7 @@ export async function resolveLegalAuthorities(input: {
       query: exact.query,
       locator: exact.locator,
       retriever: input.retriever,
+      graphRepository: input.graphRepository,
     });
   }
 
@@ -262,7 +285,34 @@ export async function resolveLegalAuthorities(input: {
     source: "question",
     authorities,
     retrievalInvoked: true,
+    conflicts: await safeDetectConflicts(authorities, input.graphRepository),
   };
+}
+
+/**
+ * Never lets a graph-layer failure affect the answer: any error here is
+ * swallowed and reported as no conflicts found, matching how the rest of
+ * this module treats retrieval degradation (honest "could not verify",
+ * never a hard failure of the whole turn).
+ */
+async function safeDetectConflicts(
+  authorities: readonly ResolvedLegalAuthority[],
+  graphRepository: AsyncGraphRepository | undefined,
+): Promise<ConflictFinding[]> {
+  if (!graphRepository || authorities.length < 2) {
+    return [];
+  }
+  try {
+    return await detectAuthorityConflicts(
+      graphRepository,
+      authorities.map((authority) => ({
+        nodeId: provisionGraphId(authority.documentId, authority.nodeId),
+      })),
+    );
+  } catch (error) {
+    console.error("Graph-backed authority conflict detection failed; continuing without it.", error);
+    return [];
+  }
 }
 
 async function resolveExactCitation(input: {
@@ -270,6 +320,7 @@ async function resolveExactCitation(input: {
   query: string;
   locator: string | null;
   retriever: LegalCorpusRetriever;
+  graphRepository?: AsyncGraphRepository;
 }): Promise<ResolveLegalAuthoritiesResult> {
   // Bind to the retriever instance before detaching — this is a method
   // reference, and calling it as a bare function (as the `combined(...)`
@@ -380,11 +431,13 @@ async function resolveExactCitation(input: {
     };
   }
 
+  const resolvedAuthorities = verified.map(toResolvedAuthority);
   return {
     kind: "verified",
     source: "exact",
-    authorities: verified.map(toResolvedAuthority),
+    authorities: resolvedAuthorities,
     retrievalInvoked: true,
+    conflicts: await safeDetectConflicts(resolvedAuthorities, input.graphRepository),
   };
 }
 

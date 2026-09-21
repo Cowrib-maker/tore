@@ -134,6 +134,16 @@ export type PromptBuildInput = {
   reasoningStages?: readonly string[];
   /** Structured owned CaseFile data block (already wrapped). */
   caseContextBlock?: string;
+  /**
+   * Already-formatted warning block when the graph-backed conflict
+   * detector (src/engine/graph/conflict-detection.ts) found a deterministic,
+   * evidence-based conflict among this turn's verified authorities (e.g. an
+   * explicit REPEALS/SUPERSEDES relation, or opposite temporal force with no
+   * relation explaining it). Undefined/empty on every turn until the graph
+   * is actually populated with real relation data — this field exists so
+   * the wiring is correct now, not so it does anything today.
+   */
+  authorityConflictBlock?: string;
   /** Native-text extract from attached files, if any. */
   documentExtract?: string;
   documentFileName?: string;

@@ -50,6 +50,7 @@ export class PromptBuilderService implements IPromptBuilder {
           input.foreignLegalScope,
         ),
         input.caseContextBlock?.trim() ?? "",
+        input.authorityConflictBlock?.trim() ?? "",
         documentContext,
         intentBlock(input),
       ]

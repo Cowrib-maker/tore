@@ -14,6 +14,49 @@ import {
   type LegalCorpusRetrieveResult,
   type LegalCorpusVerifyInput,
 } from "@/application/ai/legal-corpus";
+import {
+  provisionGraphId,
+  GraphEdgeType,
+  type AsyncGraphRepository,
+  type GraphEdge,
+  type GraphEdgeUpsertInput,
+} from "@/engine/graph";
+
+/** Minimal in-memory AsyncGraphRepository fake — proves the live integration seam actually works end-to-end. */
+class FakeGraphRepository implements AsyncGraphRepository {
+  private readonly edges: GraphEdge[] = [];
+  outgoingForManyCalls = 0;
+
+  async upsertEdges(edges: readonly GraphEdgeUpsertInput[]) {
+    for (const edge of edges) {
+      this.edges.push({
+        id: `${edge.fromNodeId}:${edge.edgeType}:${edge.toNodeId}`,
+        type: edge.edgeType,
+        fromId: edge.fromNodeId,
+        toId: edge.toNodeId,
+        evidence: edge.evidence ? [edge.evidence] : [],
+      });
+    }
+    return { inserted: edges.length, updated: 0 };
+  }
+  async findNode() {
+    return null;
+  }
+  async outgoing(nodeId: string) {
+    return this.edges.filter((e) => e.fromId === nodeId);
+  }
+  async incoming(nodeId: string) {
+    return this.edges.filter((e) => e.toId === nodeId);
+  }
+  async outgoingForMany(nodeIds: readonly string[]) {
+    this.outgoingForManyCalls += 1;
+    const idSet = new Set(nodeIds);
+    return this.edges.filter((e) => idSet.has(e.fromId));
+  }
+  async neighbors() {
+    return [];
+  }
+}
 
 const authority = {
   nodeId: "node-1",
@@ -331,8 +374,97 @@ describe("resolveLegalAuthorities — open question (local-only)", () => {
     if (result.kind === "verified") {
       expect(result.source).toBe("question");
       expect(result.authorities).toHaveLength(3);
+      expect(result.conflicts).toEqual([]);
     }
     expect(retriever.verifyCitationCalls).toBe(0);
+  });
+
+  it("conflicts is empty when no graphRepository is supplied — the default, unchanged behavior", async () => {
+    const retriever = new StubRetriever({
+      kind: "retrieved",
+      status: "ok",
+      authorities: [authority, { ...authority, nodeId: "n2" }],
+      retrievedAt: "2026-08-17T00:00:00.000Z",
+    });
+
+    const result = await resolveLegalAuthorities({
+      question: OPEN_QUESTION,
+      retriever,
+      requireRetrieval: true,
+    });
+
+    expect(result.kind).toBe("verified");
+    if (result.kind === "verified") {
+      expect(result.conflicts).toEqual([]);
+    }
+  });
+
+  it("surfaces a real graph-backed conflict end-to-end when a graphRepository with an explicit REPEALS edge is supplied", async () => {
+    const retriever = new StubRetriever({
+      kind: "retrieved",
+      status: "ok",
+      authorities: [authority, { ...authority, nodeId: "n2" }],
+      retrievedAt: "2026-08-17T00:00:00.000Z",
+    });
+    const graphRepository = new FakeGraphRepository();
+    await graphRepository.upsertEdges([
+      {
+        edgeType: GraphEdgeType.REPEALS,
+        fromNodeId: provisionGraphId(authority.documentId, "n2"),
+        toNodeId: provisionGraphId(authority.documentId, authority.nodeId),
+        fromLabel: "newer",
+        toLabel: "older",
+        sourceKind: "DOCUMENT_STRUCTURE",
+        evidence: "art. 5",
+      },
+    ]);
+
+    const result = await resolveLegalAuthorities({
+      question: OPEN_QUESTION,
+      retriever,
+      requireRetrieval: true,
+      graphRepository,
+    });
+
+    expect(result.kind).toBe("verified");
+    if (result.kind === "verified") {
+      expect(result.conflicts).toHaveLength(1);
+      expect(result.conflicts[0]).toMatchObject({ type: "EXPLICIT_REPEALS", resolutionStatus: "RESOLVED" });
+    }
+    // one batched query for the whole set, not one per authority pair
+    expect(graphRepository.outgoingForManyCalls).toBe(1);
+  });
+
+  it("degrades to no conflicts (never breaks the answer) if the graph repository throws", async () => {
+    const retriever = new StubRetriever({
+      kind: "retrieved",
+      status: "ok",
+      authorities: [authority, { ...authority, nodeId: "n2" }],
+      retrievedAt: "2026-08-17T00:00:00.000Z",
+    });
+    const throwingRepository: AsyncGraphRepository = {
+      upsertEdges: async () => ({ inserted: 0, updated: 0 }),
+      findNode: async () => null,
+      outgoing: async () => [],
+      incoming: async () => [],
+      outgoingForMany: async () => {
+        throw new Error("simulated graph outage");
+      },
+      neighbors: async () => [],
+    };
+
+    const result = await resolveLegalAuthorities({
+      question: OPEN_QUESTION,
+      retriever,
+      requireRetrieval: true,
+      graphRepository: throwingRepository,
+    });
+
+    expect(result.kind).toBe("verified");
+    if (result.kind === "verified") {
+      expect(result.conflicts).toEqual([]);
+      expect(result.authorities).toHaveLength(2);
+    }
   });
 
   it("returns empty (never invents) when nothing is found locally", async () => {

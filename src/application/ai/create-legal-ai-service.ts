@@ -31,6 +31,7 @@ import {
 import {
   caseFileRepository,
   entitlementUsageRepository,
+  legalGraphRepository,
   subscriptionRepository,
   unpaidCitizenLegalQuestionUsageRepository,
   userRepository,
@@ -127,6 +128,7 @@ export function createLegalAiService(): LegalAiService {
       userRepository,
     }),
     caseContextLoader: createOwnedCaseContextLoader(caseFileRepository),
+    graphRepository: legalGraphRepository,
   });
 }
 

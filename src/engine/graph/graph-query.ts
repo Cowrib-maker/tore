@@ -97,6 +97,7 @@ const SEMANTIC_EDGE_TYPES: GraphEdgeType[] = [
   GraphEdgeType.REFERS_TO,
   GraphEdgeType.AMENDS,
   GraphEdgeType.REPEALS,
+  GraphEdgeType.SUPERSEDES,
   GraphEdgeType.IMPLEMENTS,
   GraphEdgeType.INTERPRETS,
   GraphEdgeType.APPLIES,
