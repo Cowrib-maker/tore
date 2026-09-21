@@ -31,7 +31,14 @@ const store = new PrismaLegalAiStore();
 
 export async function POST(request: Request) {
   try {
-    const actor = await requireActor(UserRole.CLIENT);
+    // ADMIN is allowed the same document-attachment capability as CLIENT
+    // for product/admin testing of TORE Chat — but ADMIN has no citizen
+    // subscription, so it must never go through assertCitizenAiOperation
+    // (which requires one and would consume its usage quota). CLIENT
+    // behavior below is completely unchanged; ADMIN just skips the
+    // entitlement guard and usage recording. Any other role is rejected
+    // by requireActor exactly as before.
+    const actor = await requireActor([UserRole.CLIENT, UserRole.ADMIN]);
     await assertEmailVerified(actor.userId);
 
     const rate = await consumeRateLimit(
@@ -43,15 +50,18 @@ export async function POST(request: Request) {
       return rateLimitHttpResponse(rate.retryAfterSeconds);
     }
 
-    const guard = await assertCitizenAiOperation(
-      actor,
-      EntitlementFeature.DOCUMENT_ANALYSIS,
-      {
-        subscriptionRepository,
-        entitlementUsageRepository,
-        userRepository,
-      },
-    );
+    const citizenGuard =
+      actor.role === UserRole.CLIENT
+        ? await assertCitizenAiOperation(
+            actor,
+            EntitlementFeature.DOCUMENT_ANALYSIS,
+            {
+              subscriptionRepository,
+              entitlementUsageRepository,
+              userRepository,
+            },
+          )
+        : null;
 
     const formData = await request.formData();
     const file = formData.get("file");
@@ -84,11 +94,13 @@ export async function POST(request: Request) {
       },
     );
 
-    await recordCitizenFeatureUsage(
-      guard.usageId,
-      EntitlementFeature.DOCUMENT_ANALYSIS,
-      { entitlementUsageRepository },
-    );
+    if (citizenGuard) {
+      await recordCitizenFeatureUsage(
+        citizenGuard.usageId,
+        EntitlementFeature.DOCUMENT_ANALYSIS,
+        { entitlementUsageRepository },
+      );
+    }
 
     return NextResponse.json(
       {
