@@ -545,6 +545,18 @@ export const marketplaceEn: MarketplaceDictionary = {
     next: "Next",
     pageOf: "Page {current} of {total}",
     forceLogout: "Force logout",
+    deactivate: "Deactivate",
+    deactivateConfirmBody:
+      "Are you sure you want to deactivate this account? They will no longer be able to sign in.",
+    reasonLabel: "Reason (optional)",
+    cancel: "Cancel",
+    confirm: "Confirm",
+    changeRoleToLawyer: "Change to Lawyer",
+    changeRoleToClient: "Change to Client",
+    changeRoleConfirmToLawyer:
+      "Change this user's role from Client to Lawyer? A new verification will be required.",
+    changeRoleConfirmToClient:
+      "Change this user's role from Lawyer to Client?",
   },
   adminTaxonomy: {
     pageTitle: "Taxonomy",

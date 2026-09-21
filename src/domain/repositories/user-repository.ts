@@ -51,6 +51,8 @@ export interface UserRepository {
   listUsers(input: ListUsersInput): Promise<ListUsersResult>;
   getPlatformUserCounts(): Promise<PlatformUserCounts>;
   updateStatus(userId: string, status: UserStatus): Promise<User>;
+  /** Changes the account's role only. Never touches role-specific profile rows. */
+  updateRole(userId: string, role: UserRole): Promise<User>;
   findAuthPrincipal(id: string): Promise<AuthPrincipal | null>;
   rotateActiveSessionIdHash(userId: string, sessionIdHash: string): Promise<void>;
   clearActiveSessionIdHash(userId: string): Promise<void>;

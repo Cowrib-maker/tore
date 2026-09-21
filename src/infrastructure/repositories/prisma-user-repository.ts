@@ -225,6 +225,15 @@ export class PrismaUserRepository implements UserRepository {
     return mapUser(record);
   }
 
+  async updateRole(userId: string, role: UserRole): Promise<User> {
+    const record = await this.db.user.update({
+      where: { id: userId },
+      data: { role },
+      select: userSelect,
+    });
+    return mapUser(record);
+  }
+
   async updateEmail(userId: string, email: string): Promise<User> {
     try {
       const record = await this.db.user.update({

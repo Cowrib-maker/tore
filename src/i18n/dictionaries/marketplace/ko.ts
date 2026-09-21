@@ -539,6 +539,18 @@ export const marketplaceKo: MarketplaceDictionary = {
     next: "다음",
     pageOf: "{current} / {total} 페이지",
     forceLogout: "강제 로그아웃",
+    deactivate: "비활성화",
+    deactivateConfirmBody:
+      "이 계정을 비활성화하시겠습니까? 더 이상 로그인할 수 없게 됩니다.",
+    reasonLabel: "사유 (선택 사항)",
+    cancel: "취소",
+    confirm: "확인",
+    changeRoleToLawyer: "변호사로 변경",
+    changeRoleToClient: "고객으로 변경",
+    changeRoleConfirmToLawyer:
+      "이 사용자의 역할을 고객에서 변호사로 변경하시겠습니까? 새로운 검증이 필요합니다.",
+    changeRoleConfirmToClient:
+      "이 사용자의 역할을 변호사에서 고객으로 변경하시겠습니까?",
   },
   adminTaxonomy: {
     pageTitle: "분류",

@@ -180,6 +180,12 @@ export const ADMIN_LAWYER_ACCOUNT_RATE_LIMIT = {
   windowMs: 15 * 60 * 1000,
 };
 
+/** Admin user deactivate/reactivate/role-change: 30 / 15 minutes / admin user */
+export const ADMIN_USER_MANAGEMENT_RATE_LIMIT = {
+  limit: 30,
+  windowMs: 15 * 60 * 1000,
+};
+
 /** Notification mark-read: 60 / 15 minutes / user */
 export const NOTIFICATION_WRITE_RATE_LIMIT = {
   limit: 60,

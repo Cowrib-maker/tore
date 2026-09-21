@@ -529,6 +529,16 @@ export const marketplaceZh: MarketplaceDictionary = {
     next: "下一页",
     pageOf: "第 {current} / {total} 页",
     forceLogout: "强制登出",
+    deactivate: "停用账号",
+    deactivateConfirmBody: "确定要停用此账号吗？该用户将无法再登录。",
+    reasonLabel: "原因（可选）",
+    cancel: "取消",
+    confirm: "确认",
+    changeRoleToLawyer: "改为律师",
+    changeRoleToClient: "改为客户",
+    changeRoleConfirmToLawyer:
+      "将该用户的角色从客户改为律师？需要重新进行认证。",
+    changeRoleConfirmToClient: "将该用户的角色从律师改为客户？",
   },
   adminTaxonomy: {
     pageTitle: "分类",

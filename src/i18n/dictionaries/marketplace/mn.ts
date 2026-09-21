@@ -560,6 +560,18 @@ export const marketplaceMn: MarketplaceDictionary = {
     next: "Дараах",
     pageOf: "Хуудас {current} / {total}",
     forceLogout: "Сессийг албадан дуусгах",
+    deactivate: "Идэвхгүй болгох",
+    deactivateConfirmBody:
+      "Энэ хэрэглэгчийн бүртгэлийг идэвхгүй болгодоо итгэлтэй байна уу? Тэрээр системд нэвтрэх боломжгүй болно.",
+    reasonLabel: "Шалтгаан (заавал биш)",
+    cancel: "Цуцлах",
+    confirm: "Баталгаажуулах",
+    changeRoleToLawyer: "Хуульч болгох",
+    changeRoleToClient: "Иргэн болгох",
+    changeRoleConfirmToLawyer:
+      "Энэ хэрэглэгчийн эрхийг Иргэнээс Хуульч болгон өөрчлөх үү? Шинээр баталгаажуулалт шаардагдана.",
+    changeRoleConfirmToClient:
+      "Энэ хэрэглэгчийн эрхийг Хуульчаас Иргэн болгон өөрчлөх үү?",
   },
   adminTaxonomy: {
     pageTitle: "Ангилал",

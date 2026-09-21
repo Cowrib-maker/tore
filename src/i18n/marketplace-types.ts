@@ -495,6 +495,15 @@ export type MarketplaceDictionary = {
     next: string;
     pageOf: string;
     forceLogout: string;
+    deactivate: string;
+    deactivateConfirmBody: string;
+    reasonLabel: string;
+    cancel: string;
+    confirm: string;
+    changeRoleToLawyer: string;
+    changeRoleToClient: string;
+    changeRoleConfirmToLawyer: string;
+    changeRoleConfirmToClient: string;
   };
   adminTaxonomy: {
     pageTitle: string;

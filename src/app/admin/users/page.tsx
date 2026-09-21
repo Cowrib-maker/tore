@@ -2,7 +2,10 @@ import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
 import { getAdminUsersList } from "@/application/actions/admin-users.actions";
+import { AdminChangeUserRoleButton } from "@/components/admin/admin-change-user-role-button";
+import { AdminDeactivateUserButton } from "@/components/admin/admin-deactivate-user-button";
 import { AdminForceLogoutButton } from "@/components/admin/admin-force-logout-button";
+import { AdminReactivateUserButton } from "@/components/admin/admin-reactivate-user-button";
 import { AdminUserStatusButton } from "@/components/admin/admin-user-status-button";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { Badge } from "@/components/ui/badge";
@@ -178,16 +181,31 @@ export default async function AdminUsersPage({
                   {au.joined} {user.createdAt.toISOString().slice(0, 10)}
                 </p>
                 {user.id !== session.user.id ? (
-                  <div className="flex items-center gap-2">
-                    <AdminUserStatusButton
-                      userId={user.id}
-                      status={user.status}
-                      suspendLabel={au.suspend}
-                      activateLabel={au.activate}
-                    />
+                  <div className="flex flex-wrap items-center gap-2">
+                    {user.status === UserStatus.DEACTIVATED ? (
+                      <AdminReactivateUserButton
+                        userId={user.id}
+                        label={au.activate}
+                      />
+                    ) : (
+                      <>
+                        <AdminUserStatusButton
+                          userId={user.id}
+                          status={user.status}
+                          suspendLabel={au.suspend}
+                          activateLabel={au.activate}
+                        />
+                        <AdminDeactivateUserButton userId={user.id} copy={au} />
+                      </>
+                    )}
                     <AdminForceLogoutButton
                       userId={user.id}
                       label={au.forceLogout}
+                    />
+                    <AdminChangeUserRoleButton
+                      userId={user.id}
+                      currentRole={user.role}
+                      copy={au}
                     />
                   </div>
                 ) : null}
