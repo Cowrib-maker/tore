@@ -4,3 +4,4 @@ export {
   type LegalInfoLawParserOptions,
 } from "../adapters/mongolia/legalinfo";
 export { LegalInfoKnowledgeParser } from "./legalinfo-knowledge.parser";
+export { collectStruckLocators, isArticleNumberStruck } from "./struck-content";

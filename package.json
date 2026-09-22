@@ -34,6 +34,7 @@
     "ingest:legalinfo:staging-canary": "tsx scripts/ingest-legalinfo-staging-canary.ts",
     "ingest:legalinfo:cloud": "tsx scripts/ingest-legalinfo-cloud.ts",
     "ingest:legalinfo:local-prisma": "tsx scripts/ingest-legalinfo-local-prisma.ts",
+    "ingest:legalinfo:local-verified": "tsx scripts/ingest-legalinfo-local-verified.ts",
     "ingest:shuukh:canary": "tsx scripts/ingest-shuukh-canary.ts",
     "graph:populate": "tsx scripts/populate-legal-knowledge-graph.ts",
     "extract:legal-vocabulary": "tsx scripts/extract-legal-vocabulary.ts",

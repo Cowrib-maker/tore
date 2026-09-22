@@ -21,6 +21,7 @@ import { RuleBasedKnowledgeMetadataExtractor } from "../metadata";
 import { UnicodeKnowledgeNormalizer } from "../normalizer";
 import { LegalInfoKnowledgeParser } from "../parser/legalinfo-knowledge.parser";
 import { StructuralKnowledgeParser } from "../parser";
+import { collectStruckLocators, isArticleNumberStruck } from "../parser/struck-content";
 import { InMemoryKnowledgeRepository } from "../repository";
 import { KnowledgeEngine } from "../services";
 import { documentTypeForLegalInfoCategory } from "../crawler/legalinfo-categories";
@@ -392,9 +393,41 @@ export class LegalInfoIngestionQueue {
       };
     }
 
-    const stored = result.ingested[0] as StoredKnowledgeDocument | undefined;
-    if (!stored) {
+    const parsedResult = result.ingested[0] as StoredKnowledgeDocument | undefined;
+    if (!parsedResult) {
       return { ok: false, reason: "ingestion produced no stored document" };
+    }
+
+    // The shared parser strips all markup, including legalinfo.mn's <s>
+    // (struck-through) repealed-provision marker, before producing
+    // articles/chunks — so a repealed article would otherwise persist
+    // indistinguishably from current law. Scan the raw HTML independently
+    // (same approach already used to protect the OFFICIAL_WEB cache
+    // boundary — see struck-content.ts's doc comment) and drop struck
+    // articles/chunks before anything is saved.
+    const html = new TextDecoder("utf-8").decode(raw.bytes);
+    const struckLocators = collectStruckLocators(html);
+    const stored: StoredKnowledgeDocument =
+      struckLocators.size === 0
+        ? parsedResult
+        : {
+            ...parsedResult,
+            articles: parsedResult.articles.filter(
+              (article) =>
+                !article.articleNumber ||
+                !isArticleNumberStruck(article.articleNumber, struckLocators),
+            ),
+            chunks: parsedResult.chunks.filter(
+              (chunk) =>
+                !chunk.articleNumber ||
+                !isArticleNumberStruck(chunk.articleNumber, struckLocators),
+            ),
+          };
+    const struckArticleCount = parsedResult.articles.length - stored.articles.length;
+    if (struckArticleCount > 0) {
+      console.warn(
+        `[LegalInfoIngestionQueue] lawId=${doc.lawId}: excluded ${struckArticleCount} struck-through (repealed) article(s) from the persisted corpus.`,
+      );
     }
 
     const title = stored.title?.trim() ?? "";
@@ -404,7 +437,10 @@ export class LegalInfoIngestionQueue {
     if (stored.articles.length === 0) {
       return {
         ok: false,
-        reason: "parser/source-structure failure: article count is 0",
+        reason:
+          struckArticleCount > 0
+            ? "all parsed articles were struck through (repealed) — nothing current to persist"
+            : "parser/source-structure failure: article count is 0",
       };
     }
     if (stored.chunks.length === 0) {
