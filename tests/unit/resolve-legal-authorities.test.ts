@@ -15,6 +15,7 @@ import {
   type LegalCorpusVerifyInput,
 } from "@/application/ai/legal-corpus";
 import {
+  documentGraphId,
   provisionGraphId,
   GraphEdgeType,
   type AsyncGraphRepository,
@@ -464,6 +465,102 @@ describe("resolveLegalAuthorities — open question (local-only)", () => {
     if (result.kind === "verified") {
       expect(result.conflicts).toEqual([]);
       expect(result.authorities).toHaveLength(2);
+      // outgoingForMany throwing (the conflict-detection path) does not
+      // affect temporalValidity, which uses incoming() instead — still
+      // computed normally here, since the fake's incoming() never throws.
+      expect(result.authorities.every((a) => a.temporalValidity?.status === "UNKNOWN")).toBe(true);
+    }
+  });
+
+  it("temporalValidity itself degrades to null (never breaks the answer) if the graph repository's incoming() throws", async () => {
+    const retriever = new StubRetriever({
+      kind: "retrieved",
+      status: "ok",
+      authorities: [authority],
+      retrievedAt: "2026-08-17T00:00:00.000Z",
+    });
+    const throwingIncomingRepository: AsyncGraphRepository = {
+      upsertEdges: async () => ({ inserted: 0, updated: 0 }),
+      findNode: async () => null,
+      outgoing: async () => [],
+      incoming: async () => {
+        throw new Error("simulated graph outage");
+      },
+      outgoingForMany: async () => [],
+      neighbors: async () => [],
+    };
+
+    const result = await resolveLegalAuthorities({
+      question: OPEN_QUESTION,
+      retriever,
+      requireRetrieval: true,
+      graphRepository: throwingIncomingRepository,
+    });
+
+    expect(result.kind).toBe("verified");
+    if (result.kind === "verified") {
+      expect(result.authorities[0]!.temporalValidity).toBeNull();
+    }
+  });
+
+  it("temporalValidity flags a SINGLE surfaced authority as REPEALED when the graph has an explicit repeal targeting its document — the gap a pairwise conflict check alone would miss", async () => {
+    const repealedAuthority = { ...authority, documentId: "doc-old", nodeId: "n1" };
+    const retriever = new StubRetriever({
+      kind: "retrieved",
+      status: "ok",
+      authorities: [repealedAuthority],
+      retrievedAt: "2026-08-17T00:00:00.000Z",
+    });
+    const graphRepository = new FakeGraphRepository();
+    await graphRepository.upsertEdges([
+      {
+        edgeType: GraphEdgeType.REPEALS,
+        fromNodeId: documentGraphId("doc-repealer"),
+        toNodeId: documentGraphId("doc-old"),
+        fromLabel: "repealer",
+        toLabel: "old law",
+        sourceKind: "LEGALINFO_REPEAL_DECLARATION",
+        evidence: "real repeal declaration text",
+      },
+    ]);
+
+    const result = await resolveLegalAuthorities({
+      question: OPEN_QUESTION,
+      retriever,
+      requireRetrieval: true,
+      graphRepository,
+    });
+
+    expect(result.kind).toBe("verified");
+    if (result.kind === "verified") {
+      expect(result.authorities).toHaveLength(1);
+      expect(result.authorities[0]!.temporalValidity?.status).toBe("REPEALED");
+      expect(result.authorities[0]!.temporalValidity?.evidence).toContain("real repeal declaration text");
+      // a single authority never produces a pairwise conflict finding
+      expect(result.conflicts).toEqual([]);
+    }
+  });
+
+  it("temporalValidity is null (not fabricated) for an authority with no repeal evidence and no dates", async () => {
+    const retriever = new StubRetriever({
+      kind: "retrieved",
+      status: "ok",
+      authorities: [{ ...authority, documentId: "doc-untouched" }],
+      retrievedAt: "2026-08-17T00:00:00.000Z",
+    });
+    const graphRepository = new FakeGraphRepository();
+
+    const result = await resolveLegalAuthorities({
+      question: OPEN_QUESTION,
+      retriever,
+      requireRetrieval: true,
+      graphRepository,
+    });
+
+    expect(result.kind).toBe("verified");
+    if (result.kind === "verified") {
+      expect(result.authorities[0]!.temporalValidity?.status).toBe("UNKNOWN");
+      expect(result.authorities[0]!.temporalValidity?.repealChain).toBeNull();
     }
   });
 

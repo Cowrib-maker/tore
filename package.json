@@ -37,6 +37,7 @@
     "ingest:legalinfo:local-verified": "tsx scripts/ingest-legalinfo-local-verified.ts",
     "ingest:shuukh:canary": "tsx scripts/ingest-shuukh-canary.ts",
     "graph:populate": "tsx scripts/populate-legal-knowledge-graph.ts",
+    "audit:repeal-declarations": "tsx scripts/audit-repeal-declarations.ts",
     "extract:legal-vocabulary": "tsx scripts/extract-legal-vocabulary.ts",
     "build:evaluation-corpus": "tsx scripts/build-evaluation-corpus.ts",
     "measure:orthography-engine": "tsx scripts/measure-orthography-engine.ts",

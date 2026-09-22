@@ -51,6 +51,7 @@ export class PromptBuilderService implements IPromptBuilder {
         ),
         input.caseContextBlock?.trim() ?? "",
         input.authorityConflictBlock?.trim() ?? "",
+        input.temporalValidityBlock?.trim() ?? "",
         documentContext,
         intentBlock(input),
       ]

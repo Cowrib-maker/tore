@@ -6,10 +6,15 @@ import {
 import type { LegalCorpusRetriever } from "@/application/ai/legal-corpus";
 import {
   detectAuthorityConflicts,
+  documentGraphId,
   provisionGraphId,
   type AsyncGraphRepository,
   type ConflictFinding,
 } from "@/engine/graph";
+import {
+  resolveTemporalValidity,
+  type TemporalValidityResult,
+} from "@/application/legal-graph/resolve-temporal-validity";
 import {
   CitationVerificationStatus,
   LegalCorpusSource,
@@ -178,6 +183,20 @@ export type ResolvedLegalAuthority = {
   article: string | null;
   paragraph: string | null;
   sourceType: string;
+  /**
+   * Current-status graph/date evidence for this specific document (Phase
+   * 7 of the temporal/authority intelligence foundation) — never a
+   * historical-as-of check, since retrieval already filtered for the
+   * question's own temporal intent before an authority reaches here (see
+   * KnowledgeLegalCorpusRetriever's versionIsProven). This is the
+   * complementary "is this document still current law RIGHT NOW"
+   * signal, closing the gap where a single citation to an
+   * already-repealed law would otherwise carry no repeal signal at all
+   * unless a second, repealing authority happened to be surfaced
+   * alongside it (see `conflicts`, which only fires for a surfaced
+   * pair). Null when graphRepository was not supplied.
+   */
+  temporalValidity?: TemporalValidityResult | null;
 };
 
 export type ResolveLegalAuthoritiesResult =
@@ -276,9 +295,10 @@ export async function resolveLegalAuthorities(input: {
     return { kind: "empty", reason: "not_found", retrievalInvoked: true };
   }
 
-  const authorities = retrieved.authorities
-    .slice(0, MAX_QUESTION_HITS)
-    .map(toResolvedAuthority);
+  const authorities = await withTemporalValidity(
+    retrieved.authorities.slice(0, MAX_QUESTION_HITS).map(toResolvedAuthority),
+    input.graphRepository,
+  );
 
   return {
     kind: "verified",
@@ -287,6 +307,37 @@ export async function resolveLegalAuthorities(input: {
     retrievalInvoked: true,
     conflicts: await safeDetectConflicts(authorities, input.graphRepository),
   };
+}
+
+/**
+ * Attaches current-status temporal validity to each authority (Phase 7).
+ * Never lets a graph-layer failure affect the answer — same degrade-safe
+ * contract as safeDetectConflicts below, just per-authority instead of
+ * per-pair. Bounded by MAX_QUESTION_HITS, so this is at most a handful of
+ * repeal-chain lookups, never a corpus scan.
+ */
+async function withTemporalValidity(
+  authorities: readonly ResolvedLegalAuthority[],
+  graphRepository: AsyncGraphRepository | undefined,
+): Promise<ResolvedLegalAuthority[]> {
+  if (!graphRepository) {
+    return authorities.map((authority) => ({ ...authority, temporalValidity: null }));
+  }
+  return Promise.all(
+    authorities.map(async (authority) => {
+      try {
+        const temporalValidity = await resolveTemporalValidity(graphRepository, {
+          nodeId: documentGraphId(authority.documentId),
+          validFrom: authority.effectiveFrom,
+          validTo: authority.effectiveTo,
+        });
+        return { ...authority, temporalValidity };
+      } catch (error) {
+        console.error("Graph-backed temporal validity resolution failed; continuing without it.", error);
+        return { ...authority, temporalValidity: null };
+      }
+    }),
+  );
 }
 
 /**
@@ -431,7 +482,10 @@ async function resolveExactCitation(input: {
     };
   }
 
-  const resolvedAuthorities = verified.map(toResolvedAuthority);
+  const resolvedAuthorities = await withTemporalValidity(
+    verified.map(toResolvedAuthority),
+    input.graphRepository,
+  );
   return {
     kind: "verified",
     source: "exact",
@@ -458,6 +512,7 @@ function toResolvedAuthority(
     sourceVersion: nullIfBlank(authority.sourceVersion),
     article: nullIfBlank(authority.article) ?? pinpoint.article,
     paragraph: nullIfBlank(authority.paragraph) ?? pinpoint.paragraph,
+    temporalValidity: null,
     sourceType: authority.sourceType ?? VERIFIED_SOURCE_TYPE,
   };
 }

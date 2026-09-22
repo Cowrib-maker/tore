@@ -139,11 +139,19 @@ export type PromptBuildInput = {
    * detector (src/engine/graph/conflict-detection.ts) found a deterministic,
    * evidence-based conflict among this turn's verified authorities (e.g. an
    * explicit REPEALS/SUPERSEDES relation, or opposite temporal force with no
-   * relation explaining it). Undefined/empty on every turn until the graph
-   * is actually populated with real relation data — this field exists so
-   * the wiring is correct now, not so it does anything today.
+   * relation explaining it). Populated whenever two or more of this turn's
+   * verified authorities have a direct graph relation between them — see
+   * resolve-legal-authorities.ts's safeDetectConflicts.
    */
   authorityConflictBlock?: string;
+  /**
+   * Already-formatted warning block (legal-ai-temporal-validity-block.ts)
+   * for any single verified authority whose current-status temporal
+   * validity (resolve-temporal-validity.ts) is REPEALED, EXPIRED, or only
+   * HISTORICALLY_IN_FORCE — the complementary single-authority signal to
+   * authorityConflictBlock, which only fires for a surfaced pair.
+   */
+  temporalValidityBlock?: string;
   /** Native-text extract from attached files, if any. */
   documentExtract?: string;
   documentFileName?: string;

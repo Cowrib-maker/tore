@@ -72,3 +72,11 @@ export {
   type ConflictCandidate,
   type ConflictFinding,
 } from "./conflict-detection";
+
+export {
+  RepealChainTerminalReason,
+  resolveRepealChain,
+  type RepealChainHop,
+  type RepealChainResult,
+  type ResolveRepealChainOptions,
+} from "./repeal-chain";

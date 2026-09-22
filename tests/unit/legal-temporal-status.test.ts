@@ -312,6 +312,90 @@ describe("resolveLegalTemporalStatus", () => {
     expect(result.status).not.toBe(LegalTemporalEvaluationStatus.REPEALED);
   });
 
+  it("a matching REPEALS relation with no effectiveDate is UNKNOWN with a distinct basis — not silently indistinguishable from no evidence at all", () => {
+    const result = resolveLegalTemporalStatus({
+      lawId: "563",
+      validFrom: null,
+      validTo: null,
+      asOfDate: "2026-08-23",
+      explicitRelations: [
+        {
+          relationType: LegalTemporalRelationType.REPEALS,
+          fromLawId: "9406",
+          toLawId: "563",
+          effectiveDate: null,
+          sourceLawId: "9406",
+          evidence: "real repeal declaration; repeal act's own effective date not established locally",
+        },
+      ],
+    });
+    expect(result.status).toBe(LegalTemporalEvaluationStatus.UNKNOWN);
+    expect(result.basis).toBe(LegalTemporalStatusBasis.EXPLICIT_REPEAL_DATE_UNKNOWN);
+    // still never invents a date
+    expect(result.validFrom).toBeNull();
+    expect(result.validTo).toBeNull();
+  });
+
+  it("a matching SUPERSEDES relation with no effectiveDate is also DATE_UNKNOWN, same as REPEALS", () => {
+    const result = resolveLegalTemporalStatus({
+      lawId: "112",
+      validFrom: null,
+      validTo: null,
+      asOfDate: "2018-01-01",
+      explicitRelations: [
+        {
+          relationType: LegalTemporalRelationType.SUPERSEDES,
+          fromLawId: "11705",
+          toLawId: "112",
+          effectiveDate: null,
+          sourceLawId: "11705",
+          evidence: "supersession without a known effective date",
+        },
+      ],
+    });
+    expect(result.basis).toBe(LegalTemporalStatusBasis.EXPLICIT_REPEAL_DATE_UNKNOWN);
+  });
+
+  it("a dateless relation for a DIFFERENT lawId never affects this source", () => {
+    const result = resolveLegalTemporalStatus({
+      lawId: "563",
+      validFrom: null,
+      validTo: null,
+      asOfDate: "2026-08-23",
+      explicitRelations: [
+        {
+          relationType: LegalTemporalRelationType.REPEALS,
+          fromLawId: "9406",
+          toLawId: "999999",
+          effectiveDate: null,
+          sourceLawId: "9406",
+          evidence: "targets a different law entirely",
+        },
+      ],
+    });
+    expect(result.basis).toBe(LegalTemporalStatusBasis.INSUFFICIENT_SOURCE_DATA);
+  });
+
+  it("a dated repeal not yet in effect is still plain UNKNOWN, not DATE_UNKNOWN (the date IS known, just not yet reached)", () => {
+    const result = resolveLegalTemporalStatus({
+      lawId: "59",
+      validFrom: "2002-01-01",
+      validTo: null,
+      asOfDate: "2016-01-01",
+      explicitRelations: [
+        {
+          relationType: LegalTemporalRelationType.REPEALS,
+          fromLawId: "12705",
+          toLawId: "59",
+          effectiveDate: "2017-07-01",
+          sourceLawId: "12705",
+          evidence: "repeal not yet in force on asOfDate",
+        },
+      ],
+    });
+    expect(result.basis).not.toBe(LegalTemporalStatusBasis.EXPLICIT_REPEAL_DATE_UNKNOWN);
+  });
+
   it("repeal-act title does not invent a target lawId", () => {
     const result = resolveLegalTemporalStatus({
       lawId: "12705",

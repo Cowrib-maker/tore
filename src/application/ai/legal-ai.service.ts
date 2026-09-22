@@ -19,6 +19,7 @@ import {
 import { detectForeignLegalScope } from "@/engine/relevance";
 import type { AsyncGraphRepository, ConflictFinding } from "@/engine/graph";
 import { formatAuthorityConflictBlock } from "@/application/ai/legal-ai-authority-conflict-block";
+import { formatTemporalValidityBlock } from "@/application/ai/legal-ai-temporal-validity-block";
 import {
   MISSING_LEGAL_SOURCE_MESSAGE,
   resolveLegalAuthorities,
@@ -484,6 +485,9 @@ export class LegalAiService {
     const authorityConflicts: ConflictFinding[] =
       authorities.kind === "verified" ? authorities.conflicts : [];
     const authorityConflictBlock = formatAuthorityConflictBlock(authorityConflicts);
+    const temporalValidityBlock = verifiedAuthorities
+      ? formatTemporalValidityBlock(verifiedAuthorities)
+      : undefined;
     const missingLegalSourceMessage =
       foreignLegalScope && !foreignLegalScope.comparativeWithMn
         ? undefined
@@ -515,6 +519,7 @@ export class LegalAiService {
       verifiedAuthorities,
       caseContextBlock,
       authorityConflictBlock,
+      temporalValidityBlock,
       documentContextBlock,
       hasReadableDocumentText: documents.length > 0 ? hasDocumentText : undefined,
       foreignLegalScope,
