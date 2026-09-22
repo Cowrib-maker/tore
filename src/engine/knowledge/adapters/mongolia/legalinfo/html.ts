@@ -17,16 +17,33 @@ export function extractLegalInfoMetadata(
     firstMatch(html, /downloadlaw\(\s*['"]1['"]\s*,\s*['"](\d+)['"]/i) ??
     firstMatch(html, /var\s+lawId\s*=\s*['"](\d+)['"]/i);
 
+  // Priority: og:title / <title> before the page's first <h1>.
+  //
+  // Evidence (2026-09-22, real corpus): checked every locally-archived
+  // document where extraction picked the wrong title (lawIds 223, 224 — an
+  // "(...орчуулга) Unofficial translation" banner; 344 — the page's first
+  // ARTICLE heading, "Article 1.Purpose of the Law") against a sample of
+  // documents that parsed correctly (216, 367, 563, 7106). The correct
+  // documents have NO <h1> at all on the page — they were only ever correct
+  // because the old h1-first lookup found nothing and fell through to
+  // og:title. og:title held the real, official title in every one of the 7
+  // documents checked, including all 3 known-bad ones. <h1> is unreliable
+  // whenever present (translation notices, per-article headings, boilerplate
+  // "LAW OF MONGOLIA" stamps) — it is kept only as a last-resort fallback for
+  // a page that has neither a usable og:title nor a <title> tag.
   const title =
-    decodeEntities(firstMatch(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i) ?? "")
-      .replace(/\s+/g, " ")
-      .trim() ||
     decodeEntities(
       firstMatch(
         html,
         /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i,
       ) ?? "",
     ).trim() ||
+    decodeEntities(firstMatch(html, /<title[^>]*>([\s\S]*?)<\/title>/i) ?? "")
+      .replace(/\s+/g, " ")
+      .trim() ||
+    decodeEntities(firstMatch(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i) ?? "")
+      .replace(/\s+/g, " ")
+      .trim() ||
     null;
 
   const canonical = firstMatch(

@@ -24,6 +24,10 @@ import {
   extractLegalInfoCrossReferences,
   type LegalInfoCrossReference,
 } from "@/engine/knowledge/evidence/extract-legalinfo-cross-references";
+import {
+  extractLegalRepealDeclaration,
+  isRepealDeclarationTitle,
+} from "@/engine/knowledge/evidence/extract-legal-repeal-declaration";
 import { LegalIdentifierScheme } from "@/engine/knowledge/schema";
 
 export type ProjectableArticle = {
@@ -161,4 +165,73 @@ function citationEdge(
  */
 function externalLegalInfoNodeId(lawId: string): string {
   return externalGraphId(LegalIdentifierScheme.LEGALINFO_LAW_ID, lawId);
+}
+
+export type ResolveLawByTitle = (
+  normalizedTitle: string,
+) => Promise<{ documentId: string; title: string } | null>;
+
+export type ProjectableRepealDeclarationDocument = {
+  id: string;
+  title: string;
+  /** article 1's text, already persisted — no HTML access needed. */
+  articleOneText: string;
+};
+
+/**
+ * REPEALS edges from the narrow "хүчингүй болсонд тооцох тухай" document
+ * pattern (see extract-legal-repeal-declaration.ts for the real-corpus
+ * evidence this is based on). Only ever called for a document whose own
+ * title already passed {@link isRepealDeclarationTitle} — this function
+ * re-checks anyway so a caller cannot accidentally apply it to an
+ * unrelated document and manufacture a relation that was never declared.
+ *
+ * A target not yet in the local corpus still gets an edge (a forward
+ * reference, identified by the extracted name+date rather than a lawId,
+ * since a repeal declaration has no LegalInfo link to the law it names)
+ * — never silently dropped, and never guessed into a false match.
+ */
+export async function projectRepealDeclaration(
+  document: ProjectableRepealDeclarationDocument,
+  resolveTarget: ResolveLawByTitle,
+): Promise<GraphEdgeUpsertInput[]> {
+  if (!isRepealDeclarationTitle(document.title)) {
+    return [];
+  }
+  const declaration = extractLegalRepealDeclaration(document.articleOneText);
+  if (!declaration) {
+    return [];
+  }
+
+  const fromNodeId = documentGraphId(document.id);
+  const target = await resolveTarget(normalizeLegalTitle(declaration.targetLawName));
+  const toNodeId = target
+    ? documentGraphId(target.documentId)
+    : externalGraphId(
+        LegalIdentifierScheme.CUSTOM,
+        `repeal-declaration:${declaration.targetLawName}:${declaration.targetEnactedDate ?? "unknown-date"}`,
+      );
+
+  return [
+    {
+      edgeType: GraphEdgeType.REPEALS,
+      fromNodeId,
+      toNodeId,
+      fromDocumentId: document.id,
+      toDocumentId: target?.documentId ?? null,
+      fromLabel: document.title,
+      toLabel: target?.title ?? declaration.targetLawName,
+      sourceKind: "LEGALINFO_REPEAL_DECLARATION",
+      evidence: declaration.evidenceText,
+    },
+  ];
+}
+
+/** Same normalization the caller's title index must use, so resolution is consistent. */
+export function normalizeLegalTitle(title: string): string {
+  return title
+    .toUpperCase()
+    .replace(/[/.,"“”]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }

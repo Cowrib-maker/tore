@@ -13,10 +13,16 @@
  *   CONTAINS — every LegalKnowledgeDocument -> its LegalKnowledgeArticle rows.
  *   CITES    — explicit LegalInfo detail-link cross-references found in
  *              archived HTML, via the existing extractLegalInfoCrossReferences.
+ *   REPEALS  — ONLY the narrow "хүчингүй болсонд тооцох тухай" repeal-
+ *              declaration document template (see
+ *              extract-legal-repeal-declaration.ts's doc comment for the
+ *              real-corpus evidence this template match is based on).
+ *              Gated per-document by isRepealDeclarationTitle on that
+ *              document's own title — never applied to arbitrary prose.
  * Deliberately NOT populated (no persisted or extracted source exists
  * anywhere in the repository for these today — see the population
  * report's "Unresolved Relationships" section, not fabricated here):
- *   REPEALS, SUPERSEDES, AMENDS, IMPLEMENTS, INTERPRETS, APPLIES, REFERS_TO.
+ *   SUPERSEDES, AMENDS, IMPLEMENTS, INTERPRETS, APPLIES, REFERS_TO.
  *
  * Safety: reads DATABASE_URL from .env.local only (never .env, which may
  * hold the production Neon URL — see db-migrate-local.ts's header for
@@ -40,9 +46,12 @@ import { classifyDatabaseUrl } from "./lib/database-url-safety";
 
 import { LocalFilesystemArchiveStorage } from "../src/engine/data/archive";
 import { extractLegalInfoCrossReferences } from "../src/engine/knowledge/evidence/extract-legalinfo-cross-references";
+import { isRepealDeclarationTitle } from "../src/engine/knowledge/evidence/extract-legal-repeal-declaration";
 import {
+  normalizeLegalTitle,
   projectCitationsFromReferences,
   projectDocumentContainment,
+  projectRepealDeclaration,
 } from "../src/application/legal-graph/project-legal-knowledge-graph";
 import type { PrismaLegalGraphRepository as PrismaLegalGraphRepositoryType } from "../src/infrastructure/repositories/prisma-legal-graph-repository";
 import type { GraphEdgeUpsertInput } from "../src/engine/graph";
@@ -104,6 +113,8 @@ type Report = {
   htmlArchivesFound: number;
   crossReferencesDiscovered: number;
   crossReferencesUnresolved: number;
+  repealDeclarationsDiscovered: number;
+  repealTargetsUnresolved: number;
   edgesByType: Record<string, number>;
   edgesInserted: number;
   edgesUpdated: number;
@@ -119,6 +130,8 @@ function emptyReport(dryRun: boolean): Report {
     htmlArchivesFound: 0,
     crossReferencesDiscovered: 0,
     crossReferencesUnresolved: 0,
+    repealDeclarationsDiscovered: 0,
+    repealTargetsUnresolved: 0,
     edgesByType: {},
     edgesInserted: 0,
     edgesUpdated: 0,
@@ -159,6 +172,18 @@ async function main(): Promise<void> {
 
   const report = emptyReport(args.dryRun);
 
+  // Built once, corpus-wide (not per-batch): a repeal declaration's target
+  // law can sit in any batch, including one already scanned or one not yet
+  // reached, so resolution must not be limited to whichever page of
+  // documents happens to be in memory at the time.
+  const allDocumentTitles = await prisma.legalKnowledgeDocument.findMany({
+    select: { id: true, title: true },
+  });
+  const titleIndex = new Map<string, { documentId: string; title: string }>();
+  for (const doc of allDocumentTitles) {
+    titleIndex.set(normalizeLegalTitle(doc.title), { documentId: doc.id, title: doc.title });
+  }
+
   try {
     let cursor: string | null = null;
     // Cursor pagination, not offset — stable under concurrent writes and
@@ -182,7 +207,7 @@ async function main(): Promise<void> {
       cursor = documents[documents.length - 1]!.id;
       report.documentsScanned += documents.length;
 
-      await processBatch(documents, { prisma, graphRepository, archiveStorage, report, args });
+      await processBatch(documents, { prisma, graphRepository, archiveStorage, report, args, titleIndex });
     }
 
     console.log(JSON.stringify(report, null, 2));
@@ -200,9 +225,10 @@ async function processBatch(
     archiveStorage: LocalFilesystemArchiveStorage;
     report: Report;
     args: Args;
+    titleIndex: Map<string, { documentId: string; title: string }>;
   },
 ): Promise<void> {
-  const { prisma, graphRepository, archiveStorage, report, args } = ctx;
+  const { prisma, graphRepository, archiveStorage, report, args, titleIndex } = ctx;
   const documentIds = documents.map((d) => d.id);
 
   // One batched query for every article in this batch of documents —
@@ -229,6 +255,43 @@ async function processBatch(
         articles: docArticles.map((a) => ({ id: a.id, title: a.title, articleNumber: a.articleNumber })),
       }),
     );
+  }
+
+  // Gated strictly by the document's own title — never applied to a
+  // document that isn't itself declared as a repeal. Article 1's text is
+  // fetched separately (not via the lean containment-edge `articles`
+  // query above) so the batch's main article scan never pulls the large
+  // `text` column for documents that don't need it.
+  const repealDeclarationEdgesNested: GraphEdgeUpsertInput[][] = [];
+  const repealCandidateIds = documents
+    .filter((d) => isRepealDeclarationTitle(d.title))
+    .map((d) => d.id);
+  if (repealCandidateIds.length > 0) {
+    const articleOnes = await prisma.legalKnowledgeArticle.findMany({
+      where: { documentId: { in: repealCandidateIds }, articleNumber: "1" },
+      select: { documentId: true, text: true },
+    });
+    const articleOneByDocument = new Map(articleOnes.map((a) => [a.documentId, a.text]));
+
+    for (const document of documents) {
+      const articleOneText = articleOneByDocument.get(document.id);
+      if (!articleOneText) {
+        continue;
+      }
+      const edges = await projectRepealDeclaration(
+        { id: document.id, title: document.title, articleOneText },
+        async (normalizedTitle) => titleIndex.get(normalizedTitle) ?? null,
+      );
+      if (edges.length > 0) {
+        report.repealDeclarationsDiscovered += edges.length;
+        for (const edge of edges) {
+          if (!edge.toDocumentId) {
+            report.repealTargetsUnresolved += 1;
+          }
+        }
+        repealDeclarationEdgesNested.push(edges);
+      }
+    }
   }
 
   // One batched query for every archive in this batch — never one query
@@ -310,7 +373,7 @@ async function processBatch(
     }
   }
 
-  const allEdges = [...containmentEdges, ...citationEdgesNested.flat()];
+  const allEdges = [...containmentEdges, ...citationEdgesNested.flat(), ...repealDeclarationEdgesNested.flat()];
   for (const edge of allEdges) {
     report.edgesByType[edge.edgeType] = (report.edgesByType[edge.edgeType] ?? 0) + 1;
   }

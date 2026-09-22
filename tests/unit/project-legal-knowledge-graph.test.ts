@@ -4,9 +4,11 @@ import { GraphEdgeType, documentGraphId, externalGraphId, provisionGraphId } fro
 import { LegalIdentifierScheme } from "@/engine/knowledge/schema";
 import { extractLegalInfoCrossReferences } from "@/engine/knowledge/evidence/extract-legalinfo-cross-references";
 import {
+  normalizeLegalTitle,
   projectCitationsFromReferences,
   projectDocumentContainment,
   projectLegalInfoCitations,
+  projectRepealDeclaration,
 } from "@/application/legal-graph/project-legal-knowledge-graph";
 
 describe("projectDocumentContainment", () => {
@@ -155,5 +157,65 @@ describe("projectCitationsFromReferences", () => {
     const edges = await projectCitationsFromReferences("doc-1", "Law One", references, async () => null);
     expect(edges[0]!.toDocumentId).toBeNull();
     expect(edges[0]!.toNodeId).toBe(externalGraphId(LegalIdentifierScheme.LEGALINFO_LAW_ID, "999"));
+  });
+});
+
+describe("projectRepealDeclaration", () => {
+  // Real document lawId=9406 (see extract-legal-repeal-declaration.ts's own
+  // tests for the same verbatim text) — resolves against a target already
+  // in the local corpus.
+  const repealDoc = {
+    id: "doc-9406",
+    title: "Хөдөлмөр эрхлэлтийг дэмжих тухай хууль хүчингүй болсонд тооцох тухай",
+    articleOneText:
+      "1 дүгээр зүйл.2001 оны 4 дүгээр сарын 19-ний өдөр баталсан Хөдөлмөр эрхлэлтийг дэмжих тухай хуулийг хүчингүй болсонд тооцсугай.",
+  };
+
+  it("projects a REPEALS edge to an already-ingested target, resolved by normalized title", async () => {
+    const edges = await projectRepealDeclaration(repealDoc, async (normalizedTitle) => {
+      expect(normalizedTitle).toBe(normalizeLegalTitle("Хөдөлмөр эрхлэлтийг дэмжих тухай"));
+      return { documentId: "doc-310", title: "Хөдөлмөр эрхлэлтийг дэмжих тухай" };
+    });
+
+    expect(edges).toHaveLength(1);
+    expect(edges[0]).toMatchObject({
+      edgeType: GraphEdgeType.REPEALS,
+      fromNodeId: documentGraphId("doc-9406"),
+      toNodeId: documentGraphId("doc-310"),
+      fromDocumentId: "doc-9406",
+      toDocumentId: "doc-310",
+      fromLabel: repealDoc.title,
+      toLabel: "Хөдөлмөр эрхлэлтийг дэмжих тухай",
+      sourceKind: "LEGALINFO_REPEAL_DECLARATION",
+    });
+    expect(edges[0]!.evidence).toContain("хүчингүй болсонд тооцсугай");
+  });
+
+  it("still projects a REPEALS edge (as a forward reference) when the target isn't in the local corpus yet — never dropped, never guessed", async () => {
+    const edges = await projectRepealDeclaration(repealDoc, async () => null);
+
+    expect(edges).toHaveLength(1);
+    expect(edges[0]!.toDocumentId).toBeNull();
+    expect(edges[0]!.toLabel).toBe("Хөдөлмөр эрхлэлтийг дэмжих тухай");
+    // same target name + date always resolves to the same external node id,
+    // so re-running population never duplicates this forward-reference edge.
+    const again = await projectRepealDeclaration(repealDoc, async () => null);
+    expect(again[0]!.toNodeId).toBe(edges[0]!.toNodeId);
+  });
+
+  it("produces no edge when the document's own title is not a repeal declaration — never applies the template to unrelated documents", async () => {
+    const edges = await projectRepealDeclaration(
+      { id: "doc-1", title: "Иргэний хууль", articleOneText: repealDoc.articleOneText },
+      async () => null,
+    );
+    expect(edges).toEqual([]);
+  });
+
+  it("produces no edge when the title matches but article 1's text doesn't fit the template — never guesses a partial match", async () => {
+    const edges = await projectRepealDeclaration(
+      { ...repealDoc, articleOneText: "1 дүгээр зүйл. Хуулийн зорилт нь энэ хуулиар зохицуулна." },
+      async () => null,
+    );
+    expect(edges).toEqual([]);
   });
 });
