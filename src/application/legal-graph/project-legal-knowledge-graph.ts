@@ -100,11 +100,33 @@ export async function projectLegalInfoCitations(
     rawHtml: input.rawHtml,
   });
 
-  const fromNodeId = documentGraphId(input.sourceDocumentId);
+  return projectCitationsFromReferences(
+    input.sourceDocumentId,
+    input.sourceTitle,
+    crossReferences,
+    input.resolveTarget,
+  );
+}
+
+/**
+ * Same projection as {@link projectLegalInfoCitations}, but takes
+ * already-extracted cross-references directly. Exists so a batch caller
+ * that already read and extracted a document's HTML once (e.g. to
+ * discover every target lawId across a whole batch before doing one
+ * bulk lookup) never has to re-decode and re-parse the same bytes a
+ * second time just to reach this function's edge-shaping logic.
+ */
+export async function projectCitationsFromReferences(
+  sourceDocumentId: string,
+  sourceTitle: string,
+  crossReferences: readonly LegalInfoCrossReference[],
+  resolveTarget: ResolveLegalInfoLawTarget,
+): Promise<GraphEdgeUpsertInput[]> {
+  const fromNodeId = documentGraphId(sourceDocumentId);
   const edges: GraphEdgeUpsertInput[] = [];
   for (const reference of crossReferences) {
-    const target = await input.resolveTarget(reference.targetLawId);
-    edges.push(citationEdge(fromNodeId, input.sourceTitle, reference, target));
+    const target = await resolveTarget(reference.targetLawId);
+    edges.push(citationEdge(fromNodeId, sourceTitle, reference, target));
   }
   return edges;
 }

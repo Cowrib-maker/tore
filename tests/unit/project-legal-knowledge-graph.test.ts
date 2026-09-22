@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { GraphEdgeType, documentGraphId, externalGraphId, provisionGraphId } from "@/engine/graph";
 import { LegalIdentifierScheme } from "@/engine/knowledge/schema";
+import { extractLegalInfoCrossReferences } from "@/engine/knowledge/evidence/extract-legalinfo-cross-references";
 import {
+  projectCitationsFromReferences,
   projectDocumentContainment,
   projectLegalInfoCitations,
 } from "@/application/legal-graph/project-legal-knowledge-graph";
@@ -112,5 +114,46 @@ describe("projectLegalInfoCitations", () => {
       resolveTarget: async () => null,
     });
     expect(edges.every((edge) => edge.edgeType === GraphEdgeType.CITES)).toBe(true);
+  });
+});
+
+describe("projectCitationsFromReferences", () => {
+  it("produces the same edges as projectLegalInfoCitations, given the same already-extracted references — used by the batch population script to avoid re-parsing HTML it already decoded once", async () => {
+    const rawHtml = `<html><body><a href="/mn/detail?lawId=2">ref</a></body></html>`;
+    const references = extractLegalInfoCrossReferences({
+      sourceLawId: "1",
+      sourceUrl: "https://legalinfo.mn/mn/detail?lawId=1",
+      rawHtml,
+    });
+
+    const viaWrapper = await projectLegalInfoCitations({
+      sourceDocumentId: "doc-1",
+      sourceTitle: "Law One",
+      sourceLawId: "1",
+      sourceUrl: "https://legalinfo.mn/mn/detail?lawId=1",
+      rawHtml,
+      resolveTarget: async (lawId) => (lawId === "2" ? { documentId: "doc-2", title: "Law Two" } : null),
+    });
+    const viaDirect = await projectCitationsFromReferences(
+      "doc-1",
+      "Law One",
+      references,
+      async (lawId) => (lawId === "2" ? { documentId: "doc-2", title: "Law Two" } : null),
+    );
+
+    expect(viaDirect).toEqual(viaWrapper);
+    expect(viaDirect).toHaveLength(1);
+    expect(viaDirect[0]).toMatchObject({ toDocumentId: "doc-2", toLabel: "Law Two" });
+  });
+
+  it("still handles an unresolved target when called directly with pre-extracted references", async () => {
+    const references = extractLegalInfoCrossReferences({
+      sourceLawId: "1",
+      sourceUrl: "https://legalinfo.mn/mn/detail?lawId=1",
+      rawHtml: `<html><body><a href="/mn/detail?lawId=999">ref</a></body></html>`,
+    });
+    const edges = await projectCitationsFromReferences("doc-1", "Law One", references, async () => null);
+    expect(edges[0]!.toDocumentId).toBeNull();
+    expect(edges[0]!.toNodeId).toBe(externalGraphId(LegalIdentifierScheme.LEGALINFO_LAW_ID, "999"));
   });
 });
