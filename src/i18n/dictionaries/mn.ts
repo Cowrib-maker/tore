@@ -207,6 +207,7 @@ ctaStart: "Өмгөөлөгч хайх",
     footerBuilt: "Монгол болон олон улсын үйлчлүүлэгчид · MN / EN / ZH / KO",
   },
   publicHome: {
+    brandLine: "LEGAL INTELLIGENCE FOR A STRONGER MONGOLIA",
     tagline: "Хуулийг ойлгож, шийдлийг бүтээ.",
     chatTitle: "Танд юу тохиолдсон бэ?",
     chatSubtitle:

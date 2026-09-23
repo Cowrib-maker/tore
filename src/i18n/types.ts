@@ -90,6 +90,7 @@ export type PublicHomeStudentPageCopy = {
 };
 
 export type PublicHomeCopy = {
+  brandLine: string;
   tagline: string;
   chatTitle: string;
   chatSubtitle: string;

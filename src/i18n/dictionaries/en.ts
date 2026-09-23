@@ -216,6 +216,7 @@ export const en: Dictionary = {
     footerBuilt: "Mongolia and international clients · MN / EN / ZH / KO",
   },
   publicHome: {
+    brandLine: "LEGAL INTELLIGENCE FOR A STRONGER MONGOLIA",
     tagline: "Understand the law, build the solution.",
     chatTitle: "What happened?",
     chatSubtitle:

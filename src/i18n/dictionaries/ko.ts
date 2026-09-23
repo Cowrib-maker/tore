@@ -163,6 +163,7 @@ export const ko: Dictionary = {
     footerBuilt: "몽골 및 국제 의뢰인 · MN / EN / ZH / KO",
   },
   publicHome: {
+    brandLine: "LEGAL INTELLIGENCE FOR A STRONGER MONGOLIA",
     tagline: "법을 이해하고, 해결책을 만드십시오.",
     chatTitle: "무슨 일이 있었나요?",
     chatSubtitle: "문제를 자신의 말로 적어 주세요. 법률 용어는 필요 없습니다.",

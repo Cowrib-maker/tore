@@ -163,6 +163,7 @@ export const zh: Dictionary = {
     footerBuilt: "蒙古与国际客户 · MN / EN / ZH / KO",
   },
   publicHome: {
+    brandLine: "LEGAL INTELLIGENCE FOR A STRONGER MONGOLIA",
     tagline: "理解法律，构建解决方案。",
     chatTitle: "发生了什么？",
     chatSubtitle: "用您自己的话描述问题。无需法律术语。",
