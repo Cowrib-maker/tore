@@ -1,15 +1,28 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import {
+  BarChart3,
+  BookOpen,
+  Briefcase,
+  FileText,
+  Scale,
+  Search,
+  Users,
+  Users2,
+  Wallet,
+} from "lucide-react";
 
 import { getMyOrganizationOverviewForSession } from "@/application/actions/organization.actions";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { buttonVariants } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { NotFoundError } from "@/domain/errors/domain-error";
 import {
   OrganizationRole,
@@ -41,6 +54,26 @@ function statusLabel(
   return copy.statusDeactivated;
 }
 
+/**
+ * Module tiles mirror the approved Firm/Team reference's sidebar list.
+ * None of these are real features yet (no case/document/client/billing
+ * backend scoped to an organization exists) — rendered as inert
+ * "coming soon" tiles rather than links, so nothing pretends to work.
+ */
+function workspaceModules(copy: Dictionary["organizations"]) {
+  return [
+    { icon: Briefcase, label: copy.moduleCases },
+    { icon: Users, label: copy.moduleClients },
+    { icon: FileText, label: copy.moduleDocuments },
+    { icon: Search, label: copy.moduleResearch },
+    { icon: Scale, label: copy.moduleCourtPractice },
+    { icon: Users2, label: copy.moduleTeam },
+    { icon: BookOpen, label: copy.moduleKnowledge },
+    { icon: Wallet, label: copy.moduleBilling },
+    { icon: BarChart3, label: copy.moduleReports },
+  ];
+}
+
 export default async function OrganizationOverviewPage({
   params,
 }: {
@@ -61,6 +94,8 @@ export default async function OrganizationOverviewPage({
   }
 
   const { organization, membership } = view;
+  const isFirm = organization.type === OrganizationType.LAW_FIRM;
+  const tagline = isFirm ? copy.firmTagline : copy.teamTagline;
 
   return (
     <>
@@ -74,7 +109,32 @@ export default async function OrganizationOverviewPage({
         </Link>
       </div>
 
-      <Card>
+      {/* Hero — same navy "premium legal workspace" identity as the
+          Legal AI surface, reused here for the Firm/Team workspace. */}
+      <div className="mb-6 rounded-2xl bg-[#0B1F3A] px-6 py-7 text-white sm:px-8 sm:py-8">
+        <p className="text-[11px] font-semibold tracking-[0.2em] text-white/60 uppercase">
+          {isFirm ? "TORE FIRM" : "TORE TEAM"}
+        </p>
+        <h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
+          {organization.name}
+        </h2>
+        <p className="mt-2 max-w-xl text-sm leading-6 text-white/70">
+          {tagline}
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Badge variant="outline" className="border-white/20 text-white">
+            {typeLabel(organization.type, copy)}
+          </Badge>
+          <Badge variant="outline" className="border-white/20 text-white">
+            {roleLabel(membership.orgRole, copy)}
+          </Badge>
+          <Badge variant="outline" className="border-white/20 text-white">
+            {statusLabel(organization.status, copy)}
+          </Badge>
+        </div>
+      </div>
+
+      <Card className="mb-6">
         <CardHeader>
           <CardTitle>{copy.overviewTitle}</CardTitle>
         </CardHeader>
@@ -115,6 +175,42 @@ export default async function OrganizationOverviewPage({
           </dl>
         </CardContent>
       </Card>
+
+      <h3 className="mb-3 text-sm font-medium text-muted-foreground">
+        {isFirm ? copy.typeLawFirm : copy.typeLegalEntity}
+      </h3>
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {workspaceModules(copy).map(({ icon: Icon, label }) => (
+          <div
+            key={label}
+            className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-border px-4 py-4 opacity-80"
+          >
+            <span className="flex size-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              <Icon className="size-4" />
+            </span>
+            <p className="text-sm font-medium">{label}</p>
+            <Badge variant="secondary" className="text-[10px]">
+              {copy.comingSoonTag}
+            </Badge>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <EmptyState
+          title={copy.emptyCasesTitle}
+          description={copy.emptyCasesHint}
+        />
+        <EmptyState title={copy.emptyTeamTitle} />
+      </div>
+
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <EmptyState
+          title={copy.emptyBillingTitle}
+          description={copy.emptyBillingHint}
+        />
+        <EmptyState title={copy.emptyReportsTitle} />
+      </div>
     </>
   );
 }

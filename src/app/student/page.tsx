@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BookOpen, FileText, MessagesSquare, PenSquare } from "lucide-react";
 
 import { StudentOrthographyDraft } from "@/components/student/student-orthography-draft";
 import { StudentShell } from "@/components/student/student-shell";
@@ -10,27 +11,57 @@ export default async function StudentHubPage() {
   const home = dict.publicHome;
   const student = home.studentPage;
 
+  const quickActions = [
+    { icon: BookOpen, label: student.tracksTitle, href: "#tracks" },
+    { icon: PenSquare, label: student.modules.tests, href: "#modules" },
+    {
+      icon: FileText,
+      label: student.modules.problems,
+      href: "#modules",
+    },
+    { icon: MessagesSquare, label: student.ctaChat, href: "/#chat" },
+  ];
+
   return (
     <StudentShell
       brand={dict.common.brand}
       backHref="/"
       backLabel={student.backHome}
     >
-      <p className="text-[12px] font-semibold tracking-[0.16em] text-[#1A7A72] uppercase">
-        {home.products.student.audience}
-      </p>
-      <h1 className="mt-3 font-[family-name:var(--font-landing-display)] text-[2rem] tracking-[-0.03em] text-[#0B1F3A] sm:text-[2.4rem]">
-        {home.products.student.name}
-      </h1>
-      <p className="mt-2 inline-flex rounded-full bg-[#E8F4F1] px-3 py-1 text-[12px] font-semibold text-[#1A7A72]">
-        {student.comingSoon}
-      </p>
-      <p className="mt-5 max-w-xl text-[15px] leading-7 text-[#5C6570]">
-        {student.lead}
-      </p>
+      {/* Hero — same navy "premium legal workspace" identity used across
+          the Legal AI surface and the Firm/Team workspace. */}
+      <div className="rounded-2xl bg-[#0B1F3A] px-6 py-7 text-white sm:px-8 sm:py-8">
+        <p className="text-[11px] font-semibold tracking-[0.22em] text-white/60 uppercase">
+          {home.products.student.audience}
+        </p>
+        <h1 className="mt-3 font-[family-name:var(--font-landing-display)] text-[1.85rem] tracking-[-0.03em] sm:text-[2.2rem]">
+          {home.products.student.name}
+        </h1>
+        <p className="mt-2 inline-flex rounded-full bg-white/10 px-3 py-1 text-[12px] font-semibold text-white/80">
+          {student.comingSoon}
+        </p>
+        <p className="mt-4 max-w-xl text-[15px] leading-7 text-white/70">
+          {student.lead}
+        </p>
+      </div>
 
-      <section className="mt-10">
-        <h2 className="text-[13px] font-semibold tracking-[0.12em] text-[#1A7A72] uppercase">
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {quickActions.map(({ icon: Icon, label, href }) => (
+          <Link
+            key={label}
+            href={href}
+            className="flex flex-col items-start gap-2 rounded-xl border border-[#0B1F3A]/10 bg-white px-4 py-4 transition hover:border-[#0B5CFF]/40 hover:bg-[#E8F0FE]"
+          >
+            <span className="flex size-9 items-center justify-center rounded-lg bg-[#E8F0FE] text-[#0B5CFF]">
+              <Icon className="size-4" />
+            </span>
+            <p className="text-[13px] font-medium text-[#0B1F3A]">{label}</p>
+          </Link>
+        ))}
+      </div>
+
+      <section id="tracks" className="mt-10 scroll-mt-20">
+        <h2 className="text-[13px] font-semibold tracking-[0.12em] text-[#0B5CFF] uppercase">
           {student.tracksTitle}
         </h2>
         <ul className="mt-4 space-y-3">
@@ -38,7 +69,7 @@ export default async function StudentHubPage() {
             <li key={trackId}>
               <Link
                 href={`/student/${trackId}`}
-                className="block rounded-2xl border border-[#0B1F3A]/10 bg-white px-5 py-4 transition hover:border-[#1A7A72]/40"
+                className="block rounded-2xl border border-[#0B1F3A]/10 bg-white px-5 py-4 transition hover:border-[#0B5CFF]/40"
               >
                 <p className="text-[16px] font-semibold text-[#0B1F3A]">
                   {student.tracks[trackId]}
@@ -52,8 +83,8 @@ export default async function StudentHubPage() {
         </ul>
       </section>
 
-      <section className="mt-10">
-        <h2 className="text-[13px] font-semibold tracking-[0.12em] text-[#1A7A72] uppercase">
+      <section id="modules" className="mt-10 scroll-mt-20">
+        <h2 className="text-[13px] font-semibold tracking-[0.12em] text-[#0B5CFF] uppercase">
           {student.modulesTitle}
         </h2>
         <ol className="mt-4 space-y-2">

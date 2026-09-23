@@ -365,6 +365,28 @@ export type Dictionary = {
     backToDashboard: string;
     unavailable: string;
     noCreatePermission: string;
+    workspaceOverview: string;
+    moduleCases: string;
+    moduleClients: string;
+    moduleDocuments: string;
+    moduleResearch: string;
+    moduleCourtPractice: string;
+    moduleTeam: string;
+    moduleKnowledge: string;
+    moduleBilling: string;
+    moduleReports: string;
+    moduleSettings: string;
+    comingSoonTag: string;
+    firmTagline: string;
+    teamTagline: string;
+    emptyCasesTitle: string;
+    emptyCasesHint: string;
+    emptyDocumentsTitle: string;
+    emptyTeamTitle: string;
+    emptyBillingTitle: string;
+    emptyBillingHint: string;
+    emptyReportsTitle: string;
+    emptyActivityTitle: string;
   };
   activeContext: {
     label: string;
