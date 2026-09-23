@@ -41,7 +41,7 @@ export default async function LawyerCasesPage() {
         </div>
         <a
           href="/lawyer/workspace"
-          className="text-sm font-medium text-[#0F3D33] underline-offset-4 hover:underline"
+          className="text-sm font-medium text-[#0B5CFF] underline-offset-4 hover:underline"
         >
           Ажлын талбар руу буцах
         </a>

@@ -227,7 +227,7 @@ export function CaseWorkspaceHome({
           Хэрэг шинжлэлийн төлөв
         </h2>
         <div className="mt-3 flex flex-wrap items-center gap-3">
-          <span className="rounded-full bg-[#F4F8F6] px-2.5 py-1 text-xs font-medium text-[#0F3D33]">
+          <span className="rounded-full bg-[#E8F0FE] px-2.5 py-1 text-xs font-medium text-[#0B5CFF]">
             {analysisStatusLabelMn(payload.status)}
           </span>
           <span className="text-sm text-[#5C6570]">

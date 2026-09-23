@@ -16,12 +16,12 @@ export function LandingHero({
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(14,124,123,0.10),transparent_52%),linear-gradient(180deg,#F7F6F2_0%,#EEF4F2_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(11,92,255,0.08),transparent_52%),linear-gradient(180deg,#F7F8FB_0%,#EEF3FB_100%)]"
       />
 
       <div className="relative mx-auto max-w-3xl px-5 pt-14 pb-16 text-center sm:px-8 sm:pt-16 sm:pb-20 lg:pt-20 lg:pb-24">
         <LandingReveal>
-          <p className="text-[13px] font-semibold tracking-[0.18em] text-[#1A7A72] uppercase sm:text-sm">
+          <p className="text-[13px] font-semibold tracking-[0.18em] text-[#0B5CFF] uppercase sm:text-sm">
             {home.tagline}
           </p>
 

@@ -45,7 +45,7 @@ export function LawyerWorkspaceHome({ view }: Props) {
         </div>
         <Link
           href="/lawyer/workspace/cases#create-case"
-          className="hidden h-10 items-center rounded-lg bg-[#0F3D33] px-4 text-sm font-medium text-white shadow-[0_8px_20px_-12px_rgba(15,61,51,0.9)] hover:bg-[#145244] lg:inline-flex"
+          className="hidden h-10 items-center rounded-lg bg-[#0B5CFF] px-4 text-sm font-medium text-white shadow-[0_8px_20px_-12px_rgba(11,92,255,0.55)] hover:bg-[#0A4FDE] lg:inline-flex"
         >
           + Шинэ хэрэг
         </Link>
@@ -89,7 +89,7 @@ export function LawyerWorkspaceHome({ view }: Props) {
           </h2>
           <Link
             href="/lawyer/workspace/cases"
-            className="text-sm font-medium text-[#0F3D33] hover:underline"
+            className="text-sm font-medium text-[#0B5CFF] hover:underline"
           >
             Бүгдийг харах →
           </Link>
@@ -106,7 +106,7 @@ export function LawyerWorkspaceHome({ view }: Props) {
             </p>
             <Link
               href="/lawyer/workspace/cases#create-case"
-              className="mt-5 inline-flex h-10 items-center rounded-lg bg-[#0F3D33] px-4 text-sm font-medium text-white"
+              className="mt-5 inline-flex h-10 items-center rounded-lg bg-[#0B5CFF] px-4 text-sm font-medium text-white"
             >
               Шинэ хэрэг үүсгэх
             </Link>
@@ -117,11 +117,11 @@ export function LawyerWorkspaceHome({ view }: Props) {
               <li key={item.caseId}>
                 <article
                   data-testid={`workspace-case-${item.caseId}`}
-                  className="rounded-xl border border-[#0B1F3A]/8 bg-white px-4 py-3.5 shadow-[0_10px_24px_-20px_rgba(11,31,58,0.45)] transition hover:border-[#0F3D33]/20"
+                  className="rounded-xl border border-[#0B1F3A]/8 bg-white px-4 py-3.5 shadow-[0_10px_24px_-20px_rgba(11,31,58,0.45)] transition hover:border-[#0B5CFF]/25"
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                     <div className="flex min-w-0 flex-1 items-start gap-3">
-                      <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#EAF4F0] text-[#0F3D33]">
+                      <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#E8F0FE] text-[#0B5CFF]">
                         <FolderOpen className="size-4" />
                       </span>
                       <div className="min-w-0">
@@ -148,7 +148,7 @@ export function LawyerWorkspaceHome({ view }: Props) {
                       </span>
                       <Link
                         href={`/lawyer/workspace/case-review?caseId=${encodeURIComponent(item.caseId)}`}
-                        className="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-sm font-medium text-[#0F3D33] hover:bg-[#EAF4F0]"
+                        className="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-sm font-medium text-[#0B5CFF] hover:bg-[#E8F0FE]"
                       >
                         Нээх
                         <ChevronRight className="size-4" />
@@ -179,7 +179,7 @@ export function LawyerWorkspaceHome({ view }: Props) {
                     href={`/legal-ai?conversationId=${encodeURIComponent(item.id)}`}
                     className="flex items-center gap-3 py-3"
                   >
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#EAF4F0] text-[#0F3D33]">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#E8F0FE] text-[#0B5CFF]">
                       <MessageSquare className="size-3.5" />
                     </span>
                     <span className="min-w-0 flex-1">
@@ -203,7 +203,7 @@ export function LawyerWorkspaceHome({ view }: Props) {
           )}
           <Link
             href="/legal-ai"
-            className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-lg border border-[#0F3D33]/20 text-sm font-medium text-[#0F3D33] hover:bg-[#EAF4F0]"
+            className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-lg border border-[#0B5CFF]/25 text-sm font-medium text-[#0B5CFF] hover:bg-[#E8F0FE]"
           >
             AI чат руу очих
           </Link>
@@ -221,7 +221,7 @@ export function LawyerWorkspaceHome({ view }: Props) {
                 const parsed = splitActivity(item.label);
                 return (
                   <li key={item.id} className="flex items-start gap-3">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#0F3D33]" />
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#0B5CFF]" />
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-[#0B1F3A]">
                         {parsed.title}
@@ -269,7 +269,7 @@ function MetricCard({
           </p>
           <p className="mt-2 text-xs text-[#5C6570]">{hint}</p>
         </div>
-        <span className="flex size-9 items-center justify-center rounded-lg bg-[#EAF4F0] text-[#0F3D33]">
+        <span className="flex size-9 items-center justify-center rounded-lg bg-[#E8F0FE] text-[#0B5CFF]">
           <Icon className="size-4" />
         </span>
       </div>

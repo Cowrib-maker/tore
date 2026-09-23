@@ -35,7 +35,7 @@ export function LandingProducts({
     >
       <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-16">
         <LandingReveal className="mx-auto max-w-xl text-center">
-          <p className="text-[12px] font-semibold tracking-[0.16em] text-[#1A7A72] uppercase">
+          <p className="text-[12px] font-semibold tracking-[0.16em] text-[#0B5CFF] uppercase">
             {home.productsEyebrow}
           </p>
         </LandingReveal>
@@ -45,10 +45,10 @@ export function LandingProducts({
             <LandingReveal key={item.key} delayMs={index * 50}>
               <article
                 id={item.id}
-                className="flex h-full scroll-mt-28 flex-col rounded-2xl border border-[#0B1F3A]/10 bg-[#F7F6F2] p-5 sm:p-6"
+                className="flex h-full scroll-mt-28 flex-col rounded-2xl border border-[#0B1F3A]/10 bg-[#F7F8FB] p-5 sm:p-6"
               >
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-[11px] font-semibold tracking-[0.12em] text-[#1A7A72] uppercase">
+                  <p className="text-[11px] font-semibold tracking-[0.12em] text-[#0B5CFF] uppercase">
                     {item.copy.audience}
                   </p>
                   {item.badge ? (
@@ -65,7 +65,7 @@ export function LandingProducts({
                 </p>
                 <Link
                   href={hrefs[item.key]}
-                  className="mt-5 inline-flex text-[13px] font-semibold text-[#0B1F3A] transition hover:text-[#1A7A72]"
+                  className="mt-5 inline-flex text-[13px] font-semibold text-[#0B1F3A] transition hover:text-[#0B5CFF]"
                 >
                   {item.copy.cta}
                 </Link>

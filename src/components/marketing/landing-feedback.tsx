@@ -18,7 +18,7 @@ export function LandingFeedback({ home }: { home: Dictionary["publicHome"] }) {
   return (
     <section
       id="feedback"
-      className="scroll-mt-24 border-b border-[#0B1F3A]/8 bg-[#F7F6F2]"
+      className="scroll-mt-24 border-b border-[#0B1F3A]/8 bg-[#F7F8FB]"
     >
       <div className="mx-auto max-w-xl px-5 py-14 sm:px-8 sm:py-16">
         <LandingReveal>
@@ -63,7 +63,7 @@ export function LandingFeedback({ home }: { home: Dictionary["publicHome"] }) {
                 id="feedback-kind"
                 name="kind"
                 defaultValue="feedback"
-                className="h-10 rounded-xl border border-[#0B1F3A]/12 bg-[#F7F6F2] px-3 text-sm text-[#0A0F14] outline-none focus:border-[#1A7A72]/50"
+                className="h-10 rounded-xl border border-[#0B1F3A]/12 bg-[#F7F8FB] px-3 text-sm text-[#0A0F14] outline-none focus:border-[#0B5CFF]/50"
               >
                 <option value="feedback">{home.feedbackKinds.feedback}</option>
                 <option value="suggestion">
@@ -88,7 +88,7 @@ export function LandingFeedback({ home }: { home: Dictionary["publicHome"] }) {
                 maxLength={2000}
                 rows={5}
                 placeholder={home.feedbackMessagePlaceholder}
-                className="min-h-[8rem] rounded-xl border border-[#0B1F3A]/12 bg-[#F7F6F2] px-3 py-2 text-sm text-[#0A0F14] outline-none placeholder:text-[#9AA3AD] focus:border-[#1A7A72]/50"
+                className="min-h-[8rem] rounded-xl border border-[#0B1F3A]/12 bg-[#F7F8FB] px-3 py-2 text-sm text-[#0A0F14] outline-none placeholder:text-[#9AA3AD] focus:border-[#0B5CFF]/50"
               />
             </div>
 
@@ -107,7 +107,7 @@ export function LandingFeedback({ home }: { home: Dictionary["publicHome"] }) {
                 name="email"
                 type="email"
                 autoComplete="email"
-                className="h-10 rounded-xl border border-[#0B1F3A]/12 bg-[#F7F6F2] px-3 text-sm text-[#0A0F14] outline-none focus:border-[#1A7A72]/50"
+                className="h-10 rounded-xl border border-[#0B1F3A]/12 bg-[#F7F8FB] px-3 text-sm text-[#0A0F14] outline-none focus:border-[#0B5CFF]/50"
               />
             </div>
 

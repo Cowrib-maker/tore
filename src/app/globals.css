@@ -93,23 +93,28 @@
 }
 
 :root {
-  /* Brand primitives */
-  --brand: #0f3d33;
-  --brand-foreground: #f7faf8;
-  --brand-muted: #5a6b64;
-  --brand-subtle: #f4f8f6;
-  --canvas: #fafbfa;
+  /* Product UI primitives — deep navy / electric blue / light blue-gray.
+     Distinct from the TORE logo (src/components/brand/tokens.ts,
+     BRAND_COLORS.forest/gold), which stays forest+gold and never reads
+     from these vars — the logo mark is intentionally decoupled so the
+     product interface can carry a different visual language than the
+     wordmark, per the approved navy/electric-blue direction. */
+  --brand: #0b5cff;
+  --brand-foreground: #ffffff;
+  --brand-muted: #4a5b73;
+  --brand-subtle: #eef3fb;
+  --canvas: #f8f9fb;
   --ink: #0a0f14;
-  --moss: #3d4f48;
+  --moss: #3a4a63;
   --gold: #c8a45d;
   --elevate-sm:
-    0 1px 2px rgb(15 61 51 / 0.04), 0 8px 24px -12px rgb(15 61 51 / 0.12);
+    0 1px 2px rgb(11 31 58 / 0.04), 0 8px 24px -12px rgb(11 31 58 / 0.12);
   --elevate-md:
-    0 1px 2px rgb(15 61 51 / 0.05), 0 12px 32px -14px rgb(15 61 51 / 0.16),
-    0 28px 56px -28px rgb(15 61 51 / 0.14);
+    0 1px 2px rgb(11 31 58 / 0.05), 0 12px 32px -14px rgb(11 31 58 / 0.16),
+    0 28px 56px -28px rgb(11 31 58 / 0.14);
   --elevate-lg:
-    0 2px 4px rgb(15 61 51 / 0.04), 0 18px 40px -16px rgb(15 61 51 / 0.2),
-    0 40px 72px -36px rgb(15 61 51 / 0.18);
+    0 2px 4px rgb(11 31 58 / 0.04), 0 18px 40px -16px rgb(11 31 58 / 0.2),
+    0 40px 72px -36px rgb(11 31 58 / 0.18);
   /* Responsive page gutters (consumed by .ds-page) */
   --page-max: 72rem;
   --page-px: 1.25rem;
@@ -188,16 +193,16 @@
 }
 
 .dark {
-  /* Brand primitives — dark equivalents. Same forest identity, not a
-     generic gray theme: lightened/desaturated for contrast on a dark
+  /* Product UI primitives — dark equivalents. Same navy/electric-blue
+     identity as :root, lightened/desaturated for contrast on a dark
      canvas instead of switching to a different hue family. */
-  --brand: #7fb6a4;
-  --brand-foreground: #06130e;
-  --brand-muted: #a9b8b2;
-  --brand-subtle: #16221d;
-  --canvas: #0b0e0d;
+  --brand: #4c8dff;
+  --brand-foreground: #081019;
+  --brand-muted: #a7b0ba;
+  --brand-subtle: #182236;
+  --canvas: #0a0e16;
   --ink: #f0f4f2;
-  --moss: #9fb5a9;
+  --moss: #8fa3c2;
   --gold: #d9bb7c;
   --elevate-sm:
     0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
@@ -348,12 +353,12 @@
   }
 
   .landing-page {
-    --landing-canvas: #f7f6f2;
-    --landing-canvas-muted: #eef4f2;
+    --landing-canvas: #f7f8fb;
+    --landing-canvas-muted: #eef3fb;
     --landing-ink: #0a0f14;
     --landing-accent: #0b1f3a;
-    --landing-teal: #1a7a72;
-    --landing-mint: #e8f4f1;
+    --landing-teal: #0b5cff;
+    --landing-mint: #eaf1fb;
     --landing-surface: #ffffff;
     --landing-surface-muted: #f4f6f8;
     --landing-border: rgb(11 31 58 / 0.08);
@@ -362,12 +367,12 @@
   }
 
   .dark .landing-page {
-    --landing-canvas: #0b0e0d;
-    --landing-canvas-muted: #12211c;
+    --landing-canvas: #0a0e16;
+    --landing-canvas-muted: #121c2e;
     --landing-ink: #eef2f0;
-    --landing-accent: #cfe6dd;
-    --landing-teal: #7fd0c4;
-    --landing-mint: #16231e;
+    --landing-accent: #8fb4dd;
+    --landing-teal: #4c8dff;
+    --landing-mint: #172033;
     --landing-surface: #12100d;
     --landing-surface-muted: #17231e;
     --landing-border: rgb(255 255 255 / 0.1);

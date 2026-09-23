@@ -93,7 +93,7 @@ export function HeroLegalAiComposer({
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-3xl border border-ai-border bg-ai-surface p-3 shadow-[0_22px_50px_-24px_rgba(11,31,58,0.32)] transition focus-within:border-[#1A7A72]/45"
+        className="rounded-3xl border border-ai-border bg-ai-surface p-3 shadow-[0_22px_50px_-24px_rgba(11,31,58,0.32)] transition focus-within:border-[#0B5CFF]/45"
       >
         <textarea
           ref={textareaRef}

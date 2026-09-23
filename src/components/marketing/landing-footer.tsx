@@ -19,7 +19,7 @@ export function LandingFooter({
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-[#0B1F3A]/8 bg-[#EEF4F2]">
+    <footer className="border-t border-[#0B1F3A]/8 bg-[#EEF3FB]">
       <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-14">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           <div>
@@ -80,7 +80,7 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <p className="text-[11px] font-semibold tracking-[0.12em] text-[#1A7A72] uppercase">
+      <p className="text-[11px] font-semibold tracking-[0.12em] text-[#0B5CFF] uppercase">
         {title}
       </p>
       <ul className="mt-3 space-y-2.5 text-sm text-[#3D4A57] [&_a]:transition-colors [&_a]:hover:text-[#0B1F3A]">

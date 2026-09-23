@@ -133,7 +133,7 @@ export function LawyerWorkspaceFrame({
           ) : (
             <Link
               href="/lawyer/workspace/cases#create-case"
-              className="inline-flex h-9 items-center rounded-lg bg-[#0F3D33] px-3 text-sm font-medium text-white"
+              className="inline-flex h-9 items-center rounded-lg bg-[#0B5CFF] px-3 text-sm font-medium text-white"
             >
               + Шинэ хэрэг
             </Link>
@@ -252,7 +252,7 @@ function WorkspaceSidebar({
           onClick={onNavigate}
           className="flex items-center gap-3 rounded-xl bg-white/8 px-3 py-3"
         >
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#0F3D33] text-xs font-semibold text-white">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#0B5CFF] text-xs font-semibold text-white">
             {initials(displayName)}
           </span>
           <span className="min-w-0">
@@ -306,7 +306,7 @@ function SideLink({
       className={cn(
         "flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-colors",
         active
-          ? "bg-[#0F3D33] text-white"
+          ? "bg-[#0B5CFF] text-white"
           : "text-white/70 hover:bg-white/8 hover:text-white",
       )}
     >

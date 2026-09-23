@@ -58,10 +58,10 @@ export function LandingIntelligenceFeedClient({
               <li key={item.id}>
                 <Link
                   href={item.detailHref}
-                  className="block px-5 py-4 transition hover:bg-[#F7F6F2]/80"
+                  className="block px-5 py-4 transition hover:bg-[#F7F8FB]/80"
                 >
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full bg-[#E8F4F1] px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-[#1A7A72]">
+                    <span className="rounded-full bg-[#E8F0FE] px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-[#0B5CFF]">
                       {home.intelligenceSections[item.section]}
                     </span>
                     {item.date ? (
@@ -114,7 +114,7 @@ function CategoryPill({
       className={
         active
           ? "inline-flex items-center gap-1.5 rounded-full bg-[#0B1F3A] px-3.5 py-1.5 text-[12px] font-semibold text-white"
-          : "inline-flex items-center gap-1.5 rounded-full border border-[#0B1F3A]/12 bg-white px-3.5 py-1.5 text-[12px] font-medium text-[#3D4A57] transition hover:border-[#1A7A72]/40 hover:text-[#0B1F3A]"
+          : "inline-flex items-center gap-1.5 rounded-full border border-[#0B1F3A]/12 bg-white px-3.5 py-1.5 text-[12px] font-medium text-[#3D4A57] transition hover:border-[#0B5CFF]/40 hover:text-[#0B1F3A]"
       }
     >
       {label}

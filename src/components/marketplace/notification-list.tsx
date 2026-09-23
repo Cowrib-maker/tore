@@ -79,7 +79,7 @@ export function NotificationList({
             className={
               note.readAt
                 ? "rounded-xl border px-4 py-3 opacity-70"
-                : "rounded-xl border border-[#0F3D33]/25 bg-[#F4F8F6] px-4 py-3"
+                : "rounded-xl border border-[#0B5CFF]/25 bg-[#E8F0FE] px-4 py-3"
             }
           >
             <div className="flex flex-wrap items-start justify-between gap-2">
