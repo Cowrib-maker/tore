@@ -123,6 +123,24 @@ export async function resolveTemporalValidity(
     };
   }
 
+  // A known validFrom that is still in the future relative to asOfDate is
+  // itself a decisive, date-evidenced answer ("this source did not exist
+  // yet on that date") — a repeal is legally irrelevant to a period
+  // before the source existed, so graph-chain evidence must not override
+  // this with a repeal-flavored explanation that has nothing to do with
+  // why the date is actually UNKNOWN here.
+  if (dateBased.validFrom && asOfDate < dateBased.validFrom) {
+    return {
+      status: dateBased.status,
+      effectiveFrom: dateBased.validFrom,
+      effectiveUntil: dateBased.validTo,
+      basis: dateBased.basis,
+      evidence: [],
+      uncertainty: null,
+      repealChain: null,
+    };
+  }
+
   if (hasRepealChainEvidence) {
     if (isCurrentQuery) {
       return {

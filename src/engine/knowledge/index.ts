@@ -223,6 +223,19 @@ export {
 } from "./temporal/parse-legal-temporal-query-intent";
 export { evaluateVersionForTemporalQuery } from "./temporal/evaluate-version-for-temporal-query";
 export {
+  EntryIntoForceKind,
+  classifyEntryIntoForceClause,
+} from "./temporal/classify-entry-into-force-clause";
+export type { EntryIntoForceEvidence } from "./temporal/classify-entry-into-force-clause";
+export {
+  RepealEffectiveDateStatus,
+  resolveRepealEffectiveDate,
+} from "./temporal/resolve-repeal-effective-date";
+export type {
+  RepealEffectiveDateResult,
+  ResolvedReferenceTarget,
+} from "./temporal/resolve-repeal-effective-date";
+export {
   LegalInfoCrossReferenceKind,
   extractLegalInfoCrossReferences,
 } from "./evidence";

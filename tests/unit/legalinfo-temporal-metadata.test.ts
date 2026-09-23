@@ -9,6 +9,12 @@ import {
   RuleBasedKnowledgeMetadataExtractor,
 } from "@/engine/knowledge";
 
+// The sanal-form filter widget and entry-into-force clause mirror the
+// REAL legalinfo.mn page structure (verified against the local archived
+// corpus, 2026-09-23) — see extractLegalInfoAdoptionDate and
+// classifyEntryIntoForceClause. `data-block="enacteddate"/"enforcementdate"`
+// (this fixture's previous shape) never actually occurs on a real
+// archived page — see html.ts's extractLegalInfoMetadata doc comment.
 const DATED_HTML = `<!DOCTYPE html>
 <html>
 <head>
@@ -16,12 +22,17 @@ const DATED_HTML = `<!DOCTYPE html>
 </head>
 <body>
   <h1>МОНГОЛ УЛСЫН ХУУЛЬ</h1>
-  <div data-block="enacteddate">2017 оны 5 дугаар сарын 25</div>
-  <div data-block="enforcementdate">2017 оны 7 дугаар сарын 01</div>
+  <form class="sanal-form" action="#">
+    <div><input type="radio" data-status="checked"><label>МОНГОЛ УЛСЫН ХУУЛЬ</label></div>
+    <div><input type="radio" data-status="checked"><label>2017 ОНЫ 5 ДУГААР САРЫН 25-НЫ ӨДӨР</label></div>
+    <div><input type="radio" data-status="checked"><label>УЛААНБААТАР ХОТ</label></div>
+    <div><input type="radio" data-status="checked"><label>ИРГЭНИЙ ХЭРЭГ ШҮҮХЭД ХЯНАН ШИЙДВЭРЛЭХ ТУХАЙ</label></div>
+  </form>
   <div class="law-content">
     <p>ИРГЭНИЙ ХЭРЭГ ШҮҮХЭД ХЯНАН ШИЙДВЭРЛЭХ ТУХАЙ</p>
     <p>1 дүгээр зүйл.Хуулийн зорилт</p>
     <p>1.1.Энэ хуулийн зорилт нь иргэний хэргийг шүүхэд хянан шийдвэрлэх журмыг тогтооход оршино.</p>
+    <p>2 дугаар зүйл.Энэ хуулийг 2017 оны 7 дугаар сарын 01-ний өдрөөс эхлэн дагаж мөрдөнө.</p>
   </div>
 </body>
 </html>`;
@@ -64,7 +75,7 @@ describe("LegalInfo temporal metadata preservation", () => {
     expect(metadata.sourceVersion).toBeNull();
   });
 
-  it("does not treat enacteddate as validFrom", async () => {
+  it("does not treat the adoption date as validFrom — validFrom is the resolved effective date", async () => {
     const parsed = await new LegalInfoKnowledgeParser().parse({
       sourceId: "legalinfo",
       sourceUrl: "https://legalinfo.mn/mn/detail?lawId=16230654312051",

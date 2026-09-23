@@ -179,6 +179,53 @@ describe("resolveTemporalValidity", () => {
     expect(result.effectiveUntil).toBeNull();
   });
 
+  it("G. a real-corpus case (563): validFrom known (2013-01-01) and repeal-chain evidence present — a historical query BEFORE validFrom is UNKNOWN with plain SOURCE_DATES basis, not the repeal-flavored one, since the repeal is irrelevant before the source even existed", async () => {
+    const repo = new FakeAsyncGraphRepository();
+    await repo.upsertEdges([
+      {
+        edgeType: GraphEdgeType.REPEALS,
+        fromNodeId: "graph:doc:9406",
+        toNodeId: "graph:doc:563",
+        fromLabel: "9406",
+        toLabel: "563",
+        sourceKind: "LEGALINFO_REPEAL_DECLARATION",
+        evidence: "real repeal declaration text",
+      },
+    ]);
+    const result = await resolveTemporalValidity(
+      repo,
+      { nodeId: "graph:doc:563", lawId: "563", validFrom: "2013-01-01", validTo: null },
+      { asOfDate: "2012-01-01" },
+    );
+    expect(result.status).toBe(LegalTemporalEvaluationStatus.UNKNOWN);
+    expect(result.basis).toBe(LegalTemporalStatusBasis.SOURCE_DATES);
+    expect(result.effectiveFrom).toBe("2013-01-01");
+    expect(result.repealChain).toBeNull();
+    expect(result.uncertainty).toBeNull();
+  });
+
+  it("the same real-corpus case, queried AFTER its known validFrom, still uses repeal-chain evidence normally", async () => {
+    const repo = new FakeAsyncGraphRepository();
+    await repo.upsertEdges([
+      {
+        edgeType: GraphEdgeType.REPEALS,
+        fromNodeId: "graph:doc:9406",
+        toNodeId: "graph:doc:563",
+        fromLabel: "9406",
+        toLabel: "563",
+        sourceKind: "LEGALINFO_REPEAL_DECLARATION",
+        evidence: "real repeal declaration text",
+      },
+    ]);
+    const result = await resolveTemporalValidity(
+      repo,
+      { nodeId: "graph:doc:563", lawId: "563", validFrom: "2013-01-01", validTo: null },
+      { asOfDate: "2015-01-01" },
+    );
+    expect(result.status).toBe(LegalTemporalEvaluationStatus.UNKNOWN);
+    expect(result.basis).toBe(LegalTemporalStatusBasis.EXPLICIT_REPEAL_DATE_UNKNOWN);
+  });
+
   it("does not manufacture repeal evidence for a source with no incoming graph edges", async () => {
     const repo = new FakeAsyncGraphRepository();
     const result = await resolveTemporalValidity(

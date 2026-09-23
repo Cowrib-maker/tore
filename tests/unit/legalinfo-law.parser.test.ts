@@ -8,6 +8,13 @@ import {
   LegalSourceKind,
 } from "@/engine/knowledge/schema";
 
+// The sanal-form filter widget and entry-into-force clause below mirror
+// the REAL legalinfo.mn page structure (verified against the local
+// archived corpus, 2026-09-23) — see extractLegalInfoAdoptionDate and
+// classifyEntryIntoForceClause. `data-block="enacteddate"/"enforcementdate"`
+// (this fixture's previous shape) never actually occurs on a real
+// archived page and was replaced for that reason, not to make a test
+// pass — see html.ts's extractLegalInfoMetadata doc comment.
 const FIXTURE_HTML = `<!DOCTYPE html>
 <html>
 <head>
@@ -16,8 +23,12 @@ const FIXTURE_HTML = `<!DOCTYPE html>
 </head>
 <body>
   <h1>МОНГОЛ УЛСЫН ХУУЛЬ</h1>
-  <div data-block="enacteddate">2017 оны 5 дугаар сарын 25</div>
-  <div data-block="enforcementdate">2017 оны 7 дугаар сарын 01</div>
+  <form class="sanal-form" action="#">
+    <div><input type="radio" data-status="checked"><label>МОНГОЛ УЛСЫН ХУУЛЬ</label></div>
+    <div><input type="radio" data-status="checked"><label>2017 ОНЫ 5 ДУГААР САРЫН 25-НЫ ӨДӨР</label></div>
+    <div><input type="radio" data-status="checked"><label>УЛААНБААТАР ХОТ</label></div>
+    <div><input type="radio" data-status="checked"><label>ИРГЭНИЙ ХЭРЭГ ШҮҮХЭД ХЯНАН ШИЙДВЭРЛЭХ ТУХАЙ</label></div>
+  </form>
   <div>Төрийн мэдээлэл эмхэтгэл: 2017 оны 24 дүгээр</div>
   <div class="law-content">
     <p>МОНГОЛ УЛСЫН ХУУЛЬ</p>
@@ -36,6 +47,7 @@ const FIXTURE_HTML = `<!DOCTYPE html>
     <p>2.1.Шүүх хэргийг харьяаллын дагуу шийдвэрлэнэ.</p>
     <p>ХОЁРДУГААР БҮЛЭГ ШҮҮХ ХУРАЛДААН</p>
     <p>АРВАН ДОЛДУГААР БҮЛЭГ ШИЙДВЭР</p>
+    <p>3 дугаар зүйл.Энэ хуулийг 2017 оны 7 дугаар сарын 01-ний өдрөөс эхлэн дагаж мөрдөнө.</p>
   </div>
 </body>
 </html>`;

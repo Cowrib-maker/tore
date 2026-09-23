@@ -1,3 +1,5 @@
+import { classifyEntryIntoForceClause } from "@/engine/knowledge/temporal/classify-entry-into-force-clause";
+
 type PageMetadata = {
   lawId: string | null;
   title: string | null;
@@ -50,8 +52,18 @@ export function extractLegalInfoMetadata(
     html,
     /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i,
   );
-  const issuedOn = isoDate(dataBlockText(html, "enacteddate"));
-  const effectiveOn = isoDate(dataBlockText(html, "enforcementdate"));
+  // Evidence (2026-09-23, real 105-document corpus): `data-block="enacteddate"`
+  // / `data-block="enforcementdate"` NEVER appear on a real archived page —
+  // 0/105. The real adoption date lives in the "sanal-form" faceted-filter
+  // widget printed just above the law body (type / date / place / title, in
+  // that order, each pre-checked to match THIS document) — see
+  // extractLegalInfoAdoptionDate. Real effective date requires classifying
+  // the law's own entry-into-force article (see classifyEntryIntoForceClause
+  // in engine/knowledge/temporal) — resolved only for the templates that
+  // module has verified real evidence for; every other case stays null,
+  // never guessed.
+  const issuedOn = extractLegalInfoAdoptionDate(html);
+  const effectiveOn = resolveLegalInfoEffectiveDate(html, issuedOn);
   const series = innerText(
     firstMatch(html, /Төрийн мэдээлэл эмхэтгэл:\s*([^<]+)/i),
   );
@@ -70,6 +82,86 @@ export function extractLegalInfoMetadata(
     issuedOn,
     effectiveOn,
   };
+}
+
+/**
+ * A Mongolian statute page prints its own classification as a small
+ * pre-checked filter form just above the law body: instrument type, then
+ * adoption date, then place of adoption, then title, in that fixed order
+ * — e.g. "МОНГОЛ УЛСЫН ХУУЛЬ" / "2002 ОНЫ 1 ДҮГЭЭР САРЫН 10-НЫ ӨДӨР" /
+ * "УЛААНБААТАР ХОТ" / "ИРГЭНИЙ ХУУЛЬ". Verified against 105/105 real
+ * archived documents (2026-09-23): every one has this form, and the
+ * second checked label is always this document's own adoption date —
+ * cross-checked against known facts (e.g. lawId=299's date here,
+ * 2002-01-10, matches the Civil Code's well-known adoption date).
+ *
+ * This is the ADOPTION date ("баталсан огноо") — when the law was
+ * approved — never the effective date. The two often differ (see
+ * classifyEntryIntoForceClause); conflating them is exactly the mistake
+ * this extraction is designed to avoid.
+ */
+export function extractLegalInfoAdoptionDate(html: string): string | null {
+  const formStart = html.indexOf('<form class="sanal-form" action="#">');
+  if (formStart < 0) {
+    return null;
+  }
+  const formEnd = html.indexOf("</form>", formStart);
+  const formHtml = formEnd > formStart ? html.slice(formStart, formEnd) : html.slice(formStart);
+  const checkedLabels = [
+    ...formHtml.matchAll(/data-status=["']checked["'][^>]*>\s*<label[^>]*>([^<]*)<\/label>/gi),
+  ].map((m) => m[1]!.trim());
+  // index 1: [type, DATE, place, title, ...articles]
+  return isoDate(checkedLabels[1] ?? null);
+}
+
+/**
+ * Resolves this law's own effective date from its entry-into-force
+ * article, using only the templates classifyEntryIntoForceClause has
+ * verified real evidence for. `adoptionDate` (from
+ * extractLegalInfoAdoptionDate) is consulted ONLY for the
+ * SELF_ADOPTION_DATE template, where the source text itself says effect
+ * starts on the day of adoption — never used as a stand-in effective
+ * date otherwise. CROSS_DOCUMENT_REFERENCE and UNRECOGNIZED both return
+ * null: resolving a reference to another law's own effective date would
+ * need a second lookup this function does not attempt, and guessing is
+ * worse than an honest unknown.
+ */
+export function resolveLegalInfoEffectiveDate(
+  html: string,
+  adoptionDate: string | null,
+): string | null {
+  const clauseText = findEntryIntoForceClauseText(html);
+  if (!clauseText) {
+    return null;
+  }
+  const evidence = classifyEntryIntoForceClause(clauseText);
+  if (evidence.kind === "FIXED_DATE") {
+    return evidence.date;
+  }
+  if (evidence.kind === "SELF_ADOPTION_DATE") {
+    return adoptionDate;
+  }
+  return null;
+}
+
+/**
+ * The entry-into-force clause is almost always the law's last operative
+ * article, so this scans from the end of the extracted law body (never
+ * the raw page — nav/chrome text must not collide with real article
+ * text) for the last line carrying entry-into-force vocabulary. Exported
+ * so a caller that needs the full classification (not just the resolved
+ * date resolveLegalInfoEffectiveDate returns) — e.g. an audit reporting
+ * WHY a date is unknown — can classify the same text this module uses
+ * internally, rather than re-deriving it with separate logic.
+ */
+export function findEntryIntoForceClauseText(html: string): string | null {
+  const lines = legalInfoHtmlToLines(html);
+  for (let i = lines.length - 1; i >= 0; i -= 1) {
+    if (/дагаж мөрдөнө|хүчин төгөлдөр болно/iu.test(lines[i]!)) {
+      return lines[i]!;
+    }
+  }
+  return null;
 }
 
 export function legalInfoHtmlToLines(html: string): string[] {
@@ -222,7 +314,7 @@ function isoDate(value: string | null): string | null {
     return `${dotted[1]}-${pad2(dotted[2])}-${pad2(dotted[3])}`;
   }
   const mn = value.match(
-    /(\d{4})\s*оны\s*(\d{1,2})\s*(?:дуг[аэ]ар|дүгээр)\s*сарын\s*(\d{1,2})/i,
+    /(\d{4})\s*оны\s*(\d{1,2})\s*(?:дуг[аэ]ар|дүгээр)?\s*сарын?\s*(\d{1,2})/i,
   );
   if (mn) {
     return `${mn[1]}-${pad2(mn[2])}-${pad2(mn[3])}`;
