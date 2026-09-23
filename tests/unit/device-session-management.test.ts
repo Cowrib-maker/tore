@@ -36,7 +36,12 @@ import { InMemorySubscriptionRepository } from "@/infrastructure/repositories/in
 const lawyer: ActorContext = { userId: "lawyer-a", role: UserRole.LAWYER };
 const otherLawyer: ActorContext = { userId: "lawyer-b", role: UserRole.LAWYER };
 const client: ActorContext = { userId: "client-1", role: UserRole.CLIENT };
-const now = new Date("2026-08-22T04:00:00.000Z");
+// Anchored to the real clock rather than a fixed calendar date: these
+// tests create SOLO subscriptions whose currentPeriodEnd is `now` + 1
+// calendar month and assert "still active" against the repository's
+// real Date.now() comparison. A hardcoded past date drifts stale and
+// fails once real time catches up to that computed expiry.
+const now = new Date();
 const policy = DEFAULT_SESSION_PROTECTION_POLICY;
 
 describe("lawyer device sessions and entitlements", () => {

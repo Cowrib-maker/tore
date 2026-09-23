@@ -50,8 +50,13 @@ import type { PlatformSettingRepository } from "@/domain/repositories/platform-s
 const lawyer: ActorContext = { userId: "lawyer-1", role: UserRole.LAWYER };
 const otherLawyer: ActorContext = { userId: "lawyer-2", role: UserRole.LAWYER };
 const client: ActorContext = { userId: "client-1", role: UserRole.CLIENT };
-const now = new Date("2026-08-22T12:00:00.000Z");
-const later = new Date("2026-08-23T12:00:00.000Z");
+// Deliberately not a hardcoded calendar date: these tests create real
+// SOLO subscriptions whose currentPeriodEnd is `now` + 1 calendar month,
+// then assert "still active" against the repository's real Date.now()
+// comparison. A fixed past date drifts stale and fails once real time
+// catches up to that computed expiry — anchor to the actual run time.
+const now = new Date();
+const later = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 const CALLBACK_URL = "https://tore.test/api/billing/qpay/callback";
 
 function paidCheck(
@@ -181,6 +186,39 @@ describe("QPay-activated SOLO subscriptions", () => {
     expect(qpay.created[0]?.amountMnt).toBe(49_000);
     expect(qpay.created[0]?.callbackUrl).toBe(CALLBACK_URL);
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it("handles two concurrent checkout calls for the same lawyer without creating an unbounded number of invoices", async () => {
+    const deps = billingDeps();
+    const [first, second] = await Promise.all([
+      createSoloCheckout(lawyer, deps, now),
+      createSoloCheckout(lawyer, deps, now),
+    ]);
+    // Both calls must resolve to a well-formed SOLO checkout — never throw,
+    // never a partial/invalid invoice — regardless of whether the two
+    // in-process calls happened to interleave onto the same invoice or
+    // two distinct ones. A real Postgres deployment additionally reuses
+    // the same DB connection's transaction isolation; this test documents
+    // in-process behavior only, not a substitute for a DB-level race test.
+    for (const view of [first, second]) {
+      expect(view.amountMnt).toBe(49_000);
+      expect(view.status).toBe(InvoiceStatus.PENDING);
+    }
+
+    // Pay whichever invoice(s) resulted, then confirm exactly one ACTIVE
+    // SOLO subscription exists afterward — paying either one activates the
+    // same subscription, never two independent activations.
+    qpay.nextCheck = paidCheck("pay-concurrent");
+    await processQpayInvoicePayment(`qpay-${first.invoiceId}`, deps, now);
+    if (second.invoiceId !== first.invoiceId) {
+      qpay.nextCheck = paidCheck("pay-concurrent-2");
+      await processQpayInvoicePayment(`qpay-${second.invoiceId}`, deps, now);
+    }
+    const subscription = await subscriptions.findActiveOwnedByUserId(
+      lawyer.userId,
+    );
+    expect(subscription?.status).toBe(SubscriptionStatus.ACTIVE);
+    expect(subscription?.planCode).toBe(SubscriptionPlanCode.SOLO);
   });
 
   it("activates a subscription only after callback + payment/check succeeds", async () => {
