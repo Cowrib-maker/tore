@@ -170,6 +170,14 @@ export const zh: Dictionary = {
     chatPlaceholder: "用您自己的话描述问题。",
     chatSubmit: "发送",
     chatTyping: "TORE Chat 正在回复...",
+    chatSuggestionsLabel: "例如：",
+    chatSuggestions: [
+      "合同纠纷",
+      "交通事故",
+      "劳动关系问题",
+      "家庭纠纷",
+      "被警方传唤",
+    ],
     introTitle: "什么是 TORE？",
     introBody:
       "TORE 是面向公民、法学学生和法律专业人士的法律科技平台。",

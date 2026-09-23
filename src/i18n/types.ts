@@ -97,6 +97,8 @@ export type PublicHomeCopy = {
   chatPlaceholder: string;
   chatSubmit: string;
   chatTyping: string;
+  chatSuggestionsLabel: string;
+  chatSuggestions: string[];
   introTitle: string;
   introBody: string;
   productsEyebrow: string;

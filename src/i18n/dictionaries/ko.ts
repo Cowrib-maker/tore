@@ -170,6 +170,14 @@ export const ko: Dictionary = {
     chatPlaceholder: "문제를 자신의 말로 적어 주세요.",
     chatSubmit: "보내기",
     chatTyping: "TORE Chat이 작성 중입니다...",
+    chatSuggestionsLabel: "예를 들어:",
+    chatSuggestions: [
+      "계약 분쟁",
+      "교통사고",
+      "고용 관련 문제",
+      "가족 분쟁",
+      "경찰 소환",
+    ],
     introTitle: "TORE란 무엇인가요?",
     introBody:
       "TORE는 시민, 법학 학생, 법률 전문가를 위한 리걸테크 플랫폼입니다.",

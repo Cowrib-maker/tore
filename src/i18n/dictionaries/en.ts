@@ -224,6 +224,14 @@ export const en: Dictionary = {
     chatPlaceholder: "Describe the issue in your own words.",
     chatSubmit: "Send",
     chatTyping: "TORE Chat is writing...",
+    chatSuggestionsLabel: "For example:",
+    chatSuggestions: [
+      "Contract dispute",
+      "Traffic accident",
+      "Employment issue",
+      "Family dispute",
+      "Called in by police",
+    ],
     introTitle: "What is TORE?",
     introBody:
       "TORE is a legal technology platform for citizens, law students, and legal professionals.",

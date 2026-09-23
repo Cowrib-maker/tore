@@ -14,11 +14,15 @@ export function HeroLegalAiComposer({
   submitLabel = "Илгээх",
   typingLabel = "TORE Chat бичиж байна...",
   checkoutEnabled = false,
+  suggestionsLabel,
+  suggestions,
 }: {
   placeholder: string;
   submitLabel?: string;
   typingLabel?: string;
   checkoutEnabled?: boolean;
+  suggestionsLabel?: string;
+  suggestions?: string[];
 }) {
   const [question, setQuestion] = useState("");
   const { messages, loading, error, accessGate, sendMessage } =
@@ -121,6 +125,28 @@ export function HeroLegalAiComposer({
           </button>
         </div>
       </form>
+
+      {suggestions?.length && messages.length === 0 ? (
+        <div className="flex flex-wrap items-center justify-center gap-2 text-left sm:justify-start">
+          <span className="text-xs font-medium text-[#5C6570]">
+            {suggestionsLabel}
+          </span>
+          {suggestions.map((item) => (
+            <button
+              key={item}
+              type="button"
+              onClick={() => {
+                setQuestion(item);
+                textareaRef.current?.focus();
+              }}
+              className="rounded-full border border-[#0B1F3A]/10 bg-white px-3 py-1 text-xs font-medium text-[#0B1F3A] transition hover:border-[#0B5CFF]/40 hover:bg-[#E8F0FE] hover:text-[#0B5CFF]"
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       <LegalAiDutyNotice variant="citizen" className="px-1 text-center" />
     </div>
   );
