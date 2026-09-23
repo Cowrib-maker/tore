@@ -1,15 +1,20 @@
 import Link from "next/link";
-import { FileText, GraduationCap, MessageCircle } from "lucide-react";
+import { Briefcase, Building2, GraduationCap, Users, Users2 } from "lucide-react";
 
 import { LandingReveal } from "@/components/marketing/landing-reveal";
 import type { Dictionary } from "@/i18n/types";
 
-type ProductKey = "chat" | "student" | "legalAi";
+type ProductKey = "citizen" | "student" | "lawyer" | "firm" | "team";
 
-const PRODUCT_ICONS: Record<ProductKey, typeof MessageCircle> = {
-  chat: MessageCircle,
-  student: GraduationCap,
-  legalAi: FileText,
+const PRODUCT_STYLE: Record<
+  ProductKey,
+  { icon: typeof Users; tile: string; text: string }
+> = {
+  citizen: { icon: Users, tile: "bg-[#E8F0FE]", text: "text-[#0B5CFF]" },
+  student: { icon: GraduationCap, tile: "bg-[#E3F5EA]", text: "text-[#1D9A62]" },
+  lawyer: { icon: Briefcase, tile: "bg-[#FDEEE0]", text: "text-[#C2660B]" },
+  firm: { icon: Building2, tile: "bg-[#F1EAFB]", text: "text-[#7C3AED]" },
+  team: { icon: Users2, tile: "bg-[#EFEAFB]", text: "text-[#6D5BD0]" },
 };
 
 export function LandingProducts({
@@ -25,14 +30,16 @@ export function LandingProducts({
     copy: Dictionary["publicHome"]["products"][ProductKey];
     badge?: string;
   }> = [
-    { key: "chat", id: "citizen", copy: home.products.chat },
+    { key: "citizen", id: "citizen", copy: home.products.citizen },
     {
       key: "student",
       id: "student",
       copy: home.products.student,
-      badge: home.studentComingSoon,
+      badge: home.studentComingSoon || undefined,
     },
-    { key: "legalAi", id: "legal-ai", copy: home.products.legalAi },
+    { key: "lawyer", id: "lawyer", copy: home.products.lawyer },
+    { key: "firm", id: "firm", copy: home.products.firm },
+    { key: "team", id: "team", copy: home.products.team },
   ];
 
   return (
@@ -47,42 +54,47 @@ export function LandingProducts({
           </p>
         </LandingReveal>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {items.map((item, index) => {
-            const Icon = PRODUCT_ICONS[item.key];
+            const style = PRODUCT_STYLE[item.key];
+            const Icon = style.icon;
             return (
-            <LandingReveal key={item.key} delayMs={index * 50}>
-              <article
-                id={item.id}
-                className="flex h-full scroll-mt-28 flex-col rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 shadow-[0_1px_2px_rgba(11,31,58,0.03),0_8px_22px_-14px_rgba(11,31,58,0.1)] sm:p-6"
-              >
-                <span className="flex size-10 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#0B5CFF]">
-                  <Icon className="size-5" />
-                </span>
-                <div className="mt-4 flex flex-wrap items-center gap-2">
-                  <p className="text-[11px] font-semibold tracking-[0.12em] text-[#0B5CFF] uppercase">
-                    {item.copy.audience}
-                  </p>
-                  {item.badge ? (
-                    <span className="rounded-full bg-[#F7F8FB] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-[#5C6570]">
-                      {item.badge}
-                    </span>
-                  ) : null}
-                </div>
-                <h3 className="mt-2 text-[17px] font-semibold tracking-tight text-[#0B1F3A]">
-                  {item.copy.name}
-                </h3>
-                <p className="mt-3 flex-1 text-[13px] leading-relaxed text-[#5C6570]">
-                  {item.copy.description}
-                </p>
-                <Link
-                  href={hrefs[item.key]}
-                  className="mt-5 inline-flex text-[13px] font-semibold text-[#0B1F3A] transition hover:text-[#0B5CFF]"
+              <LandingReveal key={item.key} delayMs={index * 50}>
+                <article
+                  id={item.id}
+                  className="flex h-full scroll-mt-28 flex-col rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 shadow-[0_1px_2px_rgba(11,31,58,0.03),0_8px_22px_-14px_rgba(11,31,58,0.1)] sm:p-6"
                 >
-                  {item.copy.cta}
-                </Link>
-              </article>
-            </LandingReveal>
+                  <span
+                    className={`flex size-10 items-center justify-center rounded-xl ${style.tile} ${style.text}`}
+                  >
+                    <Icon className="size-5" />
+                  </span>
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <p
+                      className={`text-[11px] font-semibold tracking-[0.12em] uppercase ${style.text}`}
+                    >
+                      {item.copy.audience}
+                    </p>
+                    {item.badge ? (
+                      <span className="rounded-full bg-[#F7F8FB] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-[#5C6570]">
+                        {item.badge}
+                      </span>
+                    ) : null}
+                  </div>
+                  <h3 className="mt-2 text-[17px] font-semibold tracking-tight text-[#0B1F3A]">
+                    {item.copy.name}
+                  </h3>
+                  <p className="mt-3 flex-1 text-[13px] leading-relaxed text-[#5C6570]">
+                    {item.copy.description}
+                  </p>
+                  <Link
+                    href={hrefs[item.key]}
+                    className="mt-5 inline-flex text-[13px] font-semibold text-[#0B1F3A] transition hover:text-[#0B5CFF]"
+                  >
+                    {item.copy.cta}
+                  </Link>
+                </article>
+              </LandingReveal>
             );
           })}
         </div>

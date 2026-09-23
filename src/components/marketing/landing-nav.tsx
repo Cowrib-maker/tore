@@ -30,7 +30,7 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
   const home = dict.publicHome;
   const links = [
     { href: "/lawyers", label: dict.nav.lawyers },
-    { href: "#chat", label: home.products.chat.name },
+    { href: "#chat", label: home.products.citizen.name },
     { href: "#products", label: home.navProducts },
     { href: "#intelligence", label: home.navIntelligence },
     { href: "#faq", label: dict.nav.faq },

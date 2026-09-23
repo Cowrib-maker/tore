@@ -8,6 +8,9 @@ export const TORE_STUDENT_HREF = "/student";
 
 export const LAWYER_WORKSPACE_PATH = "/lawyer/workspace";
 
+/** Firm/Team both create or manage an Organization — same feature, two audiences. */
+export const TORE_ORGANIZATIONS_HREF = "/organizations";
+
 export type HomepageVisitorRole = UserRole | null | undefined;
 
 /**
@@ -37,14 +40,17 @@ export function getHomepageAccountHref(role: HomepageVisitorRole): string {
 }
 
 export function getHomepageProductHref(
-  product: "chat" | "student" | "legalAi",
+  product: "citizen" | "student" | "lawyer" | "firm" | "team",
   role: HomepageVisitorRole,
 ): string {
-  if (product === "chat") {
+  if (product === "citizen") {
     return TORE_CHAT_HREF;
   }
   if (product === "student") {
     return TORE_STUDENT_HREF;
+  }
+  if (product === "firm" || product === "team") {
+    return TORE_ORGANIZATIONS_HREF;
   }
   if (role === UserRole.LAWYER) {
     return LAWYER_WORKSPACE_PATH;

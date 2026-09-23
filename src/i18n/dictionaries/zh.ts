@@ -183,23 +183,35 @@ export const zh: Dictionary = {
       "TORE 是面向公民、法学学生和法律专业人士的法律科技平台。",
     productsEyebrow: "产品",
     products: {
-      chat: {
-        name: "TORE Chat",
+      citizen: {
+        name: "TORE Citizen",
         audience: "公民",
-        description: "用日常语言描述法律问题，获得初步理解。",
-        cta: "打开对话",
+        description: "理解您的法律问题，明确下一步。",
+        cta: "开始使用",
       },
       student: {
         name: "TORE Student",
         audience: "法学学生",
-        description: "理论、解题方法、测验与计分考试，可查看错题。",
+        description: "学习法律，练习真实案例。",
         cta: "开始学习",
       },
-      legalAi: {
-        name: "TORE Legal AI",
+      lawyer: {
+        name: "TORE Lawyer",
         audience: "律师",
-        description: "含 Legal Data Engine、推理与案件智能的专业工作台。",
+        description: "在一个智能工作台中处理案件、文件与研究。",
         cta: "打开工作区",
+      },
+      firm: {
+        name: "TORE Firm",
+        audience: "律师事务所",
+        description: "在一处管理团队、案件、文件与知识库。",
+        cta: "了解更多",
+      },
+      team: {
+        name: "TORE Team",
+        audience: "法务团队",
+        description: "将组织的法律工作集中在一个平台中。",
+        cta: "联系我们",
       },
     },
     studentComingSoon: "",

@@ -29,9 +29,11 @@ export function LandingFooter({
             </p>
           </div>
           <FooterColumn title={home.navProducts}>
-            <a href="#chat">{home.products.chat.name}</a>
+            <a href="#chat">{home.products.citizen.name}</a>
             <a href="#student">{home.products.student.name}</a>
-            <a href="#legal-ai">{home.products.legalAi.name}</a>
+            <a href="#lawyer">{home.products.lawyer.name}</a>
+            <a href="#firm">{home.products.firm.name}</a>
+            <a href="#team">{home.products.team.name}</a>
             <Link href="/lawyers">{t.footerDirectory}</Link>
             <a href="#intelligence">{home.intelligenceTitle}</a>
           </FooterColumn>

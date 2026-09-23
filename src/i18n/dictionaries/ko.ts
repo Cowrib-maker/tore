@@ -183,25 +183,35 @@ export const ko: Dictionary = {
       "TORE는 시민, 법학 학생, 법률 전문가를 위한 리걸테크 플랫폼입니다.",
     productsEyebrow: "제품",
     products: {
-      chat: {
-        name: "TORE Chat",
+      citizen: {
+        name: "TORE Citizen",
         audience: "시민",
-        description: "법률 문제를 쉬운 말로 적고 방향을 얻습니다.",
-        cta: "채팅 열기",
+        description: "법률 문제를 이해하고 다음 단계를 확인하세요.",
+        cta: "시작하기",
       },
       student: {
         name: "TORE Student",
         audience: "법학 학생",
-        description:
-          "이론, 문제 풀이 방법, 테스트와 채점된 시험. 틀린 답을 확인합니다.",
+        description: "법을 공부하고 실제 사례로 연습하세요.",
         cta: "학습 시작",
       },
-      legalAi: {
-        name: "TORE Legal AI",
+      lawyer: {
+        name: "TORE Lawyer",
         audience: "변호사",
-        description:
-          "Legal Data Engine, 추론, 사건 인텔리전스가 있는 전문 작업 환경입니다.",
+        description: "하나의 지능형 작업 공간에서 사건, 문서, 리서치를 처리하세요.",
         cta: "작업 공간",
+      },
+      firm: {
+        name: "TORE Firm",
+        audience: "법무법인",
+        description: "팀, 사건, 문서, 지식을 한곳에서 관리하세요.",
+        cta: "자세히 보기",
+      },
+      team: {
+        name: "TORE Team",
+        audience: "법무팀",
+        description: "조직의 법무 업무를 하나의 작업 공간에 집중하세요.",
+        cta: "문의하기",
       },
     },
     studentComingSoon: "",

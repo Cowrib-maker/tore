@@ -37,9 +37,11 @@ export default async function HomePage() {
       authUser={authUser}
       checkoutEnabled={role === UserRole.CLIENT}
       productHrefs={{
-        chat: getHomepageProductHref("chat", role),
+        citizen: getHomepageProductHref("citizen", role),
         student: getHomepageProductHref("student", role),
-        legalAi: getHomepageProductHref("legalAi", role),
+        lawyer: getHomepageProductHref("lawyer", role),
+        firm: getHomepageProductHref("firm", role),
+        team: getHomepageProductHref("team", role),
       }}
       intelligence={intelligence}
     />

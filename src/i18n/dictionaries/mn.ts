@@ -228,25 +228,37 @@ ctaStart: "Өмгөөлөгч хайх",
       "TORE бол иргэн, хуулийн оюутан, хуульч, өмгөөлөгчид зориулсан хууль зүйн технологийн платформ юм.",
     productsEyebrow: "Бүтээгдэхүүн",
     products: {
-      chat: {
-        name: "TORE Chat",
+      citizen: {
+        name: "TORE Citizen",
         audience: "Иргэн",
-        description: "Хууль зүйн асуудлаа энгийн үгээр бичиж, ойлголт авна.",
-        cta: "Чат нээх",
+        description: "Хуулийн асуудлаа ойлгож, дараагийн алхмаа тодорхойл.",
+        cta: "Эхлэх",
       },
       student: {
         name: "TORE Student",
         audience: "Хуулийн оюутан",
-        description:
-          "Онол, бодлого бодох аргачлал, тест, шалгалт — алдсан хариугаа харж оноогоо авна.",
-        cta: "Суралцаж эхлэх",
+        description: "Хуулийг судалж, кейс дээр суралц.",
+        cta: "Сурах",
       },
-      legalAi: {
-        name: "TORE Legal AI",
-        audience: "Хуульч, өмгөөлөгч",
+      lawyer: {
+        name: "TORE Lawyer",
+        audience: "Хуульч",
         description:
-          "Legal Data Engine, reasoning, case intelligence бүхий мэргэжлийн ажлын орчин.",
+          "Хэрэг, баримт, судалгаагаа нэг ухаалаг орчинд ажиллуул.",
         cta: "Ажлын орчин",
+      },
+      firm: {
+        name: "TORE Firm",
+        audience: "Хуульчийн фирм",
+        description: "Баг, хэрэг, баримт, мэдлэгээ нэг дор удирд.",
+        cta: "Дэлгэрэнгүй",
+      },
+      team: {
+        name: "TORE Team",
+        audience: "Хуулийн баг",
+        description:
+          "Байгууллагынхаа хууль зүйн ажлыг нэг орчинд төвлөрүүл.",
+        cta: "Холбогдох",
       },
     },
     studentComingSoon: "",

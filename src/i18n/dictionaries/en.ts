@@ -237,25 +237,36 @@ export const en: Dictionary = {
       "TORE is a legal technology platform for citizens, law students, and legal professionals.",
     productsEyebrow: "Products",
     products: {
-      chat: {
-        name: "TORE Chat",
+      citizen: {
+        name: "TORE Citizen",
         audience: "Citizen",
-        description: "Write a legal issue in plain language and get orientation.",
-        cta: "Open chat",
+        description: "Understand your legal issue and see your next step.",
+        cta: "Get started",
       },
       student: {
         name: "TORE Student",
         audience: "Law student",
-        description:
-          "Theory, problem-solving method, tests, and scored exams with missed answers.",
-        cta: "Start studying",
+        description: "Study the law and practice on real cases.",
+        cta: "Start learning",
       },
-      legalAi: {
-        name: "TORE Legal AI",
+      lawyer: {
+        name: "TORE Lawyer",
         audience: "Lawyer",
         description:
-          "Professional workbench with Legal Data Engine, reasoning, and case intelligence.",
+          "Run your cases, documents, and research from one intelligent workbench.",
         cta: "Open workspace",
+      },
+      firm: {
+        name: "TORE Firm",
+        audience: "Law firm",
+        description: "Manage your team, cases, documents, and knowledge in one place.",
+        cta: "Learn more",
+      },
+      team: {
+        name: "TORE Team",
+        audience: "Legal team",
+        description: "Centralize your organization's legal work in one workspace.",
+        cta: "Contact us",
       },
     },
     studentComingSoon: "",

@@ -29,9 +29,11 @@ type LandingPageProps = {
   authUser?: LandingAuthUser | null;
   checkoutEnabled: boolean;
   productHrefs: {
-    chat: string;
+    citizen: string;
     student: string;
-    legalAi: string;
+    lawyer: string;
+    firm: string;
+    team: string;
   };
   intelligence?: LegalIntelligenceFeed;
 };

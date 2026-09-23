@@ -103,9 +103,11 @@ export type PublicHomeCopy = {
   introBody: string;
   productsEyebrow: string;
   products: {
-    chat: PublicHomeProductCopy;
+    citizen: PublicHomeProductCopy;
     student: PublicHomeProductCopy;
-    legalAi: PublicHomeProductCopy;
+    lawyer: PublicHomeProductCopy;
+    firm: PublicHomeProductCopy;
+    team: PublicHomeProductCopy;
   };
   studentComingSoon: string;
   studentPage: PublicHomeStudentPageCopy;

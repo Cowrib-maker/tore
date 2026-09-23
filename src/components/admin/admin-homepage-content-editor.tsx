@@ -949,9 +949,11 @@ function LivePreviewPanel({
             authUser={null}
             checkoutEnabled={false}
             productHrefs={{
-              chat: getHomepageProductHref("chat", null),
+              citizen: getHomepageProductHref("citizen", null),
               student: getHomepageProductHref("student", null),
-              legalAi: getHomepageProductHref("legalAi", null),
+              lawyer: getHomepageProductHref("lawyer", null),
+              firm: getHomepageProductHref("firm", null),
+              team: getHomepageProductHref("team", null),
             }}
           />
         </div>

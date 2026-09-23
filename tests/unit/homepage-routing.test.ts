@@ -7,6 +7,7 @@ import {
   getPublicHomepageDestination,
   LAWYER_WORKSPACE_PATH,
   TORE_CHAT_HREF,
+  TORE_ORGANIZATIONS_HREF,
   TORE_STUDENT_HREF,
 } from "@/domain/services/homepage-routing";
 
@@ -16,7 +17,7 @@ describe("public homepage role routing", () => {
     expect(getPublicHomepageDestination(undefined)).toBe("/");
     expect(getPublicHomepageDestination(UserRole.CLIENT)).toBe("/");
     expect(getPublicHomepageDestination(UserRole.ADMIN)).toBe("/");
-    expect(getHomepageProductHref("chat", UserRole.CLIENT)).toBe(TORE_CHAT_HREF);
+    expect(getHomepageProductHref("citizen", UserRole.CLIENT)).toBe(TORE_CHAT_HREF);
     expect(getHomepageAccountHref(UserRole.CLIENT)).toBe(TORE_CHAT_HREF);
   });
 
@@ -25,7 +26,7 @@ describe("public homepage role routing", () => {
       LAWYER_WORKSPACE_PATH,
     );
     expect(getHomepageAccountHref(UserRole.LAWYER)).toBe(LAWYER_WORKSPACE_PATH);
-    expect(getHomepageProductHref("legalAi", UserRole.LAWYER)).toBe(
+    expect(getHomepageProductHref("lawyer", UserRole.LAWYER)).toBe(
       LAWYER_WORKSPACE_PATH,
     );
   });
@@ -39,9 +40,16 @@ describe("public homepage role routing", () => {
   });
 
   it("does not send non-lawyers into the lawyer workspace", () => {
-    expect(getHomepageProductHref("legalAi", null)).toBe("/register/lawyer");
-    expect(getHomepageProductHref("legalAi", UserRole.CLIENT)).toBe(
+    expect(getHomepageProductHref("lawyer", null)).toBe("/register/lawyer");
+    expect(getHomepageProductHref("lawyer", UserRole.CLIENT)).toBe(
       "/register/lawyer",
+    );
+  });
+
+  it("routes firm and team products to the organizations feature", () => {
+    expect(getHomepageProductHref("firm", null)).toBe(TORE_ORGANIZATIONS_HREF);
+    expect(getHomepageProductHref("team", UserRole.CLIENT)).toBe(
+      TORE_ORGANIZATIONS_HREF,
     );
   });
 });
