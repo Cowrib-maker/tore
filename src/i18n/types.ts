@@ -322,6 +322,7 @@ export type Dictionary = {
     navSettings: string;
     navHomepage: string;
     navAudit: string;
+    navPayments: string;
     navAdminDev: string;
     navOrganizations: string;
     pageOfferings: string;

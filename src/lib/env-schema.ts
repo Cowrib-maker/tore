@@ -162,6 +162,19 @@ export const envSchema = z.object({
   QPAY_CALLBACK_URL: emptyToUndefined(z.string().optional()),
   /** Merchant invoice_code assigned by QPay. Required to create invoices. */
   QPAY_INVOICE_CODE: emptyToUndefined(z.string().optional()),
+  /**
+   * Manual (bank transfer / printed QPay QR) payment — interim method
+   * while QPay Dynamic QR credentials are pending. Server-only display
+   * config; never a payment credential. Defaults to enabled so the
+   * feature works out of the box in local/dev; bank details still
+   * default to empty and must be configured before real use.
+   */
+  MANUAL_PAYMENT_ENABLED: z.coerce.boolean().default(true),
+  MANUAL_BANK_NAME: emptyToUndefined(z.string().optional()),
+  MANUAL_BANK_ACCOUNT: emptyToUndefined(z.string().optional()),
+  MANUAL_ACCOUNT_NAME: emptyToUndefined(z.string().optional()),
+  /** Path or URL to the printed QPay QR image asset. Never fabricated — see manual-payment-config.ts. */
+  MANUAL_QR_ASSET: emptyToUndefined(z.string().optional()),
 });
 
 export type Env = z.infer<typeof envSchema>;

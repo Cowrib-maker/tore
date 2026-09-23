@@ -10,7 +10,7 @@ import {
 } from "@/application/use-cases/billing/process-qpay-payment";
 import type { Invoice } from "@/domain/entities/invoice";
 import type { Subscription } from "@/domain/entities/subscription";
-import { InvoiceStatus } from "@/domain/enums";
+import { BILLING_PROVIDER_QPAY, InvoiceStatus } from "@/domain/enums";
 import { ForbiddenError, NotFoundError } from "@/domain/errors/domain-error";
 import { PaymentVerificationError } from "@/domain/errors/payment-verification-error";
 import type { InvoiceRepository } from "@/domain/repositories/invoice-repository";
@@ -49,7 +49,15 @@ export async function getOwnInvoicePaymentStatus(
     throw new ForbiddenError();
   }
 
-  if (invoice.status === InvoiceStatus.PENDING && invoice.providerInvoiceId) {
+  // Only QPay invoices are live-checked here — a manual (bank
+  // transfer / printed QR) invoice's providerInvoiceId is our own
+  // synthetic reference, never a real QPay invoice id, and its status
+  // only ever changes via an admin's verify/reject decision.
+  if (
+    invoice.status === InvoiceStatus.PENDING &&
+    invoice.providerInvoiceId &&
+    invoice.provider === BILLING_PROVIDER_QPAY
+  ) {
     try {
       const processed = await processQpayInvoicePayment(
         invoice.providerInvoiceId,

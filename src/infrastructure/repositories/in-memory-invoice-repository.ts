@@ -6,6 +6,7 @@ import type {
   CreatePaymentTransactionInput,
   Invoice,
   PaymentTransaction,
+  RecordManualVerificationInput,
 } from "@/domain/entities/invoice";
 import { InvoiceStatus } from "@/domain/enums";
 import {
@@ -43,6 +44,9 @@ export class InMemoryInvoiceRepository implements InvoiceRepository {
       qrImage: null,
       shortUrl: null,
       deeplinks: [],
+      verifiedByUserId: null,
+      verifiedAt: null,
+      rejectionReason: null,
       createdAt: now,
       updatedAt: now,
     };
@@ -133,6 +137,31 @@ export class InMemoryInvoiceRepository implements InvoiceRepository {
     const current = this.invoices.get(id);
     if (!current) throw new Error("Invoice not found");
     const next = { ...current, subscriptionId, updatedAt: new Date() };
+    this.invoices.set(id, next);
+    return clone(next);
+  }
+
+  async listByStatus(status: InvoiceStatus): Promise<Invoice[]> {
+    return [...this.invoices.values()]
+      .filter((item) => item.status === status)
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+      .map((item) => clone(item));
+  }
+
+  async recordManualVerification(
+    id: string,
+    input: RecordManualVerificationInput,
+  ): Promise<Invoice> {
+    const current = this.invoices.get(id);
+    if (!current) throw new Error("Invoice not found");
+    const next: Invoice = {
+      ...current,
+      status: input.status,
+      verifiedByUserId: input.verifiedByUserId,
+      verifiedAt: input.verifiedAt,
+      rejectionReason: input.rejectionReason ?? null,
+      updatedAt: new Date(),
+    };
     this.invoices.set(id, next);
     return clone(next);
   }

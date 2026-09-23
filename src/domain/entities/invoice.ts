@@ -1,8 +1,5 @@
-import type {
-  InvoiceStatus,
-  PaymentTransactionStatus,
-  SubscriptionPlanCode,
-} from "@/domain/enums";
+import { InvoiceStatus } from "@/domain/enums";
+import type { PaymentTransactionStatus, SubscriptionPlanCode } from "@/domain/enums";
 
 export type InvoiceDeeplink = {
   name: string;
@@ -27,6 +24,10 @@ export type Invoice = {
   qrImage: string | null;
   shortUrl: string | null;
   deeplinks: InvoiceDeeplink[];
+  /** Manual-payment verification audit — always null for QPay invoices. */
+  verifiedByUserId: string | null;
+  verifiedAt: Date | null;
+  rejectionReason: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -75,4 +76,12 @@ export type CreatePaymentTransactionInput = {
   status: PaymentTransactionStatus;
   paidAt: Date | null;
   metadata?: Record<string, unknown> | null;
+};
+
+/** Admin verify/reject of a manual (bank transfer / printed QR) payment claim. */
+export type RecordManualVerificationInput = {
+  status: InvoiceStatus.PAID | InvoiceStatus.FAILED;
+  verifiedByUserId: string;
+  verifiedAt: Date;
+  rejectionReason?: string | null;
 };

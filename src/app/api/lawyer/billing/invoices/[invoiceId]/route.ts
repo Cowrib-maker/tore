@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { lawyerBillingDeps } from "@/application/common/lawyer-billing-http";
+import { invoiceStatusDeps } from "@/application/common/lawyer-billing-http";
 import { requireActor } from "@/application/common/require-actor";
 import { getOwnInvoicePaymentStatus } from "@/application/use-cases/billing/get-invoice-payment-status";
 import { billingApiErrorResponse } from "@/application/use-cases/billing/qpay-callback-parse";
@@ -16,7 +16,7 @@ export async function GET(
     const view = await getOwnInvoicePaymentStatus(
       actor,
       invoiceId,
-      lawyerBillingDeps(),
+      invoiceStatusDeps(),
     );
     return NextResponse.json(view);
   } catch (error) {

@@ -212,6 +212,8 @@ export enum SubscriptionStatus {
 
 export enum InvoiceStatus {
   PENDING = "PENDING",
+  /** User claims a manual (bank transfer / printed QR) payment was made; not yet PAID until an admin verifies it. */
+  AWAITING_VERIFICATION = "AWAITING_VERIFICATION",
   PAID = "PAID",
   FAILED = "FAILED",
   EXPIRED = "EXPIRED",
@@ -226,6 +228,14 @@ export enum PaymentTransactionStatus {
 }
 
 export const BILLING_PROVIDER_QPAY = "QPAY";
+/** Manual verification methods (Part 4/5 of the payment architecture) — never auto-activate entitlement; an admin must verify. */
+export const BILLING_PROVIDER_MANUAL_BANK_TRANSFER = "MANUAL_BANK_TRANSFER";
+export const BILLING_PROVIDER_MANUAL_QR = "MANUAL_QR";
+export const MANUAL_BILLING_PROVIDERS = [
+  BILLING_PROVIDER_MANUAL_BANK_TRANSFER,
+  BILLING_PROVIDER_MANUAL_QR,
+] as const;
+export type ManualBillingProvider = (typeof MANUAL_BILLING_PROVIDERS)[number];
 
 export enum SeatStatus {
   ACTIVE = "ACTIVE",

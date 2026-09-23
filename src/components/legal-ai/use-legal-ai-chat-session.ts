@@ -9,7 +9,6 @@ import {
   interpretLegalAiChatAccess,
   type LegalAiAccessGate,
 } from "@/components/legal-ai/interpret-legal-ai-chat-access";
-import { requestLawyerCheckout } from "@/components/legal-ai/request-lawyer-checkout";
 
 export type ChatMessage = {
   role: "USER" | "ASSISTANT";
@@ -76,6 +75,7 @@ export function useLegalAiChatSession(initial?: {
         status: response.status,
         body: data,
         question: text,
+        audience: initial?.billingAudience,
       });
 
       if (interpreted.type === "auth") {
@@ -84,15 +84,11 @@ export function useLegalAiChatSession(initial?: {
       }
 
       if (interpreted.type === "billing") {
-        const checkout =
-          initial?.billingAudience === "lawyer"
-            ? await requestLawyerCheckout()
-            : { view: null, error: undefined };
-        setAccessGate({
-          ...interpreted.gate,
-          checkout: checkout.view,
-          checkoutError: checkout.error,
-        });
+        // Checkout is no longer auto-created here — the gate card lets
+        // the user pick a payment method (QR / bank transfer / QPay)
+        // first, for both audiences, then creates the checkout for
+        // whichever one they choose.
+        setAccessGate(interpreted.gate);
         return "gated";
       }
 

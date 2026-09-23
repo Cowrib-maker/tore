@@ -609,6 +609,7 @@ export const ko: Dictionary = {
     navSettings: "설정",
     navHomepage: "홈페이지",
     navAudit: "감사 로그",
+    navPayments: "결제",
     navAdminDev: "Dev tools",
     navOrganizations: "조직",
     pageOfferings: "상담 서비스",

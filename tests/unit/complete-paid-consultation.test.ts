@@ -28,6 +28,9 @@ describe("completePaidConsultationBooking", () => {
       qrImage: "img",
       shortUrl: null,
       deeplinks: [],
+      verifiedByUserId: null,
+      verifiedAt: null,
+      rejectionReason: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

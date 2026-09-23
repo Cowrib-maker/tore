@@ -601,6 +601,7 @@ export const zh: Dictionary = {
     navSettings: "设置",
     navHomepage: "主页",
     navAudit: "审计日志",
+    navPayments: "付款",
     navAdminDev: "Dev tools",
     navOrganizations: "组织",
     pageOfferings: "咨询服务",

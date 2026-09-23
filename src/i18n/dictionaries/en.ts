@@ -670,6 +670,7 @@ export const en: Dictionary = {
     navSettings: "Settings",
     navHomepage: "Homepage",
     navAudit: "Audit log",
+    navPayments: "Payments",
     navAdminDev: "Dev tools",
     navOrganizations: "Organizations",
     pageOfferings: "Consultation offerings",

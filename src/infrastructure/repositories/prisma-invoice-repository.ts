@@ -3,6 +3,7 @@ import type {
   CreateInvoiceInput,
   Invoice,
   InvoiceDeeplink,
+  RecordManualVerificationInput,
 } from "@/domain/entities/invoice";
 import { InvoiceStatus } from "@/domain/enums";
 import type { InvoiceRepository } from "@/domain/repositories/invoice-repository";
@@ -51,6 +52,9 @@ function mapInvoice(record: {
   qrImage: string | null;
   shortUrl: string | null;
   deeplinksJson: unknown;
+  verifiedByUserId: string | null;
+  verifiedAt: Date | null;
+  rejectionReason: string | null;
   createdAt: Date;
   updatedAt: Date;
 }): Invoice {
@@ -70,6 +74,9 @@ function mapInvoice(record: {
     qrImage: record.qrImage,
     shortUrl: record.shortUrl,
     deeplinks: asDeeplinks(record.deeplinksJson),
+    verifiedByUserId: record.verifiedByUserId,
+    verifiedAt: record.verifiedAt,
+    rejectionReason: record.rejectionReason,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
@@ -171,6 +178,30 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
     const record = await this.db.invoice.update({
       where: { id },
       data: { subscriptionId },
+    });
+    return mapInvoice(record);
+  }
+
+  async listByStatus(status: InvoiceStatus): Promise<Invoice[]> {
+    const records = await this.db.invoice.findMany({
+      where: { status },
+      orderBy: { createdAt: "asc" },
+    });
+    return records.map(mapInvoice);
+  }
+
+  async recordManualVerification(
+    id: string,
+    input: RecordManualVerificationInput,
+  ): Promise<Invoice> {
+    const record = await this.db.invoice.update({
+      where: { id },
+      data: {
+        status: input.status,
+        verifiedByUserId: input.verifiedByUserId,
+        verifiedAt: input.verifiedAt,
+        rejectionReason: input.rejectionReason ?? null,
+      },
     });
     return mapInvoice(record);
   }

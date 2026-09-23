@@ -6,6 +6,8 @@ export type LegalAiAccessGate = {
   message: string;
   checkout?: LegalAiCheckoutView | null;
   checkoutError?: string;
+  /** Defaults to "citizen" when absent — only the lawyer workspace ever sets "lawyer". */
+  audience?: "citizen" | "lawyer";
 };
 
 export type LegalAiChatHttpResult =
@@ -27,6 +29,7 @@ export function interpretLegalAiChatAccess(input: {
     message?: { content?: string; citations?: unknown };
   };
   question: string;
+  audience?: "citizen" | "lawyer";
 }): LegalAiChatHttpResult {
   if (input.status === 401) {
     return {
@@ -37,6 +40,7 @@ export function interpretLegalAiChatAccess(input: {
         message:
           input.body.error ??
           "Үнэгүй хууль зүйн асуултынхаа хариуг авсан тул нэвтэрнэ үү.",
+        audience: input.audience,
       },
     };
   }
@@ -50,6 +54,7 @@ export function interpretLegalAiChatAccess(input: {
         message:
           input.body.error ??
           "Шинэ хууль зүйн асуултад төлбөртэй багц хэрэгтэй.",
+        audience: input.audience,
       },
     };
   }

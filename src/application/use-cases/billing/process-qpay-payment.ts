@@ -4,33 +4,24 @@ import {
   BILLING_PROVIDER_QPAY,
   InvoiceStatus,
   PaymentTransactionStatus,
-  SeatStatus,
-  SubscriptionPlanCode,
-  SubscriptionStatus,
 } from "@/domain/enums";
 import { PaymentVerificationError } from "@/domain/errors/payment-verification-error";
-import type { BillingRepositories, BillingUnitOfWork } from "@/domain/ports/billing-unit-of-work";
+import type { BillingUnitOfWork } from "@/domain/ports/billing-unit-of-work";
 import type { QpayGateway } from "@/domain/ports/qpay-gateway";
 import {
   DuplicatePaymentError,
   type InvoiceRepository,
   type PaymentTransactionRepository,
 } from "@/domain/repositories/invoice-repository";
-import {
-  DuplicateActiveSoloError,
-  type SubscriptionRepository,
-} from "@/domain/repositories/subscription-repository";
+import type { SubscriptionRepository } from "@/domain/repositories/subscription-repository";
 import type { BookingRepository } from "@/domain/repositories/booking-repository";
 import type { LawyerProfileRepository } from "@/domain/repositories/profile-repository";
 import type { NotificationRepository } from "@/domain/repositories/trust-repository";
 import type { AuditLogRepository } from "@/domain/repositories/audit-log-repository";
-import {
-  getPlanDefinition,
-  getPricedPlanDefinition,
-} from "@/domain/constants/subscription-plans";
-import { decideSoloSubscriptionPeriod } from "@/domain/services/subscription-period";
+import { getPricedPlanDefinition } from "@/domain/constants/subscription-plans";
 import { verifyQpayCatalogPayment } from "@/domain/services/qpay-payment-verification";
 import { completePaidConsultationBooking } from "@/application/use-cases/billing/complete-paid-consultation";
+import { activateOrRenewPaidSubscription } from "@/application/use-cases/billing/activate-subscription";
 
 export type ProcessQpayPaymentDeps = {
   qpayGateway: QpayGateway;
@@ -287,91 +278,3 @@ async function processBookingQpayPayment(
   };
 }
 
-async function activateOrRenewPaidSubscription(input: {
-  userId: string;
-  planCode: SubscriptionPlanCode;
-  providerInvoiceId: string;
-  now: Date;
-  repos: BillingRepositories;
-}): Promise<Subscription> {
-  const plan = getPlanDefinition(input.planCode);
-  const existing =
-    await input.repos.subscriptionRepository.findLatestOwnedByUserId(
-      input.userId,
-      input.planCode,
-    );
-  const decision = decideSoloSubscriptionPeriod({
-    now: input.now,
-    existing,
-  });
-
-  if (!existing) {
-    try {
-      const created = await input.repos.subscriptionRepository.create({
-        ownerUserId: input.userId,
-        planCode: plan.code,
-        status: SubscriptionStatus.ACTIVE,
-        seatLimit: plan.seatLimit,
-        currentPeriodStart: decision.startsAt,
-        currentPeriodEnd: decision.expiresAt,
-        providerInvoiceId: input.providerInvoiceId,
-      });
-      await input.repos.subscriptionRepository.createSeat({
-        subscriptionId: created.id,
-        userId: input.userId,
-        status: SeatStatus.ACTIVE,
-      });
-      return created;
-    } catch (error) {
-      if (error instanceof DuplicateActiveSoloError) {
-        const raced =
-          await input.repos.subscriptionRepository.findLatestOwnedByUserId(
-            input.userId,
-            input.planCode,
-          );
-        if (raced) {
-          return applyPeriod(raced, input);
-        }
-      }
-      throw error;
-    }
-  }
-
-  return applyPeriod(existing, input);
-}
-
-async function applyPeriod(
-  existing: Subscription,
-  input: {
-    now: Date;
-    providerInvoiceId: string;
-    repos: BillingRepositories;
-  },
-): Promise<Subscription> {
-  const decision = decideSoloSubscriptionPeriod({
-    now: input.now,
-    existing,
-  });
-  const updated = await input.repos.subscriptionRepository.updatePeriod(
-    existing.id,
-    {
-      status: SubscriptionStatus.ACTIVE,
-      currentPeriodStart: decision.startsAt,
-      currentPeriodEnd: decision.expiresAt,
-      providerInvoiceId: input.providerInvoiceId,
-    },
-  );
-  const seats = await input.repos.subscriptionRepository.listSeats(updated.id);
-  const hasSeat = seats.some(
-    (seat) =>
-      seat.userId === existing.ownerUserId && seat.status === SeatStatus.ACTIVE,
-  );
-  if (!hasSeat) {
-    await input.repos.subscriptionRepository.createSeat({
-      subscriptionId: updated.id,
-      userId: existing.ownerUserId,
-      status: SeatStatus.ACTIVE,
-    });
-  }
-  return updated;
-}

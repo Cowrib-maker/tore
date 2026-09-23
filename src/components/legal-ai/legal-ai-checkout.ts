@@ -1,4 +1,5 @@
 export type LegalAiCheckoutAudience = "citizen" | "lawyer";
+export type LegalAiCheckoutMethod = "QPAY" | "BANK_TRANSFER" | "QR";
 
 export type LegalAiCheckoutView = {
   invoiceId?: string;
@@ -7,6 +8,16 @@ export type LegalAiCheckoutView = {
   amountMnt: number;
   planCode: string;
   audience: LegalAiCheckoutAudience;
+  /** Defaults to "QPAY" when absent — every pre-existing checkout view stays QPay. */
+  method?: LegalAiCheckoutMethod;
+  /** Invoice status string (e.g. "PENDING" | "AWAITING_VERIFICATION" | "PAID") — only set for manual methods. */
+  status?: string;
+  /** The "Гүйлгээний утга" to enter with a manual transfer. */
+  reference?: string | null;
+  bankName?: string | null;
+  bankAccountNumber?: string | null;
+  bankAccountName?: string | null;
+  qrAssetUrl?: string | null;
 };
 
 export function qrImageSrc(qrImage: string | null): string | null {

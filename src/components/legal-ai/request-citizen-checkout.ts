@@ -1,4 +1,7 @@
-import type { LegalAiCheckoutView } from "@/components/legal-ai/legal-ai-checkout";
+import type {
+  LegalAiCheckoutMethod,
+  LegalAiCheckoutView,
+} from "@/components/legal-ai/legal-ai-checkout";
 import {
   CITIZEN_BASIC_PLAN,
   CITIZEN_PLUS_PLAN,
@@ -10,6 +13,7 @@ export type CitizenCheckoutView = LegalAiCheckoutView;
 export async function requestCitizenCheckout(input?: {
   enabled?: boolean;
   planCode?: "CITIZEN_BASIC" | "CITIZEN_PLUS";
+  method?: LegalAiCheckoutMethod;
 }): Promise<{ view: CitizenCheckoutView | null; error?: string }> {
   if (input?.enabled === false) {
     return { view: null, error: "Төлбөр төлөхийн тулд нэвтэрнэ үү." };
@@ -23,13 +27,14 @@ export async function requestCitizenCheckout(input?: {
     planCode === SubscriptionPlanCode.CITIZEN_PLUS
       ? CITIZEN_PLUS_PLAN
       : CITIZEN_BASIC_PLAN;
+  const method = input?.method ?? "QPAY";
 
   try {
     const response = await fetch("/api/citizen/billing/checkout", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ planCode }),
+      body: JSON.stringify(method === "QPAY" ? { planCode } : { planCode, method }),
     });
     const data = (await response.json()) as {
       error?: string;
@@ -38,6 +43,12 @@ export async function requestCitizenCheckout(input?: {
       shortUrl?: string | null;
       amountMnt?: number;
       planCode?: string;
+      status?: string;
+      reference?: string | null;
+      bankName?: string | null;
+      bankAccountNumber?: string | null;
+      bankAccountName?: string | null;
+      qrAssetUrl?: string | null;
     };
     if (!response.ok) {
       return {
@@ -53,6 +64,13 @@ export async function requestCitizenCheckout(input?: {
         amountMnt: data.amountMnt ?? catalog.priceMnt,
         planCode: data.planCode ?? planCode,
         audience: "citizen",
+        method,
+        status: data.status,
+        reference: data.reference ?? null,
+        bankName: data.bankName ?? null,
+        bankAccountNumber: data.bankAccountNumber ?? null,
+        bankAccountName: data.bankAccountName ?? null,
+        qrAssetUrl: data.qrAssetUrl ?? null,
       },
     };
   } catch {

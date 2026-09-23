@@ -62,6 +62,13 @@
   --color-ai-text-muted: var(--ai-text-muted);
   --color-ai-text-subtle: var(--ai-text-subtle);
   --color-ai-gold: var(--ai-gold);
+  /* Bright interactive accent for the navy Legal AI surface — CTAs,
+     selected states, focus — kept distinct from --ai-accent (navy,
+     used for text/headers/icons) so "premium legal intelligence" reads
+     as restrained navy with a sparing bright-blue interactive pop,
+     never a wall of blue. */
+  --color-ai-accent-bright: var(--ai-accent-bright);
+  --color-ai-accent-bright-foreground: var(--ai-accent-bright-foreground);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -160,6 +167,8 @@
   --ai-text-muted: #5c6570;
   --ai-text-subtle: #66717d;
   --ai-gold: #8a6b2a;
+  --ai-accent-bright: #0b5cff;
+  --ai-accent-bright-foreground: #ffffff;
 }
 
 @media (min-width: 640px) {
@@ -244,6 +253,8 @@
   --ai-text-muted: #a7b0ba;
   --ai-text-subtle: #98a2ad;
   --ai-gold: #d9bb7c;
+  --ai-accent-bright: #4c8dff;
+  --ai-accent-bright-foreground: #081019;
 }
 
 @layer base {

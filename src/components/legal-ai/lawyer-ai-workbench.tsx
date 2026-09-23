@@ -43,7 +43,6 @@ import type {
 import { interpretLegalAiChatAccess } from "@/components/legal-ai/interpret-legal-ai-chat-access";
 import type { LegalAiAccessGate } from "@/components/legal-ai/interpret-legal-ai-chat-access";
 import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
-import { requestLawyerCheckout } from "@/components/legal-ai/request-lawyer-checkout";
 import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-list";
 import { LEGAL_AI_CHAT_RETRY_MESSAGE } from "@/components/legal-ai/legal-ai-chat-errors";
 import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
@@ -173,8 +172,7 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
       const data = (await response.json()) as { error?: string; code?: string; id?: string; conversationId?: string; fileName?: string; mimeType?: string; sizeBytes?: number; extractStatus?: AttachedDocument["extractStatus"]; pageCount?: number | null; storageKey?: string; key?: string };
       if (response.status === 401) { window.location.assign(loginHrefForLegalAi()); return; }
       if (response.status === 402 || (response.status === 403 && (data.code === "BILLING_REQUIRED" || data.code === "FEATURE_QUOTA_EXCEEDED" || data.code === "TOKEN_CEILING_REACHED" || data.code === "SUBSCRIPTION_INACTIVE"))) {
-        const checkout = await requestLawyerCheckout();
-        setAccessGate({ kind: "billing", question: draft.trim() || ATTACHMENT_ANALYSIS_PROMPT, message: data.error ?? "Баримт хавсаргахад төлбөртэй багц хэрэгтэй.", checkout: checkout.view, checkoutError: checkout.error });
+        setAccessGate({ kind: "billing", question: draft.trim() || ATTACHMENT_ANALYSIS_PROMPT, message: data.error ?? "Баримт хавсаргахад төлбөртэй багц хэрэгтэй.", audience: "lawyer" });
         return;
       }
       if (!response.ok) throw new Error(data.error ?? "Баримт хавсаргахад алдаа гарлаа.");
@@ -249,9 +247,9 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
         // entitlement/case-ownership/validation) — same JSON contract this
         // route used before streaming existed, handled exactly the same way.
         const data = (await response.json()) as { error?: string; conversationId?: string; message?: { content?: string; citations?: unknown }; code?: string };
-        const interpreted = interpretLegalAiChatAccess({ status: response.status, body: data, question: text });
+        const interpreted = interpretLegalAiChatAccess({ status: response.status, body: data, question: text, audience: "lawyer" });
         if (interpreted.type === "auth") { setAccessGate(interpreted.gate); setDraft(text); return; }
-        if (interpreted.type === "billing") { const checkout = await requestLawyerCheckout(); setAccessGate({ ...interpreted.gate, checkout: checkout.view, checkoutError: checkout.error }); if (!options?.resume) setDraft(text); return; }
+        if (interpreted.type === "billing") { setAccessGate(interpreted.gate); if (!options?.resume) setDraft(text); return; }
         if (interpreted.type === "error") throw new Error(interpreted.message);
         return;
       }

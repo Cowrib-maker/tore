@@ -203,6 +203,8 @@ enum SubscriptionStatus {
 
 enum BillingInvoiceStatus {
   PENDING
+  /** User claims a manual (bank transfer / printed QR) payment was made; not yet PAID until an admin verifies it. */
+  AWAITING_VERIFICATION
   PAID
   FAILED
   EXPIRED
@@ -1190,6 +1192,15 @@ model Invoice {
   qrImage           String?               @map("qr_image") @db.Text
   shortUrl          String?               @map("short_url")
   deeplinksJson     Json?                 @map("deeplinks_json")
+  /**
+   * Manual-payment verification audit (bank transfer / printed QR only —
+   * always null for QPay, which is verified by qpay/payment-check instead).
+   * Not a relation: an admin's own account lifecycle must never cascade
+   * into historical payment records.
+   */
+  verifiedByUserId  String?               @map("verified_by_user_id")
+  verifiedAt        DateTime?             @map("verified_at")
+  rejectionReason   String?               @map("rejection_reason") @db.Text
   createdAt         DateTime              @default(now()) @map("created_at")
   updatedAt         DateTime              @updatedAt @map("updated_at")
 

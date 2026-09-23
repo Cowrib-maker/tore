@@ -4,6 +4,7 @@ import type {
   CreatePaymentTransactionInput,
   Invoice,
   PaymentTransaction,
+  RecordManualVerificationInput,
 } from "@/domain/entities/invoice";
 import type { InvoiceStatus } from "@/domain/enums";
 
@@ -30,6 +31,17 @@ export interface InvoiceRepository {
   ): Promise<Invoice>;
   updateStatus(id: string, status: InvoiceStatus): Promise<Invoice>;
   linkSubscription(id: string, subscriptionId: string): Promise<Invoice>;
+  listByStatus(status: InvoiceStatus): Promise<Invoice[]>;
+  /**
+   * Atomically records an admin's verify/reject decision on a manual
+   * payment claim — status + verifiedByUserId + verifiedAt (+
+   * rejectionReason on reject) in one write, so an invoice can never end
+   * up PAID/FAILED without the audit fields that explain who decided it.
+   */
+  recordManualVerification(
+    id: string,
+    input: RecordManualVerificationInput,
+  ): Promise<Invoice>;
 }
 
 export interface PaymentTransactionRepository {

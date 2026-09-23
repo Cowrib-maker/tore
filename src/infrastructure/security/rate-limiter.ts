@@ -192,6 +192,18 @@ export const NOTIFICATION_WRITE_RATE_LIMIT = {
   windowMs: 15 * 60 * 1000,
 };
 
+/** Admin manual-payment verify/reject: 30 / 15 minutes / admin user */
+export const ADMIN_PAYMENT_VERIFICATION_RATE_LIMIT = {
+  limit: 30,
+  windowMs: 15 * 60 * 1000,
+};
+
+/** User's own "Төлбөр хийсэн" claim + manual checkout creation: 10 / 10 minutes / user — generous for retries, tight against abuse. */
+export const MANUAL_PAYMENT_CLAIM_RATE_LIMIT = {
+  limit: 10,
+  windowMs: 10 * 60 * 1000,
+};
+
 /** Legal AI chat: 30 requests / 15 minutes / user */
 export const LEGAL_AI_CHAT_RATE_LIMIT = {
   limit: 30,

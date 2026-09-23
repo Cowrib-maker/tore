@@ -5,13 +5,18 @@ import Link from "next/link";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import type { LegalAiAccessGate } from "@/components/legal-ai/interpret-legal-ai-chat-access";
-import type { LegalAiCheckoutView } from "@/components/legal-ai/legal-ai-checkout";
+import type {
+  LegalAiCheckoutMethod,
+  LegalAiCheckoutView,
+} from "@/components/legal-ai/legal-ai-checkout";
 import {
   isEntitlementReadyToContinue,
   isLawyerInvoicePaid,
   qrImageSrc,
 } from "@/components/legal-ai/legal-ai-checkout";
 import { requestCitizenCheckout } from "@/components/legal-ai/request-citizen-checkout";
+import { requestLawyerCheckout } from "@/components/legal-ai/request-lawyer-checkout";
+import { requestClaimManualPayment } from "@/components/legal-ai/request-claim-manual-payment";
 import {
   CITIZEN_BASIC_PLAN,
   CITIZEN_PLUS_PLAN,
@@ -22,6 +27,14 @@ import {
 } from "@/domain/services/rbac";
 import { cn } from "@/lib/utils";
 
+type CitizenPlanCode = "CITIZEN_BASIC" | "CITIZEN_PLUS";
+
+const METHOD_OPTIONS: Array<{ value: LegalAiCheckoutMethod; label: string; hint: string }> = [
+  { value: "QR", label: "QR кодоор төлөх", hint: "Банкны апп-аар уншуулж төлнө." },
+  { value: "BANK_TRANSFER", label: "Дансаар шилжүүлэх", hint: "Дансны дугаар руу шилжүүлнэ." },
+  { value: "QPAY", label: "QPay / банкны апп", hint: "QR эсвэл холбоосоор шууд төлнө." },
+];
+
 export function LegalAiAccessGateCard({
   gate,
   onPaid,
@@ -29,6 +42,7 @@ export function LegalAiAccessGateCard({
   gate: LegalAiAccessGate;
   onPaid?: () => void;
 }) {
+  const audience = gate.audience ?? "citizen";
   const loginHref = loginHrefForLegalAi(gate.question);
   const registerHref = registerClientHrefForLegalAi(gate.question);
   const onPaidRef = useRef(onPaid);
@@ -40,6 +54,10 @@ export function LegalAiAccessGateCard({
   );
   const [checkoutError, setCheckoutError] = useState(gate.checkoutError);
   const [selecting, setSelecting] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<CitizenPlanCode>("CITIZEN_BASIC");
+  const [claiming, setClaiming] = useState(false);
+  const [claimError, setClaimError] = useState<string | undefined>(undefined);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setCheckout(gate.checkout ?? null);
@@ -63,7 +81,7 @@ export function LegalAiAccessGateCard({
     }
 
     const invoiceId = checkout?.invoiceId;
-    const audience = checkout?.audience;
+    const checkoutAudience = checkout?.audience;
 
     const entitlementTimer = window.setInterval(() => {
       void fetch("/api/ai/entitlement", { credentials: "include" })
@@ -80,9 +98,9 @@ export function LegalAiAccessGateCard({
     }, 4000);
 
     let invoiceTimer: number | undefined;
-    if (invoiceId && audience) {
+    if (invoiceId && checkoutAudience) {
       const path =
-        audience === "lawyer"
+        checkoutAudience === "lawyer"
           ? `/api/lawyer/billing/invoices/${invoiceId}`
           : `/api/citizen/billing/invoices/${invoiceId}`;
       invoiceTimer = window.setInterval(() => {
@@ -92,7 +110,11 @@ export function LegalAiAccessGateCard({
             const payload = (await response.json()) as {
               paid?: boolean;
               subscriptionStatus?: string;
+              invoice?: { status?: string };
             };
+            if (payload.invoice?.status) {
+              setCheckout((prev) => (prev ? { ...prev, status: payload.invoice!.status } : prev));
+            }
             if (isLawyerInvoicePaid(payload)) {
               finishPaid();
             }
@@ -111,25 +133,50 @@ export function LegalAiAccessGateCard({
 
   const qr = qrImageSrc(checkout?.qrImage ?? null);
   const amount = checkout?.amountMnt;
-  const isLawyer = checkout?.audience === "lawyer";
-  const showPlanPicker =
-    gate.kind === "billing" && !isLawyer && !checkout && !checkoutError;
+  const showMethodPicker = gate.kind === "billing" && !checkout && !checkoutError;
 
-  async function selectCitizenPlan(planCode: "CITIZEN_BASIC" | "CITIZEN_PLUS") {
+  async function chooseMethod(method: LegalAiCheckoutMethod) {
     setSelecting(true);
     setCheckoutError(undefined);
-    const result = await requestCitizenCheckout({ planCode });
+    const result =
+      audience === "lawyer"
+        ? await requestLawyerCheckout({ method })
+        : await requestCitizenCheckout({ planCode: selectedPlan, method });
     setCheckout(result.view);
     setCheckoutError(result.error);
     setSelecting(false);
   }
 
+  async function handleClaim() {
+    if (!checkout?.invoiceId) return;
+    setClaiming(true);
+    setClaimError(undefined);
+    const result = await requestClaimManualPayment(checkout.invoiceId, audience);
+    if (result.ok) {
+      setCheckout((prev) => (prev ? { ...prev, status: "AWAITING_VERIFICATION" } : prev));
+    } else {
+      setClaimError(result.error);
+    }
+    setClaiming(false);
+  }
+
+  function copyReference() {
+    if (!checkout?.reference) return;
+    void navigator.clipboard?.writeText(checkout.reference).then(() => {
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
+  const awaitingVerification = checkout?.status === "AWAITING_VERIFICATION";
+  const isManual = checkout?.method === "BANK_TRANSFER" || checkout?.method === "QR";
+
   return (
     <div
       role="dialog"
-      className="mt-5 rounded-xl border border-[#0B1F3A]/15 bg-white px-4 py-4 text-sm text-[#3F4852] shadow-[0_10px_24px_-20px_rgba(11,31,58,0.45)]"
+      className="mt-5 rounded-xl border border-ai-border-strong bg-ai-surface px-4 py-4 text-sm text-ai-text-muted shadow-[0_10px_24px_-20px_rgba(11,31,58,0.45)]"
     >
-      <p className="font-medium text-[#0A0F14]">{gate.message}</p>
+      <p className="font-medium text-ai-text">{gate.message}</p>
       {gate.kind === "auth" ? (
         <div className="mt-3 flex flex-wrap gap-2">
           <Link href={loginHref} className={cn(buttonVariants({ size: "sm" }))}>
@@ -144,79 +191,179 @@ export function LegalAiAccessGateCard({
         </div>
       ) : (
         <div className="mt-3 space-y-3">
-          {showPlanPicker ? (
+          {showMethodPicker && audience === "citizen" ? (
             <div className="space-y-2">
-              <p className="text-xs text-[#66717D]">Багцаа сонгоно уу.</p>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  disabled={selecting}
-                  onClick={() => void selectCitizenPlan("CITIZEN_BASIC")}
-                >
-                  {CITIZEN_BASIC_PLAN.name} ·{" "}
-                  {CITIZEN_BASIC_PLAN.priceMnt.toLocaleString("mn-MN")}₮
-                  <span className="mt-1 block text-[11px] font-normal text-[#66717D]">
-                    {CITIZEN_BASIC_PLAN.quotas.legalAiQueries} асуулт ·{" "}
-                    {CITIZEN_BASIC_PLAN.quotas.documentAnalysis} баримт
-                  </span>
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  disabled={selecting}
-                  onClick={() => void selectCitizenPlan("CITIZEN_PLUS")}
-                >
-                  {CITIZEN_PLUS_PLAN.name} ·{" "}
-                  {CITIZEN_PLUS_PLAN.priceMnt.toLocaleString("mn-MN")}₮
-                  <span className="mt-1 block text-[11px] font-normal text-white/80">
-                    {CITIZEN_PLUS_PLAN.quotas.legalAiQueries} асуулт ·{" "}
-                    {CITIZEN_PLUS_PLAN.quotas.documentAnalysis} баримт
-                  </span>
-                </Button>
+              <p className="text-xs text-ai-text-subtle">Багцаа сонгоно уу.</p>
+              <div
+                role="radiogroup"
+                aria-label="Багц сонгох"
+                className="grid gap-2 sm:grid-cols-2"
+              >
+                {(
+                  [
+                    ["CITIZEN_BASIC", CITIZEN_BASIC_PLAN],
+                    ["CITIZEN_PLUS", CITIZEN_PLUS_PLAN],
+                  ] as const
+                ).map(([code, plan]) => (
+                  <button
+                    key={code}
+                    type="button"
+                    role="radio"
+                    aria-checked={selectedPlan === code}
+                    disabled={selecting}
+                    onClick={() => setSelectedPlan(code)}
+                    className={cn(
+                      "rounded-lg border px-3 py-2 text-left text-sm transition-colors",
+                      selectedPlan === code
+                        ? "border-ai-accent bg-ai-accent text-ai-accent-foreground"
+                        : "border-ai-border bg-ai-surface text-ai-text hover:border-ai-border-strong",
+                    )}
+                  >
+                    {plan.name} · {plan.priceMnt.toLocaleString("mn-MN")}₮
+                    <span
+                      className={cn(
+                        "mt-1 block text-[11px] font-normal",
+                        selectedPlan === code ? "text-ai-accent-foreground/80" : "text-ai-text-subtle",
+                      )}
+                    >
+                      {plan.quotas.legalAiQueries} асуулт · {plan.quotas.documentAnalysis} баримт
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
           ) : null}
-          {amount ? (
-            <p>
-              {isLawyer
+
+          {showMethodPicker ? (
+            <div className="space-y-2">
+              <p className="text-xs text-ai-text-subtle">Төлбөрийн арга</p>
+              <div role="radiogroup" aria-label="Төлбөрийн арга" className="grid gap-2">
+                {METHOD_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={false}
+                    disabled={selecting}
+                    onClick={() => void chooseMethod(option.value)}
+                    className="flex flex-col rounded-lg border border-ai-border bg-ai-surface px-3 py-2 text-left text-sm text-ai-text transition-colors hover:border-ai-accent-bright hover:bg-ai-surface-muted disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <span className="font-medium">{option.label}</span>
+                    <span className="text-[11px] font-normal text-ai-text-subtle">{option.hint}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {amount && !showMethodPicker ? (
+            <p className="text-ai-text">
+              {audience === "lawyer"
                 ? "TORE SOLO"
                 : checkout?.planCode === "CITIZEN_PLUS"
                   ? CITIZEN_PLUS_PLAN.name
                   : CITIZEN_BASIC_PLAN.name}{" "}
-              · {amount.toLocaleString("mn-MN")}₮
+              · {amount.toLocaleString("mn-MN")}₮ / сар
             </p>
           ) : null}
-          {checkoutError ? (
-            <p className="text-red-700">{checkoutError}</p>
+
+          {checkoutError ? <p className="text-red-700">{checkoutError}</p> : null}
+
+          {checkout?.method === "QPAY" ? (
+            <>
+              {qr ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={qr}
+                  alt="QPay QR"
+                  className="h-40 w-40 rounded-md border border-ai-border"
+                />
+              ) : null}
+              {checkout?.shortUrl ? (
+                <a
+                  href={checkout.shortUrl}
+                  className="inline-flex text-ai-accent underline"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  QPay-ээр төлөх
+                </a>
+              ) : null}
+              {waiting && checkout ? (
+                <p className="text-xs text-ai-text-subtle">
+                  Төлбөр хүлээгдэж байна. QR эсвэл холбоосоор төлнө үү. Төлсний
+                  дараа асуулт үргэлжилнэ.
+                </p>
+              ) : null}
+            </>
           ) : null}
-          {qr ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={qr}
-              alt="QPay QR"
-              className="h-40 w-40 rounded-md border border-[#D9DEE5]"
-            />
+
+          {checkout?.method === "QR" ? (
+            <div className="space-y-2">
+              {checkout.qrAssetUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={checkout.qrAssetUrl}
+                  alt="Төрийн банкны QPay QR"
+                  className="h-40 w-40 rounded-md border border-ai-border object-contain"
+                />
+              ) : (
+                <p className="text-red-700">Одоогоор QR код тохируулагдаагүй байна.</p>
+              )}
+              <ManualPaymentReference
+                label="Гүйлгээний утга"
+                value={checkout.reference}
+                copied={copied}
+                onCopy={copyReference}
+              />
+            </div>
           ) : null}
-          {checkout?.shortUrl ? (
-            <a
-              href={checkout.shortUrl}
-              className="inline-flex text-[#0B1F3A] underline"
-              target="_blank"
-              rel="noreferrer"
-            >
-              QPay-ээр төлөх
-            </a>
+
+          {checkout?.method === "BANK_TRANSFER" ? (
+            <div className="space-y-1.5 rounded-lg border border-ai-border bg-ai-surface-muted px-3 py-2.5">
+              <FieldRow label="Банк" value={checkout.bankName ?? "Тохируулагдаагүй"} />
+              <FieldRow label="Данс" value={checkout.bankAccountNumber ?? "Тохируулагдаагүй"} />
+              <FieldRow label="Дансны нэр" value={checkout.bankAccountName ?? "Тохируулагдаагүй"} />
+              <FieldRow label="Дүн" value={`${amount?.toLocaleString("mn-MN")}₮`} />
+              <ManualPaymentReference
+                label="Гүйлгээний утга"
+                value={checkout.reference}
+                copied={copied}
+                onCopy={copyReference}
+              />
+            </div>
           ) : null}
-          {waiting && checkout ? (
-            <p className="text-xs text-[#66717D]">
-              Төлбөр хүлээгдэж байна. QR эсвэл холбоосоор төлнө үү. Төлсний
-              дараа асуулт үргэлжилнэ.
-            </p>
+
+          {isManual && checkout ? (
+            <div className="space-y-2">
+              {awaitingVerification ? (
+                <p className="text-xs font-medium text-ai-gold">
+                  Төлбөр баталгаажихыг хүлээж байна. Төлбөр амжилттай
+                  шалгагдсаны дараа таны эрх автоматаар идэвхжинэ.
+                </p>
+              ) : (
+                <p className="text-xs text-ai-text-subtle">
+                  Дээрх мэдээллийн дагуу шилжүүлгээ хийсний дараа доорх товч
+                  дээр дарна уу.
+                </p>
+              )}
+              {claimError ? <p className="text-red-700">{claimError}</p> : null}
+              {!awaitingVerification ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={claiming}
+                  onClick={() => void handleClaim()}
+                  className="bg-ai-accent-bright text-ai-accent-bright-foreground hover:bg-ai-accent-bright/90"
+                >
+                  Төлбөр хийсэн
+                </Button>
+              ) : null}
+            </div>
           ) : null}
+
           <div className="flex flex-wrap gap-2">
-            {checkout ? (
+            {checkout && checkout.method === "QPAY" ? (
               <Button
                 type="button"
                 size="sm"
@@ -229,7 +376,7 @@ export function LegalAiAccessGateCard({
                 Төлсөн — үргэлжлүүлэх
               </Button>
             ) : null}
-            {isLawyer ? (
+            {audience === "lawyer" ? (
               <Link
                 href="/lawyer/profile"
                 className={cn(buttonVariants({ size: "sm", variant: "ghost" }))}
@@ -240,6 +387,41 @@ export function LegalAiAccessGateCard({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function FieldRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 text-sm">
+      <span className="text-ai-text-subtle">{label}</span>
+      <span className="font-medium text-ai-text">{value}</span>
+    </div>
+  );
+}
+
+function ManualPaymentReference({
+  label,
+  value,
+  copied,
+  onCopy,
+}: {
+  label: string;
+  value: string | null | undefined;
+  copied: boolean;
+  onCopy: () => void;
+}) {
+  if (!value) return null;
+  return (
+    <div className="flex items-center justify-between gap-2 text-sm">
+      <span className="text-ai-text-subtle">{label}</span>
+      <button
+        type="button"
+        onClick={onCopy}
+        className="rounded-md border border-ai-border bg-ai-surface px-2 py-1 font-mono text-xs font-medium text-ai-text hover:border-ai-accent-bright"
+      >
+        {value} {copied ? "· хуулагдлаа" : ""}
+      </button>
     </div>
   );
 }
