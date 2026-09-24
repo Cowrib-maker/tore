@@ -387,6 +387,25 @@ export type Dictionary = {
     emptyBillingHint: string;
     emptyReportsTitle: string;
     emptyActivityTitle: string;
+    composerPlaceholder: string;
+    composerAttach: string;
+    composerAi: string;
+    composerKnowledgeFirm: string;
+    composerKnowledgeTeam: string;
+    quickActionCaseTitle: string;
+    quickActionCaseDesc: string;
+    quickActionUploadTitle: string;
+    quickActionUploadDesc: string;
+    quickActionResearchTitle: string;
+    quickActionResearchDesc: string;
+    quickActionTeamTitle: string;
+    quickActionTeamDesc: string;
+    quickActionReportsTitle: string;
+    quickActionReportsDesc: string;
+    planCardEyebrow: string;
+    planCardTitle: string;
+    planCardDescription: string;
+    planCardCta: string;
   };
   activeContext: {
     label: string;

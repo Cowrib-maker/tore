@@ -5,10 +5,13 @@ import {
   BookOpen,
   Briefcase,
   Building2,
+  Crown,
   FileText,
+  FolderPlus,
   Home,
   Scale,
   Search,
+  Upload,
   Users,
   Users2,
   Wallet,
@@ -20,6 +23,8 @@ import {
   WorkspaceSideNav,
   type WorkspaceSideNavItem,
 } from "@/components/workspace/workspace-side-nav";
+import { WorkspaceAiComposer } from "@/components/workspace/workspace-ai-composer";
+import { WorkspaceQuickAction } from "@/components/workspace/workspace-quick-action";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -133,12 +138,40 @@ export default async function OrganizationOverviewPage({
           title={isFirm ? "TORE Firm" : "TORE Team"}
           subtitle={organization.name}
           items={workspaceNavItems(copy, organization.id)}
+          footer={
+            <div className="rounded-xl border border-[#0B1F3A]/8 bg-[#F7F8FB] p-3.5">
+              <div className="flex items-center gap-2">
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-[#0B1F3A] text-white">
+                  <Crown className="size-3.5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-[11px] font-semibold text-[#8A939D] uppercase">
+                    {copy.planCardEyebrow}
+                  </p>
+                  <p className="truncate text-[13px] font-semibold text-[#0B1F3A]">
+                    {copy.planCardTitle}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-2 text-[12px] leading-5 text-[#5C6570]">
+                {copy.planCardDescription}
+              </p>
+              <button
+                type="button"
+                disabled
+                title={copy.comingSoonTag}
+                className="mt-3 flex h-8 w-full cursor-not-allowed items-center justify-center rounded-lg bg-[#0B1F3A]/40 text-[12px] font-semibold text-white/80"
+              >
+                {copy.planCardCta}
+              </button>
+            </div>
+          }
         />
 
         <div>
           {/* Hero — same navy "premium legal workspace" identity as the
               Legal AI surface, reused here for the Firm/Team workspace. */}
-          <div className="mb-6 rounded-2xl bg-[#0B1F3A] px-6 py-7 text-white sm:px-8 sm:py-8">
+          <div className="mb-4 rounded-2xl bg-[#0B1F3A] px-6 py-7 text-white sm:px-8 sm:py-8">
             <p className="text-[11px] font-semibold tracking-[0.2em] text-white/60 uppercase">
               {isFirm ? "TORE FIRM" : "TORE TEAM"}
             </p>
@@ -159,6 +192,54 @@ export default async function OrganizationOverviewPage({
                 {statusLabel(organization.status, copy)}
               </Badge>
             </div>
+          </div>
+
+          <div className="mb-6">
+            <WorkspaceAiComposer
+              placeholder={copy.composerPlaceholder}
+              attachLabel={copy.composerAttach}
+              aiLabel={copy.composerAi}
+              knowledgeLabel={isFirm ? copy.composerKnowledgeFirm : copy.composerKnowledgeTeam}
+              comingSoonLabel={copy.comingSoonTag}
+            />
+          </div>
+
+          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
+            <WorkspaceQuickAction
+              icon={FolderPlus}
+              iconClassName="bg-[#F1EBFF] text-[#7C5CFC]"
+              title={copy.quickActionCaseTitle}
+              description={copy.quickActionCaseDesc}
+              comingSoonLabel={copy.comingSoonTag}
+            />
+            <WorkspaceQuickAction
+              icon={Upload}
+              iconClassName="bg-[#E6F7EE] text-[#1F9D5C]"
+              title={copy.quickActionUploadTitle}
+              description={copy.quickActionUploadDesc}
+              comingSoonLabel={copy.comingSoonTag}
+            />
+            <WorkspaceQuickAction
+              icon={Search}
+              iconClassName="bg-[#E8F0FE] text-[#0B5CFF]"
+              title={copy.quickActionResearchTitle}
+              description={copy.quickActionResearchDesc}
+              href="/legal-ai"
+            />
+            <WorkspaceQuickAction
+              icon={Users2}
+              iconClassName="bg-[#F1EBFF] text-[#7C5CFC]"
+              title={copy.quickActionTeamTitle}
+              description={copy.quickActionTeamDesc}
+              comingSoonLabel={copy.comingSoonTag}
+            />
+            <WorkspaceQuickAction
+              icon={BarChart3}
+              iconClassName="bg-[#E6F7F5] text-[#0F9C8F]"
+              title={copy.quickActionReportsTitle}
+              description={copy.quickActionReportsDesc}
+              comingSoonLabel={copy.comingSoonTag}
+            />
           </div>
 
           <Card className="mb-6">
