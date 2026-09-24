@@ -218,10 +218,10 @@ export const en: Dictionary = {
   publicHome: {
     brandLine: "LEGAL INTELLIGENCE FOR A STRONGER MONGOLIA",
     tagline: "Understand the law, build the solution.",
-    chatTitle: "What happened?",
+    chatTitle: "Describe your legal issue.",
     chatSubtitle:
-      "Describe the issue in your own words. You do not need legal terminology.",
-    chatPlaceholder: "Describe the issue in your own words.",
+      "Describe the issue in your own words. You don't need to know legal terms or article numbers.",
+    chatPlaceholder: "Describe your issue...",
     chatSubmit: "Send",
     chatTyping: "TORE Chat is writing...",
     chatSuggestionsLabel: "For example:",

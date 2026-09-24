@@ -1,6 +1,14 @@
 import Link from "next/link";
-import { BookOpen, FileText, MessagesSquare, PenSquare } from "lucide-react";
+import {
+  Bookmark,
+  BookOpen,
+  FileText,
+  MessagesSquare,
+  NotebookPen,
+  PenSquare,
+} from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { StudentOrthographyDraft } from "@/components/student/student-orthography-draft";
 import { StudentShell } from "@/components/student/student-shell";
 import { STUDENT_TRACK_IDS } from "@/domain/student";
@@ -14,12 +22,16 @@ export default async function StudentHubPage() {
   const quickActions = [
     { icon: BookOpen, label: student.tracksTitle, href: "#tracks" },
     { icon: PenSquare, label: student.modules.tests, href: "#modules" },
-    {
-      icon: FileText,
-      label: student.modules.problems,
-      href: "#modules",
-    },
+    { icon: FileText, label: student.modules.problems, href: "#modules" },
     { icon: MessagesSquare, label: student.ctaChat, href: "/#chat" },
+  ];
+
+  // Nav items from the approved reference that don't have a real feature
+  // behind them yet — shown honestly as inert, not linked, per the same
+  // "coming soon" convention used on the Firm/Team workspace.
+  const comingSoonActions = [
+    { icon: NotebookPen, label: "Тэмдэглэл" },
+    { icon: Bookmark, label: "Хадгалсан" },
   ];
 
   return (
@@ -57,6 +69,22 @@ export default async function StudentHubPage() {
             </span>
             <p className="text-[13px] font-medium text-[#0B1F3A]">{label}</p>
           </Link>
+        ))}
+        {comingSoonActions.map(({ icon: Icon, label }) => (
+          <div
+            key={label}
+            className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-[#0B1F3A]/12 px-4 py-4 opacity-70"
+          >
+            <span className="flex size-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              <Icon className="size-4" />
+            </span>
+            <div className="flex w-full items-center justify-between gap-1">
+              <p className="text-[13px] font-medium text-[#3F4852]">{label}</p>
+              <Badge variant="secondary" className="text-[9px]">
+                Тун удахгүй
+              </Badge>
+            </div>
+          </div>
         ))}
       </div>
 

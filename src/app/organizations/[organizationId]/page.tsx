@@ -4,7 +4,9 @@ import {
   BarChart3,
   BookOpen,
   Briefcase,
+  Building2,
   FileText,
+  Home,
   Scale,
   Search,
   Users,
@@ -14,6 +16,10 @@ import {
 
 import { getMyOrganizationOverviewForSession } from "@/application/actions/organization.actions";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
+import {
+  WorkspaceSideNav,
+  type WorkspaceSideNavItem,
+} from "@/components/workspace/workspace-side-nav";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -55,22 +61,34 @@ function statusLabel(
 }
 
 /**
- * Module tiles mirror the approved Firm/Team reference's sidebar list.
- * None of these are real features yet (no case/document/client/billing
- * backend scoped to an organization exists) — rendered as inert
- * "coming soon" tiles rather than links, so nothing pretends to work.
+ * Sidebar nav mirrors the approved Firm/Team reference's left nav list.
+ * Only "Тойм" (this page) is a real, working destination — none of the
+ * other modules have a backend yet (no case/document/client/billing
+ * scoped to an organization exists), so they render as inert
+ * "coming soon" rows rather than links, per the same pattern already
+ * used for the module tiles below.
  */
-function workspaceModules(copy: Dictionary["organizations"]) {
+function workspaceNavItems(
+  copy: Dictionary["organizations"],
+  organizationId: string,
+): WorkspaceSideNavItem[] {
   return [
-    { icon: Briefcase, label: copy.moduleCases },
-    { icon: Users, label: copy.moduleClients },
-    { icon: FileText, label: copy.moduleDocuments },
-    { icon: Search, label: copy.moduleResearch },
-    { icon: Scale, label: copy.moduleCourtPractice },
-    { icon: Users2, label: copy.moduleTeam },
-    { icon: BookOpen, label: copy.moduleKnowledge },
-    { icon: Wallet, label: copy.moduleBilling },
-    { icon: BarChart3, label: copy.moduleReports },
+    {
+      key: "overview",
+      icon: Home,
+      label: copy.workspaceOverview,
+      href: `/organizations/${organizationId}`,
+      active: true,
+    },
+    { key: "cases", icon: Briefcase, label: copy.moduleCases, comingSoonLabel: copy.comingSoonTag },
+    { key: "clients", icon: Users, label: copy.moduleClients, comingSoonLabel: copy.comingSoonTag },
+    { key: "documents", icon: FileText, label: copy.moduleDocuments, comingSoonLabel: copy.comingSoonTag },
+    { key: "research", icon: Search, label: copy.moduleResearch, comingSoonLabel: copy.comingSoonTag },
+    { key: "court", icon: Scale, label: copy.moduleCourtPractice, comingSoonLabel: copy.comingSoonTag },
+    { key: "team", icon: Users2, label: copy.moduleTeam, comingSoonLabel: copy.comingSoonTag },
+    { key: "knowledge", icon: BookOpen, label: copy.moduleKnowledge, comingSoonLabel: copy.comingSoonTag },
+    { key: "billing", icon: Wallet, label: copy.moduleBilling, comingSoonLabel: copy.comingSoonTag },
+    { key: "reports", icon: BarChart3, label: copy.moduleReports, comingSoonLabel: copy.comingSoonTag },
   ];
 }
 
@@ -109,107 +127,98 @@ export default async function OrganizationOverviewPage({
         </Link>
       </div>
 
-      {/* Hero — same navy "premium legal workspace" identity as the
-          Legal AI surface, reused here for the Firm/Team workspace. */}
-      <div className="mb-6 rounded-2xl bg-[#0B1F3A] px-6 py-7 text-white sm:px-8 sm:py-8">
-        <p className="text-[11px] font-semibold tracking-[0.2em] text-white/60 uppercase">
-          {isFirm ? "TORE FIRM" : "TORE TEAM"}
-        </p>
-        <h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
-          {organization.name}
-        </h2>
-        <p className="mt-2 max-w-xl text-sm leading-6 text-white/70">
-          {tagline}
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Badge variant="outline" className="border-white/20 text-white">
-            {typeLabel(organization.type, copy)}
-          </Badge>
-          <Badge variant="outline" className="border-white/20 text-white">
-            {roleLabel(membership.orgRole, copy)}
-          </Badge>
-          <Badge variant="outline" className="border-white/20 text-white">
-            {statusLabel(organization.status, copy)}
-          </Badge>
-        </div>
-      </div>
+      <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
+        <WorkspaceSideNav
+          icon={isFirm ? Building2 : Users2}
+          title={isFirm ? "TORE Firm" : "TORE Team"}
+          subtitle={organization.name}
+          items={workspaceNavItems(copy, organization.id)}
+        />
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>{copy.overviewTitle}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <dl className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                {copy.fieldType}
-              </dt>
-              <dd className="mt-1 text-sm font-medium">
+        <div>
+          {/* Hero — same navy "premium legal workspace" identity as the
+              Legal AI surface, reused here for the Firm/Team workspace. */}
+          <div className="mb-6 rounded-2xl bg-[#0B1F3A] px-6 py-7 text-white sm:px-8 sm:py-8">
+            <p className="text-[11px] font-semibold tracking-[0.2em] text-white/60 uppercase">
+              {isFirm ? "TORE FIRM" : "TORE TEAM"}
+            </p>
+            <h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
+              {organization.name}
+            </h2>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-white/70">
+              {tagline}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Badge variant="outline" className="border-white/20 text-white">
                 {typeLabel(organization.type, copy)}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                {copy.fieldRole}
-              </dt>
-              <dd className="mt-1 text-sm font-medium">
+              </Badge>
+              <Badge variant="outline" className="border-white/20 text-white">
                 {roleLabel(membership.orgRole, copy)}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                {copy.fieldStatus}
-              </dt>
-              <dd className="mt-1 text-sm font-medium">
+              </Badge>
+              <Badge variant="outline" className="border-white/20 text-white">
                 {statusLabel(organization.status, copy)}
-              </dd>
+              </Badge>
             </div>
-            <div>
-              <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                {copy.fieldCreated}
-              </dt>
-              <dd className="mt-1 text-sm font-medium">
-                {organization.createdAt.toISOString().slice(0, 10)}
-              </dd>
-            </div>
-          </dl>
-        </CardContent>
-      </Card>
-
-      <h3 className="mb-3 text-sm font-medium text-muted-foreground">
-        {isFirm ? copy.typeLawFirm : copy.typeLegalEntity}
-      </h3>
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        {workspaceModules(copy).map(({ icon: Icon, label }) => (
-          <div
-            key={label}
-            className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-border px-4 py-4 opacity-80"
-          >
-            <span className="flex size-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-              <Icon className="size-4" />
-            </span>
-            <p className="text-sm font-medium">{label}</p>
-            <Badge variant="secondary" className="text-[10px]">
-              {copy.comingSoonTag}
-            </Badge>
           </div>
-        ))}
-      </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <EmptyState
-          title={copy.emptyCasesTitle}
-          description={copy.emptyCasesHint}
-        />
-        <EmptyState title={copy.emptyTeamTitle} />
-      </div>
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>{copy.overviewTitle}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <dl className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                    {copy.fieldType}
+                  </dt>
+                  <dd className="mt-1 text-sm font-medium">
+                    {typeLabel(organization.type, copy)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                    {copy.fieldRole}
+                  </dt>
+                  <dd className="mt-1 text-sm font-medium">
+                    {roleLabel(membership.orgRole, copy)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                    {copy.fieldStatus}
+                  </dt>
+                  <dd className="mt-1 text-sm font-medium">
+                    {statusLabel(organization.status, copy)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                    {copy.fieldCreated}
+                  </dt>
+                  <dd className="mt-1 text-sm font-medium">
+                    {organization.createdAt.toISOString().slice(0, 10)}
+                  </dd>
+                </div>
+              </dl>
+            </CardContent>
+          </Card>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <EmptyState
-          title={copy.emptyBillingTitle}
-          description={copy.emptyBillingHint}
-        />
-        <EmptyState title={copy.emptyReportsTitle} />
+          <div className="grid gap-4 lg:grid-cols-2">
+            <EmptyState
+              title={copy.emptyCasesTitle}
+              description={copy.emptyCasesHint}
+            />
+            <EmptyState title={copy.emptyTeamTitle} />
+          </div>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <EmptyState
+              title={copy.emptyBillingTitle}
+              description={copy.emptyBillingHint}
+            />
+            <EmptyState title={copy.emptyReportsTitle} />
+          </div>
+        </div>
       </div>
     </>
   );

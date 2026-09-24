@@ -165,9 +165,9 @@ export const ko: Dictionary = {
   publicHome: {
     brandLine: "LEGAL INTELLIGENCE FOR A STRONGER MONGOLIA",
     tagline: "법을 이해하고, 해결책을 만드십시오.",
-    chatTitle: "무슨 일이 있었나요?",
-    chatSubtitle: "문제를 자신의 말로 적어 주세요. 법률 용어는 필요 없습니다.",
-    chatPlaceholder: "문제를 자신의 말로 적어 주세요.",
+    chatTitle: "법률 문제를 적어 주세요.",
+    chatSubtitle: "문제를 자신의 말로 적어 주세요. 법률 용어나 조항 번호를 알 필요 없습니다.",
+    chatPlaceholder: "문제를 적어 주세요...",
     chatSubmit: "보내기",
     chatTyping: "TORE Chat이 작성 중입니다...",
     chatSuggestionsLabel: "예를 들어:",

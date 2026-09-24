@@ -209,10 +209,10 @@ ctaStart: "Өмгөөлөгч хайх",
   publicHome: {
     brandLine: "LEGAL INTELLIGENCE FOR A STRONGER MONGOLIA",
     tagline: "Хуулийг ойлгож, шийдлийг бүтээ.",
-    chatTitle: "Танд юу тохиолдсон бэ?",
+    chatTitle: "Хуулийн асуудлаа бичнэ үү.",
     chatSubtitle:
-      "Асуудлаа өөрийнхөөрөө бичээрэй. Хуулийн нэр томъёо мэдэх шаардлагагүй.",
-    chatPlaceholder: "Асуудлаа өөрийнхөөрөө бичээрэй.",
+      "Асуудлаа өөрийнхөөрөө бичнэ үү. Хуулийн нэр, зүйл заалт мэдэх шаардлагагүй.",
+    chatPlaceholder: "Асуудлаа бичнэ үү...",
     chatSubmit: "Илгээх",
     chatTyping: "TORE Chat бичиж байна...",
     chatSuggestionsLabel: "Жишээ нь:",

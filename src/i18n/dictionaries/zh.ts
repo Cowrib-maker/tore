@@ -165,9 +165,9 @@ export const zh: Dictionary = {
   publicHome: {
     brandLine: "LEGAL INTELLIGENCE FOR A STRONGER MONGOLIA",
     tagline: "理解法律，构建解决方案。",
-    chatTitle: "发生了什么？",
-    chatSubtitle: "用您自己的话描述问题。无需法律术语。",
-    chatPlaceholder: "用您自己的话描述问题。",
+    chatTitle: "请描述您的法律问题。",
+    chatSubtitle: "用您自己的话描述问题。无需了解法律术语或具体条款。",
+    chatPlaceholder: "请描述您的问题...",
     chatSubmit: "发送",
     chatTyping: "TORE Chat 正在回复...",
     chatSuggestionsLabel: "例如：",
