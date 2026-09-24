@@ -169,6 +169,7 @@ export function LegalAiAccessGateCard({
   }
 
   const awaitingVerification = checkout?.status === "AWAITING_VERIFICATION";
+  const manualRejected = checkout?.status === "FAILED";
   const isManual = checkout?.method === "BANK_TRANSFER" || checkout?.method === "QR";
 
   return (
@@ -259,7 +260,7 @@ export function LegalAiAccessGateCard({
           {amount && !showMethodPicker ? (
             <p className="text-ai-text">
               {audience === "lawyer"
-                ? "TORE SOLO"
+                ? "TORE Lawyer"
                 : checkout?.planCode === "CITIZEN_PLUS"
                   ? CITIZEN_PLUS_PLAN.name
                   : CITIZEN_BASIC_PLAN.name}{" "}
@@ -276,7 +277,7 @@ export function LegalAiAccessGateCard({
                 <img
                   src={qr}
                   alt="QPay QR"
-                  className="h-40 w-40 rounded-md border border-ai-border"
+                  className="h-56 w-56 max-w-full rounded-md border border-ai-border bg-white object-contain p-2 sm:h-64 sm:w-64"
                 />
               ) : null}
               {checkout?.shortUrl ? (
@@ -305,11 +306,14 @@ export function LegalAiAccessGateCard({
                 <img
                   src={checkout.qrAssetUrl}
                   alt="Төрийн банкны QPay QR"
-                  className="h-40 w-40 rounded-md border border-ai-border object-contain"
+                  className="h-56 w-56 max-w-full rounded-md border border-ai-border bg-white object-contain p-2 sm:h-64 sm:w-64"
                 />
               ) : (
                 <p className="text-red-700">Одоогоор QR код тохируулагдаагүй байна.</p>
               )}
+              <p className="text-xs text-ai-text-subtle">
+                QR кодыг банкны апп-аар уншуулж төлбөрөө хийнэ үү.
+              </p>
               <ManualPaymentReference
                 label="Гүйлгээний утга"
                 value={checkout.reference}
@@ -336,10 +340,14 @@ export function LegalAiAccessGateCard({
 
           {isManual && checkout ? (
             <div className="space-y-2">
-              {awaitingVerification ? (
+              {manualRejected ? (
+                <p className="text-xs font-medium text-red-700">
+                  Төлбөрийн мэдээлэл баталгаажаагүй байна.
+                </p>
+              ) : awaitingVerification ? (
                 <p className="text-xs font-medium text-ai-gold">
-                  Төлбөр баталгаажихыг хүлээж байна. Төлбөр амжилттай
-                  шалгагдсаны дараа таны эрх автоматаар идэвхжинэ.
+                  Таны төлбөрийн мэдээлэл хүлээн авлаа. Админ баталгаажуулсны
+                  дараа эрх идэвхжинэ.
                 </p>
               ) : (
                 <p className="text-xs text-ai-text-subtle">
@@ -348,7 +356,7 @@ export function LegalAiAccessGateCard({
                 </p>
               )}
               {claimError ? <p className="text-red-700">{claimError}</p> : null}
-              {!awaitingVerification ? (
+              {!awaitingVerification && !manualRejected ? (
                 <Button
                   type="button"
                   size="sm"
@@ -360,6 +368,12 @@ export function LegalAiAccessGateCard({
                 </Button>
               ) : null}
             </div>
+          ) : null}
+
+          {checkout?.status === "PAID" ? (
+            <p className="text-xs font-medium text-green-700">
+              Төлбөр баталгаажлаа. Таны эрх идэвхжсэн.
+            </p>
           ) : null}
 
           <div className="flex flex-wrap gap-2">

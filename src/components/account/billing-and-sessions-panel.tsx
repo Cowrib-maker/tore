@@ -7,6 +7,7 @@ import {
   revokeDeviceSessionAction,
   revokeOtherDeviceSessionsAction,
 } from "@/application/actions/session.actions";
+import { requestClaimManualPayment } from "@/components/legal-ai/request-claim-manual-payment";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,6 +30,8 @@ type SessionRow = {
   status: string;
 };
 
+type CheckoutMethod = "QR" | "BANK_TRANSFER" | "QPAY";
+
 type PendingInvoice = {
   invoiceId: string;
   amountMnt: number;
@@ -38,6 +41,13 @@ type PendingInvoice = {
   qrImage: string | null;
   shortUrl: string | null;
   deeplinks: Array<{ name: string; description: string; logo: string; link: string }>;
+  /** Present only when the invoice was created for a manual (QR/bank-transfer) method. */
+  method?: CheckoutMethod;
+  reference?: string;
+  bankName?: string | null;
+  bankAccountNumber?: string | null;
+  bankAccountName?: string | null;
+  qrAssetUrl?: string | null;
 };
 
 type BillingPayload = {
@@ -101,8 +111,10 @@ export function BillingAndSessionsPanel({
   const [pending, startTransition] = useTransition();
   const [checkoutPending, setCheckoutPending] = useState(false);
   const [paymentState, setPaymentState] = useState<
-    "idle" | "waiting" | "success" | "failure"
+    "idle" | "waiting" | "awaiting_verification" | "success" | "failure"
   >("idle");
+  const [claiming, setClaiming] = useState(false);
+  const [claimError, setClaimError] = useState<string | null>(null);
   const pollRef = useRef<number | null>(null);
 
   const load = useCallback(async () => {
@@ -160,6 +172,10 @@ export function BillingAndSessionsPanel({
               await load();
               return;
             }
+            if (payload.invoiceStatus === "AWAITING_VERIFICATION") {
+              setPaymentState("awaiting_verification");
+              return;
+            }
             if (payload.invoiceStatus === "FAILED") {
               setPaymentState("failure");
               stopPolling();
@@ -175,7 +191,11 @@ export function BillingAndSessionsPanel({
     void load()
       .then((payload) => {
         if (payload.pendingInvoice?.invoiceId && payload.billingRequired) {
-          setPaymentState("waiting");
+          setPaymentState(
+            payload.pendingInvoice.status === "AWAITING_VERIFICATION"
+              ? "awaiting_verification"
+              : "waiting",
+          );
           pollInvoice(payload.pendingInvoice.invoiceId);
         }
       })
@@ -183,13 +203,17 @@ export function BillingAndSessionsPanel({
     return () => stopPolling();
   }, [copy.sessionsLoadError, load, pollInvoice, stopPolling]);
 
-  const startCheckout = async () => {
+  const startCheckout = async (method: CheckoutMethod) => {
     setCheckoutPending(true);
     setPaymentState("waiting");
     try {
       const response = await fetch("/api/lawyer/billing/checkout", {
         method: "POST",
         credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          method: method === "QPAY" ? undefined : method,
+        }),
       });
       if (!response.ok) {
         setPaymentState("failure");
@@ -207,11 +231,37 @@ export function BillingAndSessionsPanel({
     }
   };
 
+  const handleClaim = async (invoiceId: string) => {
+    setClaiming(true);
+    setClaimError(null);
+    const result = await requestClaimManualPayment(invoiceId, "lawyer");
+    if (result.ok) {
+      setPaymentState("awaiting_verification");
+      setData((current) =>
+        current?.pendingInvoice
+          ? {
+              ...current,
+              pendingInvoice: {
+                ...current.pendingInvoice,
+                status: "AWAITING_VERIFICATION",
+              },
+            }
+          : current,
+      );
+    } else {
+      setClaimError(result.error ?? null);
+    }
+    setClaiming(false);
+  };
+
   const current = data?.sessions.find((session) => session.isCurrent);
   const others =
     data?.sessions.filter((session) => !session.isCurrent) ?? [];
   const invoice = data?.pendingInvoice;
   const qr = qrSrc(invoice?.qrImage ?? null);
+  const isManualInvoice =
+    invoice?.method === "QR" || invoice?.method === "BANK_TRANSFER";
+  const showMethodPicker = Boolean(data?.billingRequired) && !invoice;
 
   return (
     <div className="grid gap-6">
@@ -266,8 +316,13 @@ export function BillingAndSessionsPanel({
                   )}
                 </li>
               </ul>
-              {paymentState === "waiting" ? (
+              {paymentState === "waiting" && !invoice ? (
                 <p>{copy.paymentWaiting}</p>
+              ) : null}
+              {paymentState === "awaiting_verification" ? (
+                <p className="font-medium text-amber-600">
+                  {copy.paymentAwaitingVerification}
+                </p>
               ) : null}
               {paymentState === "success" && !data.billingRequired ? (
                 <p>{copy.paymentSuccess}</p>
@@ -275,23 +330,101 @@ export function BillingAndSessionsPanel({
               {paymentState === "failure" ? (
                 <p className="text-destructive">{copy.paymentFailure}</p>
               ) : null}
-              {data.billingRequired ? (
-                <Button
-                  type="button"
-                  disabled={checkoutPending}
-                  onClick={() => void startCheckout()}
-                >
-                  {copy.payButton}
-                </Button>
+
+              {showMethodPicker ? (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">{copy.methodLabel}</p>
+                  <div
+                    role="radiogroup"
+                    aria-label={copy.methodLabel}
+                    className="grid gap-2 sm:grid-cols-3"
+                  >
+                    {(
+                      [
+                        ["QR", copy.methodQr],
+                        ["BANK_TRANSFER", copy.methodBankTransfer],
+                        ["QPAY", copy.methodQpay],
+                      ] as const
+                    ).map(([method, label]) => (
+                      <button
+                        key={method}
+                        type="button"
+                        role="radio"
+                        aria-checked={false}
+                        disabled={checkoutPending}
+                        onClick={() => void startCheckout(method)}
+                        className="rounded-lg border px-3 py-2 text-left text-sm transition-colors hover:border-primary disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">{copy.payButton}</p>
+                </div>
               ) : null}
+
               {invoice && data.billingRequired ? (
-                <div className="space-y-3 rounded-lg border p-3">
-                  {qr ? (
+                <div className="space-y-3 rounded-lg border p-4">
+                  {invoice.method === "QR" ? (
+                    <div className="space-y-3">
+                      {invoice.qrAssetUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={invoice.qrAssetUrl}
+                          alt={copy.qrLabel}
+                          className="h-64 w-64 max-w-full rounded-md border bg-white object-contain p-2 sm:h-72 sm:w-72"
+                        />
+                      ) : (
+                        <p className="text-destructive">{copy.qrUnavailable}</p>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        {copy.qrInstructions}
+                      </p>
+                    </div>
+                  ) : null}
+
+                  {invoice.method === "BANK_TRANSFER" ? (
+                    <div className="space-y-1.5 text-sm">
+                      <p>
+                        <span className="text-muted-foreground">
+                          {copy.bankNameLabel}:{" "}
+                        </span>
+                        {invoice.bankName ?? "—"}
+                      </p>
+                      <p>
+                        <span className="text-muted-foreground">
+                          {copy.bankAccountLabel}:{" "}
+                        </span>
+                        <span className="font-mono">
+                          {invoice.bankAccountNumber ?? "—"}
+                        </span>
+                      </p>
+                      <p>
+                        <span className="text-muted-foreground">
+                          {copy.bankAccountNameLabel}:{" "}
+                        </span>
+                        {invoice.bankAccountName ?? "—"}
+                      </p>
+                    </div>
+                  ) : null}
+
+                  {invoice.method === "QR" || invoice.method === "BANK_TRANSFER" ? (
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">
+                        {copy.referenceLabel}:{" "}
+                      </span>
+                      <span className="font-mono font-medium">
+                        {invoice.reference}
+                      </span>
+                    </p>
+                  ) : null}
+
+                  {qr && !invoice.method ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={qr}
                       alt={copy.qrLabel}
-                      className="h-40 w-40 bg-white p-2"
+                      className="h-64 w-64 max-w-full rounded-md border bg-white object-contain p-2 sm:h-72 sm:w-72"
                     />
                   ) : null}
                   {invoice.shortUrl ? (
@@ -319,6 +452,22 @@ export function BillingAndSessionsPanel({
                         </a>
                       ))}
                     </div>
+                  ) : null}
+
+                  {isManualInvoice && paymentState !== "awaiting_verification" ? (
+                    <>
+                      {claimError ? (
+                        <p className="text-sm text-destructive">{claimError}</p>
+                      ) : null}
+                      <Button
+                        type="button"
+                        size="sm"
+                        disabled={claiming}
+                        onClick={() => void handleClaim(invoice.invoiceId)}
+                      >
+                        {copy.claimButton}
+                      </Button>
+                    </>
                   ) : null}
                 </div>
               ) : null}

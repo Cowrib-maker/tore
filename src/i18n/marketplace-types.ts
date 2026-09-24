@@ -219,6 +219,18 @@ export type MarketplaceDictionary = {
     qrLabel: string;
     deeplinkLabel: string;
     openPaymentLink: string;
+    methodLabel: string;
+    methodQr: string;
+    methodBankTransfer: string;
+    methodQpay: string;
+    qrInstructions: string;
+    claimButton: string;
+    referenceLabel: string;
+    bankNameLabel: string;
+    bankAccountLabel: string;
+    bankAccountNameLabel: string;
+    paymentAwaitingVerification: string;
+    qrUnavailable: string;
     sessionsTitle: string;
     sessionsDescription: string;
     currentDevice: string;
