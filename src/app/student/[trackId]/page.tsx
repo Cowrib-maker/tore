@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { StudentShell } from "@/components/student/student-shell";
+import { StudentShell, studentSidebarItems } from "@/components/student/student-shell";
 import {
   getPublicTrackQuiz,
   getStudentLegalProblem,
@@ -32,8 +32,9 @@ export default async function StudentTrackPage({
       brand={dict.common.brand}
       backHref="/student"
       backLabel={student.backHome}
+      sidebar={studentSidebarItems("library")}
     >
-      <p className="text-[12px] font-semibold tracking-[0.16em] text-[#1A7A72] uppercase">
+      <p className="text-[12px] font-semibold tracking-[0.16em] text-[#0B5CFF] uppercase">
         {student.tracksTitle}
       </p>
       <h1 className="mt-3 font-[family-name:var(--font-landing-display)] text-[2rem] tracking-[-0.03em] text-[#0B1F3A] sm:text-[2.35rem]">
@@ -57,7 +58,7 @@ export default async function StudentTrackPage({
       />
 
       <section className="mt-10">
-        <h2 className="text-[13px] font-semibold tracking-[0.12em] text-[#1A7A72] uppercase">
+        <h2 className="text-[13px] font-semibold tracking-[0.12em] text-[#0B5CFF] uppercase">
           {student.modules.exams}
         </h2>
         <ul className="mt-4 space-y-3">
@@ -112,7 +113,7 @@ function LessonGroup({
   if (lessons.length === 0) return null;
   return (
     <section className="mt-10">
-      <h2 className="text-[13px] font-semibold tracking-[0.12em] text-[#1A7A72] uppercase">
+      <h2 className="text-[13px] font-semibold tracking-[0.12em] text-[#0B5CFF] uppercase">
         {title}
       </h2>
       <ul className="mt-4 space-y-3">
@@ -120,7 +121,7 @@ function LessonGroup({
           <li key={lesson.id}>
             <Link
               href={`/student/${trackId}/lesson/${lesson.id}`}
-              className="block rounded-2xl border border-[#0B1F3A]/10 bg-white px-5 py-4 transition hover:border-[#1A7A72]/40"
+              className="block rounded-2xl border border-[#0B1F3A]/10 bg-white px-5 py-4 transition hover:border-[#0B5CFF]/40"
             >
               <p className="text-[15px] font-semibold text-[#0B1F3A]">
                 {lesson.title}
@@ -156,9 +157,9 @@ function QuizCard({
     <li>
       <Link
         href={href}
-        className="block rounded-2xl border border-[#0B1F3A]/10 bg-white px-5 py-4 transition hover:border-[#1A7A72]/40"
+        className="block rounded-2xl border border-[#0B1F3A]/10 bg-white px-5 py-4 transition hover:border-[#0B5CFF]/40"
       >
-        <p className="text-[11px] font-semibold tracking-wide text-[#1A7A72] uppercase">
+        <p className="text-[11px] font-semibold tracking-wide text-[#0B5CFF] uppercase">
           {badge}
         </p>
         <p className="mt-2 text-[15px] font-semibold text-[#0B1F3A]">{title}</p>

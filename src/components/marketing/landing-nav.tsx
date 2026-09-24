@@ -43,7 +43,7 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
         <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_LANDING} />
 
         <nav
-          className="hidden items-center gap-1 md:flex"
+          className="hidden items-center gap-1 xl:flex"
           aria-label="Primary"
         >
           {links.map((item) => (
@@ -94,7 +94,7 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
           )}
           <button
             type="button"
-            className="inline-flex size-9 items-center justify-center rounded-full border border-[var(--landing-border-strong)] text-[var(--landing-accent)] md:hidden"
+            className="inline-flex size-9 items-center justify-center rounded-full border border-[var(--landing-border-strong)] text-[var(--landing-accent)] xl:hidden"
             aria-expanded={open}
             aria-controls="landing-mobile-nav"
             onClick={() => setOpen((value) => !value)}
@@ -108,7 +108,7 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
       {open ? (
         <nav
           id="landing-mobile-nav"
-          className="border-t border-[var(--landing-border)] bg-[var(--landing-surface)] px-5 py-3 md:hidden"
+          className="border-t border-[var(--landing-border)] bg-[var(--landing-surface)] px-5 py-3 xl:hidden"
           aria-label="Mobile"
         >
           <div className="mx-auto flex max-w-6xl flex-col gap-0.5">

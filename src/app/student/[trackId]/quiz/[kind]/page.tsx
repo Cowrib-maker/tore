@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { StudentQuizForm } from "@/components/student/student-quiz-form";
-import { StudentShell } from "@/components/student/student-shell";
+import { StudentShell, studentSidebarItems } from "@/components/student/student-shell";
 import {
   getPublicTrackQuiz,
   parseStudentQuizKind,
@@ -32,8 +32,9 @@ export default async function StudentQuizPage({
       brand={dict.common.brand}
       backHref={`/student/${trackId}`}
       backLabel={student.backTrack}
+      sidebar={studentSidebarItems("library")}
     >
-      <p className="text-[12px] font-semibold tracking-[0.16em] text-[#1A7A72] uppercase">
+      <p className="text-[12px] font-semibold tracking-[0.16em] text-[#0B5CFF] uppercase">
         {student.tracks[trackId]} · {kindLabel}
       </p>
       <h1 className="mt-3 font-[family-name:var(--font-landing-display)] text-[1.85rem] tracking-[-0.03em] text-[#0B1F3A] sm:text-[2.2rem]">
