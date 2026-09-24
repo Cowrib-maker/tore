@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { FileText, PenSquare } from "lucide-react";
+import { BriefcaseBusiness, FileSearch, GraduationCap, PenSquare } from "lucide-react";
 
 import { StudentOrthographyDraft } from "@/components/student/student-orthography-draft";
 import { StudentShell, studentSidebarItems } from "@/components/student/student-shell";
+import { WorkspaceAiComposer } from "@/components/workspace/workspace-ai-composer";
+import { WorkspaceQuickAction } from "@/components/workspace/workspace-quick-action";
 import { STUDENT_TRACK_IDS } from "@/domain/student";
 import { getDictionary } from "@/i18n/get-dictionary";
 
@@ -10,14 +12,7 @@ export default async function StudentHubPage() {
   const dict = await getDictionary();
   const home = dict.publicHome;
   const student = home.studentPage;
-
-  // "Хуулийн сан" and "TORE Chat" now live in the persistent sidebar —
-  // only the module-specific shortcuts stay here to avoid duplicating
-  // the same links in two places.
-  const quickActions = [
-    { icon: PenSquare, label: student.modules.tests, href: "#modules" },
-    { icon: FileText, label: student.modules.problems, href: "#modules" },
-  ];
+  const org = dict.organizations;
 
   return (
     <StudentShell
@@ -25,6 +20,28 @@ export default async function StudentHubPage() {
       backHref="/"
       backLabel={student.backHome}
       sidebar={studentSidebarItems("home")}
+      wideContent
+      sidebarFooter={
+        <div className="rounded-xl border border-[#0B1F3A]/8 bg-[#F7F8FB] p-3.5">
+          <div className="flex items-center gap-2">
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-[#0B1F3A] text-white">
+              <GraduationCap className="size-3.5" />
+            </span>
+            <p className="text-[13px] font-semibold text-[#0B1F3A]">
+              {student.tracksTitle}
+            </p>
+          </div>
+          <p className="mt-2 text-[12px] leading-5 text-[#5C6570]">
+            {STUDENT_TRACK_IDS.length} салбар нээлттэй байна.
+          </p>
+          <Link
+            href="/student#tracks"
+            className="mt-3 flex h-8 w-full items-center justify-center rounded-lg bg-[#0B1F3A] text-[12px] font-semibold text-white transition hover:bg-[#16365F]"
+          >
+            {student.tracksTitle} →
+          </Link>
+        </div>
+      }
     >
       {/* Hero — same navy "premium legal workspace" identity used across
           the Legal AI surface and the Firm/Team workspace. */}
@@ -43,31 +60,57 @@ export default async function StudentHubPage() {
         </p>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-3">
-        {quickActions.map(({ icon: Icon, label, href }) => (
-          <Link
-            key={label}
-            href={href}
-            className="flex flex-col items-start gap-2 rounded-xl border border-[#0B1F3A]/10 bg-white px-4 py-4 transition hover:border-[#0B5CFF]/40 hover:bg-[#E8F0FE]"
-          >
-            <span className="flex size-9 items-center justify-center rounded-lg bg-[#E8F0FE] text-[#0B5CFF]">
-              <Icon className="size-4" />
-            </span>
-            <p className="text-[13px] font-medium text-[#0B1F3A]">{label}</p>
-          </Link>
-        ))}
+      <div className="mt-6">
+        <WorkspaceAiComposer
+          placeholder="Хууль, кейс, ойлголтын талаар асуух..."
+          attachLabel={org.composerAttach}
+          aiLabel="AI сонгох"
+          knowledgeLabel="Вэбээс хайх"
+          comingSoonLabel={org.comingSoonTag}
+        />
+      </div>
+
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <WorkspaceQuickAction
+          icon={GraduationCap}
+          iconClassName="bg-[#E8F0FE] text-[#0B5CFF]"
+          title="Хууль судлах"
+          description="Салбар, зүйл заалт, эх сурвалж"
+          href="#tracks"
+        />
+        <WorkspaceQuickAction
+          icon={BriefcaseBusiness}
+          iconClassName="bg-[#F1EBFF] text-[#7C5CFC]"
+          title="Кейс судалгаа"
+          description="Шүүхийн шийдвэр, дүн шинжилгээ"
+          comingSoonLabel={org.comingSoonTag}
+        />
+        <WorkspaceQuickAction
+          icon={PenSquare}
+          iconClassName="bg-[#E6F7EE] text-[#1F9D5C]"
+          title={student.modules.tests}
+          description="Онолын мэдлэгээ шалгах"
+          href="#modules"
+        />
+        <WorkspaceQuickAction
+          icon={FileSearch}
+          iconClassName="bg-[#E6F7F5] text-[#0F9C8F]"
+          title="Баримт бичиг шинжлэх"
+          description="Гэрээ, өргөдөл, маягт шинжлэх"
+          comingSoonLabel={org.comingSoonTag}
+        />
       </div>
 
       <section id="tracks" className="mt-10 scroll-mt-20">
         <h2 className="text-[13px] font-semibold tracking-[0.12em] text-[#0B5CFF] uppercase">
           {student.tracksTitle}
         </h2>
-        <ul className="mt-4 space-y-3">
+        <ul className="mt-4 grid gap-3 sm:grid-cols-3">
           {STUDENT_TRACK_IDS.map((trackId) => (
             <li key={trackId}>
               <Link
                 href={`/student/${trackId}`}
-                className="block rounded-2xl border border-[#0B1F3A]/10 bg-white px-5 py-4 transition hover:border-[#0B5CFF]/40"
+                className="block h-full rounded-2xl border border-[#0B1F3A]/10 bg-white px-5 py-4 transition hover:border-[#0B5CFF]/40"
               >
                 <p className="text-[16px] font-semibold text-[#0B1F3A]">
                   {student.tracks[trackId]}
@@ -85,7 +128,7 @@ export default async function StudentHubPage() {
         <h2 className="text-[13px] font-semibold tracking-[0.12em] text-[#0B5CFF] uppercase">
           {student.modulesTitle}
         </h2>
-        <ol className="mt-4 space-y-2">
+        <ol className="mt-4 grid gap-2 sm:grid-cols-2">
           {(
             [
               "theory",
@@ -109,14 +152,14 @@ export default async function StudentHubPage() {
         </ol>
       </section>
 
-      <div className="mt-10">
+      <div className="mt-10 max-w-2xl">
         <StudentOrthographyDraft billingHref="/#chat" />
       </div>
 
-      <p className="mt-8 text-[13px] leading-6 text-[#7B8490]">
+      <p className="mt-8 max-w-2xl text-[13px] leading-6 text-[#7B8490]">
         {student.disclaimer}
       </p>
-      <p className="mt-3 text-[12px] leading-5 text-[#8A939D]">
+      <p className="mt-3 max-w-2xl text-[12px] leading-5 text-[#8A939D]">
         {student.studyDisclaimer}
       </p>
 

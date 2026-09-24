@@ -1,5 +1,14 @@
 import Link from "next/link";
-import { Bookmark, GraduationCap, Home, MessagesSquare, NotebookPen } from "lucide-react";
+import {
+  Bookmark,
+  BriefcaseBusiness,
+  FolderOpen,
+  GraduationCap,
+  Home,
+  MessagesSquare,
+  NotebookPen,
+  PenSquare,
+} from "lucide-react";
 import type { ReactNode } from "react";
 
 import { BRAND_LOGO_LANDING } from "@/components/brand/tokens";
@@ -23,6 +32,7 @@ export function studentSidebarItems(
 ): WorkspaceSideNavItem[] {
   return [
     { key: "home", icon: Home, label: "Нүүр", href: "/student", active: active === "home" },
+    { key: "ai", icon: MessagesSquare, label: "AI туслах", href: "/#chat" },
     {
       key: "library",
       icon: GraduationCap,
@@ -30,7 +40,9 @@ export function studentSidebarItems(
       href: "/student#tracks",
       active: active === "library",
     },
-    { key: "chat", icon: MessagesSquare, label: "TORE Chat", href: "/#chat" },
+    { key: "case-study", icon: BriefcaseBusiness, label: "Кейс судалгаа", comingSoonLabel: "Тун удахгүй" },
+    { key: "tests", icon: PenSquare, label: "Шалгалтын тест", href: "/student#modules" },
+    { key: "materials", icon: FolderOpen, label: "Хичээлийн материал", href: "/student#modules" },
     { key: "notes", icon: NotebookPen, label: "Тэмдэглэл", comingSoonLabel: "Тун удахгүй" },
     { key: "saved", icon: Bookmark, label: "Хадгалсан", comingSoonLabel: "Тун удахгүй" },
   ];
@@ -42,6 +54,8 @@ export function StudentShell({
   backLabel,
   children,
   sidebar,
+  sidebarFooter,
+  wideContent,
 }: {
   brand: Dictionary["common"]["brand"];
   backHref: string;
@@ -54,6 +68,13 @@ export function StudentShell({
    * existing call site renders byte-identical unless it passes this.
    */
   sidebar?: WorkspaceSideNavItem[];
+  sidebarFooter?: ReactNode;
+  /**
+   * Lets the hub page use the full available width next to the sidebar
+   * (matching the Firm/Team workspace composition) — lesson/quiz pages
+   * keep the narrower max-w-3xl reading column by omitting this.
+   */
+  wideContent?: boolean;
 }) {
   return (
     <div className="min-h-screen bg-[#F7F6F2] text-[#0A0F14]">
@@ -86,9 +107,10 @@ export function StudentShell({
               title="TORE Student"
               subtitle="Хуулийн оюутан"
               items={sidebar}
+              footer={sidebarFooter}
               className="lg:sticky lg:top-24"
             />
-            <div className="min-w-0 max-w-3xl">{children}</div>
+            <div className={cn("min-w-0", wideContent ? "" : "max-w-3xl")}>{children}</div>
           </div>
         ) : (
           children
