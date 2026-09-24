@@ -30,5 +30,7 @@ export { entitlementUsageRepository } from "./prisma-entitlement-usage-repositor
 export { unpaidCitizenLegalQuestionUsageRepository } from "./prisma-unpaid-citizen-legal-question-usage-repository";
 export { invoiceRepository } from "./prisma-invoice-repository";
 export { paymentTransactionRepository } from "./prisma-payment-transaction-repository";
+export { studentAttemptRepository } from "./prisma-student-attempt-repository";
 export { legalGraphRepository } from "./prisma-legal-graph-repository";
+export { adminPaymentRepository } from "./prisma-admin-payment-repository";
 export { unitOfWork } from "@/infrastructure/database/prisma-unit-of-work";
