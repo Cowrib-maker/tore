@@ -255,7 +255,7 @@ export const marketplaceEn: MarketplaceDictionary = {
     methodBankTransfer: "Bank transfer",
     methodQpay: "QPay / bank app",
     qrInstructions:
-      "Scan the QR code with your bank app to pay. After paying, click below to confirm.",
+      "Pay using the QR code above or by transferring to the account shown. Be sure to enter the 4-digit code above as the transfer description, and transfer the exact amount shown. After paying, click below to confirm.",
     claimButton: "I've paid",
     referenceLabel: "Payment reference",
     bankNameLabel: "Bank",

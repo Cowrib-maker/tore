@@ -15,6 +15,20 @@ export class DuplicatePaymentError extends Error {
   }
 }
 
+/**
+ * Thrown when `InvoiceRepository.create()` is given a `paymentCode` that
+ * another PENDING/AWAITING_VERIFICATION invoice already holds (enforced by
+ * a database-level partial unique index, never by an app-level
+ * check-then-insert alone — see the migration that adds `payment_code`).
+ * Callers should generate a fresh code and retry a bounded number of times.
+ */
+export class DuplicatePaymentCodeError extends Error {
+  constructor(message = "Duplicate active payment code") {
+    super(message);
+    this.name = "DuplicatePaymentCodeError";
+  }
+}
+
 export interface InvoiceRepository {
   create(input: CreateInvoiceInput): Promise<Invoice>;
   findById(id: string): Promise<Invoice | null>;

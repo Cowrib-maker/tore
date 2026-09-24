@@ -247,7 +247,7 @@ export const marketplaceZh: MarketplaceDictionary = {
     methodQr: "扫码付款",
     methodBankTransfer: "银行转账",
     methodQpay: "QPay / 银行应用",
-    qrInstructions: "请用银行应用扫描二维码付款。付款后点击下方按钮确认。",
+    qrInstructions: "请使用上方二维码或转账至所示账户付款。请务必在转账说明中填写上方的4位数字代码，并转账精确金额。付款后点击下方按钮确认。",
     claimButton: "我已付款",
     referenceLabel: "转账用途",
     bankNameLabel: "银行",

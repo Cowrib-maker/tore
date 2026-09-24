@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ActorContext } from "@/application/common/actor-context";
 import { claimManualPayment } from "@/application/use-cases/billing/claim-manual-payment";
@@ -6,6 +6,7 @@ import {
   createManualCitizenCheckout,
   createManualLawyerCheckout,
 } from "@/application/use-cases/billing/create-manual-checkout";
+import * as manualPaymentCodeModule from "@/domain/services/manual-payment-code";
 import { listManualPayments } from "@/application/use-cases/billing/list-manual-payments";
 import { rejectManualPayment } from "@/application/use-cases/billing/reject-manual-payment";
 import { verifyManualPayment } from "@/application/use-cases/billing/verify-manual-payment";
@@ -78,13 +79,17 @@ describe("manual payment lifecycle", () => {
       );
       expect(view.status).toBe(InvoiceStatus.PENDING);
       expect(view.amountMnt).toBe(49_000);
-      expect(view.reference).toMatch(/^TORE-[A-Z0-9]{8}$/);
+      expect(view.reference).toMatch(/^\d{4}$/);
+      expect(view.paymentCode).toBe(view.reference);
       expect(view.bankName).toBe("Төрийн банк");
       expect(view.qrAssetUrl).toBeNull();
 
       const stored = await invoices.findById(view.invoiceId);
       expect(stored?.provider).toBe(BILLING_PROVIDER_MANUAL_BANK_TRANSFER);
-      expect(stored?.providerInvoiceId).toBe(view.reference);
+      // providerInvoiceId keeps its own, separate, deterministic format —
+      // never repurposed for the customer-facing payment code.
+      expect(stored?.providerInvoiceId).toMatch(/^TORE-[A-Z0-9]{8}$/);
+      expect(stored?.paymentCode).toBe(view.reference);
     });
 
     it("creates a QR invoice for a citizen plan, distinct provider from bank transfer", async () => {
@@ -96,7 +101,10 @@ describe("manual payment lifecycle", () => {
         now,
       );
       expect(view.qrAssetUrl).toBe("/brand/qpay-qr.png");
-      expect(view.bankName).toBeNull();
+      // QR customers can also see the destination account — the QR
+      // encodes it, but showing it lets a customer confirm/manually enter
+      // it if their banking app can't scan the code.
+      expect(view.bankName).toBe("Төрийн банк");
 
       const stored = await invoices.findById(view.invoiceId);
       expect(stored?.provider).toBe(BILLING_PROVIDER_MANUAL_QR);
@@ -425,6 +433,142 @@ describe("manual payment lifecycle", () => {
           userRepository: users,
         }),
       ).rejects.toThrow(ForbiddenError);
+    });
+  });
+
+  describe("paymentCode generation and collision handling", () => {
+    it("retries with a freshly generated code when the first one collides with an active invoice, and only creates one invoice", async () => {
+      await invoices.create({
+        userId: otherLawyer.userId,
+        planCode: SubscriptionPlanCode.SOLO,
+        amountMnt: 49_000,
+        currency: "MNT",
+        provider: BILLING_PROVIDER_MANUAL_BANK_TRANSFER,
+        status: InvoiceStatus.PENDING,
+        expiresAt: new Date(now.getTime() + 60_000),
+        paymentCode: "1111",
+      });
+
+      const spy = vi
+        .spyOn(manualPaymentCodeModule, "generateManualPaymentCode")
+        .mockReturnValueOnce("1111")
+        .mockReturnValueOnce("2222");
+
+      const view = await createManualLawyerCheckout(
+        lawyer,
+        "BANK_TRANSFER",
+        { invoiceRepository: invoices, manualPaymentConfig: ENABLED_CONFIG },
+        now,
+      );
+
+      expect(view.paymentCode).toBe("2222");
+      expect(spy).toHaveBeenCalledTimes(2);
+      expect((await invoices.listByUserId(lawyer.userId)).length).toBe(1);
+      spy.mockRestore();
+    });
+
+    it("gives up and throws after exhausting every retry attempt when every generated code collides", async () => {
+      await invoices.create({
+        userId: otherLawyer.userId,
+        planCode: SubscriptionPlanCode.SOLO,
+        amountMnt: 49_000,
+        currency: "MNT",
+        provider: BILLING_PROVIDER_MANUAL_BANK_TRANSFER,
+        status: InvoiceStatus.AWAITING_VERIFICATION,
+        expiresAt: new Date(now.getTime() + 60_000),
+        paymentCode: "9999",
+      });
+      const spy = vi
+        .spyOn(manualPaymentCodeModule, "generateManualPaymentCode")
+        .mockReturnValue("9999");
+
+      await expect(
+        createManualLawyerCheckout(
+          lawyer,
+          "BANK_TRANSFER",
+          { invoiceRepository: invoices, manualPaymentConfig: ENABLED_CONFIG },
+          now,
+        ),
+      ).rejects.toThrow(ValidationError);
+      expect(spy).toHaveBeenCalledTimes(10);
+      spy.mockRestore();
+    });
+
+    it("lets a code be reused once the invoice that held it is no longer PENDING/AWAITING_VERIFICATION", async () => {
+      const first = await invoices.create({
+        userId: otherLawyer.userId,
+        planCode: SubscriptionPlanCode.SOLO,
+        amountMnt: 49_000,
+        currency: "MNT",
+        provider: BILLING_PROVIDER_MANUAL_BANK_TRANSFER,
+        status: InvoiceStatus.PENDING,
+        expiresAt: new Date(now.getTime() + 60_000),
+        paymentCode: "4242",
+      });
+      // Terminal status — the code is now free to reuse.
+      await invoices.updateStatus(first.id, InvoiceStatus.PAID);
+
+      const spy = vi
+        .spyOn(manualPaymentCodeModule, "generateManualPaymentCode")
+        .mockReturnValueOnce("4242");
+
+      const view = await createManualLawyerCheckout(
+        lawyer,
+        "BANK_TRANSFER",
+        { invoiceRepository: invoices, manualPaymentConfig: ENABLED_CONFIG },
+        now,
+      );
+      expect(view.paymentCode).toBe("4242");
+      expect(spy).toHaveBeenCalledTimes(1);
+      spy.mockRestore();
+    });
+
+    it("never allocates the same active code to two checkouts racing for the same first choice", async () => {
+      const spy = vi
+        .spyOn(manualPaymentCodeModule, "generateManualPaymentCode")
+        .mockReturnValueOnce("5555")
+        .mockReturnValueOnce("5555")
+        .mockReturnValueOnce("6666");
+
+      const [a, b] = await Promise.all([
+        createManualLawyerCheckout(
+          lawyer,
+          "BANK_TRANSFER",
+          { invoiceRepository: invoices, manualPaymentConfig: ENABLED_CONFIG },
+          now,
+        ),
+        createManualCitizenCheckout(
+          client,
+          SubscriptionPlanCode.CITIZEN_BASIC,
+          "BANK_TRANSFER",
+          { invoiceRepository: invoices, manualPaymentConfig: ENABLED_CONFIG },
+          now,
+        ),
+      ]);
+
+      expect(a.paymentCode).not.toBe(b.paymentCode);
+      expect(new Set([a.paymentCode, b.paymentCode])).toEqual(new Set(["5555", "6666"]));
+      spy.mockRestore();
+    });
+
+    it("a freshly created manual invoice stays PENDING despite already having a paymentCode — the code alone never activates anything", async () => {
+      const view = await createManualLawyerCheckout(
+        lawyer,
+        "BANK_TRANSFER",
+        { invoiceRepository: invoices, manualPaymentConfig: ENABLED_CONFIG },
+        now,
+      );
+      expect(view.paymentCode).toMatch(/^\d{4}$/);
+      const stored = await invoices.findById(view.invoiceId);
+      expect(stored?.status).toBe(InvoiceStatus.PENDING);
+
+      // Even after the user claims payment, the invoice sits at
+      // AWAITING_VERIFICATION — never PAID — until an admin explicitly
+      // verifies it. Nothing about paymentCode's presence changes this.
+      await claimManualPayment(lawyer, view.invoiceId, { invoiceRepository: invoices }, now);
+      const claimed = await invoices.findById(view.invoiceId);
+      expect(claimed?.status).toBe(InvoiceStatus.AWAITING_VERIFICATION);
+      expect(claimed?.paymentCode).toBe(view.paymentCode);
     });
   });
 });

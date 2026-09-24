@@ -311,30 +311,56 @@ export function LegalAiAccessGateCard({
               ) : (
                 <p className="text-red-700">Одоогоор QR код тохируулагдаагүй байна.</p>
               )}
-              <p className="text-xs text-ai-text-subtle">
-                QR кодыг банкны апп-аар уншуулж төлбөрөө хийнэ үү.
-              </p>
+              <div className="space-y-1.5 rounded-lg border border-ai-border bg-ai-surface-muted px-3 py-2.5">
+                <FieldRow label="Банк" value={checkout.bankName ?? "Тохируулагдаагүй"} />
+                <FieldRow
+                  label="Дансны нэр"
+                  value={checkout.bankAccountName ?? "Тохируулагдаагүй"}
+                />
+                <FieldRow
+                  label="Данс"
+                  value={checkout.bankAccountNumber ?? "Тохируулагдаагүй"}
+                />
+              </div>
               <ManualPaymentReference
                 label="Гүйлгээний утга"
                 value={checkout.reference}
                 copied={copied}
                 onCopy={copyReference}
               />
+              <p className="text-xs text-ai-text-subtle">
+                Дээрх QR кодоор эсвэл дансаар төлбөрөө хийнэ үү. Гүйлгээний
+                утга хэсэгт дээрх 4 оронтой кодыг заавал оруулна уу. Төлбөрийн
+                дүнг яг тааруулж шилжүүлнэ үү.
+              </p>
             </div>
           ) : null}
 
           {checkout?.method === "BANK_TRANSFER" ? (
-            <div className="space-y-1.5 rounded-lg border border-ai-border bg-ai-surface-muted px-3 py-2.5">
-              <FieldRow label="Банк" value={checkout.bankName ?? "Тохируулагдаагүй"} />
-              <FieldRow label="Данс" value={checkout.bankAccountNumber ?? "Тохируулагдаагүй"} />
-              <FieldRow label="Дансны нэр" value={checkout.bankAccountName ?? "Тохируулагдаагүй"} />
-              <FieldRow label="Дүн" value={`${amount?.toLocaleString("mn-MN")}₮`} />
+            <div className="space-y-2">
+              <div className="space-y-1.5 rounded-lg border border-ai-border bg-ai-surface-muted px-3 py-2.5">
+                <FieldRow label="Банк" value={checkout.bankName ?? "Тохируулагдаагүй"} />
+                <FieldRow
+                  label="Дансны нэр"
+                  value={checkout.bankAccountName ?? "Тохируулагдаагүй"}
+                />
+                <FieldRow
+                  label="Данс"
+                  value={checkout.bankAccountNumber ?? "Тохируулагдаагүй"}
+                />
+                <FieldRow label="Дүн" value={`${amount?.toLocaleString("mn-MN")}₮`} />
+              </div>
               <ManualPaymentReference
                 label="Гүйлгээний утга"
                 value={checkout.reference}
                 copied={copied}
                 onCopy={copyReference}
               />
+              <p className="text-xs text-ai-text-subtle">
+                Дээрх дансаар төлбөрөө хийнэ үү. Гүйлгээний утга хэсэгт дээрх 4
+                оронтой кодыг заавал оруулна уу. Төлбөрийн дүнг яг тааруулж
+                шилжүүлнэ үү.
+              </p>
             </div>
           ) : null}
 

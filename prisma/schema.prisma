@@ -947,8 +947,9 @@ model GuestSession {
   createdAt              DateTime @default(now()) @map("created_at")
   lastSeenAt             DateTime @default(now()) @map("last_seen_at")
 
-  claimedBy     User?            @relation("GuestSessionClaimedBy", fields: [claimedByUserId], references: [id], onDelete: SetNull)
-  conversations AIConversation[]
+  claimedBy       User?            @relation("GuestSessionClaimedBy", fields: [claimedByUserId], references: [id], onDelete: SetNull)
+  conversations   AIConversation[]
+  studentAttempts StudentAttempt[]
 
   @@index([expiresAt])
   @@map("guest_sessions")
@@ -1175,6 +1176,13 @@ model EntitlementUsage {
 /**
  * Local billing invoice. QPay invoice_id is stored as providerInvoiceId.
  * Subscription is linked only after verified payment (or reused on renewal).
+ *
+ * `paymentCode` additionally has a partial unique index —
+ * `invoices_payment_code_active_key`, unique only where
+ * status IN ('PENDING', 'AWAITING_VERIFICATION') — added by raw SQL in its
+ * migration (Prisma's schema DSL has no WHERE-clause index syntax, same
+ * reason the pg_trgm indexes aren't declared here either). Do not let a
+ * future `prisma migrate dev` drop it as "drift".
  */
 model Invoice {
   id                String                @id @default(cuid())
@@ -1201,6 +1209,13 @@ model Invoice {
   verifiedByUserId  String?               @map("verified_by_user_id")
   verifiedAt        DateTime?             @map("verified_at")
   rejectionReason   String?               @map("rejection_reason") @db.Text
+  /**
+   * Short customer-facing "Гүйлгээний утга" for manual (bank transfer /
+   * printed QR) payments only — always null for QPay. Never globally
+   * unique (only 10,000 possible 4-digit values); see the partial unique
+   * index documented on the model above.
+   */
+  paymentCode       String?               @map("payment_code")
   createdAt         DateTime              @default(now()) @map("created_at")
   updatedAt         DateTime              @updatedAt @map("updated_at")
 
@@ -1211,6 +1226,7 @@ model Invoice {
 
   @@index([userId, status])
   @@index([status, expiresAt])
+  @@index([paymentCode])
   @@map("invoices")
 }
 
@@ -1656,4 +1672,39 @@ model LegalKnowledgeGraphEdge {
   @@index([fromDocumentId])
   @@index([toDocumentId])
   @@map("legal_knowledge_graph_edges")
+}
+
+/**
+ * TORE Legal Learning — written-exam / AI-tutor attempt (Sprint: written
+ * problem v1). Unauthenticated (Student Mode has no login wall today),
+ * so identity is the SAME guest-session mechanism already used for
+ * anonymous Legal AI chat (GuestSession), not a new identity scheme.
+ *
+ * `answerHistory` and `hintsRevealed` are append-only JSON arrays — a
+ * revision NEVER overwrites a prior entry, it appends one. Each
+ * `answerHistory` entry embeds its own evaluation (see
+ * `AttemptRevision` in written-exam-types.ts), so there is no separate
+ * `evaluations` column — that would only duplicate data already inside
+ * `answerHistory`. Stored as JSON (not normalized child tables) because
+ * their shape is owned by the domain layer and read/written as a whole
+ * per attempt; splitting them into rows would not be queried
+ * independently anywhere and would only add migration surface for no
+ * benefit — see "do not introduce unnecessary tables".
+ */
+model StudentAttempt {
+  id             String    @id @default(cuid())
+  guestSessionId String?   @map("guest_session_id")
+  problemId      String    @map("problem_id")
+  trackId        String    @map("track_id")
+  status         String    @default("in_progress")
+  answerHistory  Json      @default("[]") @map("answer_history")
+  hintsRevealed  Json      @default("[]") @map("hints_revealed")
+  finalGradeJson Json?     @map("final_grade")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  guestSession GuestSession? @relation(fields: [guestSessionId], references: [id], onDelete: SetNull)
+
+  @@index([guestSessionId, problemId, updatedAt(sort: Desc)])
+  @@map("student_attempts")
 }

@@ -28,6 +28,15 @@ export type Invoice = {
   verifiedByUserId: string | null;
   verifiedAt: Date | null;
   rejectionReason: string | null;
+  /**
+   * Short customer-facing "Гүйлгээний утга" for manual (bank transfer /
+   * printed QR) payments only — always null for QPay invoices, which use
+   * their own provider-issued reference instead. Never the canonical
+   * identity of the invoice (that's `id`) and never unique forever (only
+   * among currently PENDING/AWAITING_VERIFICATION invoices, enforced by a
+   * partial unique index — see the migration that adds this column).
+   */
+  paymentCode: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -57,6 +66,8 @@ export type CreateInvoiceInput = {
   provider: string;
   status: InvoiceStatus;
   expiresAt: Date;
+  /** Manual payments only — see `Invoice.paymentCode`. */
+  paymentCode?: string | null;
 };
 
 export type AttachProviderInvoiceInput = {

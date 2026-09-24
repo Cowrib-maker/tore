@@ -45,6 +45,8 @@ export type AdminInvoiceListItem = {
   verifiedByUserId: string | null;
   verifiedAt: Date | null;
   rejectionReason: string | null;
+  /** Customer-facing "Гүйлгээний утга" for manual invoices — null for QPay. */
+  paymentCode: string | null;
 };
 
 export type AdminInvoiceListFilters = {
@@ -172,6 +174,7 @@ export type UserPaymentTraceInvoice = {
   verifiedByUserId: string | null;
   verifiedAt: Date | null;
   rejectionReason: string | null;
+  paymentCode: string | null;
   payment: {
     providerPaymentId: string;
     status: PaymentTransactionStatus;

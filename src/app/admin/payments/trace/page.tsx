@@ -139,6 +139,14 @@ export default async function AdminPaymentTracePage({
                             Үүсгэсэн: {formatDate(invoice.createdAt)} · Лавлагаа:{" "}
                             <span className="font-mono">{invoice.providerInvoiceId ?? "—"}</span>
                           </p>
+                          {invoice.paymentCode ? (
+                            <p className="text-xs text-muted-foreground">
+                              Гүйлгээний утга (код):{" "}
+                              <span className="font-mono font-semibold">
+                                {invoice.paymentCode}
+                              </span>
+                            </p>
+                          ) : null}
                           {invoice.payment ? (
                             <p className="text-xs text-muted-foreground">
                               QPay төлбөрийн ID:{" "}
@@ -197,6 +205,15 @@ export default async function AdminPaymentTracePage({
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {formatDate(invoice.createdAt)} · {invoice.providerInvoiceId ?? "—"}
+                        {invoice.paymentCode ? (
+                          <>
+                            {" "}
+                            · Код:{" "}
+                            <span className="font-mono font-semibold">
+                              {invoice.paymentCode}
+                            </span>
+                          </>
+                        ) : null}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">

@@ -19,9 +19,22 @@ import {
 } from "@/domain/enums";
 import { ForbiddenError, ValidationError } from "@/domain/errors/domain-error";
 import type { Invoice } from "@/domain/entities/invoice";
-import type { InvoiceRepository } from "@/domain/repositories/invoice-repository";
+import {
+  DuplicatePaymentCodeError,
+  type InvoiceRepository,
+} from "@/domain/repositories/invoice-repository";
+import { generateManualPaymentCode } from "@/domain/services/manual-payment-code";
 import { SOLO_INVOICE_CURRENCY } from "@/domain/services/qpay-payment-verification";
 import type { ManualPaymentConfig } from "@/infrastructure/billing/manual/manual-payment-config";
+
+/**
+ * Collisions are only possible among invoices simultaneously PENDING/
+ * AWAITING_VERIFICATION out of a 4-digit (10,000-value) space — vanishingly
+ * unlikely at this volume, and the database's partial unique index makes
+ * every attempt here safe under real concurrency, not just single-process
+ * testing (see the migration adding `payment_code`).
+ */
+const MAX_PAYMENT_CODE_ATTEMPTS = 10;
 
 export type ManualCheckoutMethod = "BANK_TRANSFER" | "QR";
 
@@ -32,8 +45,15 @@ export type ManualCheckoutView = {
   currency: string;
   status: InvoiceStatus;
   expiresAt: string;
-  /** The "Гүйлгээний утга" the user must enter — also stored as this invoice's providerInvoiceId. */
+  /**
+   * The "Гүйлгээний утга" the user must enter — the 4-digit paymentCode
+   * for any invoice created after this feature shipped; falls back to the
+   * older TORE-xxxxxxxx provider reference only for invoices created
+   * before it (which never got a paymentCode).
+   */
   reference: string;
+  /** The raw 4-digit code, null only for pre-existing invoices without one. */
+  paymentCode: string | null;
   method: ManualCheckoutMethod;
   bankName: string | null;
   bankAccountNumber: string | null;
@@ -74,11 +94,18 @@ function toManualCheckoutView(
     currency: invoice.currency,
     status: invoice.status,
     expiresAt: invoice.expiresAt.toISOString(),
-    reference: invoice.providerInvoiceId ?? manualPaymentReference(invoice.id),
+    reference:
+      invoice.paymentCode ??
+      invoice.providerInvoiceId ??
+      manualPaymentReference(invoice.id),
+    paymentCode: invoice.paymentCode,
     method,
-    bankName: method === "BANK_TRANSFER" ? config.bankName : null,
-    bankAccountNumber: method === "BANK_TRANSFER" ? config.bankAccountNumber : null,
-    bankAccountName: method === "BANK_TRANSFER" ? config.bankAccountName : null,
+    // Shown for both manual methods now — a customer paying via QR can
+    // also confirm/enter the destination account directly in their
+    // banking app, exactly like a BANK_TRANSFER customer does.
+    bankName: config.bankName,
+    bankAccountNumber: config.bankAccountNumber,
+    bankAccountName: config.bankAccountName,
     qrAssetUrl: method === "QR" ? config.qrAssetUrl : null,
   };
 }
@@ -120,15 +147,33 @@ async function createManualCheckoutForPlan(
     return toManualCheckoutView(reusable, method, deps.manualPaymentConfig);
   }
 
-  const invoice = await deps.invoiceRepository.create({
-    userId,
-    planCode: plan.code,
-    amountMnt: plan.priceMnt,
-    currency: SOLO_INVOICE_CURRENCY,
-    provider,
-    status: InvoiceStatus.PENDING,
-    expiresAt: new Date(now.getTime() + SOLO_INVOICE_TTL_MS),
-  });
+  let invoice: Invoice | undefined;
+  for (let attempt = 0; attempt < MAX_PAYMENT_CODE_ATTEMPTS; attempt++) {
+    try {
+      invoice = await deps.invoiceRepository.create({
+        userId,
+        planCode: plan.code,
+        amountMnt: plan.priceMnt,
+        currency: SOLO_INVOICE_CURRENCY,
+        provider,
+        status: InvoiceStatus.PENDING,
+        expiresAt: new Date(now.getTime() + SOLO_INVOICE_TTL_MS),
+        paymentCode: generateManualPaymentCode(),
+      });
+      break;
+    } catch (error) {
+      if (error instanceof DuplicatePaymentCodeError) {
+        if (attempt < MAX_PAYMENT_CODE_ATTEMPTS - 1) {
+          continue;
+        }
+        break;
+      }
+      throw error;
+    }
+  }
+  if (!invoice) {
+    throw new ValidationError("Could not allocate a unique payment code. Please try again.");
+  }
   const attached = await deps.invoiceRepository.attachProviderInvoice(invoice.id, {
     providerInvoiceId: manualPaymentReference(invoice.id),
     qrText: null,

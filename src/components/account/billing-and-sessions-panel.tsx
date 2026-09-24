@@ -383,7 +383,7 @@ export function BillingAndSessionsPanel({
                     </div>
                   ) : null}
 
-                  {invoice.method === "BANK_TRANSFER" ? (
+                  {invoice.method === "QR" || invoice.method === "BANK_TRANSFER" ? (
                     <div className="space-y-1.5 text-sm">
                       <p>
                         <span className="text-muted-foreground">
@@ -393,17 +393,17 @@ export function BillingAndSessionsPanel({
                       </p>
                       <p>
                         <span className="text-muted-foreground">
+                          {copy.bankAccountNameLabel}:{" "}
+                        </span>
+                        {invoice.bankAccountName ?? "—"}
+                      </p>
+                      <p>
+                        <span className="text-muted-foreground">
                           {copy.bankAccountLabel}:{" "}
                         </span>
                         <span className="font-mono">
                           {invoice.bankAccountNumber ?? "—"}
                         </span>
-                      </p>
-                      <p>
-                        <span className="text-muted-foreground">
-                          {copy.bankAccountNameLabel}:{" "}
-                        </span>
-                        {invoice.bankAccountName ?? "—"}
                       </p>
                     </div>
                   ) : null}

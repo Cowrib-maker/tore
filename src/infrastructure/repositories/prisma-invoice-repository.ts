@@ -6,7 +6,11 @@ import type {
   RecordManualVerificationInput,
 } from "@/domain/entities/invoice";
 import { InvoiceStatus } from "@/domain/enums";
-import type { InvoiceRepository } from "@/domain/repositories/invoice-repository";
+import {
+  DuplicatePaymentCodeError,
+  type InvoiceRepository,
+} from "@/domain/repositories/invoice-repository";
+import { isPrismaUniqueViolation } from "@/infrastructure/database/prisma-errors";
 import {
   getPrismaClient,
   type PrismaDbClient,
@@ -55,6 +59,7 @@ function mapInvoice(record: {
   verifiedByUserId: string | null;
   verifiedAt: Date | null;
   rejectionReason: string | null;
+  paymentCode: string | null;
   createdAt: Date;
   updatedAt: Date;
 }): Invoice {
@@ -77,6 +82,7 @@ function mapInvoice(record: {
     verifiedByUserId: record.verifiedByUserId,
     verifiedAt: record.verifiedAt,
     rejectionReason: record.rejectionReason,
+    paymentCode: record.paymentCode,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
@@ -86,21 +92,34 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
   constructor(private readonly db: PrismaDbClient = getPrismaClient()) {}
 
   async create(input: CreateInvoiceInput): Promise<Invoice> {
-    const record = await this.db.invoice.create({
-      data: {
-        ...(input.id ? { id: input.id } : {}),
-        userId: input.userId,
-        subscriptionId: input.subscriptionId ?? null,
-        bookingId: input.bookingId ?? null,
-        planCode: input.planCode ?? null,
-        amountMnt: input.amountMnt,
-        currency: input.currency,
-        provider: input.provider,
-        status: input.status,
-        expiresAt: input.expiresAt,
-      },
-    });
-    return mapInvoice(record);
+    try {
+      const record = await this.db.invoice.create({
+        data: {
+          ...(input.id ? { id: input.id } : {}),
+          userId: input.userId,
+          subscriptionId: input.subscriptionId ?? null,
+          bookingId: input.bookingId ?? null,
+          planCode: input.planCode ?? null,
+          amountMnt: input.amountMnt,
+          currency: input.currency,
+          provider: input.provider,
+          status: input.status,
+          expiresAt: input.expiresAt,
+          paymentCode: input.paymentCode ?? null,
+        },
+      });
+      return mapInvoice(record);
+    } catch (error) {
+      // `id` is a cuid (never collides in practice) and no other unique
+      // column is set at create() time (providerInvoiceId is attached
+      // later, separately) — so a unique violation here while a
+      // paymentCode was supplied can only be the partial unique index on
+      // payment_code for currently-active invoices.
+      if (isPrismaUniqueViolation(error) && input.paymentCode) {
+        throw new DuplicatePaymentCodeError();
+      }
+      throw error;
+    }
   }
 
   async findById(id: string): Promise<Invoice | null> {

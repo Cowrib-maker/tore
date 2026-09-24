@@ -250,7 +250,7 @@ export const marketplaceKo: MarketplaceDictionary = {
     methodBankTransfer: "계좌 이체",
     methodQpay: "QPay / 은행 앱",
     qrInstructions:
-      "은행 앱으로 QR 코드를 스캔해 결제하세요. 결제 후 아래 버튼을 눌러 확인해 주세요.",
+      "위의 QR 코드 또는 계좌 이체로 결제하세요. 이체 적요란에 위의 4자리 코드를 반드시 입력하고, 표시된 금액을 정확히 이체해 주세요. 결제 후 아래 버튼을 눌러 확인해 주세요.",
     claimButton: "결제 완료",
     referenceLabel: "이체 참조번호",
     bankNameLabel: "은행",

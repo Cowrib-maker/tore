@@ -10,10 +10,16 @@ import type {
 } from "@/domain/entities/invoice";
 import { InvoiceStatus } from "@/domain/enums";
 import {
+  DuplicatePaymentCodeError,
   DuplicatePaymentError,
   type InvoiceRepository,
   type PaymentTransactionRepository,
 } from "@/domain/repositories/invoice-repository";
+
+const ACTIVE_INVOICE_STATUSES = new Set<InvoiceStatus>([
+  InvoiceStatus.PENDING,
+  InvoiceStatus.AWAITING_VERIFICATION,
+]);
 
 function clone<T>(value: T): T {
   return structuredClone(value);
@@ -27,6 +33,16 @@ export class InMemoryInvoiceRepository implements InvoiceRepository {
   }
 
   async create(input: CreateInvoiceInput): Promise<Invoice> {
+    if (input.paymentCode) {
+      const collision = [...this.invoices.values()].some(
+        (item) =>
+          item.paymentCode === input.paymentCode &&
+          ACTIVE_INVOICE_STATUSES.has(item.status),
+      );
+      if (collision) {
+        throw new DuplicatePaymentCodeError();
+      }
+    }
     const now = new Date();
     const record: Invoice = {
       id: input.id ?? randomUUID(),
@@ -47,6 +63,7 @@ export class InMemoryInvoiceRepository implements InvoiceRepository {
       verifiedByUserId: null,
       verifiedAt: null,
       rejectionReason: null,
+      paymentCode: input.paymentCode ?? null,
       createdAt: now,
       updatedAt: now,
     };

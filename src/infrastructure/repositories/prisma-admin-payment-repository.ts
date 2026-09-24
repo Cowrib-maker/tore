@@ -146,6 +146,7 @@ export class PrismaAdminPaymentRepository implements AdminPaymentRepository {
         verifiedByUserId: record.verifiedByUserId,
         verifiedAt: record.verifiedAt,
         rejectionReason: record.rejectionReason,
+        paymentCode: record.paymentCode,
       })),
       total,
     };
@@ -369,6 +370,7 @@ export class PrismaAdminPaymentRepository implements AdminPaymentRepository {
         verifiedByUserId: record.verifiedByUserId,
         verifiedAt: record.verifiedAt,
         rejectionReason: record.rejectionReason,
+        paymentCode: record.paymentCode,
         payment: payment
           ? {
               providerPaymentId: payment.providerPaymentId,

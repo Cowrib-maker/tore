@@ -204,6 +204,7 @@ export default async function AdminPaymentInvoicesPage({
                   <TableHead>Арга</TableHead>
                   <TableHead>Төлөв</TableHead>
                   <TableHead>Үүсгэсэн</TableHead>
+                  <TableHead>Гүйлгээний утга (код)</TableHead>
                   <TableHead>QPay/лавлагаа дугаар</TableHead>
                   <TableHead>Төлбөрийн ID</TableHead>
                   <TableHead>Үйлдэл</TableHead>
@@ -233,6 +234,9 @@ export default async function AdminPaymentInvoicesPage({
                     </TableCell>
                     <TableCell className="text-xs whitespace-nowrap text-muted-foreground">
                       {formatDate(invoice.createdAt)}
+                    </TableCell>
+                    <TableCell className="font-mono text-sm font-semibold">
+                      {invoice.paymentCode ?? "—"}
                     </TableCell>
                     <TableCell className="font-mono text-xs">
                       {invoice.providerInvoiceId ?? "—"}

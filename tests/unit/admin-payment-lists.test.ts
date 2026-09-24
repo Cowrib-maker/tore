@@ -71,6 +71,19 @@ describe("listAdminInvoicesUseCase", () => {
     ).adminPaymentRepository.listInvoices.mock.calls[0][0];
     expect(call.offset).toBe(0);
   });
+
+  it("passes each invoice's paymentCode through to the Admin Payment Center unchanged", async () => {
+    const deps = {
+      adminPaymentRepository: {
+        listInvoices: vi.fn().mockResolvedValue({
+          items: [{ id: "inv-1", paymentCode: "4728" }],
+          total: 1,
+        }),
+      },
+    } as never;
+    const result = await listAdminInvoicesUseCase(ADMIN, { page: 1 }, deps);
+    expect(result.items[0]).toMatchObject({ paymentCode: "4728" });
+  });
 });
 
 describe("listAdminPaymentTransactionsUseCase", () => {

@@ -31,6 +31,7 @@ describe("completePaidConsultationBooking", () => {
       verifiedByUserId: null,
       verifiedAt: null,
       rejectionReason: null,
+      paymentCode: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
