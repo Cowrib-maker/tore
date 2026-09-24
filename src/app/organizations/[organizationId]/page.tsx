@@ -127,7 +127,7 @@ export default async function OrganizationOverviewPage({
         </Link>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
+      <div className="grid gap-6 lg:grid-cols-[272px_1fr]">
         <WorkspaceSideNav
           icon={isFirm ? Building2 : Users2}
           title={isFirm ? "TORE Firm" : "TORE Team"}

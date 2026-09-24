@@ -80,7 +80,7 @@ export function StudentShell({
         )}
       >
         {sidebar ? (
-          <div className="grid gap-6 lg:grid-cols-[240px_1fr] lg:items-start">
+          <div className="grid gap-6 lg:grid-cols-[272px_1fr] lg:items-start">
             <WorkspaceSideNav
               icon={GraduationCap}
               title="TORE Student"
