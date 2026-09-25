@@ -1,10 +1,26 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import {
+  Bell,
+  Briefcase,
+  Calendar,
+  FolderOpen,
+  Home,
+  MessagesSquare,
+  Scale,
+  UserRound,
+} from "lucide-react";
 
 import { getSessionUser } from "@/application/common/session";
 import { getLawyerProfileForSession } from "@/application/actions/profile-session.queries";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
+import {
+  WorkspaceSideNav,
+  type WorkspaceSideNavItem,
+} from "@/components/workspace/workspace-side-nav";
+import { WorkspaceAiComposer } from "@/components/workspace/workspace-ai-composer";
+import { WorkspaceQuickAction } from "@/components/workspace/workspace-quick-action";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -22,6 +38,31 @@ import { getDashboardPath, LEGAL_AI_PATH } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 import { formatVerificationStatus } from "@/lib/format-labels";
 import { cn } from "@/lib/utils";
+
+/**
+ * Sidebar mirrors the workspace's own PRIMARY/SECONDARY nav — every item
+ * is a real, already-shipped destination, so unlike Firm/Team/Student
+ * nothing here needs an inert "coming soon" row.
+ */
+function lawyerSidebarItems(navLabels: {
+  dashboard: string;
+  workspace: string;
+  cases: string;
+  offerings: string;
+  bookings: string;
+  notifications: string;
+  profile: string;
+}): WorkspaceSideNavItem[] {
+  return [
+    { key: "dashboard", icon: Home, label: navLabels.dashboard, href: "/lawyer/dashboard", active: true },
+    { key: "workspace", icon: Briefcase, label: navLabels.workspace, href: "/lawyer/workspace" },
+    { key: "cases", icon: FolderOpen, label: navLabels.cases, href: "/lawyer/workspace/cases" },
+    { key: "offerings", icon: Scale, label: navLabels.offerings, href: "/lawyer/offerings" },
+    { key: "bookings", icon: Calendar, label: navLabels.bookings, href: "/lawyer/bookings" },
+    { key: "notifications", icon: Bell, label: navLabels.notifications, href: "/lawyer/notifications" },
+    { key: "profile", icon: UserRound, label: navLabels.profile, href: "/lawyer/profile" },
+  ];
+}
 
 function verificationBadgeVariant(
   status: string,
@@ -97,12 +138,91 @@ export default async function LawyerDashboardPage() {
     Boolean(item.value),
   );
 
+  const d = i18n.dict.dashboard;
+  const displayName = data.user.name?.trim() || data.profile.headline || data.user.email;
+
   return (
-    <>
-      <DashboardPageHeading>{i18n.title}</DashboardPageHeading>
-      <p className="mb-5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-        {ld.intro}
-      </p>
+    <div className="grid gap-6 lg:grid-cols-[272px_1fr] lg:items-start">
+      <WorkspaceSideNav
+        icon={Scale}
+        title="TORE Lawyer"
+        subtitle={displayName}
+        items={lawyerSidebarItems({
+          dashboard: d.navDashboard,
+          workspace: d.navWorkspace,
+          cases: d.navCases,
+          offerings: d.navOfferings,
+          bookings: d.navBookings,
+          notifications: d.navNotifications,
+          profile: d.navProfile,
+        })}
+        className="lg:sticky lg:top-24"
+      />
+
+      <div className="min-w-0">
+        {/* Hero — same navy "premium legal workspace" identity used across
+            Legal AI, Firm/Team and Student. */}
+        <div className="mb-4 rounded-2xl bg-[#0B1F3A] px-6 py-7 text-white sm:px-8 sm:py-8">
+          <p className="text-[11px] font-semibold tracking-[0.2em] text-white/60 uppercase">
+            TORE LAWYER
+          </p>
+          <h1 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
+            {displayName}
+          </h1>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-white/70">
+            {ld.intro}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Badge variant="outline" className="border-white/20 text-white">
+              {formatVerificationStatus(verificationStatus, locale)}
+            </Badge>
+            <Badge variant="outline" className="border-white/20 text-white">
+              {listed ? ld.listed : ld.notListed}
+            </Badge>
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <WorkspaceAiComposer
+            placeholder="Хууль, кейс, ойлголтын талаар асуух..."
+            attachLabel="Хавсаргах"
+            aiLabel="AI сонгох"
+            knowledgeLabel="Вэбээс хайх"
+            comingSoonLabel="Тун удахгүй"
+          />
+        </div>
+
+        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <WorkspaceQuickAction
+            icon={MessagesSquare}
+            iconClassName="bg-[#E8F0FE] text-[#0B5CFF]"
+            title="Хуулийн судалгаа"
+            description="AI-аар хууль, зүйл заалт хайх"
+            href={LEGAL_AI_PATH}
+          />
+          <WorkspaceQuickAction
+            icon={FolderOpen}
+            iconClassName="bg-[#F1EBFF] text-[#7C5CFC]"
+            title={ld.workspaceTitle}
+            description={ld.workspaceHelp}
+            href="/lawyer/workspace/cases"
+          />
+          <WorkspaceQuickAction
+            icon={Calendar}
+            iconClassName="bg-[#E6F7EE] text-[#1F9D5C]"
+            title={ld.bookings}
+            description={ld.bookingsHelp}
+            href="/lawyer/bookings"
+          />
+          <WorkspaceQuickAction
+            icon={UserRound}
+            iconClassName="bg-[#E6F7F5] text-[#0F9C8F]"
+            title={ld.profile}
+            description={pf.headline}
+            href="/lawyer/profile"
+          />
+        </div>
+
       <div className="space-y-4">
         <Card>
           <CardHeader>
@@ -276,6 +396,7 @@ export default async function LawyerDashboardPage() {
         </Card>
         )}
       </div>
-    </>
+      </div>
+    </div>
   );
 }
