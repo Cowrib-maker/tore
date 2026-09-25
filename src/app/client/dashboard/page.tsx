@@ -1,10 +1,25 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import {
+  Bell,
+  Calendar,
+  Home,
+  MessagesSquare,
+  Search,
+  Sparkles,
+  UserRound,
+} from "lucide-react";
 
 import { getSessionUser } from "@/application/common/session";
 import { getClientProfileForSession } from "@/application/actions/profile-session.queries";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
+import {
+  WorkspaceSideNav,
+  type WorkspaceSideNavItem,
+} from "@/components/workspace/workspace-side-nav";
+import { WorkspaceAiComposer } from "@/components/workspace/workspace-ai-composer";
+import { WorkspaceQuickAction } from "@/components/workspace/workspace-quick-action";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -18,6 +33,25 @@ import { UserRole } from "@/domain/enums";
 import { canActAsClient, getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 import { cn } from "@/lib/utils";
+
+/** Every item here is a real, already-shipped destination. */
+function citizenSidebarItems(navLabels: {
+  dashboard: string;
+  legalAi: string;
+  findLawyers: string;
+  bookings: string;
+  notifications: string;
+  profile: string;
+}): WorkspaceSideNavItem[] {
+  return [
+    { key: "dashboard", icon: Home, label: navLabels.dashboard, href: "/client/dashboard", active: true },
+    { key: "legal-ai", icon: MessagesSquare, label: navLabels.legalAi, href: "/legal-ai" },
+    { key: "lawyers", icon: Search, label: navLabels.findLawyers, href: "/lawyers" },
+    { key: "bookings", icon: Calendar, label: navLabels.bookings, href: "/client/bookings" },
+    { key: "notifications", icon: Bell, label: navLabels.notifications, href: "/client/notifications" },
+    { key: "profile", icon: UserRound, label: navLabels.profile, href: "/client/profile" },
+  ];
+}
 
 export default async function ClientDashboardPage() {
   const session = await getSessionUser();
@@ -59,24 +93,91 @@ export default async function ClientDashboardPage() {
     data.profile.phone || data.profile.companyName,
   );
 
+  const d = i18n.dict.dashboard;
+  const displayName = data.user.name?.trim() || data.user.email;
+
   return (
-    <>
-      <DashboardPageHeading>{i18n.title}</DashboardPageHeading>
-      <p className="mb-5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-        {cd.intro}
-      </p>
+    <div className="grid gap-6 lg:grid-cols-[272px_1fr] lg:items-start">
+      <WorkspaceSideNav
+        icon={Sparkles}
+        title="TORE Citizen"
+        subtitle={displayName}
+        items={citizenSidebarItems({
+          dashboard: d.navDashboard,
+          legalAi: d.navLegalAi,
+          findLawyers: d.navFindLawyers,
+          bookings: d.navBookings,
+          notifications: d.navNotifications,
+          profile: d.navProfile,
+        })}
+        className="lg:sticky lg:top-24"
+      />
+
+      <div className="min-w-0">
+        {/* Hero — same navy "premium legal workspace" identity used across
+            Legal AI, Firm/Team, Student and Lawyer. */}
+        <div className="mb-4 rounded-2xl bg-[#0B1F3A] px-6 py-7 text-white sm:px-8 sm:py-8">
+          <p className="text-[11px] font-semibold tracking-[0.2em] text-white/60 uppercase">
+            TORE CITIZEN
+          </p>
+          <h1 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
+            {displayName}
+          </h1>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-white/70">
+            {cd.intro}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Badge variant="outline" className="border-white/20 text-white">
+              {profileFilled ? m.common.complete : m.common.incomplete}
+            </Badge>
+            <Badge variant="outline" className="border-white/20 text-white">
+              {emailVerified ? m.common.confirmed : m.common.pending}
+            </Badge>
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <WorkspaceAiComposer
+            placeholder="Хууль зүйн асуултаа бичнэ үү..."
+            attachLabel="Хавсаргах"
+            aiLabel="AI сонгох"
+            knowledgeLabel="Вэбээс хайх"
+            comingSoonLabel="Тун удахгүй"
+          />
+        </div>
+
+        <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <WorkspaceQuickAction
+            icon={MessagesSquare}
+            iconClassName="bg-[#E8F0FE] text-[#0B5CFF]"
+            title={cd.legalAi}
+            description={cd.legalAiHelp}
+            href="/legal-ai"
+          />
+          <WorkspaceQuickAction
+            icon={Search}
+            iconClassName="bg-[#F1EBFF] text-[#7C5CFC]"
+            title={m.common.browseLawyers}
+            description={cd.consultationsHelp}
+            href="/lawyers"
+          />
+          <WorkspaceQuickAction
+            icon={Calendar}
+            iconClassName="bg-[#E6F7EE] text-[#1F9D5C]"
+            title={m.common.viewBookings}
+            description={cd.consultations}
+            href="/client/bookings"
+          />
+          <WorkspaceQuickAction
+            icon={UserRound}
+            iconClassName="bg-[#E6F7F5] text-[#0F9C8F]"
+            title={m.common.editProfile}
+            description={cd.profile}
+            href="/client/profile"
+          />
+        </div>
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="border-[#0B1F3A]/15 sm:col-span-2 lg:col-span-3">
-          <CardHeader>
-            <CardTitle>{cd.legalAi}</CardTitle>
-            <CardDescription>{cd.legalAiHelp}</CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Link href="/legal-ai" className={cn(buttonVariants({ size: "sm" }))}>
-              {cd.legalAiCta}
-            </Link>
-          </CardFooter>
-        </Card>
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between gap-2">
@@ -132,6 +233,7 @@ export default async function ClientDashboardPage() {
           </CardHeader>
         </Card>
       </div>
-    </>
+      </div>
+    </div>
   );
 }
