@@ -1,116 +1,277 @@
 /**
- * Institutional visual for the right-hand hero panel: sky, a distant
- * mountain/steppe horizon, and a modern glass-and-stone institutional
- * tower with a scales-of-justice medallion set into its facade.
- *
- * Earlier version used a row of thin repeated vertical bars (a colonnade)
- * that, once scaled up, read as prison bars / a cell / metal grilles --
- * the wrong metaphor entirely for a legal-tech product. This version
- * deliberately avoids ANY repeated thin vertical elements: the tower is a
- * solid tapered mass with a few WIDE horizontal glass bands (curtain-wall
- * architecture, the way a modern courthouse or ministry building actually
- * reads), and the justice symbol is a single contained medallion rather
- * than free-floating linework.
+ * Institutional visual for the public hero: a golden-hour sky over distant
+ * Mongolian mountains and a low city silhouette, with a monumental
+ * stone-and-glass institutional building in the foreground -- a grand
+ * entrance (steps, pilasters, a pediment with a small carved justice
+ * emblem) supporting a tapered modern glass tower above it.
  *
  * No licensed photograph of a real building exists in this repository, and
- * none is fetched from the network (the repo was searched first -- only
- * brand marks and the QPay QR code exist under public/). This remains a
- * deliberately stylized illustration, not a photograph, and does not
- * depict or claim to depict any actual building -- purely decorative
- * (aria-hidden).
+ * none is fetched from the network (checked first -- only brand marks and
+ * the QPay QR code exist under public/, confirmed again for this rebuild).
+ * This is a deliberately higher-fidelity illustration than earlier
+ * attempts, built to read as architecture rather than as an abstract
+ * pattern:
+ *  - the tower's glass is a genuine grid of individual windows (both
+ *    horizontal AND vertical divisions -- floors and bays), never a single
+ *    repeated row of thin vertical or wide horizontal elements, so it
+ *    cannot read as bars or as flat translucent blocks;
+ *  - stone (base, pilasters, pediment, cornice) and glass (tower face) are
+ *    visually distinct materials, not one flat surface;
+ *  - the justice emblem is a small carved medallion set into the pediment
+ *    tympanum, not a giant free-floating icon;
+ *  - sky, sun glow, soft clouds, layered mountains, a faint city skyline
+ *    and a diagonal glass sun-glint build real atmospheric depth instead
+ *    of a flat gradient field.
+ *
+ * The viewBox is landscape (1600x900), matching the actual wide/short
+ * shape of the hero container, with the building's full height sitting
+ * near the vertical center of the canvas -- with a portrait canvas
+ * (the previous attempt), preserveAspectRatio="slice" against a wide
+ * container cropped out almost the entire building (only sky remained
+ * visible), which is why the entrance/base disappeared in QA. Landscape
+ * geometry keeps the whole building in frame at every breakpoint.
+ *
+ * Purely decorative (aria-hidden), not a claim to depict any real place.
  */
+
+const TOWER_GRID_COLUMNS = 6;
+const TOWER_GRID_ROWS = 13;
+const TOWER_GRID_X0 = 56;
+const TOWER_GRID_X1 = 366;
+const TOWER_GRID_Y0 = 58;
+const TOWER_GRID_Y1 = 528;
+const WINDOW_WIDTH = 36;
+const WINDOW_HEIGHT = 24;
+
+const TOWER_WINDOWS = Array.from(
+  { length: TOWER_GRID_COLUMNS * TOWER_GRID_ROWS },
+  (_, index) => {
+    const row = Math.floor(index / TOWER_GRID_COLUMNS);
+    const col = index % TOWER_GRID_COLUMNS;
+    const cellWidth = (TOWER_GRID_X1 - TOWER_GRID_X0) / TOWER_GRID_COLUMNS;
+    const cellHeight = (TOWER_GRID_Y1 - TOWER_GRID_Y0) / TOWER_GRID_ROWS;
+    const x = TOWER_GRID_X0 + col * cellWidth + (cellWidth - WINDOW_WIDTH) / 2;
+    const y = TOWER_GRID_Y0 + row * cellHeight + (cellHeight - WINDOW_HEIGHT) / 2;
+    // Deterministic, non-repeating shade pattern -- some panes catch the
+    // evening light (warm, brighter), most sit in cool glass shadow, a few
+    // read as darker interior floors. Never uniform, never striped.
+    const shade = (row * 3 + col * 5) % 7;
+    const fill = shade < 2 ? "#FFF3D6" : shade < 5 ? "#CBDDF4" : "#3C4E76";
+    const opacity = shade < 2 ? 0.65 : shade < 5 ? 0.32 : 0.22;
+    return { key: index, x, y, fill, opacity };
+  },
+);
+
 export function LandingHeroScene({ className }: { className?: string }) {
   return (
     <svg
       aria-hidden
-      viewBox="0 0 900 1100"
+      viewBox="0 0 1600 900"
       preserveAspectRatio="xMidYMid slice"
       className={className}
     >
       <defs>
-        <linearGradient id="hero-sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0B1F3A" />
-          <stop offset="34%" stopColor="#1E4DB8" />
-          <stop offset="68%" stopColor="#6FA0EE" />
-          <stop offset="100%" stopColor="#DCE9FC" />
+        <linearGradient id="hs-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#08162F" />
+          <stop offset="20%" stopColor="#123262" />
+          <stop offset="38%" stopColor="#25548F" />
+          <stop offset="55%" stopColor="#4E7CBA" />
+          <stop offset="72%" stopColor="#87A8D4" />
+          <stop offset="88%" stopColor="#CBD9EC" />
+          <stop offset="100%" stopColor="#EDE4CE" />
         </linearGradient>
-        <radialGradient id="hero-glow" cx="72%" cy="14%" r="42%">
-          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+        <radialGradient id="hs-sun-halo" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#FFF6DF" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#FFF6DF" stopOpacity="0" />
         </radialGradient>
-        <linearGradient id="tower-face" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#EAF0FB" />
-          <stop offset="55%" stopColor="#CBDAF0" />
-          <stop offset="100%" stopColor="#9FB6DC" />
+        <radialGradient id="hs-sun-disc" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#FFFDF4" />
+          <stop offset="100%" stopColor="#FFE8AE" />
+        </radialGradient>
+        <linearGradient id="hs-tower-face" x1="1" y1="0" x2="0" y2="0">
+          <stop offset="0%" stopColor="#EFF4FC" />
+          <stop offset="55%" stopColor="#D2DFF2" />
+          <stop offset="100%" stopColor="#9FB3D6" />
         </linearGradient>
-        <linearGradient id="tower-side" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#8098C2" />
-          <stop offset="100%" stopColor="#5A719E" />
+        <linearGradient id="hs-tower-shadow-face" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#7488B4" />
+          <stop offset="100%" stopColor="#4E608C" />
         </linearGradient>
-        <linearGradient id="glass-band" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.55" />
-          <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.08" />
+        <linearGradient id="hs-stone" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#E7E1D2" />
+          <stop offset="100%" stopColor="#C4BCA6" />
         </linearGradient>
+        <linearGradient id="hs-stone-shadow" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#B6AD93" />
+          <stop offset="100%" stopColor="#948A6E" />
+        </linearGradient>
+        <linearGradient id="hs-entrance-glass" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#33456E" />
+          <stop offset="100%" stopColor="#18233D" />
+        </linearGradient>
+        <radialGradient id="hs-emblem" cx="35%" cy="30%" r="75%">
+          <stop offset="0%" stopColor="#E7D6A0" />
+          <stop offset="100%" stopColor="#9C7B34" />
+        </radialGradient>
+        <radialGradient id="hs-tree-canopy" cx="35%" cy="30%" r="75%">
+          <stop offset="0%" stopColor="#22406A" />
+          <stop offset="100%" stopColor="#0B1F3A" />
+        </radialGradient>
+        <linearGradient id="hs-ground" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#16294B" />
+          <stop offset="100%" stopColor="#0A1730" />
+        </linearGradient>
+        <filter id="hs-soft-blur" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="10" />
+        </filter>
       </defs>
 
-      <rect x="0" y="0" width="900" height="1100" fill="url(#hero-sky)" />
-      <rect x="0" y="0" width="900" height="1100" fill="url(#hero-glow)" />
+      <rect width="1600" height="900" fill="url(#hs-sky)" />
 
-      {/* Distant mountain / steppe horizon */}
+      {/* Sun -- soft halo, then a defined disc -- positioned clear of the
+          building's silhouette (the tower group sits at x>=1024) so the
+          disc itself is never painted over by the tower drawn later; the
+          halo may bleed behind it, which reads as atmospheric glow rather
+          than hiding the sun outright. */}
+      <circle cx="860" cy="95" r="220" fill="url(#hs-sun-halo)" />
+      <circle cx="860" cy="95" r="220" fill="url(#hs-sun-halo)" filter="url(#hs-soft-blur)" />
+      <circle cx="860" cy="95" r="34" fill="url(#hs-sun-disc)" />
+
+      {/* Soft high clouds */}
+      <g fill="#FFFFFF" filter="url(#hs-soft-blur)">
+        <ellipse cx="300" cy="130" rx="150" ry="22" opacity="0.5" />
+        <ellipse cx="640" cy="90" rx="120" ry="18" opacity="0.4" />
+        <ellipse cx="120" cy="210" rx="100" ry="16" opacity="0.35" />
+        <ellipse cx="980" cy="170" rx="110" ry="16" opacity="0.3" />
+      </g>
+
+      {/* Distant mountain silhouettes, layered for atmospheric perspective */}
       <path
-        d="M0,760 L90,725 L200,748 L320,712 L460,742 L600,705 L720,745 L830,715 L900,738 L900,830 L0,830 Z"
-        fill="#7C93BE"
-        opacity="0.32"
+        d="M0,500 L130,468 L300,494 L480,454 L680,488 L880,450 L1060,486 L1260,458 L1440,484 L1600,462 L1600,620 L0,620 Z"
+        fill="#7C93C0"
+        opacity="0.58"
       />
       <path
-        d="M0,800 L110,775 L230,798 L360,768 L520,802 L660,770 L790,804 L900,778 L900,880 L0,880 Z"
-        fill="#5A719E"
-        opacity="0.28"
+        d="M0,540 L190,512 L400,538 L620,506 L840,536 L1050,508 L1260,540 L1440,512 L1600,534 L1600,660 L0,660 Z"
+        fill="#53699A"
+        opacity="0.62"
       />
 
-      {/* Institutional tower -- one solid mass, wide horizontal glass bands,
-          no repeated thin vertical elements anywhere. */}
-      <g transform="translate(190,260)">
-        {/* low annex wing, grounds the tower against the skyline */}
-        <rect x="-70" y="480" width="180" height="330" fill="url(#tower-side)" />
-        <rect x="410" y="440" width="200" height="370" fill="url(#tower-side)" />
+      {/* Faint distant city silhouette beside the institutional building */}
+      <g fill="#233A63" opacity="0.55">
+        <rect x="520" y="606" width="30" height="74" />
+        <rect x="562" y="580" width="34" height="100" />
+        <rect x="606" y="626" width="24" height="54" />
+        <rect x="642" y="596" width="30" height="84" />
+        <rect x="686" y="614" width="26" height="66" />
+        <rect x="748" y="632" width="28" height="48" />
+      </g>
 
-        {/* main tower mass, gently tapered */}
-        <path
-          d="M40,810 L20,120 L300,20 L580,120 L560,810 Z"
-          fill="url(#tower-face)"
-        />
-        {/* shaded return face for depth */}
-        <path d="M560,810 L580,120 L620,140 L600,810 Z" fill="url(#tower-side)" />
+      {/* Foreground ground, drawn before the building so the tower's own
+          steps sit cleanly on top of it and only the sides remain visible. */}
+      <rect x="0" y="770" width="1600" height="130" fill="url(#hs-ground)" />
 
-        {/* wide horizontal glass bands (curtain-wall floors) */}
-        {[170, 260, 350, 440, 530, 620, 710].map((y) => (
-          <rect key={y} x="55" y={y} width="480" height="46" fill="url(#glass-band)" />
+      {/* ---------------------------------------------------------------- */}
+      {/* Institutional building: stone entrance + glass tower -- scaled up
+          (wider more than taller) so it reads as a monumental structure
+          filling the right portion of the frame, not a small silhouette
+          adrift in empty sky. */}
+      {/* ---------------------------------------------------------------- */}
+      <g transform="translate(1080,10) scale(1.25,1.1)">
+        {/* entrance steps, widest at the bottom */}
+        <rect x="-96" y="742" width="592" height="14" fill="url(#hs-stone-shadow)" />
+        <rect x="-72" y="728" width="544" height="14" fill="url(#hs-stone)" />
+        <rect x="-48" y="714" width="496" height="14" fill="url(#hs-stone-shadow)" />
+
+        {/* base plinth */}
+        <rect x="-24" y="656" width="448" height="58" fill="url(#hs-stone)" />
+
+        {/* pilasters flanking the entrance -- exactly two, not a repeated
+            colonnade, read clearly as architectural supports either side
+            of a doorway rather than as bars. */}
+        <rect x="96" y="470" width="34" height="186" fill="url(#hs-stone)" />
+        <rect x="270" y="470" width="34" height="186" fill="url(#hs-stone)" />
+
+        {/* recessed entrance glass doors between the pilasters */}
+        <rect x="140" y="500" width="120" height="156" fill="url(#hs-entrance-glass)" />
+        <rect x="196" y="500" width="8" height="156" fill="#0E1830" opacity="0.6" />
+
+        {/* pediment above the entrance */}
+        <path d="M76,470 L324,470 L200,398 Z" fill="url(#hs-stone)" />
+        <path d="M76,470 L324,470 L316,478 L84,478 Z" fill="url(#hs-stone-shadow)" />
+
+        {/* carved justice emblem set into the pediment tympanum -- small,
+            contained, not a dominant free-floating icon. */}
+        <circle cx="200" cy="446" r="26" fill="url(#hs-emblem)" />
+        <g
+          transform="translate(200,446)"
+          stroke="#5B441C"
+          strokeWidth="2.4"
+          fill="none"
+          strokeLinecap="round"
+        >
+          <line x1="0" y1="-12" x2="0" y2="11" />
+          <line x1="-14" y1="-5" x2="14" y2="-5" />
+          <path d="M-14,-5 L-20,9 A9,6 0 0 0 -8,9 Z" />
+          <path d="M14,-5 L8,9 A9,6 0 0 0 20,9 Z" />
+          <circle cx="0" cy="-8" r="2.6" fill="#5B441C" stroke="none" />
+        </g>
+
+        {/* cornice ledge, wider than the tower, separating base from tower */}
+        <rect x="10" y="392" width="380" height="16" fill="url(#hs-stone)" />
+        <rect x="10" y="404" width="380" height="6" fill="url(#hs-stone-shadow)" />
+
+        {/* tower shadow return face (right side, depth) */}
+        <path d="M368,392 L382,20 L410,34 L396,392 Z" fill="url(#hs-tower-shadow-face)" />
+
+        {/* main tower mass, gently tapered, rising from the cornice */}
+        <path d="M32,392 L46,20 L366,20 L368,392 Z" fill="url(#hs-tower-face)" />
+
+        {/* window grid -- real floors x real bays, never a stripe */}
+        {TOWER_WINDOWS.map((w) => (
+          <rect
+            key={w.key}
+            x={w.x}
+            y={w.y}
+            width={WINDOW_WIDTH}
+            height={WINDOW_HEIGHT}
+            fill={w.fill}
+            opacity={w.opacity}
+          />
         ))}
 
-        {/* base plinth / steps */}
-        <rect x="10" y="800" width="600" height="20" fill="#B9C9E8" />
-        <rect x="-15" y="820" width="650" height="18" fill="#A6B9DE" />
+        {/* diagonal sun-glint across the glass -- subtle, photographic */}
+        <polygon points="70,60 150,60 300,392 220,392" fill="#FFFFFF" opacity="0.1" />
 
-        {/* scales-of-justice medallion set into the facade as one contained emblem */}
-        <circle cx="300" cy="330" r="74" fill="#F4F8FE" opacity="0.9" />
-        <circle cx="300" cy="330" r="74" fill="none" stroke="#8098C2" strokeWidth="4" />
-        <g transform="translate(300,330)" stroke="#5A719E" strokeWidth="5" fill="none" strokeLinecap="round">
-          <line x1="0" y1="-28" x2="0" y2="26" />
-          <line x1="-34" y1="-12" x2="34" y2="-12" />
-          <path d="M-34,-12 L-50,20 A18,12 0 0 0 -18,20 Z" />
-          <path d="M34,-12 L18,20 A18,12 0 0 0 50,20 Z" />
-          <circle cx="0" cy="-18" r="6" fill="#5A719E" stroke="none" />
-        </g>
+        {/* rooftop parapet cap */}
+        <rect x="40" y="10" width="320" height="14" fill="url(#hs-stone)" />
+        <line x1="200" y1="10" x2="200" y2="-26" stroke="#B6AD93" strokeWidth="3" />
+        <circle cx="200" cy="-30" r="4" fill="#B6AD93" />
       </g>
 
-      {/* Foreground tree silhouettes anchoring the base of the scene */}
-      <g fill="#0B1F3A" opacity="0.5">
-        <ellipse cx="60" cy="1010" rx="65" ry="85" />
-        <ellipse cx="130" cy="1040" rx="85" ry="105" />
-        <ellipse cx="820" cy="1000" rx="75" ry="95" />
+      {/* Organic foreground tree canopies for scale and warmth -- kept
+          clear of the building's footprint (world x 1096-1544). Each has
+          a trunk and a lighter rim-lit highlight so they read as trees
+          rather than dark blobs. */}
+      <g>
+        <rect x="415" y="820" width="10" height="46" fill="#0A1730" />
+        <ellipse cx="420" cy="800" rx="82" ry="64" fill="url(#hs-tree-canopy)" />
+        <ellipse cx="398" cy="778" rx="30" ry="20" fill="#3E5C8C" opacity="0.55" />
+
+        <rect x="485" y="850" width="12" height="54" fill="#0A1730" />
+        <ellipse cx="490" cy="836" rx="100" ry="76" fill="url(#hs-tree-canopy)" />
+        <ellipse cx="462" cy="808" rx="36" ry="24" fill="#3E5C8C" opacity="0.55" />
+
+        <rect x="816" y="830" width="9" height="42" fill="#0A1730" />
+        <ellipse cx="820" cy="812" rx="70" ry="56" fill="url(#hs-tree-canopy)" />
+        <ellipse cx="800" cy="792" rx="26" ry="17" fill="#3E5C8C" opacity="0.55" />
       </g>
-      <rect x="0" y="1060" width="900" height="40" fill="#0B1F3A" opacity="0.6" />
+
+      {/* Single lamp post for a sense of real scale (not repeated) */}
+      <g stroke="#0B1F3A" strokeWidth="3" opacity="0.55">
+        <line x1="700" y1="856" x2="700" y2="780" />
+      </g>
+      <circle cx="700" cy="776" r="7" fill="#FFE8AE" opacity="0.8" />
     </svg>
   );
 }

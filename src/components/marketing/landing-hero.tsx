@@ -46,31 +46,49 @@ export function LandingHero({
       id="chat"
       className="relative isolate overflow-hidden scroll-mt-24 border-b border-[#0B1F3A]/8 bg-[#F7F8FB]"
     >
-      {/* One full-bleed atmospheric scene -- a top band on mobile/tablet,
-          the entire section on desktop -- never a boxed card next to the
-          text. The scrim below is a soft gradient blend, not a hard edge,
-          so the whole hero reads as one scene rather than "text card +
-          illustration card". */}
+      {/* Mobile/tablet: the institutional scene is its own compact band,
+          stacked ABOVE the text content (not a background the text sits
+          on top of) -- the illustration is busy enough now (real window
+          grid, skyline, sun) that overlapping text on it would hurt
+          legibility. Desktop: the scene bleeds across the whole section
+          as one atmospheric background, with a soft gradient scrim (not a
+          hard edge, not a boxed card) protecting the left text column. */}
+      <div className="relative h-[260px] overflow-hidden sm:h-[340px] lg:hidden">
+        <LandingHeroScene className="size-full" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_70%,#F7F8FB_100%)]"
+        />
+      </div>
+
+      {/* The illustration's own box is pinned to its native 1600x900
+          aspect ratio (not stretched to the section's full, content-driven
+          height) -- the composer/stats stack can make the section much
+          taller than it is wide, and stretching a "slice"-cropped SVG into
+          that mismatched box zoomed in so far that the building was cropped
+          almost entirely off-screen at narrower desktop widths (confirmed
+          in QA at 1024px). Matching the box to the SVG's own aspect ratio
+          means no cropping is ever needed, at any width. A bottom fade
+          blends it into the page background for any extra section height
+          below the image. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[280px] overflow-hidden sm:h-[360px] lg:inset-0 lg:h-auto"
+        className="pointer-events-none absolute inset-x-0 top-0 hidden overflow-hidden lg:block lg:aspect-[1600/900]"
       >
         <LandingHeroScene className="size-full" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_72%,#F7F8FB_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(100deg,#F7F8FB_0%,#F7F8FB_42%,rgba(247,248,251,0.55)_50%,rgba(247,248,251,0.12)_58%,transparent_66%)]" />
       </div>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[280px] bg-[linear-gradient(180deg,transparent_45%,#F7F8FB_96%)] sm:h-[360px] lg:inset-0 lg:h-auto lg:bg-[linear-gradient(100deg,#F7F8FB_0%,#F7F8FB_38%,rgba(247,248,251,0.82)_54%,rgba(247,248,251,0.25)_72%,transparent_86%)]"
-      />
 
       <div className="relative mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-16">
-        <div className="py-10 sm:py-14 lg:flex lg:min-h-[760px] lg:items-center lg:py-24">
+        <div className="py-8 sm:py-12 lg:flex lg:min-h-[800px] lg:items-center lg:py-24">
           <div className="lg:max-w-[56%]">
             <LandingReveal>
               <p className="text-[13px] font-semibold tracking-[0.24em] text-[#5C6570] uppercase sm:text-sm">
                 {home.brandLine}
               </p>
 
-              <h1 className="mt-5 font-[family-name:var(--font-landing-display)] text-[2.75rem] leading-[1.04] font-semibold tracking-[-0.03em] text-[#0B1F3A] sm:text-[3.75rem] lg:text-[4.25rem] xl:text-[5rem]">
+              <h1 className="mt-5 max-w-[720px] font-[family-name:var(--font-landing-display)] text-[2.75rem] leading-[1.04] font-semibold tracking-[-0.03em] text-[#0B1F3A] sm:text-[3.75rem] lg:text-[4.25rem] xl:text-[4.5rem]">
                 {taglineAccent ? (
                   <>
                     {taglineLead}
@@ -90,7 +108,7 @@ export function LandingHero({
               </p>
             </LandingReveal>
 
-            <div className="mt-8 max-w-[900px]">
+            <div className="mt-8 max-w-[820px]">
               <HeroLegalAiComposer
                 placeholder={home.chatPlaceholder}
                 submitLabel={home.chatSubmit}
@@ -102,7 +120,7 @@ export function LandingHero({
             </div>
 
             {statEntries.length > 0 ? (
-              <div className="mt-10 flex max-w-[900px] flex-wrap gap-x-10 gap-y-4 border-t border-[#0B1F3A]/10 pt-6">
+              <div className="mt-10 flex max-w-[820px] flex-wrap gap-x-10 gap-y-4 border-t border-[#0B1F3A]/10 pt-6">
                 {statEntries.map((entry) => (
                   <div key={entry.label}>
                     <p className="text-2xl font-semibold tracking-tight text-[#0B1F3A] sm:text-[1.75rem]">
