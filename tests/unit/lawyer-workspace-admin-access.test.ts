@@ -48,12 +48,15 @@ vi.mock("@/infrastructure/repositories", () => ({
   userRepository: {
     findById: (...args: unknown[]) => findById(...args),
   },
+  notificationRepository: {
+    findByUserId: vi.fn().mockResolvedValue({ items: [], nextCursor: null }),
+  },
 }));
 vi.mock("@/i18n/dashboard-shell-i18n", () => ({
   getShellI18n: vi.fn().mockResolvedValue({
     nav: [],
     shellProps: {},
-    dict: { marketplace: { account: {} } },
+    dict: { marketplace: { account: {} }, dashboard: { navNotifications: "" } },
   }),
 }));
 vi.mock("@/components/layout/lawyer-app-chrome", () => ({

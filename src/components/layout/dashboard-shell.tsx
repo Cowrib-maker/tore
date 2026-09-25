@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Bell } from "lucide-react";
 
 import { logoutAction } from "@/application/actions/auth.actions";
 import { BRAND_LOGO_SHELL, BRAND_NAME } from "@/components/brand/tokens";
@@ -33,6 +34,15 @@ interface DashboardShellProps {
   mobileNavLabel?: string;
   /** Self-service profile page. When set, the header name links there. */
   profileHref?: string | null;
+  /**
+   * Notifications inbox link. Omitted entirely (no bell rendered) for
+   * roles with no notification feed (e.g. Admin) — never a decorative
+   * bell with nowhere real to go.
+   */
+  notificationsHref?: string | null;
+  /** Real unread count from the notification repository. 0/undefined renders no badge — never fabricated. */
+  unreadNotificationsCount?: number;
+  notificationsLabel?: string;
 }
 
 export function DashboardPageHeading({
@@ -59,6 +69,9 @@ export function DashboardShell({
   navAriaLabel = "Main navigation",
   mobileNavLabel = "Navigate",
   profileHref,
+  notificationsHref,
+  unreadNotificationsCount = 0,
+  notificationsLabel = "Notifications",
 }: DashboardShellProps) {
   return (
     <div className="min-h-svh flex flex-col">
@@ -81,6 +94,18 @@ export function DashboardShell({
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <LanguageSwitcher locale={locale} label={languageLabel} />
             <ThemeToggle />
+            {notificationsHref ? (
+              <Link
+                href={notificationsHref}
+                aria-label={notificationsLabel}
+                className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <Bell className="size-[1.1rem]" />
+                {unreadNotificationsCount > 0 ? (
+                  <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-500" />
+                ) : null}
+              </Link>
+            ) : null}
             {profileHref ? (
               <Link
                 href={profileHref}

@@ -47,6 +47,9 @@ vi.mock("@/infrastructure/repositories", () => ({
     findByUserId: (...args: unknown[]) => clientProfileFindByUserId(...args),
   },
   lawyerProfileRepository: { findByUserId: vi.fn() },
+  notificationRepository: {
+    findByUserId: vi.fn().mockResolvedValue({ items: [], nextCursor: null }),
+  },
 }));
 vi.mock("@/infrastructure/storage/file-access", () => ({
   resolveProfilePhotoUrl: vi.fn(),
@@ -55,7 +58,7 @@ vi.mock("@/i18n/dashboard-shell-i18n", () => ({
   getShellI18n: vi.fn().mockResolvedValue({
     nav: [],
     shellProps: {},
-    dict: { marketplace: { account: {} } },
+    dict: { marketplace: { account: {} }, dashboard: { navNotifications: "" } },
   }),
 }));
 vi.mock("@/components/layout/dashboard-shell", () => ({

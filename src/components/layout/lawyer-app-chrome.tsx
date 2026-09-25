@@ -20,6 +20,9 @@ type Props = {
   navAriaLabel?: string;
   mobileNavLabel?: string;
   profileHref?: string | null;
+  notificationsHref?: string | null;
+  unreadNotificationsCount?: number;
+  notificationsLabel?: string;
 };
 
 export function LawyerAppChrome({
@@ -33,6 +36,9 @@ export function LawyerAppChrome({
   navAriaLabel,
   mobileNavLabel,
   profileHref,
+  notificationsHref,
+  unreadNotificationsCount,
+  notificationsLabel,
 }: Props) {
   const pathname = usePathname();
 
@@ -61,6 +67,9 @@ export function LawyerAppChrome({
       navAriaLabel={navAriaLabel}
       mobileNavLabel={mobileNavLabel}
       profileHref={profileHref}
+      notificationsHref={notificationsHref}
+      unreadNotificationsCount={unreadNotificationsCount}
+      notificationsLabel={notificationsLabel}
     >
       {children}
     </DashboardShell>
