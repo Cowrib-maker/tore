@@ -235,6 +235,9 @@ export const en: Dictionary = {
     introTitle: "What is TORE?",
     introBody:
       "TORE is a legal technology platform for citizens, law students, and legal professionals.",
+    statsLawyers: "Verified lawyers",
+    statsPracticeAreas: "Legal practice areas",
+    statsOrganizations: "Active firms & teams",
     productsEyebrow: "Products",
     products: {
       citizen: {
@@ -404,7 +407,10 @@ export const en: Dictionary = {
     feedbackPending: "Sending…",
     feedbackSuccess: "Thank you. We received your message.",
     navProducts: "Products",
+    navServices: "Services",
+    navLibrary: "Legal Library",
     navIntelligence: "Overview",
+    navHelp: "Help",
     navFeedback: "Feedback",
     accountWorkspace: "Workspace",
     footerTagline: "Understand the law, build the solution.",

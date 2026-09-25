@@ -101,6 +101,9 @@ export type PublicHomeCopy = {
   chatSuggestions: string[];
   introTitle: string;
   introBody: string;
+  statsLawyers: string;
+  statsPracticeAreas: string;
+  statsOrganizations: string;
   productsEyebrow: string;
   products: {
     citizen: PublicHomeProductCopy;
@@ -157,7 +160,10 @@ export type PublicHomeCopy = {
   feedbackPending: string;
   feedbackSuccess: string;
   navProducts: string;
+  navServices: string;
+  navLibrary: string;
   navIntelligence: string;
+  navHelp: string;
   navFeedback: string;
   accountWorkspace: string;
   footerTagline: string;

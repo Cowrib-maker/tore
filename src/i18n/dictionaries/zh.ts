@@ -181,6 +181,9 @@ export const zh: Dictionary = {
     introTitle: "什么是 TORE？",
     introBody:
       "TORE 是面向公民、法学学生和法律专业人士的法律科技平台。",
+    statsLawyers: "认证律师",
+    statsPracticeAreas: "法律执业领域",
+    statsOrganizations: "活跃律所与团队",
     productsEyebrow: "产品",
     products: {
       citizen: {
@@ -345,7 +348,10 @@ export const zh: Dictionary = {
     feedbackPending: "发送中…",
     feedbackSuccess: "谢谢。我们已收到您的留言。",
     navProducts: "产品",
+    navServices: "服务",
+    navLibrary: "法律库",
     navIntelligence: "概览",
+    navHelp: "帮助",
     navFeedback: "反馈",
     accountWorkspace: "工作区",
     footerTagline: "理解法律，构建解决方案。",

@@ -29,12 +29,12 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
   const [open, setOpen] = useState(false);
   const home = dict.publicHome;
   const links = [
-    { href: "/lawyers", label: dict.nav.lawyers },
-    { href: "#chat", label: home.products.citizen.name },
     { href: "#products", label: home.navProducts },
+    { href: "#marketplace", label: home.navServices },
+    { href: "/legal-ai", label: home.navLibrary },
+    { href: "/lawyers", label: dict.nav.lawyers },
     { href: "#intelligence", label: home.navIntelligence },
-    { href: "#faq", label: dict.nav.faq },
-    { href: "#feedback", label: home.navFeedback },
+    { href: "#faq", label: home.navHelp },
   ];
 
   return (

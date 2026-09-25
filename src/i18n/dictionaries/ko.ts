@@ -181,6 +181,9 @@ export const ko: Dictionary = {
     introTitle: "TORE란 무엇인가요?",
     introBody:
       "TORE는 시민, 법학 학생, 법률 전문가를 위한 리걸테크 플랫폼입니다.",
+    statsLawyers: "인증된 변호사",
+    statsPracticeAreas: "법률 분야",
+    statsOrganizations: "활동 중인 로펌·팀",
     productsEyebrow: "제품",
     products: {
       citizen: {
@@ -346,7 +349,10 @@ export const ko: Dictionary = {
     feedbackPending: "보내는 중…",
     feedbackSuccess: "감사합니다. 메시지를 받았습니다.",
     navProducts: "제품",
+    navServices: "서비스",
+    navLibrary: "법률 라이브러리",
     navIntelligence: "개요",
+    navHelp: "도움말",
     navFeedback: "피드백",
     accountWorkspace: "작업 공간",
     footerTagline: "법을 이해하고, 해결책을 만드십시오.",

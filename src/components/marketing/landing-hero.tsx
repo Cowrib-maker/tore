@@ -1,5 +1,7 @@
 import { HeroLegalAiComposer } from "@/components/marketing/hero-legal-ai-composer";
+import { LandingHeroScene } from "@/components/marketing/landing-hero-scene";
 import { LandingReveal } from "@/components/marketing/landing-reveal";
+import type { HomepageStats } from "@/application/use-cases/homepage/get-homepage-stats";
 import type { Dictionary } from "@/i18n/types";
 
 /**
@@ -17,51 +19,47 @@ function splitLastWord(text: string): [string, string | null] {
 export function LandingHero({
   home,
   checkoutEnabled,
+  stats,
+  statsLabels,
 }: {
   home: Dictionary["publicHome"];
   checkoutEnabled: boolean;
+  /** Real, live counts. Omitted (no panel) when unavailable or all-zero -- never fabricated. */
+  stats?: HomepageStats;
+  statsLabels?: { lawyers: string; practiceAreas: string; organizations: string };
 }) {
   const [taglineLead, taglineAccent] = splitLastWord(home.tagline);
+  const hasStats =
+    stats && statsLabels && (stats.listedLawyers > 0 || stats.practiceAreas > 0 || stats.activeOrganizations > 0);
 
   return (
     <section
       id="chat"
-      className="relative overflow-hidden scroll-mt-24 border-b border-[#0B1F3A]/8"
+      className="relative isolate overflow-hidden scroll-mt-24 border-b border-[#0B1F3A]/8"
     >
+      {/* One full-bleed atmospheric scene (sky + institutional building),
+          not a boxed illustration beside the text -- a top band on mobile,
+          the entire section on desktop, with the scrim below keeping text
+          legible so the whole hero reads as a single scene. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(11,92,255,0.08),transparent_52%),linear-gradient(180deg,#F7F8FB_0%,#EEF3FB_100%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[280px] overflow-hidden sm:h-[360px] lg:inset-0 lg:h-auto"
+      >
+        <LandingHeroScene className="size-full" />
+      </div>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[280px] bg-[linear-gradient(180deg,transparent_45%,#F7F8FB_96%)] sm:h-[360px] lg:inset-0 lg:h-auto lg:bg-[linear-gradient(100deg,#F7F8FB_0%,#F7F8FB_34%,rgba(247,248,251,0.75)_50%,rgba(247,248,251,0.15)_68%,transparent_82%)]"
       />
 
-      {/* Full-bleed architectural visual — right two-fifths on desktop,
-          top banner on mobile. A white-to-transparent fade keeps the left
-          text column legible; captions are real HTML text overlaid on the
-          image, never baked into the asset itself. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[220px] overflow-hidden sm:h-[280px] lg:inset-y-0 lg:right-0 lg:left-[54%] lg:h-auto"
-      >
-        <img
-          src="/images/landing/hero-architecture.svg"
-          alt=""
-          className="size-full object-cover"
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,#F7F8FB_100%)] lg:bg-[linear-gradient(90deg,#F7F8FB_0%,rgba(247,248,251,0.55)_16%,transparent_38%)]" />
-        <div className="absolute right-4 bottom-3 max-w-[220px] text-right sm:right-6 sm:bottom-5 lg:right-10 lg:bottom-10 lg:max-w-xs">
-          <p className="text-[10px] font-semibold tracking-[0.2em] text-white/85 uppercase sm:text-[11px]">
-            {home.brandLine}
-          </p>
-        </div>
-      </div>
-
-      <div className="relative mx-auto max-w-6xl px-5 pt-[240px] sm:px-8 sm:pt-[300px] lg:grid lg:grid-cols-[minmax(0,54%)_1fr] lg:pt-0">
-        <div className="py-10 sm:py-14 lg:py-20 lg:pr-10">
+      <div className="relative mx-auto max-w-7xl px-5 pt-[300px] sm:px-8 sm:pt-[380px] lg:flex lg:min-h-[760px] lg:items-center lg:pt-0">
+        <div className="max-w-xl py-10 sm:py-14 lg:max-w-2xl lg:py-20">
           <LandingReveal>
-            <p className="text-[11px] font-semibold tracking-[0.22em] text-[#5C6570] uppercase sm:text-xs">
+            <p className="text-[11px] font-semibold tracking-[0.24em] text-[#5C6570] uppercase sm:text-xs">
               {home.brandLine}
             </p>
 
-            <h1 className="mt-5 max-w-xl font-[family-name:var(--font-landing-display)] text-[2rem] leading-[1.15] font-semibold tracking-[-0.03em] text-[#0B1F3A] sm:text-[2.5rem]">
+            <h1 className="mt-5 max-w-2xl font-[family-name:var(--font-landing-display)] text-[2.5rem] leading-[1.08] font-semibold tracking-[-0.03em] text-[#0B1F3A] sm:text-[3.4rem] lg:text-[3.9rem]">
               {taglineAccent ? (
                 <>
                   {taglineLead}
@@ -72,7 +70,7 @@ export function LandingHero({
               )}
             </h1>
 
-            <p className="mt-4 max-w-lg text-lg font-medium text-[#0B1F3A]/80">
+            <p className="mt-5 max-w-lg text-xl font-medium text-[#0B1F3A]/80 sm:text-2xl">
               {home.chatTitle}
             </p>
 
@@ -81,7 +79,7 @@ export function LandingHero({
             </p>
           </LandingReveal>
 
-          <div className="mt-8">
+          <div className="mt-8 max-w-xl lg:max-w-2xl">
             <HeroLegalAiComposer
               placeholder={home.chatPlaceholder}
               submitLabel={home.chatSubmit}
@@ -93,6 +91,31 @@ export function LandingHero({
           </div>
         </div>
       </div>
+
+      {hasStats ? (
+        <div className="relative z-10 mx-auto hidden max-w-7xl px-8 pb-10 lg:block">
+          <div className="ml-auto flex w-fit gap-6 rounded-2xl bg-[#0B1F3A]/80 px-6 py-4 text-white shadow-[0_20px_45px_-25px_rgba(11,31,58,0.6)] backdrop-blur-sm">
+            {stats!.listedLawyers > 0 ? (
+              <div>
+                <p className="text-2xl font-semibold tracking-tight">{stats!.listedLawyers}+</p>
+                <p className="text-[11px] text-white/65">{statsLabels!.lawyers}</p>
+              </div>
+            ) : null}
+            {stats!.practiceAreas > 0 ? (
+              <div>
+                <p className="text-2xl font-semibold tracking-tight">{stats!.practiceAreas}+</p>
+                <p className="text-[11px] text-white/65">{statsLabels!.practiceAreas}</p>
+              </div>
+            ) : null}
+            {stats!.activeOrganizations > 0 ? (
+              <div>
+                <p className="text-2xl font-semibold tracking-tight">{stats!.activeOrganizations}+</p>
+                <p className="text-[11px] text-white/65">{statsLabels!.organizations}</p>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       <div className="h-10 sm:h-16 lg:h-0" />
     </section>

@@ -15,6 +15,7 @@ import {
   LandingLead,
   LandingSection,
 } from "@/components/marketing/landing-section";
+import type { HomepageStats } from "@/application/use-cases/homepage/get-homepage-stats";
 import {
   emptyLegalIntelligenceFeed,
   type LegalIntelligenceFeed,
@@ -36,6 +37,7 @@ type LandingPageProps = {
     team: string;
   };
   intelligence?: LegalIntelligenceFeed;
+  stats?: HomepageStats;
 };
 
 export function LandingPage({
@@ -45,6 +47,7 @@ export function LandingPage({
   checkoutEnabled,
   productHrefs,
   intelligence,
+  stats,
 }: LandingPageProps) {
   const home = dict.publicHome;
   const landing = dict.landing;
@@ -58,7 +61,16 @@ export function LandingPage({
     >
       <LandingNav dict={dict} locale={locale} authUser={authUser} />
       <main>
-        <LandingHero home={home} checkoutEnabled={checkoutEnabled} />
+        <LandingHero
+          home={home}
+          checkoutEnabled={checkoutEnabled}
+          stats={stats}
+          statsLabels={{
+            lawyers: home.statsLawyers,
+            practiceAreas: home.statsPracticeAreas,
+            organizations: home.statsOrganizations,
+          }}
+        />
         <LandingIntro home={home} />
         <LandingProducts home={home} hrefs={productHrefs} />
         <LandingMarketplace t={landing} />

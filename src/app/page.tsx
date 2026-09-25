@@ -1,4 +1,5 @@
 import { getSessionUser } from "@/application/common/session";
+import { getHomepageStats } from "@/application/use-cases/homepage/get-homepage-stats";
 import { loadLegalIntelligence } from "@/application/use-cases/homepage/load-legal-intelligence";
 import { LandingPage } from "@/components/marketing/landing-page";
 import { UserRole } from "@/domain/enums";
@@ -12,10 +13,11 @@ import { getLocale } from "@/i18n/get-locale";
 export default async function HomePage() {
   const locale = await getLocale();
 
-  const [dict, session, intelligence] = await Promise.all([
+  const [dict, session, intelligence, stats] = await Promise.all([
     getDictionary(locale),
     getSessionUser(),
     loadLegalIntelligence(),
+    getHomepageStats(),
   ]);
 
   const role = session?.user?.role as UserRole | undefined;
@@ -44,6 +46,7 @@ export default async function HomePage() {
         team: getHomepageProductHref("team", role),
       }}
       intelligence={intelligence}
+      stats={stats}
     />
   );
 }
