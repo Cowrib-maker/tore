@@ -9,6 +9,7 @@ import {
   interpretLegalAiChatAccess,
   type LegalAiAccessGate,
 } from "@/components/legal-ai/interpret-legal-ai-chat-access";
+import { parseSseStream } from "@/lib/parse-sse-stream";
 
 export type ChatMessage = {
   role: "USER" | "ASSISTANT";
@@ -50,6 +51,31 @@ export function useLegalAiChatSession(initial?: {
     }
     setLoading(true);
 
+    // Tracks whether a streaming ASSISTANT placeholder has been appended
+    // yet, mirroring legal-ai-chat.tsx's own pattern — an incomplete turn
+    // must never linger as a visible (and un-persisted) "successful"
+    // message if the stream errors or aborts partway through.
+    let streamingMessageAdded = false;
+    const removeStreamingPlaceholder = () => {
+      if (!streamingMessageAdded) return;
+      setMessages((current) => current.slice(0, -1));
+      streamingMessageAdded = false;
+    };
+    const appendStreamingDelta = (delta: string) => {
+      if (!streamingMessageAdded) {
+        streamingMessageAdded = true;
+        setMessages((current) => [...current, { role: "ASSISTANT", content: delta }]);
+        return;
+      }
+      setMessages((current) => {
+        const next = current.slice();
+        const last = next[next.length - 1];
+        if (!last || last.role !== "ASSISTANT") return current;
+        next[next.length - 1] = { ...last, content: last.content + delta };
+        return next;
+      });
+    };
+
     try {
       const controller = new AbortController();
       abortRef.current = controller;
@@ -64,50 +90,96 @@ export function useLegalAiChatSession(initial?: {
         signal: controller.signal,
       });
 
-      const data = (await response.json()) as {
-        error?: string;
-        code?: string;
-        conversationId?: string;
-        message?: { content?: string; citations?: unknown };
-      };
+      const contentType = response.headers.get("content-type") ?? "";
+      if (!contentType.includes("text/event-stream")) {
+        // Every non-streaming response is a pre-LLM failure (auth/billing/
+        // rate-limit/validation) — the route only ever returns plain JSON
+        // before it commits to a stream. Once it commits, EVERY outcome
+        // (success, or a failure discovered mid-turn such as exhausted
+        // entitlement) arrives as an SSE frame instead — see below.
+        const data = (await response.json()) as {
+          error?: string;
+          code?: string;
+          conversationId?: string;
+          message?: { content?: string; citations?: unknown };
+        };
 
-      const interpreted = interpretLegalAiChatAccess({
-        status: response.status,
-        body: data,
-        question: text,
-        audience: initial?.billingAudience,
-      });
+        const interpreted = interpretLegalAiChatAccess({
+          status: response.status,
+          body: data,
+          question: text,
+          audience: initial?.billingAudience,
+        });
 
-      if (interpreted.type === "auth") {
-        setAccessGate(interpreted.gate);
-        return "gated";
+        if (interpreted.type === "auth" || interpreted.type === "billing") {
+          // Checkout is no longer auto-created here — the gate card lets
+          // the user pick a payment method (QR / bank transfer / QPay)
+          // first, for both audiences, then creates the checkout for
+          // whichever one they choose.
+          setAccessGate(interpreted.gate);
+          return "gated";
+        }
+        if (interpreted.type === "error") {
+          throw new Error(interpreted.message);
+        }
+        return "ok";
       }
 
-      if (interpreted.type === "billing") {
-        // Checkout is no longer auto-created here — the gate card lets
-        // the user pick a payment method (QR / bank transfer / QPay)
-        // first, for both audiences, then creates the checkout for
-        // whichever one they choose.
-        setAccessGate(interpreted.gate);
-        return "gated";
+      if (!response.body) {
+        throw new Error("empty stream body");
       }
 
-      if (interpreted.type === "error") {
-        throw new Error(interpreted.message);
+      for await (const frame of parseSseStream(response.body)) {
+        if (frame.event === "delta") {
+          const { text: delta } = frame.data as { text: string };
+          if (delta) appendStreamingDelta(delta);
+        } else if (frame.event === "done") {
+          const payload = frame.data as {
+            conversationId?: string;
+            message?: { content?: string; citations?: unknown };
+          };
+          setConversationId(payload.conversationId);
+          conversationIdRef.current = payload.conversationId;
+          const finalMessage: ChatMessage = {
+            role: "ASSISTANT",
+            content: payload.message?.content ?? "",
+            citations: parseSafeCitationsFromUnknown(payload.message?.citations),
+          };
+          if (streamingMessageAdded) {
+            setMessages((current) => {
+              const next = current.slice();
+              next[next.length - 1] = finalMessage;
+              return next;
+            });
+          } else {
+            setMessages((current) => [...current, finalMessage]);
+          }
+        } else if (frame.event === "error") {
+          removeStreamingPlaceholder();
+          // A mid-stream error (createTurn() throwing after the route has
+          // already committed to text/event-stream — e.g. exhausted
+          // entitlement) arrives as this SSE frame, not as the
+          // non-streaming JSON response handled above. It must go through
+          // the same access-gate interpretation, or a real "you need to
+          // pay/log in" case degrades into an opaque retry error with no
+          // way to check out.
+          const payload = frame.data as { error?: string; status?: number };
+          const interpreted = interpretLegalAiChatAccess({
+            status: payload.status ?? 500,
+            body: payload,
+            question: text,
+            audience: initial?.billingAudience,
+          });
+          if (interpreted.type === "auth" || interpreted.type === "billing") {
+            setAccessGate(interpreted.gate);
+            return "gated";
+          }
+          throw new Error(interpreted.type === "error" ? interpreted.message : "stream error");
+        }
       }
-
-      setConversationId(interpreted.conversationId);
-      conversationIdRef.current = interpreted.conversationId;
-      setMessages((current) => [
-        ...current,
-        {
-          role: "ASSISTANT",
-          content: interpreted.content,
-          citations: parseSafeCitationsFromUnknown(interpreted.citations),
-        },
-      ]);
       return "ok";
     } catch (err) {
+      removeStreamingPlaceholder();
       if (err instanceof DOMException && err.name === "AbortError") {
         return "error";
       }

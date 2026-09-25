@@ -602,7 +602,30 @@ export function LegalAiChat({
           setAttachedDocuments([]);
         } else if (frame.event === "error") {
           removeStreamingPlaceholder();
-          throw new Error("stream error");
+          // A mid-stream error is thrown by createTurn() AFTER the outer
+          // route handler has already committed to a text/event-stream
+          // response (see route.ts) — so an exhausted-quota or auth
+          // failure discovered here arrives as this SSE frame, not as the
+          // non-streaming JSON response the code above already handles.
+          // It must go through the same interpretLegalAiChatAccess gate
+          // logic, or a real "you need to pay/log in" case degrades into
+          // a generic, unhelpful retry error with no way to check out.
+          const payload = frame.data as {
+            error?: string;
+            status?: number;
+            conversationId?: string;
+          };
+          const interpreted = interpretLegalAiChatAccess({
+            status: payload.status ?? 500,
+            body: payload,
+            question: text,
+          });
+          if (interpreted.type === "auth" || interpreted.type === "billing") {
+            setAccessGate(interpreted.gate);
+            setMessage(text);
+            return;
+          }
+          throw new Error(interpreted.type === "error" ? interpreted.message : "stream error");
         }
       }
     } catch (err) {
