@@ -18,6 +18,7 @@ export const getShellI18n = cache(async (role: "client" | "lawyer" | "admin") =>
       ? [
           { href: "/client/dashboard", label: d.navDashboard },
           { href: "/legal-ai", label: d.navLegalAi },
+          { href: "/billing", label: d.navBilling },
           { href: "/client/profile", label: d.navProfile },
           { href: "/client/bookings", label: d.navBookings },
           { href: "/client/notifications", label: d.navNotifications },
@@ -31,6 +32,7 @@ export const getShellI18n = cache(async (role: "client" | "lawyer" | "admin") =>
             { href: "/lawyer/workspace/cases", label: d.navCases },
             { href: "/lawyer/offerings", label: d.navOfferings },
             { href: "/lawyer/bookings", label: d.navBookings },
+            { href: "/billing", label: d.navBilling },
             { href: "/lawyer/notifications", label: d.navNotifications },
             { href: "/legal-ai", label: d.navLegalChat },
             ...orgNav,

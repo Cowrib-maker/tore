@@ -8,6 +8,7 @@ import {
   MessagesSquare,
   NotebookPen,
   PenSquare,
+  Wallet,
 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -45,6 +46,7 @@ export function studentSidebarItems(
     { key: "materials", icon: FolderOpen, label: "Хичээлийн материал", href: "/student#modules" },
     { key: "notes", icon: NotebookPen, label: "Тэмдэглэл", comingSoonLabel: "Тун удахгүй" },
     { key: "saved", icon: Bookmark, label: "Хадгалсан", comingSoonLabel: "Тун удахгүй" },
+    { key: "billing", icon: Wallet, label: "Багц & төлбөр", href: "/billing" },
   ];
 }
 

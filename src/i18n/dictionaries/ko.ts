@@ -617,6 +617,7 @@ export const ko: Dictionary = {
     adminTitle: "관리",
     profileTitle: "프로필",
     navDashboard: "개요",
+    navBilling: "요금제 & 결제",
     navProfile: "프로필",
     navBookings: "상담 신청",
     navNotifications: "알림",

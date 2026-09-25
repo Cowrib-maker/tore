@@ -679,6 +679,7 @@ export const en: Dictionary = {
     adminTitle: "Administration",
     profileTitle: "Profile",
     navDashboard: "Overview",
+    navBilling: "Plans & billing",
     navProfile: "Profile",
     navBookings: "Bookings",
     navNotifications: "Notifications",

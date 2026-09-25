@@ -9,6 +9,7 @@ import {
   MessagesSquare,
   Scale,
   UserRound,
+  Wallet,
 } from "lucide-react";
 
 import { getSessionUser } from "@/application/common/session";
@@ -49,6 +50,7 @@ function lawyerSidebarItems(navLabels: {
   workspace: string;
   cases: string;
   offerings: string;
+  billing: string;
   bookings: string;
   notifications: string;
   profile: string;
@@ -58,6 +60,7 @@ function lawyerSidebarItems(navLabels: {
     { key: "workspace", icon: Briefcase, label: navLabels.workspace, href: "/lawyer/workspace" },
     { key: "cases", icon: FolderOpen, label: navLabels.cases, href: "/lawyer/workspace/cases" },
     { key: "offerings", icon: Scale, label: navLabels.offerings, href: "/lawyer/offerings" },
+    { key: "billing", icon: Wallet, label: navLabels.billing, href: "/billing" },
     { key: "bookings", icon: Calendar, label: navLabels.bookings, href: "/lawyer/bookings" },
     { key: "notifications", icon: Bell, label: navLabels.notifications, href: "/lawyer/notifications" },
     { key: "profile", icon: UserRound, label: navLabels.profile, href: "/lawyer/profile" },
@@ -152,6 +155,7 @@ export default async function LawyerDashboardPage() {
           workspace: d.navWorkspace,
           cases: d.navCases,
           offerings: d.navOfferings,
+          billing: d.navBilling,
           bookings: d.navBookings,
           notifications: d.navNotifications,
           profile: d.navProfile,
@@ -172,13 +176,19 @@ export default async function LawyerDashboardPage() {
           <p className="mt-2 max-w-xl text-sm leading-6 text-white/70">
             {ld.intro}
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <Badge variant="outline" className="border-white/20 text-white">
               {formatVerificationStatus(verificationStatus, locale)}
             </Badge>
             <Badge variant="outline" className="border-white/20 text-white">
               {listed ? ld.listed : ld.notListed}
             </Badge>
+            <Link
+              href="/billing"
+              className="ml-auto inline-flex h-8 items-center rounded-full bg-white px-4 text-[12.5px] font-semibold text-[#0B1F3A] transition hover:bg-white/90"
+            >
+              Багц харах
+            </Link>
           </div>
         </div>
 

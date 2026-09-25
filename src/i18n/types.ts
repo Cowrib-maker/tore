@@ -316,6 +316,7 @@ export type Dictionary = {
     adminTitle: string;
     profileTitle: string;
     navDashboard: string;
+    navBilling: string;
     navProfile: string;
     navBookings: string;
     navNotifications: string;

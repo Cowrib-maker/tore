@@ -8,6 +8,7 @@ import {
   Search,
   Sparkles,
   UserRound,
+  Wallet,
 } from "lucide-react";
 
 import { getSessionUser } from "@/application/common/session";
@@ -38,6 +39,7 @@ import { cn } from "@/lib/utils";
 function citizenSidebarItems(navLabels: {
   dashboard: string;
   legalAi: string;
+  billing: string;
   findLawyers: string;
   bookings: string;
   notifications: string;
@@ -46,6 +48,7 @@ function citizenSidebarItems(navLabels: {
   return [
     { key: "dashboard", icon: Home, label: navLabels.dashboard, href: "/client/dashboard", active: true },
     { key: "legal-ai", icon: MessagesSquare, label: navLabels.legalAi, href: "/legal-ai" },
+    { key: "billing", icon: Wallet, label: navLabels.billing, href: "/billing" },
     { key: "lawyers", icon: Search, label: navLabels.findLawyers, href: "/lawyers" },
     { key: "bookings", icon: Calendar, label: navLabels.bookings, href: "/client/bookings" },
     { key: "notifications", icon: Bell, label: navLabels.notifications, href: "/client/notifications" },
@@ -105,6 +108,7 @@ export default async function ClientDashboardPage() {
         items={citizenSidebarItems({
           dashboard: d.navDashboard,
           legalAi: d.navLegalAi,
+          billing: d.navBilling,
           findLawyers: d.navFindLawyers,
           bookings: d.navBookings,
           notifications: d.navNotifications,
@@ -126,13 +130,19 @@ export default async function ClientDashboardPage() {
           <p className="mt-2 max-w-xl text-sm leading-6 text-white/70">
             {cd.intro}
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <Badge variant="outline" className="border-white/20 text-white">
               {profileFilled ? m.common.complete : m.common.incomplete}
             </Badge>
             <Badge variant="outline" className="border-white/20 text-white">
               {emailVerified ? m.common.confirmed : m.common.pending}
             </Badge>
+            <Link
+              href="/billing"
+              className="ml-auto inline-flex h-8 items-center rounded-full bg-white px-4 text-[12.5px] font-semibold text-[#0B1F3A] transition hover:bg-white/90"
+            >
+              Багц харах
+            </Link>
           </div>
         </div>
 

@@ -611,6 +611,7 @@ export const zh: Dictionary = {
     adminTitle: "管理后台",
     profileTitle: "档案",
     navDashboard: "概览",
+    navBilling: "套餐与付款",
     navProfile: "档案",
     navBookings: "咨询申请",
     navNotifications: "通知",
