@@ -1,7 +1,7 @@
 "use client";
 
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Paperclip, Sparkles } from "lucide-react";
 
 import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
 import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
@@ -51,7 +51,7 @@ export function HeroLegalAiComposer({
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-3">
+    <div className="w-full space-y-3">
       <LegalAiEntitlementBanner />
       {messages.length > 0 ? (
         <div
@@ -97,7 +97,7 @@ export function HeroLegalAiComposer({
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-3xl border border-ai-border bg-ai-surface p-3 shadow-[0_22px_50px_-24px_rgba(11,31,58,0.32)] transition focus-within:border-[#0B5CFF]/45"
+        className="rounded-[1.75rem] border border-ai-border bg-ai-surface p-4 shadow-[0_28px_60px_-28px_rgba(11,31,58,0.35)] transition focus-within:border-[#0B5CFF]/45 sm:p-5"
       >
         <textarea
           ref={textareaRef}
@@ -111,10 +111,20 @@ export function HeroLegalAiComposer({
           }}
           placeholder={placeholder}
           disabled={loading}
-          rows={1}
-          className="min-h-12 w-full resize-none bg-transparent px-3 py-2 text-[15px] leading-6 text-ai-text outline-none placeholder:text-ai-text-subtle"
+          rows={2}
+          className="min-h-16 w-full resize-none bg-transparent px-2 py-1 text-[17px] leading-7 text-ai-text outline-none placeholder:text-ai-text-subtle sm:text-[18px]"
         />
-        <div className="flex items-center justify-end pt-1">
+        <div className="mt-2 flex items-center justify-between gap-2 border-t border-ai-border/70 pt-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-full border border-ai-border bg-ai-surface-muted px-3 py-1.5 text-[12.5px] font-medium text-ai-text-subtle opacity-80">
+              <Paperclip className="size-3.5" />
+              Файл хавсаргах
+            </span>
+            <span className="hidden cursor-not-allowed items-center gap-1.5 rounded-full border border-ai-border bg-ai-surface-muted px-3 py-1.5 text-[12.5px] font-medium text-ai-text-subtle opacity-80 sm:inline-flex">
+              <Sparkles className="size-3.5" />
+              AI сонгох
+            </span>
+          </div>
           <button
             type="submit"
             aria-label={submitLabel}
@@ -127,7 +137,7 @@ export function HeroLegalAiComposer({
       </form>
 
       {suggestions?.length && messages.length === 0 ? (
-        <div className="flex flex-wrap items-center justify-center gap-2 text-left sm:justify-start">
+        <div className="flex flex-wrap items-center justify-start gap-2 text-left">
           <span className="text-xs font-medium text-[#5C6570]">
             {suggestionsLabel}
           </span>
@@ -147,7 +157,7 @@ export function HeroLegalAiComposer({
         </div>
       ) : null}
 
-      <LegalAiDutyNotice variant="citizen" className="px-1 text-center" />
+      <LegalAiDutyNotice variant="citizen" className="px-1 text-left" />
     </div>
   );
 }

@@ -29,95 +29,92 @@ export function LandingHero({
   statsLabels?: { lawyers: string; practiceAreas: string; organizations: string };
 }) {
   const [taglineLead, taglineAccent] = splitLastWord(home.tagline);
-  const hasStats =
-    stats && statsLabels && (stats.listedLawyers > 0 || stats.practiceAreas > 0 || stats.activeOrganizations > 0);
+  const statEntries = [
+    stats && stats.listedLawyers > 0 && statsLabels
+      ? { value: stats.listedLawyers, label: statsLabels.lawyers }
+      : null,
+    stats && stats.practiceAreas > 0 && statsLabels
+      ? { value: stats.practiceAreas, label: statsLabels.practiceAreas }
+      : null,
+    stats && stats.activeOrganizations > 0 && statsLabels
+      ? { value: stats.activeOrganizations, label: statsLabels.organizations }
+      : null,
+  ].filter((entry): entry is { value: number; label: string } => entry !== null);
 
   return (
     <section
       id="chat"
-      className="relative isolate overflow-hidden scroll-mt-24 border-b border-[#0B1F3A]/8"
+      className="relative isolate overflow-hidden scroll-mt-24 border-b border-[#0B1F3A]/8 bg-[#F7F8FB]"
     >
-      {/* One full-bleed atmospheric scene (sky + institutional building),
-          not a boxed illustration beside the text -- a top band on mobile,
-          the entire section on desktop, with the scrim below keeping text
-          legible so the whole hero reads as a single scene. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[280px] overflow-hidden sm:h-[360px] lg:inset-0 lg:h-auto"
-      >
+      {/* Compact decorative band for mobile/tablet -- replaced by the
+          contained right-column panel below at lg+. The two never render
+          at the same time, so there is never a doubled/overlapping visual. */}
+      <div aria-hidden className="relative h-[200px] overflow-hidden sm:h-[260px] lg:hidden">
         <LandingHeroScene className="size-full" />
-      </div>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[280px] bg-[linear-gradient(180deg,transparent_45%,#F7F8FB_96%)] sm:h-[360px] lg:inset-0 lg:h-auto lg:bg-[linear-gradient(100deg,#F7F8FB_0%,#F7F8FB_34%,rgba(247,248,251,0.75)_50%,rgba(247,248,251,0.15)_68%,transparent_82%)]"
-      />
-
-      <div className="relative mx-auto max-w-7xl px-5 pt-[300px] sm:px-8 sm:pt-[380px] lg:flex lg:min-h-[760px] lg:items-center lg:pt-0">
-        <div className="max-w-xl py-10 sm:py-14 lg:max-w-2xl lg:py-20">
-          <LandingReveal>
-            <p className="text-[11px] font-semibold tracking-[0.24em] text-[#5C6570] uppercase sm:text-xs">
-              {home.brandLine}
-            </p>
-
-            <h1 className="mt-5 max-w-2xl font-[family-name:var(--font-landing-display)] text-[2.5rem] leading-[1.08] font-semibold tracking-[-0.03em] text-[#0B1F3A] sm:text-[3.4rem] lg:text-[3.9rem]">
-              {taglineAccent ? (
-                <>
-                  {taglineLead}
-                  <span className="text-[#0B5CFF]">{taglineAccent}</span>
-                </>
-              ) : (
-                home.tagline
-              )}
-            </h1>
-
-            <p className="mt-5 max-w-lg text-xl font-medium text-[#0B1F3A]/80 sm:text-2xl">
-              {home.chatTitle}
-            </p>
-
-            <p className="mt-3 max-w-lg text-[15px] leading-7 text-[#5C6570] sm:text-base">
-              {home.chatSubtitle}
-            </p>
-          </LandingReveal>
-
-          <div className="mt-8 max-w-xl lg:max-w-2xl">
-            <HeroLegalAiComposer
-              placeholder={home.chatPlaceholder}
-              submitLabel={home.chatSubmit}
-              typingLabel={home.chatTyping}
-              checkoutEnabled={checkoutEnabled}
-              suggestionsLabel={home.chatSuggestionsLabel}
-              suggestions={home.chatSuggestions}
-            />
-          </div>
-        </div>
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_50%,#F7F8FB_100%)]" />
       </div>
 
-      {hasStats ? (
-        <div className="relative z-10 mx-auto hidden max-w-7xl px-8 pb-10 lg:block">
-          <div className="ml-auto flex w-fit gap-6 rounded-2xl bg-[#0B1F3A]/80 px-6 py-4 text-white shadow-[0_20px_45px_-25px_rgba(11,31,58,0.6)] backdrop-blur-sm">
-            {stats!.listedLawyers > 0 ? (
-              <div>
-                <p className="text-2xl font-semibold tracking-tight">{stats!.listedLawyers}+</p>
-                <p className="text-[11px] text-white/65">{statsLabels!.lawyers}</p>
-              </div>
-            ) : null}
-            {stats!.practiceAreas > 0 ? (
-              <div>
-                <p className="text-2xl font-semibold tracking-tight">{stats!.practiceAreas}+</p>
-                <p className="text-[11px] text-white/65">{statsLabels!.practiceAreas}</p>
-              </div>
-            ) : null}
-            {stats!.activeOrganizations > 0 ? (
-              <div>
-                <p className="text-2xl font-semibold tracking-tight">{stats!.activeOrganizations}+</p>
-                <p className="text-[11px] text-white/65">{statsLabels!.organizations}</p>
+      <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-16">
+        <div className="py-10 sm:py-14 lg:grid lg:min-h-[720px] lg:grid-cols-[minmax(0,60%)_minmax(0,40%)] lg:items-center lg:gap-8 lg:py-24 xl:gap-12">
+          {/* LEFT -- product/message */}
+          <div>
+            <LandingReveal>
+              <p className="text-[13px] font-semibold tracking-[0.24em] text-[#5C6570] uppercase sm:text-sm">
+                {home.brandLine}
+              </p>
+
+              <h1 className="mt-5 font-[family-name:var(--font-landing-display)] text-[2.75rem] leading-[1.04] font-semibold tracking-[-0.03em] text-[#0B1F3A] sm:text-[3.75rem] lg:text-[4.25rem] xl:text-[5rem]">
+                {taglineAccent ? (
+                  <>
+                    {taglineLead}
+                    <span className="text-[#0B5CFF]">{taglineAccent}</span>
+                  </>
+                ) : (
+                  home.tagline
+                )}
+              </h1>
+
+              <p className="mt-6 max-w-xl text-xl font-medium text-[#0B1F3A]/80 sm:text-2xl">
+                {home.chatTitle}
+              </p>
+
+              <p className="mt-3 max-w-lg text-[15px] leading-7 text-[#5C6570] sm:text-base">
+                {home.chatSubtitle}
+              </p>
+            </LandingReveal>
+
+            <div className="mt-8 max-w-[860px]">
+              <HeroLegalAiComposer
+                placeholder={home.chatPlaceholder}
+                submitLabel={home.chatSubmit}
+                typingLabel={home.chatTyping}
+                checkoutEnabled={checkoutEnabled}
+                suggestionsLabel={home.chatSuggestionsLabel}
+                suggestions={home.chatSuggestions}
+              />
+            </div>
+
+            {statEntries.length > 0 ? (
+              <div className="mt-10 flex max-w-[860px] flex-wrap gap-x-10 gap-y-4 border-t border-[#0B1F3A]/10 pt-6">
+                {statEntries.map((entry) => (
+                  <div key={entry.label}>
+                    <p className="text-2xl font-semibold tracking-tight text-[#0B1F3A] sm:text-[1.75rem]">
+                      {entry.value}+
+                    </p>
+                    <p className="mt-0.5 text-[12.5px] text-[#5C6570]">{entry.label}</p>
+                  </div>
+                ))}
               </div>
             ) : null}
           </div>
-        </div>
-      ) : null}
 
-      <div className="h-10 sm:h-16 lg:h-0" />
+          {/* RIGHT -- institutional legal visual, contained and framed --
+              a deliberate panel, not a full-bleed background wash. */}
+          <div className="relative mt-12 hidden aspect-[4/5] overflow-hidden rounded-[2rem] border border-[#0B1F3A]/10 shadow-[0_35px_70px_-35px_rgba(11,31,58,0.35)] lg:mt-0 lg:block">
+            <LandingHeroScene className="size-full" />
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
