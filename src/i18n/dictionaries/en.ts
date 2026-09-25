@@ -776,8 +776,8 @@ export const en: Dictionary = {
     quickActionReportsDesc: "Case progress, workload, finances",
     planCardEyebrow: "Plan",
     planCardTitle: "Organization plan",
-    planCardDescription: "Make your team's work more effective.",
-    planCardCta: "Manage plan",
+    planCardDescription: "Organization plans are coming soon. For now, view your own personal plan here.",
+    planCardCta: "View plan",
   },
   activeContext: {
     label: "Active context",

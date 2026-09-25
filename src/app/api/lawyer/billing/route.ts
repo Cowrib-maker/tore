@@ -7,6 +7,7 @@ import {
 } from "@/application/common/lawyer-session-http";
 import { requireActor } from "@/application/common/require-actor";
 import {
+  findActiveManualInvoice,
   toBillingCenterPendingInvoice,
   toBillingHistoryRow,
 } from "@/application/use-cases/billing/billing-center-view";
@@ -27,10 +28,8 @@ export async function GET() {
     await persistDeviceSessionCookie(snapshot.currentSessionId);
 
     const now = new Date();
-    const [rawPendingInvoice, history] = await Promise.all([
-      deps.invoiceRepository.findLatestPendingForUser(actor.userId, now),
-      deps.invoiceRepository.listByUserId(actor.userId),
-    ]);
+    const history = await deps.invoiceRepository.listByUserId(actor.userId);
+    const rawPendingInvoice = findActiveManualInvoice(history, now);
     const config = manualPaymentConfig();
 
     return NextResponse.json({

@@ -2,6 +2,7 @@ import { getPlanDefinition } from "@/domain/constants/subscription-plans";
 import {
   BILLING_PROVIDER_MANUAL_BANK_TRANSFER,
   BILLING_PROVIDER_MANUAL_QR,
+  InvoiceStatus,
 } from "@/domain/enums";
 import type { Invoice } from "@/domain/entities/invoice";
 import type { ManualPaymentConfig } from "@/infrastructure/billing/manual/manual-payment-config";
@@ -85,6 +86,33 @@ export function toBillingCenterPendingInvoice(
     shortUrl: invoice.shortUrl,
     deeplinks: invoice.deeplinks,
   };
+}
+
+/**
+ * Finds the invoice the Billing Center should treat as "still in flight" --
+ * unlike invoiceRepository.findLatestPendingForUser (PENDING-only, by
+ * design: create-manual-checkout.ts must never let a fresh checkout reuse
+ * an invoice already claimed and sitting with an admin), the Billing
+ * Center's own "pending payment" card must keep showing an invoice through
+ * AWAITING_VERIFICATION too, or a user who already claimed their payment
+ * sees the page silently forget it and offer to pick a plan again on their
+ * next visit. AWAITING_VERIFICATION invoices are never treated as expired
+ * here -- they are in the admin's hands, not the customer's, once claimed.
+ */
+export function findActiveManualInvoice(
+  invoices: readonly Invoice[],
+  now: Date,
+): Invoice | null {
+  const candidates = invoices.filter((invoice) => {
+    if (invoice.bookingId || !invoice.providerInvoiceId) return false;
+    if (invoice.status === InvoiceStatus.AWAITING_VERIFICATION) return true;
+    if (invoice.status === InvoiceStatus.PENDING) {
+      return invoice.expiresAt.getTime() > now.getTime();
+    }
+    return false;
+  });
+  candidates.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  return candidates[0] ?? null;
 }
 
 export function toBillingHistoryRow(invoice: Invoice): BillingHistoryRow {

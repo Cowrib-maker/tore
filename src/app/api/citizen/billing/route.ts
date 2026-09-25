@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { requireActor } from "@/application/common/require-actor";
 import { getLegalQuestionEntitlementSnapshot } from "@/application/legal-ai/legal-question-access";
 import {
+  findActiveManualInvoice,
   toBillingCenterPendingInvoice,
   toBillingHistoryRow,
 } from "@/application/use-cases/billing/billing-center-view";
@@ -30,7 +31,7 @@ export async function GET() {
     const actor = await requireActor(UserRole.CLIENT);
     const now = new Date();
 
-    const [snapshot, pendingInvoice, history] = await Promise.all([
+    const [snapshot, invoices] = await Promise.all([
       getLegalQuestionEntitlementSnapshot(
         { kind: "user", userId: actor.userId, role: actor.role },
         {
@@ -42,9 +43,9 @@ export async function GET() {
           userRepository,
         },
       ),
-      invoiceRepository.findLatestPendingForUser(actor.userId, now),
       invoiceRepository.listByUserId(actor.userId),
     ]);
+    const pendingInvoice = findActiveManualInvoice(invoices, now);
 
     const config = manualPaymentConfig();
     return NextResponse.json({
@@ -63,7 +64,7 @@ export async function GET() {
       pendingInvoice: pendingInvoice
         ? toBillingCenterPendingInvoice(pendingInvoice, config)
         : null,
-      history: history.map(toBillingHistoryRow),
+      history: invoices.map(toBillingHistoryRow),
     });
   } catch (error) {
     return billingApiErrorResponse(error);

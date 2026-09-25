@@ -92,7 +92,7 @@ function workspaceNavItems(
     { key: "court", icon: Scale, label: copy.moduleCourtPractice, comingSoonLabel: copy.comingSoonTag },
     { key: "team", icon: Users2, label: copy.moduleTeam, comingSoonLabel: copy.comingSoonTag },
     { key: "knowledge", icon: BookOpen, label: copy.moduleKnowledge, comingSoonLabel: copy.comingSoonTag },
-    { key: "billing", icon: Wallet, label: copy.moduleBilling, comingSoonLabel: copy.comingSoonTag },
+    { key: "billing", icon: Wallet, label: copy.moduleBilling, href: "/billing" },
     { key: "reports", icon: BarChart3, label: copy.moduleReports, comingSoonLabel: copy.comingSoonTag },
   ];
 }
@@ -156,14 +156,12 @@ export default async function OrganizationOverviewPage({
               <p className="mt-2 text-[12px] leading-5 text-[#5C6570]">
                 {copy.planCardDescription}
               </p>
-              <button
-                type="button"
-                disabled
-                title={copy.comingSoonTag}
-                className="mt-3 flex h-8 w-full cursor-not-allowed items-center justify-center rounded-lg bg-[#0B1F3A]/40 text-[12px] font-semibold text-white/80"
+              <Link
+                href="/billing"
+                className="mt-3 flex h-8 w-full items-center justify-center rounded-lg bg-[#0B1F3A] text-[12px] font-semibold text-white transition hover:bg-[#16365F]"
               >
                 {copy.planCardCta}
-              </button>
+              </Link>
             </div>
           }
         />

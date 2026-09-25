@@ -713,8 +713,8 @@ export const ko: Dictionary = {
     quickActionReportsDesc: "사건 진행 상황, 업무량, 재무 보고서",
     planCardEyebrow: "요금제",
     planCardTitle: "조직 요금제",
-    planCardDescription: "팀의 업무를 더 효율적으로 만들어보세요.",
-    planCardCta: "요금제 관리",
+    planCardDescription: "기관용 요금제는 준비 중입니다. 지금은 본인의 개인 요금제를 여기서 확인하세요.",
+    planCardCta: "요금제 보기",
   },
   activeContext: {
     label: "활성 컨텍스트",

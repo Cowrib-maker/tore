@@ -707,8 +707,8 @@ export const zh: Dictionary = {
     quickActionReportsDesc: "案件进度、工作量、财务报表",
     planCardEyebrow: "套餐",
     planCardTitle: "组织套餐",
-    planCardDescription: "让团队工作更高效。",
-    planCardCta: "管理套餐",
+    planCardDescription: "机构套餐即将推出。目前可在此查看您的个人套餐。",
+    planCardCta: "查看套餐",
   },
   activeContext: {
     label: "当前工作上下文",

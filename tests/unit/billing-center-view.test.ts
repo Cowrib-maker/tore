@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  findActiveManualInvoice,
   toBillingCenterPendingInvoice,
   toBillingHistoryRow,
 } from "@/application/use-cases/billing/billing-center-view";
@@ -109,5 +110,53 @@ describe("toBillingHistoryRow", () => {
   it("keeps planName null for an invoice with no planCode rather than guessing", () => {
     const row = toBillingHistoryRow(baseInvoice({ planCode: null }));
     expect(row.planName).toBeNull();
+  });
+});
+
+describe("findActiveManualInvoice", () => {
+  const now = new Date("2026-01-01T12:00:00.000Z");
+
+  it("keeps surfacing an AWAITING_VERIFICATION invoice even after its original expiresAt has passed", () => {
+    const claimed = baseInvoice({
+      id: "inv_claimed",
+      status: InvoiceStatus.AWAITING_VERIFICATION,
+      expiresAt: new Date("2026-01-01T00:00:00.000Z"), // already in the past relative to `now`
+    });
+    expect(findActiveManualInvoice([claimed], now)?.id).toBe("inv_claimed");
+  });
+
+  it("excludes an expired PENDING (never claimed) invoice", () => {
+    const expired = baseInvoice({
+      id: "inv_expired",
+      status: InvoiceStatus.PENDING,
+      expiresAt: new Date("2026-01-01T00:00:00.000Z"),
+    });
+    expect(findActiveManualInvoice([expired], now)).toBeNull();
+  });
+
+  it("prefers the most recently created active invoice", () => {
+    const older = baseInvoice({
+      id: "inv_older",
+      status: InvoiceStatus.PENDING,
+      createdAt: new Date("2025-12-01T00:00:00.000Z"),
+      expiresAt: new Date("2026-06-01T00:00:00.000Z"),
+    });
+    const newer = baseInvoice({
+      id: "inv_newer",
+      status: InvoiceStatus.AWAITING_VERIFICATION,
+      createdAt: new Date("2025-12-31T00:00:00.000Z"),
+      expiresAt: new Date("2026-01-01T00:00:00.000Z"),
+    });
+    expect(findActiveManualInvoice([older, newer], now)?.id).toBe("inv_newer");
+  });
+
+  it("ignores PAID/FAILED/EXPIRED/CANCELLED invoices", () => {
+    const terminal = [
+      InvoiceStatus.PAID,
+      InvoiceStatus.FAILED,
+      InvoiceStatus.EXPIRED,
+      InvoiceStatus.CANCELLED,
+    ].map((status, i) => baseInvoice({ id: `inv_${i}`, status }));
+    expect(findActiveManualInvoice(terminal, now)).toBeNull();
   });
 });
