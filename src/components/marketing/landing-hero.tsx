@@ -46,18 +46,25 @@ export function LandingHero({
       id="chat"
       className="relative isolate overflow-hidden scroll-mt-24 border-b border-[#0B1F3A]/8 bg-[#F7F8FB]"
     >
-      {/* Compact decorative band for mobile/tablet -- replaced by the
-          contained right-column panel below at lg+. The two never render
-          at the same time, so there is never a doubled/overlapping visual. */}
-      <div aria-hidden className="relative h-[200px] overflow-hidden sm:h-[260px] lg:hidden">
+      {/* One full-bleed atmospheric scene -- a top band on mobile/tablet,
+          the entire section on desktop -- never a boxed card next to the
+          text. The scrim below is a soft gradient blend, not a hard edge,
+          so the whole hero reads as one scene rather than "text card +
+          illustration card". */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[280px] overflow-hidden sm:h-[360px] lg:inset-0 lg:h-auto"
+      >
         <LandingHeroScene className="size-full" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_50%,#F7F8FB_100%)]" />
       </div>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[280px] bg-[linear-gradient(180deg,transparent_45%,#F7F8FB_96%)] sm:h-[360px] lg:inset-0 lg:h-auto lg:bg-[linear-gradient(100deg,#F7F8FB_0%,#F7F8FB_38%,rgba(247,248,251,0.82)_54%,rgba(247,248,251,0.25)_72%,transparent_86%)]"
+      />
 
-      <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-16">
-        <div className="py-10 sm:py-14 lg:grid lg:min-h-[720px] lg:grid-cols-[minmax(0,60%)_minmax(0,40%)] lg:items-center lg:gap-8 lg:py-24 xl:gap-12">
-          {/* LEFT -- product/message */}
-          <div>
+      <div className="relative mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-16">
+        <div className="py-10 sm:py-14 lg:flex lg:min-h-[760px] lg:items-center lg:py-24">
+          <div className="lg:max-w-[56%]">
             <LandingReveal>
               <p className="text-[13px] font-semibold tracking-[0.24em] text-[#5C6570] uppercase sm:text-sm">
                 {home.brandLine}
@@ -83,7 +90,7 @@ export function LandingHero({
               </p>
             </LandingReveal>
 
-            <div className="mt-8 max-w-[860px]">
+            <div className="mt-8 max-w-[900px]">
               <HeroLegalAiComposer
                 placeholder={home.chatPlaceholder}
                 submitLabel={home.chatSubmit}
@@ -95,7 +102,7 @@ export function LandingHero({
             </div>
 
             {statEntries.length > 0 ? (
-              <div className="mt-10 flex max-w-[860px] flex-wrap gap-x-10 gap-y-4 border-t border-[#0B1F3A]/10 pt-6">
+              <div className="mt-10 flex max-w-[900px] flex-wrap gap-x-10 gap-y-4 border-t border-[#0B1F3A]/10 pt-6">
                 {statEntries.map((entry) => (
                   <div key={entry.label}>
                     <p className="text-2xl font-semibold tracking-tight text-[#0B1F3A] sm:text-[1.75rem]">
@@ -106,12 +113,6 @@ export function LandingHero({
                 ))}
               </div>
             ) : null}
-          </div>
-
-          {/* RIGHT -- institutional legal visual, contained and framed --
-              a deliberate panel, not a full-bleed background wash. */}
-          <div className="relative mt-12 hidden aspect-[4/5] overflow-hidden rounded-[2rem] border border-[#0B1F3A]/10 shadow-[0_35px_70px_-35px_rgba(11,31,58,0.35)] lg:mt-0 lg:block">
-            <LandingHeroScene className="size-full" />
           </div>
         </div>
       </div>

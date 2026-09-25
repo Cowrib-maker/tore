@@ -5,6 +5,7 @@ import { logoutAction } from "@/application/actions/auth.actions";
 import { BRAND_LOGO_LANDING } from "@/components/brand/tokens";
 import { BrandLink } from "@/components/layout/brand-link";
 import type { LandingAuthUser } from "@/components/marketing/landing-nav";
+import { TORE_LEGAL_ENTITY_NAME } from "@/domain/constants/site-identity";
 import type { Dictionary } from "@/i18n/types";
 
 export function LandingFooter({
@@ -64,7 +65,7 @@ export function LandingFooter({
         </div>
         <div className="mt-10 flex flex-col gap-2 border-t border-[#0B1F3A]/8 pt-6 text-xs text-[#5C6570] sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {year} {dict.common.brand}. {t.footerRights}
+            © {year} {TORE_LEGAL_ENTITY_NAME}. {t.footerRights}
           </p>
           <p>{t.footerBuilt}</p>
         </div>

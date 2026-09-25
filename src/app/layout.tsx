@@ -12,6 +12,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getHtmlLang, getLocale } from "@/i18n/get-locale";
 import { localeMeta } from "@/i18n/config";
+import { getAppUrl } from "@/lib/app-url";
 import { env } from "@/lib/env";
 
 import "./globals.css";
@@ -32,7 +33,14 @@ const geistMono = Geist_Mono({
 
 export async function generateMetadata(): Promise<Metadata> {
   const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
-  const base = env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
+  // Canonical origin for metadataBase/og:url/social images -- routed through
+  // getAppUrl() (not the raw env var) so this stays the one place that
+  // enforces "never a localhost/http URL in production" (see app-url.ts).
+  // NOTE: this alone does not fix a misconfigured NEXT_PUBLIC_APP_URL if
+  // TORE_ALLOW_INSECURE_URLS is set -- that flag intentionally bypasses the
+  // check on both paths. The actual fix for stale localhost social-share
+  // URLs is setting NEXT_PUBLIC_APP_URL=https://www.tore.mn in production.
+  const base = getAppUrl().replace(/\/$/, "");
   const appName = env.NEXT_PUBLIC_APP_NAME || "TORE";
 
   return {

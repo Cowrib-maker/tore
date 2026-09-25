@@ -29,6 +29,7 @@ export default async function TermsOfServicePage() {
           <CardTitle>{copy.termsTitle}</CardTitle>
           <CardDescription>{doc.effectiveDate}</CardDescription>
           <CardDescription>{doc.disclaimer}</CardDescription>
+          <CardDescription>{copy.legalEntityNotice}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-8 text-sm leading-relaxed text-muted-foreground">
           {doc.chapters.map((chapter, chapterIndex) => (

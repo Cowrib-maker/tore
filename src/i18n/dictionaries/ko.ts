@@ -464,6 +464,7 @@ export const ko: Dictionary = {
     privacyTitle: "개인정보 처리방침",
     placeholderBanner:
       "시행일: 2026년 8월 31일. TORE는 법률사무소가 아니며 전문 법률 자문을 제공하지 않습니다.",
+    legalEntityNotice: "이 플랫폼은 ТОРЕ ТЕХНОЛОЖИ ХХК(TORE Technology LLC)가 운영합니다.",
     termsDocument: {
       effectiveDate: "시행일: 2026년 9월 9일.",
       disclaimer: "TORE는 법무법인이 아니며, TORE Chat 및 TORE Legal AI의 결과물은 전문적인 법률 자문이나 법률 대리가 아닙니다.",

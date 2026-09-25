@@ -525,6 +525,7 @@ export const en: Dictionary = {
     privacyTitle: "Privacy Policy",
     placeholderBanner:
       "Effective 31 August 2026. TORE is not a law firm and does not provide professional legal advice.",
+    legalEntityNotice: "This platform is operated by ТОРЕ ТЕХНОЛОЖИ ХХК (TORE Technology LLC).",
     termsDocument: {
       effectiveDate: "Effective: September 9, 2026.",
       disclaimer: "TORE is not a law firm, and output from TORE Chat and TORE Legal AI is not professional legal advice or legal representation.",

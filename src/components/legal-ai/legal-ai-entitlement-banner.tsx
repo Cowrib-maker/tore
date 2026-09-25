@@ -17,7 +17,24 @@ export type LegalAiEntitlementView = {
   expiryWarningLabel?: string | null;
 };
 
-export function LegalAiEntitlementBanner() {
+export function LegalAiEntitlementBanner({
+  hideForAudiences,
+}: {
+  /**
+   * Audiences this instance should render nothing for. Used only by the
+   * public marketing-page composer: an authenticated paid_citizen/lawyer
+   * (including the platform-demo "TORE Founder (demo)" account, which
+   * resolves to exactly these audiences) is already past the anonymous
+   * marketing experience and belongs in their real dashboard/`/legal-ai`,
+   * not the public hero -- so a normal anonymous visitor is architecturally
+   * guaranteed to never see this state (isPlatformDemoEmail requires a real
+   * authenticated session), and an authenticated tester checking the public
+   * page sees the same generic experience a real visitor would. The
+   * `/legal-ai` page itself never passes this prop, so its behavior for
+   * every audience (including the legitimate demo account) is unchanged.
+   */
+  hideForAudiences?: LegalAiEntitlementView["audience"][];
+}) {
   const [view, setView] = useState<LegalAiEntitlementView | null>(null);
 
   useEffect(() => {
@@ -39,6 +56,9 @@ export function LegalAiEntitlementBanner() {
   }, []);
 
   if (!view) {
+    return null;
+  }
+  if (hideForAudiences?.includes(view.audience)) {
     return null;
   }
 

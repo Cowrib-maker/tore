@@ -1,17 +1,23 @@
 /**
  * Institutional visual for the right-hand hero panel: sky, a distant
- * mountain/steppe horizon, and a large stylized institutional building
- * (colonnade + a scales-of-justice emblem on the facade), composed on a
- * TALL (portrait-leaning) canvas so it reads correctly inside the hero's
- * right column instead of being cropped from a wide landscape scene.
+ * mountain/steppe horizon, and a modern glass-and-stone institutional
+ * tower with a scales-of-justice medallion set into its facade.
+ *
+ * Earlier version used a row of thin repeated vertical bars (a colonnade)
+ * that, once scaled up, read as prison bars / a cell / metal grilles --
+ * the wrong metaphor entirely for a legal-tech product. This version
+ * deliberately avoids ANY repeated thin vertical elements: the tower is a
+ * solid tapered mass with a few WIDE horizontal glass bands (curtain-wall
+ * architecture, the way a modern courthouse or ministry building actually
+ * reads), and the justice symbol is a single contained medallion rather
+ * than free-floating linework.
  *
  * No licensed photograph of a real building exists in this repository, and
  * none is fetched from the network (the repo was searched first -- only
- * brand marks and the QPay QR code exist under public/). This is therefore
- * a deliberately stylized illustration, not a photograph, and it does not
- * depict or claim to depict any actual building -- it is purely decorative
- * (aria-hidden), matching the composition of the supplied reference without
- * fabricating a claim of real photography.
+ * brand marks and the QPay QR code exist under public/). This remains a
+ * deliberately stylized illustration, not a photograph, and does not
+ * depict or claim to depict any actual building -- purely decorative
+ * (aria-hidden).
  */
 export function LandingHeroScene({ className }: { className?: string }) {
   return (
@@ -32,13 +38,18 @@ export function LandingHeroScene({ className }: { className?: string }) {
           <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.5" />
           <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
         </radialGradient>
-        <linearGradient id="hero-building" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#F7F9FE" />
-          <stop offset="100%" stopColor="#CBDAF0" />
+        <linearGradient id="tower-face" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#EAF0FB" />
+          <stop offset="55%" stopColor="#CBDAF0" />
+          <stop offset="100%" stopColor="#9FB6DC" />
         </linearGradient>
-        <linearGradient id="hero-building-shadow" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="tower-side" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#8098C2" />
           <stop offset="100%" stopColor="#5A719E" />
+        </linearGradient>
+        <linearGradient id="glass-band" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.08" />
         </linearGradient>
       </defs>
 
@@ -57,29 +68,39 @@ export function LandingHeroScene({ className }: { className?: string }) {
         opacity="0.28"
       />
 
-      {/* Institutional building -- large, centered, grounded near the base */}
-      <g transform="translate(150,330)">
-        {/* wings */}
-        <rect x="-40" y="260" width="150" height="410" fill="url(#hero-building-shadow)" />
-        <rect x="490" y="230" width="170" height="440" fill="url(#hero-building-shadow)" />
-        {/* main block */}
-        <rect x="100" y="140" width="400" height="530" fill="url(#hero-building)" />
-        {/* pediment */}
-        <path d="M100,140 L300,20 L500,140 Z" fill="url(#hero-building)" />
-        {/* columns */}
-        {[130, 178, 226, 274, 322, 370, 418, 462].map((x) => (
-          <rect key={x} x={x} y="175" width="18" height="460" fill="#DEE8F9" />
+      {/* Institutional tower -- one solid mass, wide horizontal glass bands,
+          no repeated thin vertical elements anywhere. */}
+      <g transform="translate(190,260)">
+        {/* low annex wing, grounds the tower against the skyline */}
+        <rect x="-70" y="480" width="180" height="330" fill="url(#tower-side)" />
+        <rect x="410" y="440" width="200" height="370" fill="url(#tower-side)" />
+
+        {/* main tower mass, gently tapered */}
+        <path
+          d="M40,810 L20,120 L300,20 L580,120 L560,810 Z"
+          fill="url(#tower-face)"
+        />
+        {/* shaded return face for depth */}
+        <path d="M560,810 L580,120 L620,140 L600,810 Z" fill="url(#tower-side)" />
+
+        {/* wide horizontal glass bands (curtain-wall floors) */}
+        {[170, 260, 350, 440, 530, 620, 710].map((y) => (
+          <rect key={y} x="55" y={y} width="480" height="46" fill="url(#glass-band)" />
         ))}
-        {/* steps */}
-        <rect x="70" y="670" width="460" height="18" fill="#B9C9E8" />
-        <rect x="48" y="688" width="504" height="18" fill="#A6B9DE" />
-        {/* scales-of-justice emblem on the facade */}
-        <g transform="translate(300,190)" stroke="#8098C2" strokeWidth="5" fill="none" strokeLinecap="round">
-          <line x1="0" y1="0" x2="0" y2="58" />
-          <line x1="-42" y1="13" x2="42" y2="13" />
-          <path d="M-42,13 L-62,52 A22,15 0 0 0 -22,52 Z" />
-          <path d="M42,13 L22,52 A22,15 0 0 0 62,52 Z" />
-          <circle cx="0" cy="7" r="7" fill="#8098C2" stroke="none" />
+
+        {/* base plinth / steps */}
+        <rect x="10" y="800" width="600" height="20" fill="#B9C9E8" />
+        <rect x="-15" y="820" width="650" height="18" fill="#A6B9DE" />
+
+        {/* scales-of-justice medallion set into the facade as one contained emblem */}
+        <circle cx="300" cy="330" r="74" fill="#F4F8FE" opacity="0.9" />
+        <circle cx="300" cy="330" r="74" fill="none" stroke="#8098C2" strokeWidth="4" />
+        <g transform="translate(300,330)" stroke="#5A719E" strokeWidth="5" fill="none" strokeLinecap="round">
+          <line x1="0" y1="-28" x2="0" y2="26" />
+          <line x1="-34" y1="-12" x2="34" y2="-12" />
+          <path d="M-34,-12 L-50,20 A18,12 0 0 0 -18,20 Z" />
+          <path d="M34,-12 L18,20 A18,12 0 0 0 50,20 Z" />
+          <circle cx="0" cy="-18" r="6" fill="#5A719E" stroke="none" />
         </g>
       </g>
 

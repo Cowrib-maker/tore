@@ -289,6 +289,8 @@ export type Dictionary = {
     termsTitle: string;
     privacyTitle: string;
     placeholderBanner: string;
+    /** Names the actual operating legal entity -- shown on both Terms and Privacy. */
+    legalEntityNotice: string;
     termsDocument: {
       effectiveDate: string;
       disclaimer: string;

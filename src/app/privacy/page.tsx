@@ -27,6 +27,7 @@ export default async function PrivacyPolicyPage() {
         <CardHeader>
           <CardTitle>{copy.privacyTitle}</CardTitle>
           <CardDescription>{copy.placeholderBanner}</CardDescription>
+          <CardDescription>{copy.legalEntityNotice}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 text-sm leading-relaxed text-muted-foreground">
           <p>{copy.privacyIntro}</p>

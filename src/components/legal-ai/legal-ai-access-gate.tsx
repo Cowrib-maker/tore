@@ -32,7 +32,11 @@ type CitizenPlanCode = "CITIZEN_BASIC" | "CITIZEN_PLUS";
 const METHOD_OPTIONS: Array<{ value: LegalAiCheckoutMethod; label: string; hint: string }> = [
   { value: "QR", label: "QR кодоор төлөх", hint: "Банкны апп-аар уншуулж төлнө." },
   { value: "BANK_TRANSFER", label: "Дансаар шилжүүлэх", hint: "Дансны дугаар руу шилжүүлнэ." },
-  { value: "QPAY", label: "QPay / банкны апп", hint: "QR эсвэл холбоосоор шууд төлнө." },
+  {
+    value: "QPAY",
+    label: "QPay / банкны апп",
+    hint: "Одоогоор тохируулаагүй — QR код эсвэл дансаар төлнө үү.",
+  },
 ];
 
 export function LegalAiAccessGateCard({

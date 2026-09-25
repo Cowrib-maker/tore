@@ -5,6 +5,7 @@ import { useActionState } from "react";
 
 import { registerLawyerAction } from "@/application/actions/auth.actions";
 import type { ActionState } from "@/application/common/action-state";
+import { RegistrationConsent } from "@/components/auth/registration-consent";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -148,32 +149,12 @@ export function RegisterLawyerForm({
               ))}
             </NativeSelect>
           </div>
-          <div className="flex items-start gap-2">
-            <input
-              id="acceptTerms"
-              name="acceptTerms"
-              type="checkbox"
-              required
-              className="mt-1 size-4 rounded border-input"
-            />
-            <Label htmlFor="acceptTerms" className="text-sm font-normal leading-snug">
-              {copy.acceptTermsLead}{" "}
-              <Link
-                href="/terms"
-                className="text-primary underline-offset-4 hover:underline"
-              >
-                {copy.termsOfService}
-              </Link>
-              {", "}
-              <Link
-                href="/privacy"
-                className="text-primary underline-offset-4 hover:underline"
-              >
-                {copy.privacyPolicy}
-              </Link>
-              {copy.acceptTermsTrail}
-            </Label>
-          </div>
+          <RegistrationConsent
+            lead={copy.acceptTermsLead}
+            termsLabel={copy.termsOfService}
+            privacyLabel={copy.privacyPolicy}
+            trail={copy.acceptTermsTrail}
+          />
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button type="submit" className="w-full" disabled={pending}>

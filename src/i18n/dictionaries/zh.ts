@@ -458,6 +458,7 @@ export const zh: Dictionary = {
     privacyTitle: "隐私政策",
     placeholderBanner:
       "生效日期：2026 年 8 月 31 日。TORE 不是律师事务所，不提供专业法律意见。",
+    legalEntityNotice: "本平台由 ТОРЕ ТЕХНОЛОЖИ ХХК（TORE Technology LLC）运营。",
     termsDocument: {
       effectiveDate: "生效日期：2026年9月9日。",
       disclaimer: "TORE 不是律师事务所，TORE Chat 和 TORE Legal AI 的输出内容不构成专业法律意见或法律代理。",

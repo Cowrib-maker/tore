@@ -52,7 +52,7 @@ export function HeroLegalAiComposer({
 
   return (
     <div className="w-full space-y-3">
-      <LegalAiEntitlementBanner />
+      <LegalAiEntitlementBanner hideForAudiences={["paid_citizen", "lawyer"]} />
       {messages.length > 0 ? (
         <div
           ref={transcriptRef}
