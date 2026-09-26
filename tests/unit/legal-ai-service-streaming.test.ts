@@ -244,12 +244,15 @@ describe("LegalAiService — streaming", () => {
     const { service } = createService({ completion: streaming });
 
     const deltas: string[] = [];
-    // A vague, ambiguous first message triggers the clarification path,
-    // not the main legal-answer path — deliberately non-streaming (see
-    // legal-ai.service.ts's comment on why).
+    // A first-person, POSSIBLY_LEGAL narrative ("my boss fired me") triggers
+    // the citizen-intake clarification path, not the main legal-answer
+    // path — deliberately non-streaming (see legal-ai.service.ts's comment
+    // on why). Note this is unrelated to (and unaffected by) NON_LEGAL
+    // questions now getting a real, streamed general answer instead of a
+    // refusal — clarification is a different, still-non-streaming path.
     await service.createTurn({
       userId: "user-1",
-      message: "туслаач",
+      message: "Манай дарга намайг ажлаас гаргасан",
       onDelta: (d) => deltas.push(d),
     });
 

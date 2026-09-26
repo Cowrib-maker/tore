@@ -130,7 +130,11 @@ describe("LegalAiService", () => {
     expect(request?.graphNeighbors).toEqual([]);
   });
 
-  it("refuses a non-legal question without calling OpenAI or the legal corpus", async () => {
+  it("answers a non-legal question for real instead of refusing, without touching the legal corpus", async () => {
+    // LegalRelevance is routing, not a hard access gate: a NON_LEGAL
+    // question from an otherwise-unrestricted subject (the default fixture
+    // access, same as a fresh free user who still has their question
+    // reserved) gets a genuine AI answer, not the old scripted refusal.
     const reasoning = createReasoningEngine();
     const prepare = vi.spyOn(reasoning, "prepare");
     const { service, store, completion, corpusRetriever, intent } = createService({
@@ -144,20 +148,24 @@ describe("LegalAiService", () => {
     });
 
     expect(result.turnKind).toBe(PromptTurnKind.GENERAL);
-    expect(result.message.content).toBe(NON_LEGAL_REFUSAL_MESSAGE);
-    expect(result.usage).toEqual({ inputTokens: 0, outputTokens: 0 });
+    expect(result.message.content).not.toBe(NON_LEGAL_REFUSAL_MESSAGE);
+    expect(result.message.content).toBe("mocked-answer");
+    expect(result.usage).toEqual({ inputTokens: 11, outputTokens: 7 });
     expect(store.conversations.size).toBe(1);
     expect(store.userMessages).toEqual(["Elon Musk хэдэн хүүхэдтэй вэ?"]);
-    expect(store.assistantMessages).toEqual([NON_LEGAL_REFUSAL_MESSAGE]);
-    expect(store.usageCount).toBe(0);
+    expect(store.assistantMessages).toEqual(["mocked-answer"]);
+    expect(store.usageCount).toBe(1);
+    // The legal pipeline (intent classification, reasoning, corpus lookup)
+    // is still never invoked for a non-legal turn — only the general-answer
+    // path runs.
     expect(classify).not.toHaveBeenCalled();
     expect(prepare).not.toHaveBeenCalled();
-    expect(completion.complete).not.toHaveBeenCalled();
+    expect(completion.complete).toHaveBeenCalledOnce();
     expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
     expect(corpusRetriever.verifyCitation).not.toHaveBeenCalled();
   });
 
-  it("answers a paid citizen general question without consuming a legal question", async () => {
+  it("answers a paid citizen general question, consuming the entitlement but not the legal-question audit count", async () => {
     const consumeNewLegalQuestion = vi.fn();
     const { service, store, completion, corpusRetriever } = createService({
       legalQuestionAccess: paidLegalQuestionAccess({
@@ -179,7 +187,10 @@ describe("LegalAiService", () => {
     expect(systemPrompt).toContain("ердийн");
     expect(systemPrompt).not.toContain("хууль зүйн мэдээллийн асуулт");
     expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
-    expect(consumeNewLegalQuestion).not.toHaveBeenCalled();
+    // A non-legal turn is still a topic-blind consumer of the one-question
+    // entitlement (see threadReservesEntitlement) — it just never bumps the
+    // legal-question-specific billedQuestionCount audit field below.
+    expect(consumeNewLegalQuestion).toHaveBeenCalledOnce();
     expect(
       [...store.conversations.values()].every(
         (row) => row.billedQuestionCount === 0,
@@ -231,7 +242,7 @@ describe("LegalAiService", () => {
     expect(completion.complete).not.toHaveBeenCalled();
   });
 
-  it("still refuses a guest general question", async () => {
+  it("answers a guest's general question the same as a paid or free citizen's", async () => {
     const { service, completion } = createService();
 
     const result = await service.createTurn({
@@ -239,8 +250,9 @@ describe("LegalAiService", () => {
       message: "Elon Musk гэж хэн бэ?",
     });
 
-    expect(result.message.content).toBe(NON_LEGAL_REFUSAL_MESSAGE);
-    expect(completion.complete).not.toHaveBeenCalled();
+    expect(result.message.content).not.toBe(NON_LEGAL_REFUSAL_MESSAGE);
+    expect(result.message.content).toBe("mocked-answer");
+    expect(completion.complete).toHaveBeenCalledOnce();
   });
 
   it("treats an ambiguous legal question as clarification, not a firm conclusion", async () => {
@@ -327,19 +339,26 @@ describe("LegalAiService", () => {
     expect(completion.complete).not.toHaveBeenCalled();
   });
 
-  it("still refuses non-legal questions when OpenAI is not configured", async () => {
+  it("returns 503 for a non-legal question when OpenAI is not configured, same as a legal one", async () => {
+    // Every relevance outcome now reaches the model, so "not configured"
+    // must fail the same honest way regardless of topic — no more silent
+    // scripted answer for one category and a hard error for another.
     const { service, store, completion } = createService({
       completion: createCompletion(undefined, false),
     });
 
-    const result = await service.createTurn({
-      userId: "user-1",
-      message: "Elon Musk хэдэн хүүхэдтэй вэ?",
+    await expect(
+      service.createTurn({
+        userId: "user-1",
+        message: "Elon Musk хэдэн хүүхэдтэй вэ?",
+      }),
+    ).rejects.toMatchObject({
+      statusCode: 503,
+      code: "AI_NOT_CONFIGURED",
     });
-
-    expect(result.message.content).toBe(NON_LEGAL_REFUSAL_MESSAGE);
     expect(completion.complete).not.toHaveBeenCalled();
-    expect(store.userMessages).toEqual(["Elon Musk хэдэн хүүхэдтэй вэ?"]);
+    expect(store.conversations.size).toBe(0);
+    expect(store.userMessages).toEqual([]);
   });
 
   it("surfaces a controlled provider failure without calling further persistence of usage", async () => {
@@ -949,7 +968,7 @@ describe("LegalAiService", () => {
     expect(completion.complete).toHaveBeenCalled();
   });
 
-  it("still refuses a movie question as NON_LEGAL", async () => {
+  it("still classifies a movie question as NON_LEGAL, but now answers it instead of refusing", async () => {
     const { service, completion, corpusRetriever } = createService();
 
     const result = await service.createTurn({
@@ -958,8 +977,9 @@ describe("LegalAiService", () => {
     });
 
     expect(result.turnKind).toBe(PromptTurnKind.GENERAL);
-    expect(result.message.content).toBe(NON_LEGAL_REFUSAL_MESSAGE);
-    expect(completion.complete).not.toHaveBeenCalled();
+    expect(result.message.content).not.toBe(NON_LEGAL_REFUSAL_MESSAGE);
+    expect(result.message.content).toBe("mocked-answer");
+    expect(completion.complete).toHaveBeenCalledOnce();
     expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
   });
 

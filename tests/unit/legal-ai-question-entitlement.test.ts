@@ -294,7 +294,52 @@ describe("LegalAiService question threads", () => {
     expect(used.count).toBe(1);
   });
 
-  it("does not consume the guest free question on NON_LEGAL", async () => {
+  it("consumes the guest free question on NON_LEGAL and answers it for real", async () => {
+    const store = createStore();
+    const used = { count: 0 };
+    const access = createLegalQuestionAccess({
+      guestSessions: {
+        getById: async () => ({
+          id: "guest-1",
+          freeLegalQuestionsUsed: used.count,
+          expiresAt: new Date(Date.now() + 86_400_000),
+        }),
+        incrementFreeLegalQuestionsUsed: async () => {
+          used.count += 1;
+        },
+        tryConsumeFreeLegalQuestion: async (_id, limit) => {
+          if (used.count >= limit) return false;
+          used.count += 1;
+          return true;
+        },
+        releaseFreeLegalQuestion: async () => {
+          if (used.count > 0) used.count -= 1;
+        },
+      },
+      conversations: store,
+      subscriptionRepository: new InMemorySubscriptionRepository(),
+      entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+      unpaidCitizenUsage: new InMemoryUnpaidCitizenLegalQuestionUsageRepository(),
+    });
+    const result = await createService(
+      store,
+      relevance(LegalRelevance.NON_LEGAL),
+      access,
+    ).createTurn({
+      guestSessionId: "guest-1",
+      message: "Хамгийн амттай буузны жор ямар вэ?",
+    });
+    // Topic-blind: a non-legal question still consumes the one free
+    // question, and gets a real answer instead of a scripted refusal.
+    expect(used.count).toBe(1);
+    expect(result.message.content).toBe("Хууль зүйн хариу");
+    expect(result.message.citations).toEqual([]);
+    // Still never bumps the legal-question-specific audit counter — that
+    // field is scoped to actual legal questions, unchanged from before.
+    expect([...store.conversations.values()][0]?.billedQuestionCount).toBe(0);
+  });
+
+  it("requires billing for a guest's second question after their free NON_LEGAL question", async () => {
     const store = createStore();
     const used = { count: 0 };
     const access = createLegalQuestionAccess({
@@ -329,8 +374,25 @@ describe("LegalAiService question threads", () => {
       guestSessionId: "guest-1",
       message: "Хамгийн амттай буузны жор ямар вэ?",
     });
-    expect(used.count).toBe(0);
-    expect([...store.conversations.values()][0]?.billedQuestionCount).toBe(0);
+    expect(used.count).toBe(1);
+
+    const failingCompletion: LegalAiCompletionPort = {
+      isConfigured: () => true,
+      complete: async () => {
+        throw new Error("must not be called — entitlement should block first");
+      },
+    };
+    await expect(
+      createService(
+        store,
+        relevance(LegalRelevance.NON_LEGAL),
+        access,
+        failingCompletion,
+      ).createTurn({
+        guestSessionId: "guest-1",
+        message: "Дахиад нэг асуулт байна.",
+      }),
+    ).rejects.toMatchObject({ code: "AUTHENTICATION_REQUIRED", statusCode: 401 });
   });
 
   it("requires authentication for a guest new question after ANSWERED", async () => {
@@ -612,6 +674,55 @@ describe("LegalAiService question threads", () => {
     );
     await expect(
       createService(store, relevance(LegalRelevance.LEGAL), access).createTurn({
+        userId: "client-1",
+        actorRole: UserRole.CLIENT,
+        message: "Гэрээний заалт ойлгомжгүй байна.",
+      }),
+    ).rejects.toMatchObject({ code: "BILLING_REQUIRED", statusCode: 402 });
+  });
+
+  it("an unpaid citizen's first free question can be NON_LEGAL, and their second still requires billing without calling OpenAI", async () => {
+    const store = createStore();
+    const unpaidCitizenUsage = new InMemoryUnpaidCitizenLegalQuestionUsageRepository();
+    const access = createLegalQuestionAccess({
+      guestSessions: {
+        getById: async () => null,
+        incrementFreeLegalQuestionsUsed: async () => {},
+        tryConsumeFreeLegalQuestion: async () => false,
+        releaseFreeLegalQuestion: async () => {},
+      },
+      conversations: store,
+      subscriptionRepository: new InMemorySubscriptionRepository(),
+      entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+      unpaidCitizenUsage,
+    });
+
+    const first = await createService(
+      store,
+      relevance(LegalRelevance.NON_LEGAL),
+      access,
+    ).createTurn({
+      userId: "client-1",
+      actorRole: UserRole.CLIENT,
+      message: "Монгол Улсын хүн ам хэд вэ?",
+    });
+    expect(first.message.content).toBe("Хууль зүйн хариу");
+    expect(await unpaidCitizenUsage.getUsedCount("client-1")).toBe(1);
+    expect(store.conversations.get(first.conversationId)?.billedQuestionCount).toBe(0);
+
+    const blockedCompletion: LegalAiCompletionPort = {
+      isConfigured: () => true,
+      complete: async () => {
+        throw new Error("must not be called — billing gate should block first");
+      },
+    };
+    await expect(
+      createService(
+        store,
+        relevance(LegalRelevance.LEGAL),
+        access,
+        blockedCompletion,
+      ).createTurn({
         userId: "client-1",
         actorRole: UserRole.CLIENT,
         message: "Гэрээний заалт ойлгомжгүй байна.",

@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { decideLegalQuestionThreadAction } from "@/domain/legal-ai/legal-question-thread";
+import {
+  decideLegalQuestionThreadAction,
+  threadReservesEntitlement,
+} from "@/domain/legal-ai/legal-question-thread";
 import { LegalQuestionStatus } from "@/domain/enums";
 import { LegalRelevance } from "@/engine/relevance";
 
@@ -53,14 +56,14 @@ describe("decideLegalQuestionThreadAction", () => {
     });
   });
 
-  it("does not bill NON_LEGAL refusals", () => {
+  it("answers NON_LEGAL without perturbing the legal-question status machine", () => {
     expect(
       decideLegalQuestionThreadAction({
         status: LegalQuestionStatus.NEW,
         relevance: LegalRelevance.NON_LEGAL,
       }),
     ).toEqual({
-      type: "REFUSE_NON_LEGAL",
+      type: "ANSWER_NON_LEGAL",
       nextStatus: LegalQuestionStatus.NEW,
     });
     expect(
@@ -69,8 +72,19 @@ describe("decideLegalQuestionThreadAction", () => {
         relevance: LegalRelevance.NON_LEGAL,
       }),
     ).toEqual({
-      type: "REFUSE_NON_LEGAL",
+      type: "ANSWER_NON_LEGAL",
       nextStatus: LegalQuestionStatus.ANSWERED,
+    });
+  });
+
+  describe("threadReservesEntitlement", () => {
+    it("reserves the entitlement for a new legal question and a general question alike", () => {
+      expect(threadReservesEntitlement({ type: "START_NEW", nextStatus: LegalQuestionStatus.ANSWERED })).toBe(true);
+      expect(threadReservesEntitlement({ type: "ANSWER_NON_LEGAL", nextStatus: LegalQuestionStatus.NEW })).toBe(true);
+    });
+
+    it("does not reserve a second entitlement for a clarification continuation", () => {
+      expect(threadReservesEntitlement({ type: "CONTINUE", nextStatus: LegalQuestionStatus.ANSWERED })).toBe(false);
     });
   });
 });

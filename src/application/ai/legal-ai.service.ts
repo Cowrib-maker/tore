@@ -52,7 +52,10 @@ import {
   type LegalRelevanceService,
 } from "@/engine/relevance";
 import { LegalQuestionStatus, UserRole } from "@/domain/enums";
-import { decideLegalQuestionThreadAction } from "@/domain/legal-ai/legal-question-thread";
+import {
+  decideLegalQuestionThreadAction,
+  threadReservesEntitlement,
+} from "@/domain/legal-ai/legal-question-thread";
 import {
   allowAllLegalQuestionAccess,
   type LegalQuestionAccessPort,
@@ -63,12 +66,6 @@ import {
 const HISTORY_LIMIT = 30;
 const INTENT_CONFIDENCE_FLOOR = 0.5;
 const VERIFIED_SOURCE_TYPE = "legal-data-engine";
-
-const NON_LEGAL_REFUSAL_CITIZEN =
-  "Би TORE Chat — хууль зүйн асуудлаар энгийнээр туслах зориулалттай. Таны асуулт хууль зүйн асуудалтай холбоогүй байна. Хэрэв танд хууль, эрх зүйн асуудал байгаа бол нөхцөл байдлаа бичээрэй, би тусалъя.";
-
-const NON_LEGAL_REFUSAL_LAWYER =
-  "Би TORE Legal AI — мэргэжлийн хууль зүйн шинжилгээний туслах. Таны асуулт хууль зүйн асуудалтай холбоогүй байна. Хэргийн баримт, судалгаа, эсвэл эрх зүйн асуултаа бичээрэй.";
 
 export type LegalAiServiceDependencies = {
   domainFilter: IDomainFilter;
@@ -162,7 +159,10 @@ export class LegalAiService {
       relevance: relevance.relevance,
     });
 
-    const startingNewQuestion = thread.type === "START_NEW";
+    // Topic-blind: a general (non-legal) question reserves the same
+    // one-question entitlement a legal question does — see
+    // threadReservesEntitlement's doc for why this isn't `=== "START_NEW"`.
+    const startingNewQuestion = threadReservesEntitlement(thread);
     // Authorization IS the atomic quota reservation now (see
     // legal-question-access.ts's P0-3 fix) — guest/paid/unpaid-citizen
     // quota is incremented inside this call, not after a successful
@@ -236,17 +236,13 @@ export class LegalAiService {
       thread,
     } = ctx;
 
-    const paidGeneralAccess =
-      relevance.relevance === LegalRelevance.NON_LEGAL
-        ? await this.legalQuestionAccess.hasPaidLegalAiAccess(subject)
-        : false;
-
-    if (
-      (relevance.relevance === LegalRelevance.LEGAL ||
-        relevance.relevance === LegalRelevance.POSSIBLY_LEGAL ||
-        paidGeneralAccess) &&
-      !this.dependencies.completion.isConfigured()
-    ) {
+    // LegalRelevance is a ROUTING signal now, not a hard access gate — every
+    // relevance outcome (LEGAL, POSSIBLY_LEGAL, NON_LEGAL) ends up calling
+    // the model, so configuration is required unconditionally. The
+    // free-question/paid-entitlement decision already happened up front in
+    // createTurn() (assertCanStartNewLegalQuestion), before relevance was
+    // even classified — that gate is topic-blind by design and unchanged.
+    if (!this.dependencies.completion.isConfigured()) {
       console.error("OPENAI_API_KEY is not configured.");
       throw new LegalAiError(
         "AI үйлчилгээний тохиргоо хийгдээгүй байна.",
@@ -273,29 +269,23 @@ export class LegalAiService {
       await this.dependencies.store.updateQuestionThread({
         conversationId: conversation.id,
         questionStatus: overrides?.questionStatus ?? thread.nextStatus,
+        // Legal-question-specific audit counter — a general question still
+        // consumes the entitlement (see threadReservesEntitlement above)
+        // but never bumps this field, unchanged from before this task.
         incrementBilledQuestion: thread.type === "START_NEW",
       });
-      if (thread.type === "START_NEW") {
+      if (threadReservesEntitlement(thread)) {
         await this.legalQuestionAccess.consumeNewLegalQuestion(subject);
       }
       return result;
     };
 
     if (relevance.relevance === LegalRelevance.NON_LEGAL) {
-      if (!paidGeneralAccess) {
-        return afterReply(
-          await this.persistSafeReply({
-            conversationId: conversation.id,
-            content:
-              capability === LegalAiCapability.LAWYER
-                ? NON_LEGAL_REFUSAL_LAWYER
-                : NON_LEGAL_REFUSAL_CITIZEN,
-            turnKind: PromptTurnKind.GENERAL,
-            capability,
-          }),
-        );
-      }
-
+      // Every subject who reached this point already passed the topic-blind
+      // entitlement gate above (a reserved free question or an active paid
+      // slot) — a non-legal topic no longer requires a SECOND, paid-only
+      // access check on top of that. It gets a real answer just like a
+      // legal question would, and still consumes exactly one question.
       return afterReply(
         await this.completeGeneralAnswer({
           conversationId: conversation.id,
