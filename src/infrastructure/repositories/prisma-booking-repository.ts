@@ -147,6 +147,41 @@ export class PrismaBookingRepository implements BookingRepository {
     return count > 0;
   }
 
+  async countByLawyerProfileIdAndStatus(
+    lawyerProfileId: string,
+    status: BookingStatus,
+    range?: { from: Date; to: Date },
+  ): Promise<number> {
+    return this.db.booking.count({
+      where: {
+        lawyerProfileId,
+        status,
+        ...(range
+          ? { scheduledStartAt: { gte: range.from, lt: range.to } }
+          : {}),
+      },
+    });
+  }
+
+  async findUpcomingForLawyer(
+    lawyerProfileId: string,
+    status: BookingStatus,
+    from: Date,
+    limit: number,
+  ): Promise<Booking[]> {
+    const records = await this.db.booking.findMany({
+      where: {
+        lawyerProfileId,
+        status,
+        scheduledStartAt: { gte: from },
+      },
+      take: limit,
+      orderBy: [{ scheduledStartAt: "asc" }, { id: "asc" }],
+      select: bookingSelect,
+    });
+    return records.map(mapBooking);
+  }
+
   async create(input: CreateBookingInput): Promise<Booking> {
     try {
       const record = await this.db.booking.create({

@@ -58,6 +58,10 @@ type Props = {
 
 export function LawyerWorkspaceHome({ view }: Props) {
   const { cases, recentConversations, activity, summary, schedule } = view;
+  // Computed once, server-side, and passed down as a plain prop — never
+  // recomputed client-side — so every relative-time row in the case table
+  // renders from the same stable reference and can never hydration-mismatch.
+  const now = Date.now();
 
   return (
     <div
@@ -89,7 +93,7 @@ export function LawyerWorkspaceHome({ view }: Props) {
           ))}
         </section>
 
-        <LawyerWorkspaceCaseTable cases={cases} />
+        <LawyerWorkspaceCaseTable cases={cases} now={now} />
 
         <section className="rounded-xl border border-[#0B1F3A]/10 bg-white p-4 shadow-sm">
           <div className="mb-2 flex items-center justify-between gap-3">

@@ -97,48 +97,45 @@ async function loadSchedule(
   );
   if (!lawyerProfile) return EMPTY_SCHEDULE;
 
-  const [pendingPage, confirmedPage] = await Promise.all([
-    scheduleDeps.bookingRepository.findByLawyerProfileId(
-      lawyerProfile.id,
-      BookingStatus.PENDING_ACCEPTANCE,
-      { take: 50 },
-    ),
-    scheduleDeps.bookingRepository.findByLawyerProfileId(
-      lawyerProfile.id,
-      BookingStatus.CONFIRMED,
-      { take: 20 },
-    ),
-  ]);
-
-  const now = Date.now();
-  const todayStart = new Date();
+  const now = new Date();
+  const todayStart = new Date(now);
   todayStart.setHours(0, 0, 0, 0);
-  const todayEnd = new Date();
-  todayEnd.setHours(23, 59, 59, 999);
+  const tomorrowStart = new Date(todayStart);
+  tomorrowStart.setDate(tomorrowStart.getDate() + 1);
 
-  const todaysConfirmedCount = confirmedPage.items.filter((booking) => {
-    const startedAt = booking.scheduledStartAt.getTime();
-    return startedAt >= todayStart.getTime() && startedAt <= todayEnd.getTime();
-  }).length;
+  // Each query is scoped to exactly what it needs — a same-day count, an
+  // unscoped status count, and the nearest N rows ascending — rather than
+  // paginating an arbitrary take:N page (newest-first) and hoping the rows
+  // that matter happened to land in it.
+  const [pendingBookingCount, todaysConfirmedCount, upcomingBookings] =
+    await Promise.all([
+      scheduleDeps.bookingRepository.countByLawyerProfileIdAndStatus(
+        lawyerProfile.id,
+        BookingStatus.PENDING_ACCEPTANCE,
+      ),
+      scheduleDeps.bookingRepository.countByLawyerProfileIdAndStatus(
+        lawyerProfile.id,
+        BookingStatus.CONFIRMED,
+        { from: todayStart, to: tomorrowStart },
+      ),
+      scheduleDeps.bookingRepository.findUpcomingForLawyer(
+        lawyerProfile.id,
+        BookingStatus.CONFIRMED,
+        now,
+        UPCOMING_BOOKING_LIMIT,
+      ),
+    ]);
 
-  const upcoming = confirmedPage.items
-    .filter((booking) => booking.scheduledStartAt.getTime() >= now)
-    .sort(
-      (a, b) => a.scheduledStartAt.getTime() - b.scheduledStartAt.getTime(),
-    )
-    .slice(0, UPCOMING_BOOKING_LIMIT)
-    .map((booking) => ({
+  return {
+    pendingBookingCount,
+    todaysConfirmedCount,
+    upcoming: upcomingBookings.map((booking) => ({
       id: booking.id,
       issueSummary: booking.issueSummary,
       status: booking.status,
       scheduledStartAt: booking.scheduledStartAt.toISOString(),
       scheduledEndAt: booking.scheduledEndAt.toISOString(),
-    }));
-
-  return {
-    pendingBookingCount: pendingPage.items.length,
-    todaysConfirmedCount,
-    upcoming,
+    })),
   };
 }
 

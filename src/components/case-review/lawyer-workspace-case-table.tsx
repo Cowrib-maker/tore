@@ -47,8 +47,14 @@ type FilterTab = "ALL" | "ANALYZED" | "NOT_ANALYZED";
 
 export function LawyerWorkspaceCaseTable({
   cases,
+  now,
 }: {
   cases: LawyerWorkspaceCaseCard[];
+  /** Server-computed reference instant (see lawyer-workspace-home.tsx) —
+   * every row's relative-time text renders from this single value, never
+   * from Date.now() called during this "use client" component's own
+   * render, so server and client output can never disagree. */
+  now: number;
 }) {
   const [tab, setTab] = useState<FilterTab>("ALL");
 
@@ -174,7 +180,7 @@ export function LawyerWorkspaceCaseTable({
                       </span>
                     </td>
                     <td className="px-3 py-2.5 text-[11px] text-[#8A939D]">
-                      {formatRelativeMn(item.lastActivityAt)}
+                      {formatRelativeMn(item.lastActivityAt, now)}
                     </td>
                     <td className="px-4 py-2.5 text-right">
                       <Link
