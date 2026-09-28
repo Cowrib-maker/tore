@@ -12,6 +12,7 @@ import {
 } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 import { notificationRepository } from "@/infrastructure/repositories";
+import { formatTodayLabelMn } from "@/lib/format-labels";
 
 export default async function LawyerLayout({
   children,
@@ -28,6 +29,11 @@ export default async function LawyerLayout({
     notificationRepository.findByUserId(session.user.id, true),
   ]);
 
+  // Computed once, server-side, and rendered verbatim by the client — never
+  // recomputed in the browser — so the workspace header's date chip can
+  // never hydration-mismatch. See lawyer-workspace-frame.tsx TodayChip.
+  const todayLabel = formatTodayLabelMn(new Date(), i18n.locale);
+
   return (
     <LawyerAppChrome
       user={session.user}
@@ -36,6 +42,7 @@ export default async function LawyerLayout({
       notificationsHref="/lawyer/notifications"
       unreadNotificationsCount={unread.items.length}
       notificationsLabel={i18n.dict.dashboard.navNotifications}
+      todayLabel={todayLabel}
       {...i18n.shellProps}
     >
       <DeviceSessionBeacon />

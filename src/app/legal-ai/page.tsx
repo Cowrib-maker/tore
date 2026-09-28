@@ -102,6 +102,11 @@ export default async function LegalAiPage({
           }
           initialConversationId={workbench.conversationId}
           initialCaseFileId={workbench.caseFileId}
+          initialDraft={
+            !workbench.conversationId && initialQuestion
+              ? initialQuestion
+              : undefined
+          }
           initialMessages={initialMessages}
           initialAttachedDocuments={initialAttachedDocuments}
           caseContext={workbench.caseContext}

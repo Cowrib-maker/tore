@@ -85,6 +85,10 @@ type AttachedDocument = {
 type Props = {
   initialConversationId?: string;
   initialCaseFileId?: string;
+  /** Pre-fills the composer draft (e.g. carried over from the workspace
+   * home's AI entry point) — never auto-sent, the lawyer still presses
+   * Send, so every entitlement/streaming check in sendMessage still runs. */
+  initialDraft?: string;
   initialMessages?: Message[];
   initialAttachedDocuments?: AttachedDocument[];
   caseContext: LawyerAiCaseContext | null;
@@ -111,8 +115,8 @@ const OPEN_SUGGESTIONS = [
 
 const ATTACHMENT_ANALYSIS_PROMPT = "Хавсаргасан баримт бичгийг тоймлон, гол агуулга, эрсдэл, дараагийн алхмыг шинжил.";
 
-export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, initialMessages = [], initialAttachedDocuments = [], caseContext, history }: Props) {
-  const [draft, setDraft] = useState("");
+export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, initialDraft, initialMessages = [], initialAttachedDocuments = [], caseContext, history }: Props) {
+  const [draft, setDraft] = useState(initialDraft ?? "");
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [conversationId, setConversationId] = useState(initialConversationId);
   const [caseFileId] = useState(initialCaseFileId);

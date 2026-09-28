@@ -46,6 +46,9 @@ export type {
   LawyerWorkspaceCaseCard,
   LawyerWorkspaceRecentConversation,
   LawyerWorkspaceSummary,
+  LawyerWorkspaceSchedule,
+  LawyerWorkspaceUpcomingBooking,
+  LawyerWorkspaceScheduleDeps,
 } from "./load-lawyer-workspace-home";
 export { legalDomainLabelMn, analysisStatusLabelMn } from "./labels";
 export {

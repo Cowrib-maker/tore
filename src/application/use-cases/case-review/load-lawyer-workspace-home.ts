@@ -3,6 +3,9 @@ import { canActAsLawyer } from "@/domain/services/rbac";
 import { ForbiddenError } from "@/domain/errors/domain-error";
 
 import { CaseFileAnalysisStatus } from "@/domain/entities/case-file";
+import { BookingStatus } from "@/domain/enums";
+import type { BookingRepository } from "@/domain/repositories/booking-repository";
+import type { LawyerProfileRepository } from "@/domain/repositories/profile-repository";
 
 import { deriveCaseActivity, type CaseActivityItem } from "./case-activity";
 import {
@@ -41,33 +44,122 @@ export type LawyerWorkspaceSummary = {
   documentCount: number;
 };
 
+export type LawyerWorkspaceUpcomingBooking = {
+  id: string;
+  issueSummary: string;
+  status: string;
+  scheduledStartAt: string;
+  scheduledEndAt: string;
+};
+
+/**
+ * Sourced entirely from BookingRepository (real consultation requests /
+ * confirmed appointments) — never fabricated. Zeroed out (not an error)
+ * when scheduleDeps is omitted or the actor has no lawyer profile yet, so
+ * this stays additive and safe for every existing caller.
+ */
+export type LawyerWorkspaceSchedule = {
+  pendingBookingCount: number;
+  todaysConfirmedCount: number;
+  upcoming: LawyerWorkspaceUpcomingBooking[];
+};
+
 export type LawyerWorkspaceHomeView = {
   cases: LawyerWorkspaceCaseCard[];
   recentConversations: LawyerWorkspaceRecentConversation[];
   activity: CaseActivityItem[];
   summary: LawyerWorkspaceSummary;
+  schedule: LawyerWorkspaceSchedule;
+};
+
+export type LawyerWorkspaceScheduleDeps = {
+  bookingRepository: BookingRepository;
+  lawyerProfileRepository: LawyerProfileRepository;
 };
 
 const RECENT_CONVERSATION_LIMIT = 8;
 const ACTIVITY_LIMIT = 10;
 const CONVERSATION_FETCH = 50;
+const UPCOMING_BOOKING_LIMIT = 4;
+const EMPTY_SCHEDULE: LawyerWorkspaceSchedule = {
+  pendingBookingCount: 0,
+  todaysConfirmedCount: 0,
+  upcoming: [],
+};
+
+async function loadSchedule(
+  actor: ActorContext,
+  scheduleDeps: LawyerWorkspaceScheduleDeps | undefined,
+): Promise<LawyerWorkspaceSchedule> {
+  if (!scheduleDeps) return EMPTY_SCHEDULE;
+  const lawyerProfile = await scheduleDeps.lawyerProfileRepository.findByUserId(
+    actor.userId,
+  );
+  if (!lawyerProfile) return EMPTY_SCHEDULE;
+
+  const [pendingPage, confirmedPage] = await Promise.all([
+    scheduleDeps.bookingRepository.findByLawyerProfileId(
+      lawyerProfile.id,
+      BookingStatus.PENDING_ACCEPTANCE,
+      { take: 50 },
+    ),
+    scheduleDeps.bookingRepository.findByLawyerProfileId(
+      lawyerProfile.id,
+      BookingStatus.CONFIRMED,
+      { take: 20 },
+    ),
+  ]);
+
+  const now = Date.now();
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todayEnd = new Date();
+  todayEnd.setHours(23, 59, 59, 999);
+
+  const todaysConfirmedCount = confirmedPage.items.filter((booking) => {
+    const startedAt = booking.scheduledStartAt.getTime();
+    return startedAt >= todayStart.getTime() && startedAt <= todayEnd.getTime();
+  }).length;
+
+  const upcoming = confirmedPage.items
+    .filter((booking) => booking.scheduledStartAt.getTime() >= now)
+    .sort(
+      (a, b) => a.scheduledStartAt.getTime() - b.scheduledStartAt.getTime(),
+    )
+    .slice(0, UPCOMING_BOOKING_LIMIT)
+    .map((booking) => ({
+      id: booking.id,
+      issueSummary: booking.issueSummary,
+      status: booking.status,
+      scheduledStartAt: booking.scheduledStartAt.toISOString(),
+      scheduledEndAt: booking.scheduledEndAt.toISOString(),
+    }));
+
+  return {
+    pendingBookingCount: pendingPage.items.length,
+    todaysConfirmedCount,
+    upcoming,
+  };
+}
 
 export async function loadLawyerWorkspaceHome(
   actor: ActorContext,
   deps: CaseAiDeps,
+  scheduleDeps?: LawyerWorkspaceScheduleDeps,
 ): Promise<LawyerWorkspaceHomeView> {
   if (!canActAsLawyer(actor.role)) {
     throw new ForbiddenError("Зөвхөн өмгөөлөгч энэ ажлын орчныг нээж болно.");
   }
 
   const files = await deps.repository.listByOwnerLawyerId(actor.userId);
-  const [conversations, caseConversationRows] = await Promise.all([
+  const [conversations, caseConversationRows, schedule] = await Promise.all([
     deps.store.listOwnedRecentConversations(actor.userId, CONVERSATION_FETCH),
     Promise.all(
       files.map((file) =>
         deps.store.listOwnedCaseConversations(actor.userId, file.id),
       ),
     ),
+    loadSchedule(actor, scheduleDeps),
   ]);
 
   const caseTitleById = new Map(files.map((file) => [file.id, file.title]));
@@ -157,5 +249,5 @@ export async function loadLawyerWorkspaceHome(
     documentCount: cases.reduce((total, item) => total + item.documentCount, 0),
   };
 
-  return { cases, recentConversations, activity, summary };
+  return { cases, recentConversations, activity, summary, schedule };
 }

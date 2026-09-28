@@ -23,6 +23,8 @@ type Props = {
   notificationsHref?: string | null;
   unreadNotificationsCount?: number;
   notificationsLabel?: string;
+  /** Server-computed "YYYY.MM.DD Weekday" label — see lawyer/layout.tsx. */
+  todayLabel?: string;
 };
 
 export function LawyerAppChrome({
@@ -39,6 +41,7 @@ export function LawyerAppChrome({
   notificationsHref,
   unreadNotificationsCount,
   notificationsLabel,
+  todayLabel,
 }: Props) {
   const pathname = usePathname();
 
@@ -50,6 +53,8 @@ export function LawyerAppChrome({
         locale={locale}
         languageLabel={languageLabel}
         signOutLabel={signOutLabel}
+        unreadNotificationsCount={unreadNotificationsCount}
+        todayLabel={todayLabel}
       >
         {children}
       </LawyerWorkspaceFrame>

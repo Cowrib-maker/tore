@@ -1,199 +1,135 @@
 import Link from "next/link";
 import {
   ChevronRight,
-  FileText,
-  FolderOpen,
+  FileSearch,
+  FolderPlus,
+  Gavel,
   MessageSquare,
+  Scale,
+  ShieldCheck,
 } from "lucide-react";
 
 import type { LawyerWorkspaceHomeView } from "@/application/use-cases/case-review";
-import { cn } from "@/lib/utils";
+import { LawyerWorkspaceAiComposer } from "@/components/case-review/lawyer-workspace-ai-composer";
+import { LawyerWorkspaceCaseTable } from "@/components/case-review/lawyer-workspace-case-table";
+import { LawyerWorkspaceRightRail } from "@/components/case-review/lawyer-workspace-right-rail";
+import { formatRelativeMn } from "@/lib/format-relative-mn";
 
-function formatStamp(value: string | null | undefined): string {
-  if (!value) return "—";
-  return value.slice(0, 16).replace("T", " ");
-}
+type QuickAction = {
+  label: string;
+  description: string;
+  icon: typeof FolderPlus;
+  href?: string;
+};
 
-function splitActivity(label: string): { title: string; detail: string | null } {
-  const separator = " · ";
-  const index = label.indexOf(separator);
-  if (index === -1) return { title: label, detail: null };
-  return {
-    detail: label.slice(0, index),
-    title: label.slice(index + separator.length),
-  };
-}
+/** Every enabled action points at a real, existing feature (case intake
+ * form or the Legal AI flow). "Шүүхийн практик" has no dedicated
+ * precedent-search feature yet, so it is shown disabled rather than
+ * wired to something that doesn't exist. */
+const QUICK_ACTIONS: QuickAction[] = [
+  {
+    label: "Шинэ хэрэг үүсгэх",
+    description: "Хэргийн мэдээлэл бүртгэх",
+    icon: FolderPlus,
+    href: "/lawyer/workspace/cases#create-case",
+  },
+  {
+    label: "Баримт шинжлэх",
+    description: "PDF, Word баримтаа Legal AI-д хавсаргах",
+    icon: FileSearch,
+    href: "/legal-ai",
+  },
+  {
+    label: "Хуулийн судалгаа",
+    description: "Хууль, зүйл заалтын талаар асуух",
+    icon: Gavel,
+    href: "/legal-ai",
+  },
+  {
+    label: "Шүүхийн практик",
+    description: "Ижил төстэй шийдвэрийн хайлт",
+    icon: Scale,
+  },
+];
 
 type Props = {
   view: LawyerWorkspaceHomeView;
 };
 
 export function LawyerWorkspaceHome({ view }: Props) {
-  const { cases, recentConversations, activity, summary } = view;
-  const visibleCases = cases.slice(0, 8);
+  const { cases, recentConversations, activity, summary, schedule } = view;
 
   return (
-    <div className="space-y-7" data-testid="lawyer-workspace-home">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div
+      className="flex flex-col lg:h-full lg:min-h-0 lg:flex-row"
+      data-testid="lawyer-workspace-home"
+    >
+      <main className="min-w-0 flex-1 space-y-4 px-4 py-6 sm:px-6 lg:min-h-0 lg:overflow-y-auto lg:px-7 lg:py-5">
         <div>
-          <h1 className="text-[1.65rem] font-semibold tracking-tight text-[#0B1F3A]">
-            Ажлын талбар
+          <div className="mb-1.5 inline-flex items-center gap-1.5 rounded bg-[#0B5CFF]/10 px-2 py-0.5">
+            <ShieldCheck className="size-3.5 text-[#0B5CFF]" />
+            <span className="text-[10px] font-bold tracking-wider text-[#0B5CFF] uppercase">
+              TORE Lawyer Workspace
+            </span>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-[#0B1F3A] lg:text-[1.75rem]">
+            Хэрэг, баримт, судалгаагаа нэг ухаалаг орчинд удирдана.
           </h1>
-          <p className="mt-1.5 max-w-xl text-sm leading-6 text-[#5C6570]">
-            Хэргүүд, AI яриа болон баримт бичгээ нэг дороос удирдана.
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-[#5C6570]">
+            Хуулийн ажлаа төвлөрүүлж, баримтаа шинжилж, TORE Legal AI-аас
+            судалгаа авна уу.
           </p>
         </div>
-        <Link
-          href="/lawyer/workspace/cases#create-case"
-          className="hidden h-10 items-center rounded-lg bg-[#0B5CFF] px-4 text-sm font-medium text-white shadow-[0_8px_20px_-12px_rgba(11,92,255,0.55)] hover:bg-[#0A4FDE] lg:inline-flex"
-        >
-          + Шинэ хэрэг
-        </Link>
-      </header>
 
-      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <MetricCard
-          label="Нээлттэй хэрэг"
-          value={summary.caseCount}
-          hint={
-            summary.notAnalyzedCaseCount > 0
-              ? `${summary.notAnalyzedCaseCount} хэрэг шинжлээгүй`
-              : summary.analyzedCaseCount > 0
-                ? `${summary.analyzedCaseCount} хэрэг шинжилсэн`
-                : "Одоогоор хэрэг алга"
-          }
-          icon={FolderOpen}
-        />
-        <MetricCard
-          label="AI яриа"
-          value={summary.conversationCount}
-          hint={`Сүүлийн 7 хоногт ${summary.conversationsLast7Days} яриа`}
-          icon={MessageSquare}
-        />
-        <MetricCard
-          label="Баримт бичиг"
-          value={summary.documentCount}
-          hint={
-            summary.documentCount > 0
-              ? `${summary.documentCount} файл нийт`
-              : "Хавсаргасан баримт алга"
-          }
-          icon={FileText}
-        />
-      </section>
+        <LawyerWorkspaceAiComposer />
 
-      <section>
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 className="text-[13px] font-semibold tracking-[0.08em] text-[#0B1F3A] uppercase">
-            Миний хэргүүд
-          </h2>
-          <Link
-            href="/lawyer/workspace/cases"
-            className="text-sm font-medium text-[#0B5CFF] hover:underline"
-          >
-            Бүгдийг харах →
-          </Link>
-        </div>
+        <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {QUICK_ACTIONS.map((action) => (
+            <QuickActionCard key={action.label} action={action} />
+          ))}
+        </section>
 
-        {cases.length === 0 ? (
-          <div
-            data-testid="workspace-empty-cases"
-            className="rounded-xl border border-dashed border-[#0B1F3A]/12 bg-white px-6 py-12 text-center"
-          >
-            <p className="font-semibold text-[#0B1F3A]">Одоогоор хэрэг алга.</p>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#5C6570]">
-              Шинэ хэрэг үүсгээд ажлаа эндээс эхлүүлээрэй.
-            </p>
+        <LawyerWorkspaceCaseTable cases={cases} />
+
+        <section className="rounded-xl border border-[#0B1F3A]/10 bg-white p-4 shadow-sm">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <h2 className="text-[13px] font-bold tracking-wide text-[#0B1F3A] uppercase">
+              Сүүлийн AI ярианууд
+            </h2>
             <Link
-              href="/lawyer/workspace/cases#create-case"
-              className="mt-5 inline-flex h-10 items-center rounded-lg bg-[#0B5CFF] px-4 text-sm font-medium text-white"
+              href="/legal-ai"
+              className="text-xs font-medium text-[#0B5CFF] hover:underline"
             >
-              Шинэ хэрэг үүсгэх
+              AI чат руу очих →
             </Link>
           </div>
-        ) : (
-          <ul className="space-y-2.5">
-            {visibleCases.map((item) => (
-              <li key={item.caseId}>
-                <article
-                  data-testid={`workspace-case-${item.caseId}`}
-                  className="rounded-xl border border-[#0B1F3A]/8 bg-white px-4 py-3.5 shadow-[0_10px_24px_-20px_rgba(11,31,58,0.45)] transition hover:border-[#0B5CFF]/25"
-                >
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <div className="flex min-w-0 flex-1 items-start gap-3">
-                      <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#E8F0FE] text-[#0B5CFF]">
-                        <FolderOpen className="size-4" />
-                      </span>
-                      <div className="min-w-0">
-                        <h3 className="truncate text-[15px] font-semibold text-[#0B1F3A]">
-                          {item.title}
-                        </h3>
-                        <p className="mt-0.5 text-sm text-[#5C6570]">
-                          {item.domainLabel}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:justify-end">
-                      <StatusPill label={item.statusLabel} status={item.status} />
-                      <span className="flex items-center gap-1.5 text-xs text-[#5C6570]">
-                        <MessageSquare className="size-3.5" />
-                        {item.conversationCount}
-                      </span>
-                      <span className="flex items-center gap-1.5 text-xs text-[#5C6570]">
-                        <FileText className="size-3.5" />
-                        {item.documentCount}
-                      </span>
-                      <span className="text-xs text-[#8A939D]">
-                        {formatStamp(item.lastActivityAt)}
-                      </span>
-                      <Link
-                        href={`/lawyer/workspace/case-review?caseId=${encodeURIComponent(item.caseId)}`}
-                        className="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-sm font-medium text-[#0B5CFF] hover:bg-[#E8F0FE]"
-                      >
-                        Нээх
-                        <ChevronRight className="size-4" />
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <div className="grid gap-3 lg:grid-cols-2">
-        <section className="rounded-xl border border-[#0B1F3A]/8 bg-white p-5 shadow-[0_10px_24px_-20px_rgba(11,31,58,0.45)]">
-          <h2 className="text-[13px] font-semibold tracking-[0.08em] text-[#0B1F3A] uppercase">
-            Сүүлийн AI ярианууд
-          </h2>
           {recentConversations.length === 0 ? (
-            <p className="mt-4 text-sm text-[#5C6570]">
+            <p className="text-sm text-[#5C6570]">
               Одоогоор хадгалагдсан яриа байхгүй.
             </p>
           ) : (
-            <ul className="mt-2" data-testid="workspace-recent-ai">
-              {recentConversations.map((item) => (
+            <ul data-testid="workspace-recent-ai">
+              {recentConversations.slice(0, 5).map((item) => (
                 <li key={item.id}>
                   <Link
                     href={`/legal-ai?conversationId=${encodeURIComponent(item.id)}`}
-                    className="flex items-center gap-3 py-3"
+                    className="flex items-center gap-3 border-b border-[#0B1F3A]/6 py-2.5 last:border-0"
                   >
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#E8F0FE] text-[#0B5CFF]">
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#E8F0FE] text-[#0B5CFF]">
                       <MessageSquare className="size-3.5" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium text-[#0B1F3A]">
+                      <span className="block truncate text-[13px] font-medium text-[#0B1F3A]">
                         {item.title}
                       </span>
                       {item.caseTitle ? (
-                        <span className="mt-0.5 block truncate text-xs text-[#5C6570]">
+                        <span className="mt-0.5 block truncate text-[11px] text-[#8A939D]">
                           {item.caseTitle}
                         </span>
                       ) : null}
                     </span>
-                    <span className="shrink-0 text-xs text-[#8A939D]">
-                      {formatStamp(item.updatedAt)}
+                    <span className="shrink-0 text-[11px] text-[#8A939D]">
+                      {formatRelativeMn(item.updatedAt)}
                     </span>
                     <ChevronRight className="size-4 shrink-0 text-[#C5CBC7]" />
                   </Link>
@@ -201,96 +137,57 @@ export function LawyerWorkspaceHome({ view }: Props) {
               ))}
             </ul>
           )}
-          <Link
-            href="/legal-ai"
-            className="mt-2 inline-flex h-10 w-full items-center justify-center rounded-lg border border-[#0B5CFF]/25 text-sm font-medium text-[#0B5CFF] hover:bg-[#E8F0FE]"
-          >
-            AI чат руу очих
-          </Link>
         </section>
+      </main>
 
-        <section className="rounded-xl border border-[#0B1F3A]/8 bg-white p-5 shadow-[0_10px_24px_-20px_rgba(11,31,58,0.45)]">
-          <h2 className="text-[13px] font-semibold tracking-[0.08em] text-[#0B1F3A] uppercase">
-            Сүүлийн үйл ажиллагаа
-          </h2>
-          {activity.length === 0 ? (
-            <p className="mt-4 text-sm text-[#5C6570]">Үйл ажиллагаа алга.</p>
-          ) : (
-            <ol className="mt-4 space-y-4" data-testid="workspace-activity">
-              {activity.map((item) => {
-                const parsed = splitActivity(item.label);
-                return (
-                  <li key={item.id} className="flex items-start gap-3">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[#0B5CFF]" />
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-[#0B1F3A]">
-                        {parsed.title}
-                      </p>
-                      {parsed.detail ? (
-                        <p className="mt-0.5 truncate text-xs text-[#5C6570]">
-                          {parsed.detail}
-                        </p>
-                      ) : null}
-                      <p className="mt-0.5 text-xs text-[#8A939D]">
-                        {formatStamp(item.at)}
-                      </p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-          )}
-        </section>
-      </div>
+      <aside className="border-t border-[#0B1F3A]/8 bg-white p-4 lg:w-72 lg:min-h-0 lg:shrink-0 lg:overflow-y-auto lg:border-t-0 lg:border-l">
+        <LawyerWorkspaceRightRail
+          summary={summary}
+          schedule={schedule}
+          activity={activity}
+        />
+      </aside>
     </div>
   );
 }
 
-function MetricCard({
-  label,
-  value,
-  hint,
-  icon: Icon,
-}: {
-  label: string;
-  value: number;
-  hint: string;
-  icon: typeof FolderOpen;
-}) {
-  return (
-    <div className="rounded-xl border border-[#0B1F3A]/8 bg-white px-4 py-4 shadow-[0_10px_24px_-20px_rgba(11,31,58,0.45)]">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-[11px] font-medium tracking-[0.08em] text-[#8A939D] uppercase">
-            {label}
-          </p>
-          <p className="mt-2 text-[1.75rem] font-semibold leading-none text-[#0B1F3A]">
-            {value}
-          </p>
-          <p className="mt-2 text-xs text-[#5C6570]">{hint}</p>
+function QuickActionCard({ action }: { action: QuickAction }) {
+  const Icon = action.icon;
+  if (!action.href) {
+    return (
+      <div
+        className="cursor-not-allowed rounded-xl border border-[#0B1F3A]/8 bg-[#F8FAFC] p-3 opacity-60"
+        aria-disabled="true"
+        title="Удахгүй"
+      >
+        <div className="mb-1.5 flex items-center gap-2.5">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#0B1F3A]/8 text-[#5C6570]">
+            <Icon className="size-4" />
+          </span>
+          <h3 className="text-[13px] font-semibold text-[#0B1F3A]">
+            {action.label}
+          </h3>
         </div>
-        <span className="flex size-9 items-center justify-center rounded-lg bg-[#E8F0FE] text-[#0B5CFF]">
+        <p className="pl-0.5 text-[11px] text-[#8A939D]">
+          {action.description} · Удахгүй
+        </p>
+      </div>
+    );
+  }
+  return (
+    <Link
+      href={action.href}
+      className="group rounded-xl border border-[#0B1F3A]/8 bg-white p-3 transition-all hover:border-[#0B5CFF] hover:shadow-sm"
+    >
+      <div className="mb-1.5 flex items-center gap-2.5">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#0B5CFF]/10 text-[#0B5CFF] transition-colors group-hover:bg-[#0B5CFF] group-hover:text-white">
           <Icon className="size-4" />
         </span>
+        <h3 className="text-[13px] font-semibold text-[#0B1F3A]">
+          {action.label}
+        </h3>
       </div>
-    </div>
-  );
-}
-
-function StatusPill({ label, status }: { label: string; status: string }) {
-  const analyzed = status !== "NOT_ANALYZED" && status !== "ANALYSIS_FAILED";
-  return (
-    <span
-      className={cn(
-        "rounded-full px-2.5 py-1 text-[11px] font-medium",
-        status === "ANALYSIS_FAILED"
-          ? "bg-red-50 text-red-700"
-          : analyzed
-            ? "bg-[#EAF4F0] text-[#0F3D33]"
-            : "bg-[#F8F1E6] text-[#8A5A12]",
-      )}
-    >
-      {label}
-    </span>
+      <p className="pl-0.5 text-[11px] text-[#8A939D]">{action.description}</p>
+    </Link>
   );
 }

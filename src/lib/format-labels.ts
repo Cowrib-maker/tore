@@ -57,6 +57,32 @@ export function formatWeekday(day: string, locale?: Locale): string {
   return map[day] ?? humanize(day);
 }
 
+/** Date.getDay() order (0 = Sunday) — indexes into the weekdays dictionary. */
+const WEEKDAY_KEYS_BY_INDEX: (keyof Weekdays)[] = [
+  "SUNDAY",
+  "MONDAY",
+  "TUESDAY",
+  "WEDNESDAY",
+  "THURSDAY",
+  "FRIDAY",
+  "SATURDAY",
+];
+
+/**
+ * "YYYY.MM.DD Weekday" label for a given date. Built from plain date-part
+ * getters and the app's own weekday dictionary — never Intl — so a caller
+ * can compute this once (e.g. server-side) and hand the resulting string to
+ * a client component to render verbatim, with no risk of the weekday
+ * differing between the Node SSR runtime's ICU and the browser's.
+ */
+export function formatTodayLabelMn(date: Date, locale?: Locale): string {
+  const weekday = formatWeekday(WEEKDAY_KEYS_BY_INDEX[date.getDay()]!, locale);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}.${month}.${day} ${weekday}`;
+}
+
 export function formatNotificationType(
   type: string,
   locale?: Locale,
