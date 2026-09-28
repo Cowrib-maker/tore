@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Booking } from "@/domain/entities/booking";
 import { BookingStatus, UserRole } from "@/domain/enums";
@@ -111,7 +111,7 @@ describe("loadLawyerWorkspaceHome — schedule", () => {
 
     const bookingRepository = fakeBookingRepository([...farFuture, nearest]);
     const lawyerProfileRepository = {
-      findByUserId: vi.fn().mockResolvedValue({ id: "lawyer-profile-1" }),
+      findByUserId: vi.fn().mockResolvedValue({ id: "lawyer-profile-1", timezone: "UTC" }),
     };
 
     const view = await loadLawyerWorkspaceHome(actor, emptyCaseAiDeps(), {
@@ -155,7 +155,7 @@ describe("loadLawyerWorkspaceHome — schedule", () => {
       laterToday2,
     ]);
     const lawyerProfileRepository = {
-      findByUserId: vi.fn().mockResolvedValue({ id: "lawyer-profile-1" }),
+      findByUserId: vi.fn().mockResolvedValue({ id: "lawyer-profile-1", timezone: "UTC" }),
     };
 
     const view = await loadLawyerWorkspaceHome(actor, emptyCaseAiDeps(), {
@@ -179,7 +179,7 @@ describe("loadLawyerWorkspaceHome — schedule", () => {
 
     const bookingRepository = fakeBookingRepository(pending);
     const lawyerProfileRepository = {
-      findByUserId: vi.fn().mockResolvedValue({ id: "lawyer-profile-1" }),
+      findByUserId: vi.fn().mockResolvedValue({ id: "lawyer-profile-1", timezone: "UTC" }),
     };
 
     const view = await loadLawyerWorkspaceHome(actor, emptyCaseAiDeps(), {
@@ -196,6 +196,58 @@ describe("loadLawyerWorkspaceHome — schedule", () => {
       pendingBookingCount: 0,
       todaysConfirmedCount: 0,
       upcoming: [],
+    });
+  });
+
+  describe("timezone correctness", () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it("D: a booking near UTC midnight is classified by the lawyer's own configured timezone, not UTC", async () => {
+      // "now" = 2026-01-15T17:00:00Z = 2026-01-16 01:00 in Asia/Ulaanbaatar
+      // (UTC+8) — the lawyer's calendar day is already Jan 16.
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2026-01-15T17:00:00.000Z"));
+
+      // UA-yesterday (Jan 15, 23:30 UA) — a naive UTC-day boundary would
+      // wrongly count this as "today" (it's still Jan 15 in plain UTC).
+      const uaYesterday = makeBooking({
+        id: "ua-yesterday",
+        status: BookingStatus.CONFIRMED,
+        scheduledStartAt: new Date("2026-01-15T15:30:00.000Z"),
+        scheduledEndAt: new Date("2026-01-15T16:30:00.000Z"),
+      });
+      // UA-today (Jan 16, 00:30 UA) — genuinely today for the lawyer.
+      const uaToday = makeBooking({
+        id: "ua-today",
+        status: BookingStatus.CONFIRMED,
+        scheduledStartAt: new Date("2026-01-15T16:30:00.000Z"),
+        scheduledEndAt: new Date("2026-01-15T17:30:00.000Z"),
+      });
+
+      const bookingRepository = fakeBookingRepository([uaYesterday, uaToday]);
+      const lawyerProfileRepository = {
+        findByUserId: vi
+          .fn()
+          .mockResolvedValue({ id: "lawyer-profile-1", timezone: "Asia/Ulaanbaatar" }),
+      };
+
+      const view = await loadLawyerWorkspaceHome(actor, emptyCaseAiDeps(), {
+        bookingRepository: bookingRepository as never,
+        lawyerProfileRepository: lawyerProfileRepository as never,
+      });
+
+      expect(view.schedule.todaysConfirmedCount).toBe(1);
+
+      const confirmedCountCall = (
+        bookingRepository.countByLawyerProfileIdAndStatus as ReturnType<
+          typeof vi.fn
+        >
+      ).mock.calls.find((call) => call[1] === BookingStatus.CONFIRMED);
+      const range = confirmedCountCall?.[2] as { from: Date; to: Date };
+      expect(range.from.toISOString()).toBe("2026-01-15T16:00:00.000Z"); // 2026-01-16 00:00 UA
+      expect(range.to.toISOString()).toBe("2026-01-16T16:00:00.000Z"); // 2026-01-17 00:00 UA
     });
   });
 });

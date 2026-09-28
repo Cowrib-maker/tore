@@ -58,13 +58,17 @@ export function LawyerWorkspaceCaseTable({
 }) {
   const [tab, setTab] = useState<FilterTab>("ALL");
 
+  // The canonical "has this case been analyzed" signal is CaseFile's own
+  // analysisStatus field — never `status`, which is display-oriented and
+  // carries the engine's disposition (e.g. SUPPORTED) for analyzed cases.
   const counts = useMemo(
     () => ({
       ALL: cases.length,
-      ANALYZED: cases.filter((item) => item.status === CaseFileAnalysisStatus.ANALYZED)
-        .length,
+      ANALYZED: cases.filter(
+        (item) => item.analysisStatus === CaseFileAnalysisStatus.ANALYZED,
+      ).length,
       NOT_ANALYZED: cases.filter(
-        (item) => item.status === CaseFileAnalysisStatus.NOT_ANALYZED,
+        (item) => item.analysisStatus === CaseFileAnalysisStatus.NOT_ANALYZED,
       ).length,
     }),
     [cases],
@@ -76,8 +80,8 @@ export function LawyerWorkspaceCaseTable({
         ? cases
         : cases.filter((item) =>
             tab === "ANALYZED"
-              ? item.status === CaseFileAnalysisStatus.ANALYZED
-              : item.status === CaseFileAnalysisStatus.NOT_ANALYZED,
+              ? item.analysisStatus === CaseFileAnalysisStatus.ANALYZED
+              : item.analysisStatus === CaseFileAnalysisStatus.NOT_ANALYZED,
           );
     return filtered.slice(0, 8);
   }, [cases, tab]);

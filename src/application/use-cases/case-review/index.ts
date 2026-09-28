@@ -46,6 +46,7 @@ export type {
   LawyerWorkspaceCaseCard,
   LawyerWorkspaceRecentConversation,
   LawyerWorkspaceSummary,
+  LawyerWorkspaceActivityItem,
   LawyerWorkspaceSchedule,
   LawyerWorkspaceUpcomingBooking,
   LawyerWorkspaceScheduleDeps,

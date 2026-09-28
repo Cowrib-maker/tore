@@ -567,9 +567,9 @@ describe("case workspace AI integration", () => {
       homeA.recentConversations.find((row) => row.title === "Ерөнхий зөвлөгөө")
         ?.caseTitle,
     ).toBeNull();
-    expect(homeA.activity.some((item) => item.label.includes("Хөдөлмөрийн маргаан"))).toBe(
-      true,
-    );
+    expect(
+      homeA.activity.some((item) => item.caseTitle === "Хөдөлмөрийн маргаан"),
+    ).toBe(true);
     expect(homeA.summary.caseCount).toBe(1);
     expect(homeA.summary.conversationCount).toBe(2);
     expect(homeA.summary.documentCount).toBe(0);

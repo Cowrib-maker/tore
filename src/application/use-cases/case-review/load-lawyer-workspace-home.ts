@@ -6,8 +6,9 @@ import { CaseFileAnalysisStatus } from "@/domain/entities/case-file";
 import { BookingStatus } from "@/domain/enums";
 import type { BookingRepository } from "@/domain/repositories/booking-repository";
 import type { LawyerProfileRepository } from "@/domain/repositories/profile-repository";
+import { calendarDayWindowInTimeZone } from "@/domain/services/timezone";
 
-import { deriveCaseActivity, type CaseActivityItem } from "./case-activity";
+import { deriveCaseActivity } from "./case-activity";
 import {
   type CaseAiDeps,
   type CaseConversationSummary,
@@ -20,12 +21,28 @@ export type LawyerWorkspaceCaseCard = {
   title: string;
   domain: string;
   domainLabel: string;
+  /** Canonical analysis-progress state (CaseFileAnalysisStatus) — the real
+   * domain field, never the engine's disposition string. Filters must key
+   * off this, not `status`. */
+  analysisStatus: string;
+  /** Display-oriented status: the engine disposition (e.g. SUPPORTED) for
+   * analyzed cases, or the raw analysisStatus otherwise. For the status
+   * pill's label/color, not for "has this case been analyzed" filtering. */
   status: string;
   statusLabel: string;
   conversationCount: number;
   documentCount: number;
   lastActivityAt: string;
   lastActivityLabel: string;
+};
+
+/** A real activity event, structured — never a pre-joined display string —
+ * so the UI can render the event and its case separately without parsing. */
+export type LawyerWorkspaceActivityItem = {
+  id: string;
+  at: string;
+  title: string;
+  caseTitle: string | null;
 };
 
 export type LawyerWorkspaceRecentConversation = {
@@ -67,7 +84,7 @@ export type LawyerWorkspaceSchedule = {
 export type LawyerWorkspaceHomeView = {
   cases: LawyerWorkspaceCaseCard[];
   recentConversations: LawyerWorkspaceRecentConversation[];
-  activity: CaseActivityItem[];
+  activity: LawyerWorkspaceActivityItem[];
   summary: LawyerWorkspaceSummary;
   schedule: LawyerWorkspaceSchedule;
 };
@@ -98,10 +115,12 @@ async function loadSchedule(
   if (!lawyerProfile) return EMPTY_SCHEDULE;
 
   const now = new Date();
-  const todayStart = new Date(now);
-  todayStart.setHours(0, 0, 0, 0);
-  const tomorrowStart = new Date(todayStart);
-  tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+  // "Today" is the lawyer's own calendar day, not the server process's —
+  // real IANA timezone math (DST-safe), not a fixed UTC offset.
+  const { start: todayStart, end: tomorrowStart } = calendarDayWindowInTimeZone(
+    now,
+    lawyerProfile.timezone,
+  );
 
   // Each query is scoped to exactly what it needs — a same-day count, an
   // unscoped status count, and the nearest N rows ascending — rather than
@@ -183,6 +202,7 @@ export async function loadLawyerWorkspaceHome(
       title: file.title,
       domain: file.legalDomain,
       domainLabel: legalDomainLabelMn(file.legalDomain),
+      analysisStatus: file.analysisStatus,
       status,
       statusLabel: analysisStatusLabelMn(status),
       conversationCount: caseConversations.length,
@@ -203,24 +223,28 @@ export async function loadLawyerWorkspaceHome(
       updatedAt: row.updatedAt.toISOString(),
     }));
 
-  const activity = files
+  const activity: LawyerWorkspaceActivityItem[] = files
     .flatMap((file) =>
       deriveCaseActivity(file, conversationsByCase.get(file.id) ?? []).map(
-        (item) => ({
-          ...item,
+        (item): LawyerWorkspaceActivityItem => ({
           id: `${file.id}:${item.id}`,
-          label: `${file.title} · ${item.label}`,
+          at: item.at,
+          title: item.label,
+          caseTitle: file.title,
         }),
       ),
     )
     .concat(
       conversations
         .filter((row) => !row.caseFileId)
-        .map((row) => ({
-          id: `ai-started:${row.id}`,
-          at: row.createdAt.toISOString(),
-          label: "AI яриа эхлүүлсэн",
-        })),
+        .map(
+          (row): LawyerWorkspaceActivityItem => ({
+            id: `ai-started:${row.id}`,
+            at: row.createdAt.toISOString(),
+            title: "AI яриа эхлүүлсэн",
+            caseTitle: null,
+          }),
+        ),
     )
     .sort((a, b) => b.at.localeCompare(a.at))
     .slice(0, ACTIVITY_LIMIT);

@@ -2,10 +2,10 @@ import Link from "next/link";
 import { CalendarClock, Search } from "lucide-react";
 
 import type {
+  LawyerWorkspaceActivityItem,
   LawyerWorkspaceSchedule,
   LawyerWorkspaceSummary,
 } from "@/application/use-cases/case-review";
-import type { CaseActivityItem } from "@/application/use-cases/case-review";
 import {
   formatRelativeMn,
   formatTimeMn,
@@ -14,7 +14,7 @@ import {
 type Props = {
   summary: LawyerWorkspaceSummary;
   schedule: LawyerWorkspaceSchedule;
-  activity: CaseActivityItem[];
+  activity: LawyerWorkspaceActivityItem[];
 };
 
 /**
@@ -113,8 +113,13 @@ export function LawyerWorkspaceRightRail({ summary, schedule, activity }: Props)
               <div key={item.id} className="relative">
                 <span className="absolute top-1 -left-[17px] size-2 rounded-full bg-[#0B5CFF]" />
                 <p className="leading-snug font-medium text-[#0B1F3A]">
-                  {item.label}
+                  {item.title}
                 </p>
+                {item.caseTitle ? (
+                  <p className="mt-0.5 truncate text-[10px] text-[#8A939D]">
+                    {item.caseTitle}
+                  </p>
+                ) : null}
                 <p className="mt-0.5 text-[10px] text-[#8A939D]">
                   {formatRelativeMn(item.at)}
                 </p>

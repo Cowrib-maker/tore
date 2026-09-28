@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
 import { LawyerWorkspaceCaseTable } from "@/components/case-review/lawyer-workspace-case-table";
 import type { LawyerWorkspaceCaseCard } from "@/application/use-cases/case-review";
@@ -17,6 +17,7 @@ function makeCase(
     title: "Test case",
     domain: "CIVIL",
     domainLabel: "Иргэний",
+    analysisStatus: "NOT_ANALYZED",
     status: "NOT_ANALYZED",
     statusLabel: "Шинжлээгүй",
     conversationCount: 0,
@@ -71,5 +72,67 @@ describe("LawyerWorkspaceCaseTable — deterministic relative time", () => {
       />,
     );
     expect(screen.getByText("өчигдөр")).toBeTruthy();
+  });
+});
+
+/**
+ * The canonical "has this case been analyzed" signal is CaseFile's own
+ * analysisStatus field. A genuinely analyzed case's display `status` is
+ * the engine's disposition (e.g. "SUPPORTED"), not the literal "ANALYZED"
+ * — the filter/counts must never key off `status` for this.
+ */
+describe("LawyerWorkspaceCaseTable — Шинжилсэн filter uses analysisStatus", () => {
+  const analyzedCase = makeCase({
+    caseId: "analyzed-1",
+    title: "Analyzed case",
+    analysisStatus: "ANALYZED",
+    status: "SUPPORTED", // real engine disposition, never the literal "ANALYZED"
+    statusLabel: "Дэмжигдсэн",
+  });
+  const unanalyzedCase = makeCase({
+    caseId: "not-analyzed-1",
+    title: "Unanalyzed case",
+    analysisStatus: "NOT_ANALYZED",
+    status: "NOT_ANALYZED",
+    statusLabel: "Шинжлээгүй",
+  });
+
+  it("A: a genuinely analyzed case (disposition status, ANALYZED analysisStatus) is counted and shown under Шинжилсэн", () => {
+    render(
+      <LawyerWorkspaceCaseTable
+        cases={[analyzedCase, unanalyzedCase]}
+        now={Date.now()}
+      />,
+    );
+
+    fireEvent.click(screen.getByText(/^Шинжилсэн/));
+
+    expect(screen.getByText("Analyzed case")).toBeTruthy();
+  });
+
+  it("B: an unanalyzed case does not appear under Шинжилсэн", () => {
+    render(
+      <LawyerWorkspaceCaseTable
+        cases={[analyzedCase, unanalyzedCase]}
+        now={Date.now()}
+      />,
+    );
+
+    fireEvent.click(screen.getByText(/^Шинжилсэн/));
+
+    expect(screen.queryByText("Unanalyzed case")).toBeNull();
+  });
+
+  it("C: the Шинжилсэн/Шинжлээгүй tab counts match the underlying analysisStatus data", () => {
+    render(
+      <LawyerWorkspaceCaseTable
+        cases={[analyzedCase, unanalyzedCase]}
+        now={Date.now()}
+      />,
+    );
+
+    expect(screen.getByText("Шинжилсэн (1)")).toBeTruthy();
+    expect(screen.getByText("Шинжлээгүй (1)")).toBeTruthy();
+    expect(screen.getByText("Бүгд (2)")).toBeTruthy();
   });
 });
