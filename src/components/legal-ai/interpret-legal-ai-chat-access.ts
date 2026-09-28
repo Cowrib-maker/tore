@@ -39,7 +39,7 @@ export function interpretLegalAiChatAccess(input: {
         question: input.question,
         message:
           input.body.error ??
-          "Үнэгүй хууль зүйн асуултынхаа хариуг авсан тул нэвтэрнэ үү.",
+          "Үнэгүй асуултынхаа хариуг авсан тул нэвтэрнэ үү.",
         audience: input.audience,
       },
     };

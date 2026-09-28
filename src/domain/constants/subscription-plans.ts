@@ -75,7 +75,7 @@ export const CITIZEN_BASIC_PLAN: SubscriptionPlanDefinition = {
   quotas: {
     caseAnalysis: 0,
     documentAnalysis: 5,
-    legalAiQueries: 20,
+    legalAiQueries: 50,
   },
   tokenCeilings: {
     inputTokens: 200_000,
@@ -147,7 +147,7 @@ export const FEATURE_QUOTA_EXCEEDED_MESSAGES: Record<
   DOCUMENT_ANALYSIS:
     "Та энэ сарын баримт бичгийн шинжилгээний хязгаарт хүрсэн байна. Багцаа сунгана уу.",
   LEGAL_AI_QUERY:
-    "Та энэ сарын хууль зүйн AI асуултын хязгаарт хүрсэн байна. Багцаа сунгана уу.",
+    "Та энэ сарын AI асуултын хязгаарт хүрсэн байна. Багцаа сунгана уу.",
 };
 
 export const TOKEN_CEILING_USER_MESSAGE =
@@ -160,7 +160,7 @@ export const BILLING_REQUIRED_MESSAGE =
   "Таны TORE SOLO багц идэвхгүй байна. Төлбөр төлж багцаа идэвхжүүлнэ үү.";
 
 export const CITIZEN_BILLING_REQUIRED_MESSAGE =
-  "Шинэ хууль зүйн асуулт асуухад төлбөртэй багц шаардлагатай. Үнэгүй тодруулга энэ асуултын хүрээнд үргэлжилнэ.";
+  "Шинэ асуулт асуухад төлбөртэй багц шаардлагатай. Үнэгүй тодруулга энэ асуултын хүрээнд үргэлжилнэ.";
 
 export const LEGAL_AI_AUTHENTICATION_REQUIRED_MESSAGE =
-  "Үнэгүй хууль зүйн асуултынхаа хариуг авсан тул шинэ асуултад нэвтэрч, багц идэвхжүүлнэ үү.";
+  "Үнэгүй асуултынхаа хариуг авсан тул шинэ асуултад нэвтэрч, багц идэвхжүүлнэ үү.";

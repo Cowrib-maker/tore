@@ -13,6 +13,8 @@ export type LegalAiEntitlementView = {
   statusLabel: string;
   remainingLabel: string;
   exhaustedLabel: string;
+  /** Pre-formatted "Багц хүчинтэй: YYYY.MM.DD хүртэл" — present only for an active paid plan. */
+  validUntilLabel?: string | null;
   expiresSoon?: boolean;
   expiryWarningLabel?: string | null;
 };
@@ -74,6 +76,9 @@ export function LegalAiEntitlementBanner({
     <div className="rounded-xl border border-ai-border bg-ai-surface-muted px-3 py-3 text-left text-sm text-ai-text">
       <p className="font-medium text-ai-text">{view.statusLabel}</p>
       <p className="mt-1">{view.remainingLabel}</p>
+      {view.validUntilLabel ? (
+        <p className="mt-0.5 text-xs text-ai-text-subtle">{view.validUntilLabel}</p>
+      ) : null}
       <p className="mt-1 text-xs text-ai-text-subtle">{view.exhaustedLabel}</p>
       {view.expiresSoon && view.expiryWarningLabel ? (
         <p className="mt-2 text-xs font-medium text-ai-accent">

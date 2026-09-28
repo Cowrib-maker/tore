@@ -201,6 +201,21 @@ function createService(
     unpaidCitizenUsage: new InMemoryUnpaidCitizenLegalQuestionUsageRepository(),
   }),
   completionPort: LegalAiCompletionPort = completion(),
+  corpusRetriever: ConstructorParameters<typeof LegalAiService>[0]["corpusRetriever"] = {
+    retrieveExactCitation: async () => ({
+      kind: "unavailable",
+      reason: "not_configured",
+      authorities: [],
+      retrievedAt: null,
+    }),
+    retrieveLegalQuestion: async () => ({
+      kind: "unavailable",
+      reason: "not_configured",
+      authorities: [],
+      retrievedAt: null,
+    }),
+    verifyCitation: async () => ({ ok: false, reason: "not_configured" }),
+  },
 ) {
   return new LegalAiService({
     domainFilter: new RuleBasedDomainFilter(),
@@ -211,21 +226,7 @@ function createService(
     legalRelevance,
     store,
     completion: completionPort,
-    corpusRetriever: {
-      retrieveExactCitation: async () => ({
-        kind: "unavailable",
-        reason: "not_configured",
-        authorities: [],
-        retrievedAt: null,
-      }),
-      retrieveLegalQuestion: async () => ({
-        kind: "unavailable",
-        reason: "not_configured",
-        authorities: [],
-        retrievedAt: null,
-      }),
-      verifyCitation: async () => ({ ok: false, reason: "not_configured" }),
-    },
+    corpusRetriever,
     legalQuestionAccess: access,
   });
 }
@@ -623,6 +624,13 @@ describe("LegalAiService question threads", () => {
       entitlementUsageRepository: usage,
       unpaidCitizenUsage: new InMemoryUnpaidCitizenLegalQuestionUsageRepository(),
     });
+    // An open (non-exact-citation) legal question, not a pinpoint statute
+    // citation — the fixture's corpusRetriever reports "not_configured" for
+    // everything, which for an exact citation now correctly REFUSES (a safe
+    // no-answer, refunded — see "consumes 0 for a safe no-answer" below)
+    // rather than consuming quota. This test's own point is that a genuine
+    // answered question consumes exactly one paid unit, so it must avoid
+    // that citation-refusal path.
     const first = await createService(
       store,
       relevance(LegalRelevance.LEGAL),
@@ -630,7 +638,7 @@ describe("LegalAiService question threads", () => {
     ).createTurn({
       userId: "client-1",
       actorRole: UserRole.CLIENT,
-      message: "Эрүүгийн хуулийн 17.1 дүгээр зүйл юу гэж заасан бэ?",
+      message: "Хөрш маань хашааг минь нураасан.",
     });
     const periodStart = new Date(
       Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1),
@@ -728,6 +736,99 @@ describe("LegalAiService question threads", () => {
         message: "Гэрээний заалт ойлгомжгүй байна.",
       }),
     ).rejects.toMatchObject({ code: "BILLING_REQUIRED", statusCode: 402 });
+  });
+
+  it("a safe 'cannot verify this citation' no-answer refunds the unpaid-citizen free question instead of consuming it", async () => {
+    const store = createStore();
+    const unpaidCitizenUsage = new InMemoryUnpaidCitizenLegalQuestionUsageRepository();
+    const access = createLegalQuestionAccess({
+      guestSessions: {
+        getById: async () => null,
+        incrementFreeLegalQuestionsUsed: async () => {},
+        tryConsumeFreeLegalQuestion: async () => false,
+        releaseFreeLegalQuestion: async () => {},
+      },
+      conversations: store,
+      subscriptionRepository: new InMemorySubscriptionRepository(),
+      entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+      unpaidCitizenUsage,
+    });
+    // An exact-citation query the corpus can never verify (every tier
+    // reports "not_configured") resolves to a safe "cannot verify" reply —
+    // never a real answer, so it must not cost the user their one free
+    // question.
+    const result = await createService(
+      store,
+      relevance(LegalRelevance.LEGAL),
+      access,
+    ).createTurn({
+      userId: "client-1",
+      actorRole: UserRole.CLIENT,
+      message: "Эрүүгийн хуулийн 17.1 дүгээр зүйл юу гэж заасан бэ?",
+    });
+    expect(result.message.content).not.toBe("Хууль зүйн хариу");
+    expect(await unpaidCitizenUsage.getUsedCount("client-1")).toBe(0);
+    expect(
+      store.conversations.get(result.conversationId)?.billedQuestionCount,
+    ).toBe(0);
+  });
+
+  it("a failed attempt followed by a successful retry consumes exactly one question total", async () => {
+    const store = createStore();
+    const unpaidCitizenUsage = new InMemoryUnpaidCitizenLegalQuestionUsageRepository();
+    const access = createLegalQuestionAccess({
+      guestSessions: {
+        getById: async () => null,
+        incrementFreeLegalQuestionsUsed: async () => {},
+        tryConsumeFreeLegalQuestion: async () => false,
+        releaseFreeLegalQuestion: async () => {},
+      },
+      conversations: store,
+      subscriptionRepository: new InMemorySubscriptionRepository(),
+      entitlementUsageRepository: new InMemoryEntitlementUsageRepository(),
+      unpaidCitizenUsage,
+    });
+
+    // First attempt: OpenAI itself fails outright (a hard failure, not a
+    // safe no-answer) — the reservation is released via createTurn's own
+    // catch block, same as before this task.
+    const failing: LegalAiCompletionPort = {
+      isConfigured: () => true,
+      complete: async () => {
+        throw new LegalAiError(
+          "AI үйлчилгээтэй холбогдоход алдаа гарлаа.",
+          503,
+          "AI_UNAVAILABLE",
+        );
+      },
+    };
+    await expect(
+      createService(
+        store,
+        relevance(LegalRelevance.LEGAL),
+        access,
+        failing,
+      ).createTurn({
+        userId: "client-1",
+        actorRole: UserRole.CLIENT,
+        message: "Хөрш маань хашааг минь нураасан.",
+      }),
+    ).rejects.toMatchObject({ code: "AI_UNAVAILABLE" });
+    expect(await unpaidCitizenUsage.getUsedCount("client-1")).toBe(0);
+
+    // Retry succeeds — consumes exactly the one question, not a second one
+    // stacked on top of the failed attempt.
+    const retried = await createService(
+      store,
+      relevance(LegalRelevance.LEGAL),
+      access,
+    ).createTurn({
+      userId: "client-1",
+      actorRole: UserRole.CLIENT,
+      message: "Хөрш маань хашааг минь нураасан.",
+    });
+    expect(retried.message.content).toBe("Хууль зүйн хариу");
+    expect(await unpaidCitizenUsage.getUsedCount("client-1")).toBe(1);
   });
 });
 

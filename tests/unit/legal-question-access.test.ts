@@ -6,7 +6,7 @@ import {
   type GuestSessionStore,
   type LegalQuestionReservation,
 } from "@/application/legal-ai/legal-question-access";
-import { GUEST_FREE_LEGAL_QUESTIONS, SOLO_PLAN, UNPAID_CITIZEN_FREE_LEGAL_QUESTIONS } from "@/domain/constants/subscription-plans";
+import { CITIZEN_BASIC_PLAN, GUEST_FREE_LEGAL_QUESTIONS, SOLO_PLAN, UNPAID_CITIZEN_FREE_LEGAL_QUESTIONS } from "@/domain/constants/subscription-plans";
 import {
   EntitlementFeature,
   SeatStatus,
@@ -600,6 +600,54 @@ describe("createLegalQuestionAccess", () => {
 
     const finalUsage = await usage.getOrCreate({ userId: "lawyer-1", subscriptionId: created.id, periodStart });
     expect(finalUsage.legalAiQueryCount).toBe(SOLO_PLAN.quotas.legalAiQueries); // exactly at the ceiling, not over it
+  });
+
+  it("Citizen Basic allows exactly 50 AI questions per period, then requires billing", async () => {
+    expect(CITIZEN_BASIC_PLAN.quotas.legalAiQueries).toBe(50);
+
+    const subscriptions = new InMemorySubscriptionRepository();
+    const usage = new InMemoryEntitlementUsageRepository();
+    const created = await subscriptions.create({
+      ownerUserId: "client-1",
+      planCode: SubscriptionPlanCode.CITIZEN_BASIC,
+      status: SubscriptionStatus.ACTIVE,
+      seatLimit: 1,
+      currentPeriodStart: new Date(),
+      currentPeriodEnd: futureDate(),
+    });
+    await subscriptions.createSeat({
+      subscriptionId: created.id,
+      userId: "client-1",
+      status: SeatStatus.ACTIVE,
+    });
+    const periodStart = new Date(
+      Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1),
+    );
+    const seedUsage = await usage.getOrCreate({ userId: "client-1", subscriptionId: created.id, periodStart });
+    await usage.increment(seedUsage.id, {
+      legalAiQueryCount: CITIZEN_BASIC_PLAN.quotas.legalAiQueries - 1,
+    });
+
+    const access = createLegalQuestionAccess({
+      guestSessions: createGuestSessionsDouble(),
+      conversations: { countBilledQuestionsForUser: async () => 0 },
+      subscriptionRepository: subscriptions,
+      entitlementUsageRepository: usage,
+      unpaidCitizenUsage: noopUnpaidCitizenUsage(),
+    });
+    const subject = { kind: "user" as const, userId: "client-1", role: UserRole.CLIENT };
+
+    // The 50th question succeeds.
+    await access.assertCanStartNewLegalQuestion(subject);
+    const afterFiftieth = await usage.getOrCreate({ userId: "client-1", subscriptionId: created.id, periodStart });
+    expect(afterFiftieth.legalAiQueryCount).toBe(50);
+
+    // The 51st is blocked and does not bump the count past the ceiling.
+    await expect(access.assertCanStartNewLegalQuestion(subject)).rejects.toMatchObject({
+      code: "FEATURE_QUOTA_EXCEEDED",
+    });
+    const finalUsage = await usage.getOrCreate({ userId: "client-1", subscriptionId: created.id, periodStart });
+    expect(finalUsage.legalAiQueryCount).toBe(50);
   });
 
   it("treats guests and unpaid citizens as unpaid for general questions", async () => {

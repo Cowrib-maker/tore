@@ -30,6 +30,7 @@ import type {
   LegalAiCreateTurnInput,
   LegalAiCreateTurnResult,
   LegalAiConversationDocumentMeta,
+  LegalAiRecentConversationSummary,
   LegalAiStore,
   LegalAiStoredMessage,
 } from "@/application/ai/legal-ai.types";
@@ -195,6 +196,7 @@ export class LegalAiService {
         conversationState,
         relevance,
         thread,
+        reservation,
       });
     } catch (error) {
       if (startingNewQuestion) {
@@ -224,6 +226,7 @@ export class LegalAiService {
     };
     relevance: Awaited<ReturnType<LegalRelevanceService["classify"]>>;
     thread: ReturnType<typeof decideLegalQuestionThreadAction>;
+    reservation: LegalQuestionReservation;
   }): Promise<LegalAiCreateTurnResult> {
     const {
       input,
@@ -234,6 +237,7 @@ export class LegalAiService {
       conversationState,
       relevance,
       thread,
+      reservation,
     } = ctx;
 
     // LegalRelevance is a ROUTING signal now, not a hard access gate — every
@@ -264,18 +268,48 @@ export class LegalAiService {
 
     const afterReply = async <T extends LegalAiCreateTurnResult>(
       result: T,
-      overrides?: { questionStatus?: LegalQuestionStatus },
+      overrides?: {
+        questionStatus?: LegalQuestionStatus;
+        /**
+         * False for a safe, system-generated no-answer (e.g. an exact legal
+         * citation that could not be verified against any tier — see the
+         * `authorities.kind === "refused"` call site below): the turn
+         * completed without throwing, so this is the only place that can
+         * still give the reservation back. A no-answer must never
+         * permanently consume the one-question entitlement, and must never
+         * bump the legal-question audit counter either — as far as billing
+         * and thread progression are concerned, it is as if the question
+         * was never asked (the message pair is still persisted, honestly,
+         * for chat history). Defaults to true — every other call site is
+         * a genuine, substantive answer and keeps today's behavior exactly.
+         */
+        consumesEntitlement?: boolean;
+      },
     ): Promise<T> => {
+      const consumesEntitlement = overrides?.consumesEntitlement ?? true;
       await this.dependencies.store.updateQuestionThread({
         conversationId: conversation.id,
         questionStatus: overrides?.questionStatus ?? thread.nextStatus,
         // Legal-question-specific audit counter — a general question still
         // consumes the entitlement (see threadReservesEntitlement above)
-        // but never bumps this field, unchanged from before this task.
-        incrementBilledQuestion: thread.type === "START_NEW",
+        // but never bumps this field, unchanged from before this task. A
+        // refunded no-answer never bumps it either.
+        incrementBilledQuestion: consumesEntitlement && thread.type === "START_NEW",
       });
-      if (threadReservesEntitlement(thread)) {
+      if (!threadReservesEntitlement(thread)) {
+        return result;
+      }
+      if (consumesEntitlement) {
         await this.legalQuestionAccess.consumeNewLegalQuestion(subject);
+      } else {
+        await this.legalQuestionAccess
+          .releaseNewLegalQuestion(reservation)
+          .catch((releaseError: unknown) => {
+            console.error(
+              "Failed to release legal-question reservation after a safe no-answer turn.",
+              releaseError,
+            );
+          });
       }
       return result;
     };
@@ -458,6 +492,10 @@ export class LegalAiService {
     });
 
     if (authorities.kind === "refused") {
+      // A safe "cannot verify this citation" reply is not a substantive
+      // answer — refund the reservation instead of consuming it, and leave
+      // the question-thread status exactly where it was (this exchange
+      // didn't move the thread forward either).
       return afterReply(
         await this.persistSafeReply({
           conversationId: conversation.id,
@@ -467,6 +505,10 @@ export class LegalAiService {
           taskType,
           retrievalInvoked: authorities.retrievalInvoked,
         }),
+        {
+          questionStatus: conversationState.questionStatus,
+          consumesEntitlement: false,
+        },
       );
     }
 
@@ -613,6 +655,19 @@ export class LegalAiService {
       conversationId,
       userId,
     );
+  }
+
+  /**
+   * Recent conversation list for reopening a prior thread — the same
+   * underlying store method lawyer flows already use
+   * (listOwnedRecentConversations), exposed here so citizen routes go
+   * through this service instead of reaching into the store directly.
+   */
+  async listRecentConversations(
+    userId: string,
+    take = 20,
+  ): Promise<LegalAiRecentConversationSummary[]> {
+    return this.dependencies.store.listOwnedRecentConversations(userId, take);
   }
 
   private async completeGeneralAnswer(input: {

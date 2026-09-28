@@ -392,9 +392,18 @@ export type LegalQuestionEntitlementSnapshot = {
   remainingLabel: string;
   exhaustedLabel: string;
   currentPeriodEnd: string | null;
+  /** Pre-formatted "Багц хүчинтэй: YYYY.MM.DD хүртэл" — null when there's no active paid period (guest/unpaid/inactive). */
+  validUntilLabel: string | null;
   expiresSoon: boolean;
   expiryWarningLabel: string | null;
 };
+
+function formatValidUntilLabel(periodEnd: Date): string {
+  const y = periodEnd.getUTCFullYear();
+  const m = String(periodEnd.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(periodEnd.getUTCDate()).padStart(2, "0");
+  return `Багц хүчинтэй: ${y}.${m}.${d} хүртэл`;
+}
 
 export async function getLegalQuestionEntitlementSnapshot(
   subject:
@@ -450,7 +459,7 @@ export async function getLegalQuestionEntitlementSnapshot(
         remainingKind: "plan_quota",
         exhaustedNextStep: "wait_period",
         statusLabel: PLATFORM_DEMO_PLAN_NAME,
-        remainingLabel: `Энэ сард үлдсэн хууль зүйн AI асуулт: ${PLATFORM_DEMO_UNLIMITED_REMAINING}+`,
+        remainingLabel: `Энэ сард үлдсэн AI асуулт: ${PLATFORM_DEMO_UNLIMITED_REMAINING}+`,
         exhaustedLabel:
           "Founder demo эрх — төлбөртэй багц шаардлагагүй.",
       });
@@ -512,7 +521,7 @@ async function paidPlanSnapshot(
       remainingKind: "plan_quota",
       exhaustedNextStep: "billing",
       statusLabel: "Төлбөртэй багц",
-      remainingLabel: "Үлдсэн хууль зүйн AI асуулт: 0",
+      remainingLabel: "Үлдсэн AI асуулт: 0",
       exhaustedLabel: "Багц идэвхгүй байна. Төлбөр төлж идэвхжүүлнэ үү.",
     });
   }
@@ -538,10 +547,11 @@ async function paidPlanSnapshot(
     remainingKind: "plan_quota",
     exhaustedNextStep: remaining > 0 ? "wait_period" : "wait_period",
     statusLabel: plan.name,
-    remainingLabel: `Энэ сард үлдсэн хууль зүйн AI асуулт: ${remaining}`,
+    remainingLabel: `AI асуулт: ${remaining} / ${entitlement.quotas.legalAiQueries} үлдсэн`,
     exhaustedLabel:
-      "Хязгаар дуусмагц дараагийн төлбөрийн үе хүртэл шинэ хууль зүйн асуулт асуух боломжгүй.",
+      "Хязгаар дуусмагц дараагийн төлбөрийн үе хүртэл шинэ AI асуулт асуух боломжгүй.",
     currentPeriodEnd: owned.currentPeriodEnd.toISOString(),
+    validUntilLabel: formatValidUntilLabel(owned.currentPeriodEnd),
     expiresSoon,
     expiryWarningLabel: expiresSoon
       ? "Багц 3 хоногийн дотор дуусна. Сунгахын тулд төлбөр төлнө үү."
@@ -551,9 +561,10 @@ async function paidPlanSnapshot(
 
 type SnapshotInput = Omit<
   LegalQuestionEntitlementSnapshot,
-  "currentPeriodEnd" | "expiresSoon" | "expiryWarningLabel"
+  "currentPeriodEnd" | "validUntilLabel" | "expiresSoon" | "expiryWarningLabel"
 > & {
   currentPeriodEnd?: string | null;
+  validUntilLabel?: string | null;
   expiresSoon?: boolean;
   expiryWarningLabel?: string | null;
 };
@@ -562,6 +573,7 @@ function copySnapshot(snapshot: SnapshotInput): LegalQuestionEntitlementSnapshot
   return {
     ...snapshot,
     currentPeriodEnd: snapshot.currentPeriodEnd ?? null,
+    validUntilLabel: snapshot.validUntilLabel ?? null,
     expiresSoon: snapshot.expiresSoon ?? false,
     expiryWarningLabel: snapshot.expiryWarningLabel ?? null,
   };

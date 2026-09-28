@@ -219,6 +219,49 @@ export function LegalAiChat({
     conversationIdRef.current = conversationId;
   }, [conversationId]);
 
+  // Keeps the URL in sync with the active conversation (without a full
+  // navigation/remount) so a reload of this same tab restores it via the
+  // server-side ?conversationId= load in src/app/legal-ai/page.tsx, instead
+  // of silently starting a brand-new conversation. Previously conversationId
+  // only ever lived in React state, so a reload always lost the thread.
+  useEffect(() => {
+    if (!conversationId) return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("conversationId") === conversationId) return;
+    url.searchParams.set("conversationId", conversationId);
+    window.history.replaceState(null, "", url.toString());
+  }, [conversationId]);
+
+  const [recentConversations, setRecentConversations] = useState<
+    { id: string; title: string | null; updatedAt: string }[]
+  >([]);
+
+  // Best-effort: silently empty for a guest (401) or on any network error —
+  // "no history to show" is always a safe, honest fallback, never an error
+  // banner for a feature that's purely a convenience.
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/ai/conversations", { credentials: "include" })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        return (await response.json()) as {
+          conversations: { id: string; title: string | null; updatedAt: string }[];
+        };
+      })
+      .then((data) => {
+        if (!cancelled && data?.conversations) {
+          setRecentConversations(data.conversations);
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+    // Re-fetched only on mount and when the active conversation changes
+    // (a new conversation was just created, or a different one was opened)
+    // — not on every message, which would be wasteful.
+  }, [conversationId]);
+
   const scrollTranscriptToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
     const el = transcriptRef.current;
     if (!el) return;
@@ -658,6 +701,8 @@ export function LegalAiChat({
     <LegalAiSidebar
       onNewConversation={resetConversation}
       onNavigate={() => setMobileNavOpen(false)}
+      conversations={recentConversations}
+      activeConversationId={conversationId}
     />
   );
 
@@ -967,9 +1012,13 @@ export function LegalAiChat({
 function LegalAiSidebar({
   onNewConversation,
   onNavigate,
+  conversations,
+  activeConversationId,
 }: {
   onNewConversation: () => void;
   onNavigate: () => void;
+  conversations: { id: string; title: string | null; updatedAt: string }[];
+  activeConversationId?: string;
 }) {
   return (
     <div className="flex h-full w-full flex-col bg-[#0B1F3A] text-[#F7FAF8]">
@@ -1005,6 +1054,30 @@ function LegalAiSidebar({
             Хуульч, өмгөөлөгч
           </SidebarLink>
         </nav>
+
+        {conversations.length > 0 ? (
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <p className="px-2 pb-1.5 text-[11px] font-semibold tracking-[0.1em] text-white/45 uppercase">
+              Өмнөх яриа
+            </p>
+            <nav className="space-y-0.5" aria-label="Өмнөх яриа">
+              {conversations.map((conversation) => (
+                <Link
+                  key={conversation.id}
+                  href={`${LEGAL_AI_PATH}?conversationId=${conversation.id}`}
+                  onClick={onNavigate}
+                  className={cn(
+                    "block truncate rounded-lg px-2.5 py-1.5 text-[13px] text-white/70 transition hover:bg-white/8 hover:text-white",
+                    conversation.id === activeConversationId &&
+                      "bg-white/10 text-white",
+                  )}
+                >
+                  {conversation.title?.trim() || "Гарчиггүй яриа"}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        ) : null}
 
         <div className="mt-auto rounded-xl border border-white/10 bg-white/5 px-3 py-3">
           <p className="text-[11px] font-semibold tracking-[0.14em] text-gold">

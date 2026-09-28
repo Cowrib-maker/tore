@@ -36,6 +36,7 @@ export class PromptBuilderService implements IPromptBuilder {
         attachmentRuleBlock(hasDocumentContext, capability, hasUnreadableDocumentOnly),
         audienceBlock(input.userType, capability),
         turnKindBlock(turnKind, input, capability),
+        concisenessBlock(),
         outputStructureBlock(capability, input),
         caseMethodBlock(capability, input, turnKind),
         turnKind === PromptTurnKind.GENERAL ? "" : orthographyCoachBlock(),
@@ -96,6 +97,22 @@ const LAWYER_PREAMBLE = `Та бол TORE Legal AI. Өмгөөлөгч, хуул
 - Хэрэглэгч гадаадын хууль, олон улсын акт, бусад орны practice / мэргэжлийн жишгийг асуусан бол бүрэн, мэргэжлийн түвшинд хариул. TORE-ийн Монголын корпус энэ хэсгийг баталгаажуулдаггүй.
 - Эсрэг байр суурь, эрсдэл, дутуу баримтыг нууж болохгүй.
 - Эх сурвалж байхгүй бол тодорхой хэл. Бүү зохио.`;
+
+/**
+ * A default-length instruction applied to every turn, regardless of
+ * capability or turn kind. Answers had grown reflexively long (the citizen
+ * legal-answer structure below mandates the same 7 sections for a trivial
+ * question as for a genuinely complex one). This does not remove that
+ * structure or shorten it with a hard token cap — it tells the model when
+ * brevity is appropriate, so a simple question gets a short answer and a
+ * complex legal question can still take the space it actually needs.
+ */
+function concisenessBlock(): string {
+  return `ХАРИУЛТЫН УРТ
+Шууд, тодорхой хариултаас эхэл. Давтагдсан үг өгүүлбэр, шаардлагагүй анхааруулга бүү оруул.
+Энгийн асуултад товч хариул. Ихэнх тохиолдолд ойролцоогоор 4-8 богино догол мөр/бүлэг хангалттай.
+Хууль зүйн нарийн, олон хүчин зүйлтэй асуудал бол шаардлагатай хэмжээгээр урт, дэлгэрэнгүй бич — гэхдээ хууль зүйн үндэслэл, эх сурвалж, ишлэлийг хэзээ ч бүү хасаж, бүү товчил.`;
+}
 
 function resolveCapability(
   input: PromptBuildInput,
@@ -246,7 +263,7 @@ function outputStructureBlock(
 
   if (capability === "CITIZEN") {
     return `CITIZEN OUTPUT (TORE Chat)
-Боломжтой үед дараах бүтэцтэй, энгийн монголоор хариул. Хоосон хэсэг бүү гарга.
+Энгийн монголоор хариул.
 
 1. Товч хариулт
 2. Таны нөхцөл байдал
@@ -256,6 +273,7 @@ function outputStructureBlock(
 6. Анхаарах зүйл
 7. Эх сурвалж
 
+Асуулт энгийн, шууд хариулт хангалттай бол дээрх бүх 7 хэсгийг заавал бичих шаардлагагүй — 1, 3, 4-ийг нэг товч хариулт болгож нэгтгэн, 2, 5, 6-г хэрэггүй бол орхиж болно. Эх сурвалж байгаа тохиолдолд 7-г үргэлж оруул. Асуудал олон хүчин зүйлтэй, нарийн бол бүх 7 хэсгийг ашигла. Хоосон хэсэг бүү гарга.
 Эх сурвалж өгөөгүй бол 3, 7-д "холбогдох эрх зүйн зохицуулалт одоогоор баталгаатай эх сурвалжаас олдсонгүй" гэж хэл. Бүү зохио.
 "Эх сурвалж" болон "TORE-ийн дүгнэлт"-ийг ялга.
 Төгсгөлд санамж: Энэ хариулт мэргэжлийн хуульч, өмгөөлөгчийн зөвлөгөөг орлохгүй. Асуудлаа шийдвэрлүүлэхийн тулд баталгаажсан хуульч, өмгөөлөгчтэй холбогдоорой.`;

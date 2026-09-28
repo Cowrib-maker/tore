@@ -334,7 +334,7 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
                   </p>
                   <ul className="mt-3 space-y-1 text-[13px] text-[#5C6570]">
                     <li className="flex items-center gap-1.5">
-                      <Check className="size-3.5 text-[#1F9D5C]" /> {plan.quotas.legalAiQueries} хууль зүйн AI асуулт/сар
+                      <Check className="size-3.5 text-[#1F9D5C]" /> {plan.quotas.legalAiQueries} AI асуулт/сар
                     </li>
                     <li className="flex items-center gap-1.5">
                       <Check className="size-3.5 text-[#1F9D5C]" /> {plan.quotas.documentAnalysis} баримт бичиг шинжилгээ/сар

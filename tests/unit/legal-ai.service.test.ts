@@ -289,6 +289,30 @@ describe("LegalAiService", () => {
     expect(store.assistantMessages).toHaveLength(2);
   });
 
+  it("lists a user's recent conversations, most recently updated first, scoped to that user", async () => {
+    const { service } = createService();
+
+    const mine1 = await service.createTurn({
+      userId: "user-1",
+      message: "Гэрээ гэж юу вэ?",
+    });
+    const mine2 = await service.createTurn({
+      userId: "user-1",
+      message: "Хөдөлмөрийн гэрээ хэрхэн цуцлах вэ?",
+    });
+    await service.createTurn({
+      userId: "user-2",
+      message: "Өөр хэрэглэгчийн асуулт.",
+    });
+
+    const recent = await service.listRecentConversations("user-1", 10);
+
+    expect(recent.map((item) => item.id).sort()).toEqual(
+      [mine1.conversationId, mine2.conversationId].sort(),
+    );
+    expect(recent.every((item) => item.id !== undefined)).toBe(true);
+  });
+
   it("persists the user message before generating an assistant reply", async () => {
     const store = createStore();
     const order: string[] = [];
