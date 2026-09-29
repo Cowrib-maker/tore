@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { CSSProperties } from "react";
+import Link from "next/link";
 import { LogOut } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -64,6 +65,8 @@ export interface WorkspaceShellProps {
   languageLabel: string;
   signOutLabel: string;
   navAriaLabel?: string;
+  /** Self-service profile page. When set, the sidebar identity card links there. */
+  profileHref?: string | null;
   /**
    * Optional persistent content row rendered above `children`, inside the
    * main content area (not the sidebar). Distinct page headers (a
@@ -114,10 +117,28 @@ export function WorkspaceShell({
   languageLabel,
   signOutLabel,
   navAriaLabel = "Main navigation",
+  profileHref,
   header,
   rightRail,
 }: WorkspaceShellProps) {
   const initial = initialOf(user.name, user.email);
+  const identity = (
+    <>
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-workspace-accent text-xs font-semibold text-white">
+        {initial}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-xs font-semibold text-sidebar-foreground">
+          {user.name ?? user.email ?? "—"}
+        </p>
+        {user.name && user.email ? (
+          <p className="truncate text-[11px] text-sidebar-foreground/60">
+            {user.email}
+          </p>
+        ) : null}
+      </div>
+    </>
+  );
 
   return (
     <SidebarProvider
@@ -158,21 +179,18 @@ export function WorkspaceShell({
             </p>
           ) : null}
 
-          <div className="flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.04] p-2.5">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-workspace-accent text-xs font-semibold text-white">
-              {initial}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-semibold text-sidebar-foreground">
-                {user.name ?? user.email ?? "—"}
-              </p>
-              {user.name && user.email ? (
-                <p className="truncate text-[11px] text-sidebar-foreground/60">
-                  {user.email}
-                </p>
-              ) : null}
+          {profileHref ? (
+            <Link
+              href={profileHref}
+              className="flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.04] p-2.5 transition-colors hover:bg-white/[0.08]"
+            >
+              {identity}
+            </Link>
+          ) : (
+            <div className="flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.04] p-2.5">
+              {identity}
             </div>
-          </div>
+          )}
 
           <div className="flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.08] p-1.5">
             <LanguageSwitcher

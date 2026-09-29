@@ -1,12 +1,25 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import {
+  Bell,
+  Briefcase,
+  Building2,
+  CalendarClock,
+  CreditCard,
+  FolderOpen,
+  LayoutDashboard,
+  LayoutGrid,
+  Sparkles,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import { LawyerWorkspaceFrame } from "@/components/case-review/lawyer-workspace-frame";
+import type { DashboardNavItem } from "@/components/layout/dashboard-shell";
 import {
-  DashboardShell,
-  type DashboardNavItem,
-} from "@/components/layout/dashboard-shell";
+  WorkspaceShell,
+  type WorkspaceNavItem,
+} from "@/components/workspace/workspace-shell";
 import type { Locale } from "@/i18n/config";
 
 type Props = {
@@ -27,6 +40,25 @@ type Props = {
   todayLabel?: string;
 };
 
+/**
+ * Icon-per-route is a WorkspaceShell (sidebar) concern only — the shared
+ * nav item list from getShellI18n("lawyer") stays {href,label}, unchanged.
+ * /lawyer/workspace keeps its own icon here too even though clicking it
+ * navigates to a route rendered by LawyerWorkspaceFrame, not WorkspaceShell
+ * — it's still a real outbound link from every other lawyer page.
+ */
+const LAWYER_NAV_ICONS: Record<string, LucideIcon> = {
+  "/lawyer/dashboard": LayoutDashboard,
+  "/lawyer/workspace": LayoutGrid,
+  "/lawyer/workspace/cases": FolderOpen,
+  "/lawyer/offerings": Briefcase,
+  "/lawyer/bookings": CalendarClock,
+  "/billing": CreditCard,
+  "/lawyer/notifications": Bell,
+  "/legal-ai": Sparkles,
+  "/organizations": Building2,
+};
+
 export function LawyerAppChrome({
   children,
   user,
@@ -36,11 +68,9 @@ export function LawyerAppChrome({
   signOutLabel,
   brand,
   navAriaLabel,
-  mobileNavLabel,
   profileHref,
   notificationsHref,
   unreadNotificationsCount,
-  notificationsLabel,
   todayLabel,
 }: Props) {
   const pathname = usePathname();
@@ -61,22 +91,27 @@ export function LawyerAppChrome({
     );
   }
 
+  const items: WorkspaceNavItem[] = (nav ?? []).map((item) => ({
+    href: item.href,
+    label: item.label,
+    icon: LAWYER_NAV_ICONS[item.href],
+    badge:
+      item.href === notificationsHref ? unreadNotificationsCount : undefined,
+  }));
+
   return (
-    <DashboardShell
+    <WorkspaceShell
+      context="lawyer"
       user={user}
-      nav={nav}
+      navGroups={[{ items }]}
       locale={locale}
       languageLabel={languageLabel}
       signOutLabel={signOutLabel}
       brand={brand}
       navAriaLabel={navAriaLabel}
-      mobileNavLabel={mobileNavLabel}
       profileHref={profileHref}
-      notificationsHref={notificationsHref}
-      unreadNotificationsCount={unreadNotificationsCount}
-      notificationsLabel={notificationsLabel}
     >
       {children}
-    </DashboardShell>
+    </WorkspaceShell>
   );
 }
