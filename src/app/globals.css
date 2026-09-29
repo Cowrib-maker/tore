@@ -571,13 +571,21 @@
   }
 
   .landing-page {
+    /* Aliased onto the shared Layer 0/2 tokens (globals.css, commit
+       401ee3a) wherever the resolved value is an exact match — same
+       ink/accent/teal/surface identity Admin's WorkspaceShell now reads
+       from, not a separate palette that happens to look similar.
+       --landing-canvas-muted / --landing-mint / --landing-surface-muted /
+       --landing-border (and -strong) / --landing-nav-text have no
+       matching shared token yet, so they stay literal rather than
+       forcing a false unification. */
     --landing-canvas: #f7f8fb;
     --landing-canvas-muted: #eef3fb;
-    --landing-ink: #0a0f14;
-    --landing-accent: #0b1f3a;
-    --landing-teal: #0b5cff;
+    --landing-ink: var(--primitive-neutral-900);
+    --landing-accent: var(--public-accent);
+    --landing-teal: var(--public-accent-bright);
     --landing-mint: #eaf1fb;
-    --landing-surface: #ffffff;
+    --landing-surface: var(--public-surface);
     --landing-surface-muted: #f4f6f8;
     --landing-border: rgb(11 31 58 / 0.08);
     --landing-border-strong: rgb(11 31 58 / 0.14);
@@ -585,11 +593,11 @@
   }
 
   .dark .landing-page {
-    --landing-canvas: #0a0e16;
+    --landing-canvas: var(--public-background);
     --landing-canvas-muted: #121c2e;
     --landing-ink: #eef2f0;
-    --landing-accent: #8fb4dd;
-    --landing-teal: #4c8dff;
+    --landing-accent: var(--public-accent);
+    --landing-teal: var(--public-accent-bright);
     --landing-mint: #172033;
     --landing-surface: #12100d;
     --landing-surface-muted: #17231e;

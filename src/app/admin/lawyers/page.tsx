@@ -1,29 +1,46 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { CheckCircle2, Clock, PauseCircle, XCircle } from "lucide-react";
 
 import { getSessionUser } from "@/application/common/session";
 import { getAdminLawyerVerificationQueue } from "@/application/actions/verification.actions";
+import { AdminKpiTile } from "@/components/admin/admin-kpi-tile";
 import { AdminLawyerAccountActions } from "@/components/admin/admin-lawyer-account-actions";
 import { AdminListingActions } from "@/components/admin/admin-listing-actions";
-import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
-import { ReviewCredentialActions } from "@/components/verification/review-credential-actions";
-import { Badge } from "@/components/ui/badge";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { UserRole } from "@/domain/enums";
+  AdminVerificationStatusBadge,
+  type VerificationBadgeTone,
+} from "@/components/admin/admin-verification-status-badge";
+import { ReviewCredentialActions } from "@/components/verification/review-credential-actions";
+import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
+import {
+  CredentialReviewStatus,
+  LawyerVerificationStatus,
+  UserRole,
+} from "@/domain/enums";
 import { isLawyerVerified } from "@/domain/services/lawyer-eligibility";
 import { getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 import {
   formatCredentialStatus,
+  formatDateTimeUtc,
   formatVerificationStatus,
 } from "@/lib/format-labels";
 import { localizedTaxonomyName } from "@/lib/localized-content";
+
+const LAWYER_STATUS_TONE: Record<LawyerVerificationStatus, VerificationBadgeTone> = {
+  [LawyerVerificationStatus.PENDING]: "warning",
+  [LawyerVerificationStatus.APPROVED]: "success",
+  [LawyerVerificationStatus.REJECTED]: "destructive",
+  [LawyerVerificationStatus.SUSPENDED]: "neutral",
+};
+
+const CREDENTIAL_STATUS_TONE: Record<CredentialReviewStatus, VerificationBadgeTone> = {
+  [CredentialReviewStatus.SUBMITTED]: "warning",
+  [CredentialReviewStatus.APPROVED]: "success",
+  [CredentialReviewStatus.REJECTED]: "destructive",
+};
 
 export default async function AdminLawyersPage() {
   const session = await getSessionUser();
@@ -47,86 +64,131 @@ export default async function AdminLawyersPage() {
     redirect(getDashboardPath(UserRole.ADMIN));
   }
 
+  // Real counts only — derived from the already-fetched queue/directory,
+  // never a separate fabricated statistic.
+  const pendingCount = queue.items.length;
+  const approvedCount = queue.directory.filter(
+    (item) => item.lawyer.verificationStatus === LawyerVerificationStatus.APPROVED,
+  ).length;
+  const rejectedCount = queue.directory.filter(
+    (item) => item.lawyer.verificationStatus === LawyerVerificationStatus.REJECTED,
+  ).length;
+  const suspendedCount = queue.directory.filter(
+    (item) => item.lawyer.verificationStatus === LawyerVerificationStatus.SUSPENDED,
+  ).length;
+
   return (
     <>
-      <DashboardPageHeading>{a.pageTitle}</DashboardPageHeading>
-      <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>{a.pendingTitle}</CardTitle>
-          <CardDescription>{a.pendingHelp}</CardDescription>
-        </CardHeader>
-      </Card>
+      <h1 className="text-2xl font-bold text-ink sm:text-[1.75rem]">
+        {a.pageTitle}
+      </h1>
+      <p className="mt-1 text-sm text-muted-foreground">{a.pendingHelp}</p>
 
-      {queue.items.length === 0 ? (
-        <Card className="mb-6">
-          <CardContent className="py-8 text-sm text-muted-foreground">
-            {a.emptyQueue}{" "}
-            <Link
-              href="/admin/dashboard"
-              className="text-primary underline-offset-4 hover:underline"
-            >
-              {a.backDashboard}
-            </Link>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="mb-8 grid gap-4">
-          {queue.items.map((item) => (
-            <Card key={item.credential.id}>
-              <CardHeader>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <CardTitle className="text-base">
-                      {item.lawyerName ?? m.common.lawyerFallback} ·{" "}
-                      {item.lawyer.slug}
-                    </CardTitle>
-                    <CardDescription>
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <AdminKpiTile
+          icon={Clock}
+          label={formatVerificationStatus(LawyerVerificationStatus.PENDING, locale)}
+          value={String(pendingCount)}
+        />
+        <AdminKpiTile
+          icon={CheckCircle2}
+          label={formatVerificationStatus(LawyerVerificationStatus.APPROVED, locale)}
+          value={String(approvedCount)}
+        />
+        <AdminKpiTile
+          icon={XCircle}
+          label={formatVerificationStatus(LawyerVerificationStatus.REJECTED, locale)}
+          value={String(rejectedCount)}
+        />
+        <AdminKpiTile
+          icon={PauseCircle}
+          label={formatVerificationStatus(LawyerVerificationStatus.SUSPENDED, locale)}
+          value={String(suspendedCount)}
+        />
+      </div>
+
+      <section className="mt-8">
+        <h2 className="text-lg font-semibold text-ink">{a.pendingTitle}</h2>
+
+        {queue.items.length === 0 ? (
+          <EmptyState
+            className="mt-4"
+            title={a.emptyQueue}
+            action={
+              <Link
+                href="/admin/dashboard"
+                className="text-sm text-primary underline-offset-4 hover:underline"
+              >
+                {a.backDashboard}
+              </Link>
+            }
+          />
+        ) : (
+          <div className="mt-4 grid gap-4">
+            {queue.items.map((item) => (
+              <Card key={item.credential.id}>
+                <CardContent className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0 flex-1 space-y-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-sm font-semibold text-ink">
+                        {item.lawyerName ?? m.common.lawyerFallback}{" "}
+                        <span className="font-normal text-muted-foreground">
+                          · {item.lawyer.slug}
+                        </span>
+                      </h3>
+                      <AdminVerificationStatusBadge
+                        tone={CREDENTIAL_STATUS_TONE[item.credential.status]}
+                        label={formatCredentialStatus(item.credential.status, locale)}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
                       {item.lawyerEmail} · {a.submitted}{" "}
-                      {item.credential.submittedAt.toISOString()}
-                    </CardDescription>
-                  </div>
-                  <Badge>
-                    {formatCredentialStatus(item.credential.status, locale)}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2 text-sm">
-                  <p>
-                    <span className="text-muted-foreground">{a.license}</span>{" "}
-                    {item.credential.licenseNumber}
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">{a.authority}</span>{" "}
-                    {item.credential.issuingAuthority}
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">{a.experience}</span>{" "}
-                    {item.lawyer.yearsOfExperience ?? "—"}
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">{a.phone}</span>{" "}
-                    {item.lawyer.phone ?? "—"}
-                  </p>
-                  <p>
-                    <span className="text-muted-foreground">
-                      {a.practiceAreas}
-                    </span>{" "}
-                    {item.practiceAreas.length > 0
-                      ? item.practiceAreas
-                          .map((area) => localizedTaxonomyName(area, locale))
-                          .join(", ")
-                      : "—"}
-                  </p>
-                  {item.lawyer.bio ? (
-                    <p className="whitespace-pre-wrap text-muted-foreground">
-                      {item.lawyer.bio}
+                      {formatDateTimeUtc(item.credential.submittedAt, locale)}
                     </p>
-                  ) : null}
-                  <p>
+                    <dl className="grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2">
+                      <div>
+                        <dt className="text-muted-foreground">{a.license}</dt>
+                        <dd className="mt-0.5 font-medium text-ink">
+                          {item.credential.licenseNumber}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-muted-foreground">{a.authority}</dt>
+                        <dd className="mt-0.5 font-medium text-ink">
+                          {item.credential.issuingAuthority}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-muted-foreground">{a.experience}</dt>
+                        <dd className="mt-0.5 font-medium text-ink">
+                          {item.lawyer.yearsOfExperience ?? "—"}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-muted-foreground">{a.phone}</dt>
+                        <dd className="mt-0.5 font-medium text-ink">
+                          {item.lawyer.phone ?? "—"}
+                        </dd>
+                      </div>
+                      <div className="sm:col-span-2">
+                        <dt className="text-muted-foreground">{a.practiceAreas}</dt>
+                        <dd className="mt-0.5 font-medium text-ink">
+                          {item.practiceAreas.length > 0
+                            ? item.practiceAreas
+                                .map((area) => localizedTaxonomyName(area, locale))
+                                .join(", ")
+                            : "—"}
+                        </dd>
+                      </div>
+                    </dl>
+                    {item.lawyer.bio ? (
+                      <p className="whitespace-pre-wrap text-xs text-muted-foreground">
+                        {item.lawyer.bio}
+                      </p>
+                    ) : null}
                     <a
                       href={item.documentUrl}
-                      className="text-primary underline-offset-4 hover:underline"
+                      className="inline-block text-xs font-medium text-primary underline-offset-4 hover:underline"
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -135,73 +197,87 @@ export default async function AdminLawyersPage() {
                         item.credential.documentFileName,
                       )}
                     </a>
-                  </p>
-                </div>
-                <ReviewCredentialActions
-                  credentialId={item.credential.id}
-                  copy={m.reviewCredential}
-                />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                  </div>
+                  <div className="shrink-0 sm:w-64">
+                    <ReviewCredentialActions
+                      credentialId={item.credential.id}
+                      copy={m.reviewCredential}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </section>
 
-      <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>{a.directoryTitle}</CardTitle>
-          <CardDescription>{a.directoryHelp}</CardDescription>
-        </CardHeader>
-      </Card>
-      <div className="grid gap-4">
-        {queue.directory.map((item) => (
-          <Card key={item.lawyer.id}>
-            <CardHeader>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <CardTitle className="text-base">
-                    {item.lawyerName ?? m.common.lawyerFallback} ·{" "}
-                    {item.lawyer.slug}
-                  </CardTitle>
-                  <CardDescription>{item.lawyerEmail}</CardDescription>
-                </div>
-                <Badge variant="outline">
-                  {formatVerificationStatus(
-                    item.lawyer.verificationStatus,
-                    locale,
-                  )}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="grid gap-4 md:grid-cols-[1fr_auto]">
-              <div className="space-y-2 text-sm">
-                <p>
-                  <span className="text-muted-foreground">{a.license}</span>{" "}
-                  {item.latestCredential?.licenseNumber ?? "—"}
-                </p>
-                <p>
-                  <span className="text-muted-foreground">{a.authority}</span>{" "}
-                  {item.latestCredential?.issuingAuthority ?? "—"}
-                </p>
-                <p>
-                  <span className="text-muted-foreground">{a.experience}</span>{" "}
-                  {item.lawyer.yearsOfExperience ?? "—"}
-                </p>
-                <p>
-                  <span className="text-muted-foreground">
-                    {a.practiceAreas}
-                  </span>{" "}
-                  {item.practiceAreas.length > 0
-                    ? item.practiceAreas
-                        .map((area) => localizedTaxonomyName(area, locale))
-                        .join(", ")
-                    : "—"}
-                </p>
-                {item.documentUrl && item.latestCredential ? (
-                  <p>
+      <section className="mt-8">
+        <h2 className="text-lg font-semibold text-ink">{a.directoryTitle}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{a.directoryHelp}</p>
+
+        <div className="mt-4 grid gap-4">
+          {queue.directory.map((item) => (
+            <Card key={item.lawyer.id}>
+              <CardContent className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0 flex-1 space-y-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-sm font-semibold text-ink">
+                      {item.lawyerName ?? m.common.lawyerFallback}{" "}
+                      <span className="font-normal text-muted-foreground">
+                        · {item.lawyer.slug}
+                      </span>
+                    </h3>
+                    <AdminVerificationStatusBadge
+                      tone={LAWYER_STATUS_TONE[item.lawyer.verificationStatus]}
+                      label={formatVerificationStatus(
+                        item.lawyer.verificationStatus,
+                        locale,
+                      )}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {item.lawyerEmail}
+                  </p>
+                  <dl className="grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2">
+                    <div>
+                      <dt className="text-muted-foreground">{a.license}</dt>
+                      <dd className="mt-0.5 font-medium text-ink">
+                        {item.latestCredential?.licenseNumber ?? "—"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-muted-foreground">{a.authority}</dt>
+                      <dd className="mt-0.5 font-medium text-ink">
+                        {item.latestCredential?.issuingAuthority ?? "—"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-muted-foreground">{a.experience}</dt>
+                      <dd className="mt-0.5 font-medium text-ink">
+                        {item.lawyer.yearsOfExperience ?? "—"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-muted-foreground">{a.listing}</dt>
+                      <dd className="mt-0.5 font-medium text-ink">
+                        {item.lawyer.isListed ? m.common.yes : m.common.no}
+                      </dd>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <dt className="text-muted-foreground">{a.practiceAreas}</dt>
+                      <dd className="mt-0.5 font-medium text-ink">
+                        {item.practiceAreas.length > 0
+                          ? item.practiceAreas
+                              .map((area) => localizedTaxonomyName(area, locale))
+                              .join(", ")
+                          : "—"}
+                      </dd>
+                    </div>
+                  </dl>
+                  {item.documentUrl && item.latestCredential ? (
                     <a
                       href={item.documentUrl}
-                      className="text-primary underline-offset-4 hover:underline"
+                      className="inline-block text-xs font-medium text-primary underline-offset-4 hover:underline"
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -210,30 +286,26 @@ export default async function AdminLawyersPage() {
                         item.latestCredential.documentFileName,
                       )}
                     </a>
-                  </p>
-                ) : null}
-                <p>
-                  <span className="text-muted-foreground">{a.listing}</span>{" "}
-                  {item.lawyer.isListed ? m.common.yes : m.common.no}
-                </p>
-              </div>
-              <div className="flex flex-col items-start gap-2">
-                <AdminListingActions
-                  lawyerProfileId={item.lawyer.id}
-                  isListed={item.lawyer.isListed}
-                  canList={isLawyerVerified(item.lawyer)}
-                  copy={a}
-                />
-                <AdminLawyerAccountActions
-                  lawyerProfileId={item.lawyer.id}
-                  verificationStatus={item.lawyer.verificationStatus}
-                  copy={a}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                  ) : null}
+                </div>
+                <div className="flex shrink-0 flex-col items-start gap-2 sm:w-64">
+                  <AdminListingActions
+                    lawyerProfileId={item.lawyer.id}
+                    isListed={item.lawyer.isListed}
+                    canList={isLawyerVerified(item.lawyer)}
+                    copy={a}
+                  />
+                  <AdminLawyerAccountActions
+                    lawyerProfileId={item.lawyer.id}
+                    verificationStatus={item.lawyer.verificationStatus}
+                    copy={a}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
     </>
   );
 }
