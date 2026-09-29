@@ -1,8 +1,12 @@
 import { redirect } from "next/navigation";
+import { Banknote, CalendarClock, Scale, Users } from "lucide-react";
+import Link from "next/link";
 
 import { getSessionUser } from "@/application/common/session";
 import { getAdminDashboardOverview } from "@/application/actions/admin-dashboard.actions";
-import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
+import { getAdminPaymentDashboard } from "@/application/actions/admin-payment-center.actions";
+import { AdminBookingStatusChart } from "@/components/admin/admin-booking-status-chart";
+import { AdminKpiTile } from "@/components/admin/admin-kpi-tile";
 import {
   Card,
   CardContent,
@@ -10,23 +14,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { UserRole } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
-import { formatAuditAction, formatBookingStatus, formatDateTimeUtc } from "@/lib/format-labels";
+import { formatAuditAction, formatDateTimeUtc } from "@/lib/format-labels";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 
-function KpiCard({ label, value }: { label: string; value: number }) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardDescription>{label}</CardDescription>
-        <CardTitle className="text-3xl tabular-nums">{value}</CardTitle>
-      </CardHeader>
-    </Card>
-  );
+function formatMnt(amount: number): string {
+  return `${amount.toLocaleString("mn-MN")}₮`;
 }
 
 export default async function AdminDashboardPage() {
@@ -40,9 +37,10 @@ export default async function AdminDashboardPage() {
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 
-  const [i18n, overview] = await Promise.all([
+  const [i18n, overview, paymentTotals] = await Promise.all([
     getShellI18n("admin"),
     getAdminDashboardOverview(),
+    getAdminPaymentDashboard(),
   ]);
   const m = i18n.dict.marketplace;
   const a = m.admin;
@@ -50,48 +48,61 @@ export default async function AdminDashboardPage() {
   const au = m.adminUsers;
 
   const { userCounts, pendingVerifications, bookingCounts, recentActivity } = overview;
+  const totalBookings = Object.values(bookingCounts).reduce(
+    (sum, count) => sum + count,
+    0,
+  );
 
   return (
     <>
-      <DashboardPageHeading>{i18n.title}</DashboardPageHeading>
+      <h1 className="text-2xl font-bold text-ink sm:text-[1.75rem]">
+        {ad.overviewTitle} — {session.user.name ?? au.roleAdmin}
+      </h1>
+      <p className="mt-1 text-sm text-muted-foreground">{i18n.title}</p>
 
-      <h2 className="mb-3 text-sm font-medium text-muted-foreground">
-        {ad.overviewTitle}
-      </h2>
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label={ad.totalUsers} value={userCounts.total} />
-        <KpiCard label={au.roleClient} value={userCounts.byRole[UserRole.CLIENT]} />
-        <KpiCard label={au.roleLawyer} value={userCounts.byRole[UserRole.LAWYER]} />
-        <KpiCard label={au.roleAdmin} value={userCounts.byRole[UserRole.ADMIN]} />
-        <KpiCard label={ad.activeUsers} value={userCounts.byStatus.ACTIVE} />
-        <KpiCard label={ad.suspendedUsers} value={userCounts.byStatus.SUSPENDED} />
-        <KpiCard label={ad.pendingVerifications} value={pendingVerifications} />
-        <KpiCard label={ad.recentActivityTitle} value={recentActivity.last24hCount} />
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <AdminKpiTile icon={Users} label={ad.totalUsers} value={String(userCounts.total)} />
+        <AdminKpiTile
+          icon={Scale}
+          label={au.roleLawyer}
+          value={String(userCounts.byRole[UserRole.LAWYER])}
+        />
+        <AdminKpiTile
+          icon={CalendarClock}
+          label="Нийт захиалга"
+          value={String(totalBookings)}
+        />
+        <AdminKpiTile
+          icon={Banknote}
+          label="Нийт орлого"
+          value={formatMnt(paymentTotals.totalRevenueMnt)}
+        />
       </div>
 
-      <div className="mb-6 grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>{ad.bookingsTitle}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {Object.values(bookingCounts).every((count) => count === 0) ? (
-              <p className="text-sm text-muted-foreground">{ad.bookingsEmpty}</p>
-            ) : (
-              <ul className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-3">
-                {Object.entries(bookingCounts).map(([status, count]) => (
-                  <li key={status} className="flex items-center justify-between gap-2">
-                    <span className="text-muted-foreground">
-                      {formatBookingStatus(status, i18n.locale)}
-                    </span>
-                    <span className="tabular-nums font-medium">{count}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
+      <div className="mt-6 grid gap-4 lg:grid-cols-12">
+        <div className="lg:col-span-7">
+          {/* The Stitch reference's primary chart is a 30-day user-growth
+              trend. No daily/time-bucketed history exists anywhere in the
+              repository (see P0 Step 2 report) — an honest unavailable
+              state is shown instead of a fabricated trend. */}
+          <EmptyState
+            className="flex h-full min-h-52 flex-col items-center justify-center"
+            title="Хэрэглэгчийн өсөлт"
+            description="Түүхэн статистик одоогоор бүртгэгдэхгүй байна."
+          />
+        </div>
+        <div className="lg:col-span-5">
+          <AdminBookingStatusChart
+            bookingCounts={bookingCounts}
+            locale={i18n.locale}
+            title={ad.bookingsTitle}
+            totalLabel="нийт захиалга"
+            emptyLabel={ad.bookingsEmpty}
+          />
+        </div>
+      </div>
 
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>{ad.recentActivityTitle}</CardTitle>
@@ -108,18 +119,27 @@ export default async function AdminDashboardPage() {
                 {ad.recentActivityEmpty}
               </p>
             ) : (
-              <ul className="space-y-2 text-sm">
+              <ul className="divide-y divide-border/60">
                 {recentActivity.items.map((entry) => (
-                  <li key={entry.id} className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5 border-b border-border/60 pb-2 last:border-0 last:pb-0">
-                    <span>
-                      <span className="font-medium">
+                  <li
+                    key={entry.id}
+                    className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0"
+                  >
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-workspace-accent/10 text-xs font-semibold text-workspace-accent">
+                      {(entry.actorName ?? entry.actorEmail ?? "?")
+                        .charAt(0)
+                        .toUpperCase()}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-xs font-semibold text-ink">
                         {entry.actorEmail ?? entry.actorName ?? "—"}
-                      </span>{" "}
-                      <span className="text-muted-foreground">
-                        {formatAuditAction(entry.action, i18n.locale)} {entry.entityType}
+                      </span>
+                      <span className="block truncate text-[11px] text-muted-foreground">
+                        {formatAuditAction(entry.action, i18n.locale)}{" "}
+                        {entry.entityType}
                       </span>
                     </span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="shrink-0 text-[11px] text-muted-foreground">
                       {formatDateTimeUtc(entry.createdAt, i18n.locale)}
                     </span>
                   </li>
@@ -134,9 +154,7 @@ export default async function AdminDashboardPage() {
             </Link>
           </CardContent>
         </Card>
-      </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>{a.queueTitle}</CardTitle>
@@ -147,14 +165,19 @@ export default async function AdminDashboardPage() {
                   ? a.pendingOne
                   : a.pendingMany.replace("{n}", String(pendingVerifications))}
             </CardDescription>
+          </CardHeader>
+          <CardContent>
             <Link
               href="/admin/lawyers"
-              className={cn(buttonVariants({ size: "sm" }), "mt-2 w-fit")}
+              className={cn(buttonVariants({ size: "sm" }), "w-fit")}
             >
               {a.openQueue}
             </Link>
-          </CardHeader>
+          </CardContent>
         </Card>
+      </div>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>{a.adminTitle}</CardTitle>
