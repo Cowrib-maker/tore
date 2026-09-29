@@ -7,6 +7,7 @@ import { BookingStatus } from "@/domain/enums";
 import type { BookingRepository } from "@/domain/repositories/booking-repository";
 import type { LawyerProfileRepository } from "@/domain/repositories/profile-repository";
 import { calendarDayWindowInTimeZone } from "@/domain/services/timezone";
+import { formatTodayLabelMn } from "@/lib/format-labels";
 
 import { deriveCaseActivity } from "./case-activity";
 import {
@@ -79,6 +80,11 @@ export type LawyerWorkspaceSchedule = {
   pendingBookingCount: number;
   todaysConfirmedCount: number;
   upcoming: LawyerWorkspaceUpcomingBooking[];
+  /** The single canonical "today" label for the workspace — the lawyer's
+   * own calendar day (LawyerProfile.timezone), formatted once here so every
+   * consumer (e.g. the right rail) renders the same value instead of each
+   * computing its own, possibly server-timezone-based, date. */
+  todayLabel: string;
 };
 
 export type LawyerWorkspaceHomeView = {
@@ -98,28 +104,35 @@ const RECENT_CONVERSATION_LIMIT = 8;
 const ACTIVITY_LIMIT = 10;
 const CONVERSATION_FETCH = 50;
 const UPCOMING_BOOKING_LIMIT = 4;
-const EMPTY_SCHEDULE: LawyerWorkspaceSchedule = {
+const EMPTY_SCHEDULE_COUNTS = {
   pendingBookingCount: 0,
   todaysConfirmedCount: 0,
-  upcoming: [],
+  upcoming: [] as LawyerWorkspaceUpcomingBooking[],
 };
 
 async function loadSchedule(
   actor: ActorContext,
   scheduleDeps: LawyerWorkspaceScheduleDeps | undefined,
 ): Promise<LawyerWorkspaceSchedule> {
-  if (!scheduleDeps) return EMPTY_SCHEDULE;
-  const lawyerProfile = await scheduleDeps.lawyerProfileRepository.findByUserId(
-    actor.userId,
-  );
-  if (!lawyerProfile) return EMPTY_SCHEDULE;
-
   const now = new Date();
+  const lawyerProfile = scheduleDeps
+    ? await scheduleDeps.lawyerProfileRepository.findByUserId(actor.userId)
+    : null;
+
   // "Today" is the lawyer's own calendar day, not the server process's —
-  // real IANA timezone math (DST-safe), not a fixed UTC offset.
+  // real IANA timezone math (DST-safe), not a fixed UTC offset. Falls back
+  // to UTC only when there is no lawyer profile to read a timezone from,
+  // matching calendarDayWindowInTimeZone's own fallback below.
+  const timeZone = lawyerProfile?.timezone ?? "UTC";
+  const todayLabel = formatTodayLabelMn(now, timeZone);
+
+  if (!scheduleDeps || !lawyerProfile) {
+    return { ...EMPTY_SCHEDULE_COUNTS, todayLabel };
+  }
+
   const { start: todayStart, end: tomorrowStart } = calendarDayWindowInTimeZone(
     now,
-    lawyerProfile.timezone,
+    timeZone,
   );
 
   // Each query is scoped to exactly what it needs — a same-day count, an
@@ -155,6 +168,7 @@ async function loadSchedule(
       scheduledStartAt: booking.scheduledStartAt.toISOString(),
       scheduledEndAt: booking.scheduledEndAt.toISOString(),
     })),
+    todayLabel,
   };
 }
 

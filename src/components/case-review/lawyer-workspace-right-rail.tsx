@@ -24,11 +24,11 @@ type Props = {
  * intentionally omitted rather than faked.
  */
 export function LawyerWorkspaceRightRail({ summary, schedule, activity }: Props) {
-  const today = new Date().toLocaleDateString("mn-MN", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+  // schedule.todayLabel is the single canonical "today" value for the whole
+  // workspace (lawyer's own timezone, from loadLawyerWorkspaceHome) — this
+  // panel must never compute its own, or it can silently disagree with the
+  // todaysConfirmedCount tile rendered right below it.
+  const today = schedule.todayLabel;
 
   return (
     <div className="space-y-5">

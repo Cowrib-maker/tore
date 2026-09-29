@@ -2,6 +2,7 @@ import type { MarketplaceDictionary } from "@/i18n/marketplace-types";
 import type { Locale } from "@/i18n/config";
 import { defaultLocale } from "@/i18n/config";
 import { getDictionarySync } from "@/i18n/get-dictionary-sync";
+import { safeTimeZone, wallDateParts } from "@/domain/services/timezone";
 
 type StatusLabels = MarketplaceDictionary["status"];
 type Weekdays = MarketplaceDictionary["weekdays"];
@@ -69,18 +70,26 @@ const WEEKDAY_KEYS_BY_INDEX: (keyof Weekdays)[] = [
 ];
 
 /**
- * "YYYY.MM.DD Weekday" label for a given date. Built from plain date-part
- * getters and the app's own weekday dictionary — never Intl — so a caller
- * can compute this once (e.g. server-side) and hand the resulting string to
- * a client component to render verbatim, with no risk of the weekday
- * differing between the Node SSR runtime's ICU and the browser's.
+ * "YYYY.MM.DD Weekday" label for the calendar day `instant` falls on in
+ * `timeZone` — e.g. a lawyer's LawyerProfile.timezone, never the server
+ * process's own local timezone. The (year, month, day) come from
+ * `wallDateParts` (the same Intl-based day math `calendarDayWindowInTimeZone`
+ * uses), and the weekday is derived from that pure calendar date — not from
+ * `instant` directly — so the label and weekday can never disagree.
+ * Callers compute this once (e.g. server-side) and hand the resulting string
+ * to a client component to render verbatim, with no risk of it differing
+ * between the Node SSR runtime's ICU and the browser's, and no risk of it
+ * drifting from the same PR's timezone-aware booking counts.
  */
-export function formatTodayLabelMn(date: Date, locale?: Locale): string {
-  const weekday = formatWeekday(WEEKDAY_KEYS_BY_INDEX[date.getDay()]!, locale);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}.${month}.${day} ${weekday}`;
+export function formatTodayLabelMn(
+  instant: Date,
+  timeZone: string,
+  locale?: Locale,
+): string {
+  const { year, month, day } = wallDateParts(instant, safeTimeZone(timeZone));
+  const weekdayIndex = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+  const weekday = formatWeekday(WEEKDAY_KEYS_BY_INDEX[weekdayIndex]!, locale);
+  return `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(2, "0")} ${weekday}`;
 }
 
 export function formatNotificationType(

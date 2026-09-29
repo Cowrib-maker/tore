@@ -11,7 +11,10 @@ import {
   getProfilePath,
 } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
-import { notificationRepository } from "@/infrastructure/repositories";
+import {
+  lawyerProfileRepository,
+  notificationRepository,
+} from "@/infrastructure/repositories";
 import { formatTodayLabelMn } from "@/lib/format-labels";
 
 export default async function LawyerLayout({
@@ -24,15 +27,23 @@ export default async function LawyerLayout({
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 
-  const [i18n, unread] = await Promise.all([
+  const [i18n, unread, lawyerProfile] = await Promise.all([
     getShellI18n("lawyer"),
     notificationRepository.findByUserId(session.user.id, true),
+    lawyerProfileRepository.findByUserId(session.user.id),
   ]);
 
   // Computed once, server-side, and rendered verbatim by the client — never
   // recomputed in the browser — so the workspace header's date chip can
   // never hydration-mismatch. See lawyer-workspace-frame.tsx TodayChip.
-  const todayLabel = formatTodayLabelMn(new Date(), i18n.locale);
+  // Uses the lawyer's own configured timezone (falling back to UTC only if
+  // no profile exists yet), matching the calendar day loadLawyerWorkspaceHome
+  // computes for the booking counts shown in the same workspace.
+  const todayLabel = formatTodayLabelMn(
+    new Date(),
+    lawyerProfile?.timezone ?? "UTC",
+    i18n.locale,
+  );
 
   return (
     <LawyerAppChrome

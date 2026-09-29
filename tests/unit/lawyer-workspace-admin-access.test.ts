@@ -51,6 +51,9 @@ vi.mock("@/infrastructure/repositories", () => ({
   notificationRepository: {
     findByUserId: vi.fn().mockResolvedValue({ items: [], nextCursor: null }),
   },
+  lawyerProfileRepository: {
+    findByUserId: vi.fn().mockResolvedValue(null),
+  },
 }));
 vi.mock("@/i18n/dashboard-shell-i18n", () => ({
   getShellI18n: vi.fn().mockResolvedValue({

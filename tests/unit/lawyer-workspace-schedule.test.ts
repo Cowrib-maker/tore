@@ -192,11 +192,12 @@ describe("loadLawyerWorkspaceHome — schedule", () => {
 
   it("omits schedule data safely (zeroed) when scheduleDeps is not provided", async () => {
     const view = await loadLawyerWorkspaceHome(actor, emptyCaseAiDeps());
-    expect(view.schedule).toEqual({
-      pendingBookingCount: 0,
-      todaysConfirmedCount: 0,
-      upcoming: [],
-    });
+    expect(view.schedule.pendingBookingCount).toBe(0);
+    expect(view.schedule.todaysConfirmedCount).toBe(0);
+    expect(view.schedule.upcoming).toEqual([]);
+    // Still a real, well-formed label (UTC fallback) — never undefined —
+    // even with no schedule deps at all.
+    expect(view.schedule.todayLabel).toMatch(/^\d{4}\.\d{2}\.\d{2} .+$/);
   });
 
   describe("timezone correctness", () => {
@@ -248,6 +249,52 @@ describe("loadLawyerWorkspaceHome — schedule", () => {
       const range = confirmedCountCall?.[2] as { from: Date; to: Date };
       expect(range.from.toISOString()).toBe("2026-01-15T16:00:00.000Z"); // 2026-01-16 00:00 UA
       expect(range.to.toISOString()).toBe("2026-01-16T16:00:00.000Z"); // 2026-01-17 00:00 UA
+    });
+
+    it("E: schedule.todayLabel uses the lawyer's timezone at a UTC boundary where the server's own date would be wrong", async () => {
+      // Same instant as test D: 2026-01-15T17:00:00Z is already
+      // 2026-01-16 (Friday, Баасан) in Asia/Ulaanbaatar, but still
+      // 2026-01-15 (Thursday) in plain UTC — proves the label is not
+      // derived from the server process's own timezone/getters.
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2026-01-15T17:00:00.000Z"));
+
+      const bookingRepository = fakeBookingRepository([]);
+      const lawyerProfileRepository = {
+        findByUserId: vi
+          .fn()
+          .mockResolvedValue({ id: "lawyer-profile-1", timezone: "Asia/Ulaanbaatar" }),
+      };
+
+      const view = await loadLawyerWorkspaceHome(actor, emptyCaseAiDeps(), {
+        bookingRepository: bookingRepository as never,
+        lawyerProfileRepository: lawyerProfileRepository as never,
+      });
+
+      expect(view.schedule.todayLabel).toBe("2026.01.16 Баасан");
+    });
+
+    it("F: the same view.schedule object is what the right rail renders — no independent recomputation downstream", async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2026-01-15T17:00:00.000Z"));
+
+      const bookingRepository = fakeBookingRepository([]);
+      const lawyerProfileRepository = {
+        findByUserId: vi
+          .fn()
+          .mockResolvedValue({ id: "lawyer-profile-1", timezone: "Asia/Ulaanbaatar" }),
+      };
+
+      const view = await loadLawyerWorkspaceHome(actor, emptyCaseAiDeps(), {
+        bookingRepository: bookingRepository as never,
+        lawyerProfileRepository: lawyerProfileRepository as never,
+      });
+
+      // The exact string LawyerWorkspaceRightRail must render verbatim —
+      // see "LawyerWorkspaceRightRail — today label" in
+      // lawyer-workspace-right-rail.test.tsx for the render-side assertion.
+      expect(view.schedule.todayLabel).toBe("2026.01.16 Баасан");
+      expect(view.schedule.todaysConfirmedCount).toBe(0);
     });
   });
 });

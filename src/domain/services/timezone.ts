@@ -7,7 +7,13 @@
 
 const FALLBACK_TIME_ZONE = "UTC";
 
-function wallDateParts(
+/**
+ * The (year, month, day) a caller in `timeZone` would read off a calendar
+ * for `instant`. Exported so other date-label formatting (e.g. the
+ * workspace's "today" chip) can derive the lawyer's calendar day without
+ * re-implementing this Intl parsing.
+ */
+export function wallDateParts(
   instant: Date,
   timeZone: string,
 ): { year: number; month: number; day: number } {
@@ -74,7 +80,8 @@ function utcInstantForWallDate(
   return new Date(guess);
 }
 
-function safeTimeZone(timeZone: string): string {
+/** Falls back to UTC only if `timeZone` is not a valid IANA zone identifier. */
+export function safeTimeZone(timeZone: string): string {
   try {
     new Intl.DateTimeFormat("en-US", { timeZone });
     return timeZone;

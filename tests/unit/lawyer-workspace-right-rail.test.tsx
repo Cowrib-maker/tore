@@ -23,6 +23,7 @@ const schedule = {
   pendingBookingCount: 0,
   todaysConfirmedCount: 0,
   upcoming: [],
+  todayLabel: "2026.01.15 Пүрэв",
 };
 
 /**
@@ -75,5 +76,49 @@ describe("LawyerWorkspaceRightRail — activity title/caption hierarchy", () => 
     );
 
     expect(screen.getByText("AI яриа эхлүүлсэн")).toBeTruthy();
+  });
+});
+
+/**
+ * The right rail's "Өнөөдрийн тойм" date must be the loader's canonical,
+ * lawyer-timezone-aware label (schedule.todayLabel) — never a value this
+ * component computes itself from the ambient (server) clock/timezone. This
+ * is the regression test for the Major finding: the header chip and this
+ * panel used to independently compute "today" in the server's own
+ * timezone, disagreeing with the timezone-aware todaysConfirmedCount tile
+ * rendered right next to it.
+ */
+describe("LawyerWorkspaceRightRail — today label", () => {
+  it("renders exactly schedule.todayLabel, not an independently computed date", () => {
+    render(
+      <LawyerWorkspaceRightRail
+        summary={summary}
+        schedule={{ ...schedule, todayLabel: "2026.01.16 Баасан" }}
+        activity={[]}
+      />,
+    );
+
+    expect(screen.getByText("2026.01.16 Баасан")).toBeTruthy();
+  });
+
+  it("changes only when schedule.todayLabel changes, never on its own", () => {
+    const { rerender } = render(
+      <LawyerWorkspaceRightRail
+        summary={summary}
+        schedule={{ ...schedule, todayLabel: "2026.03.08 Ням" }}
+        activity={[]}
+      />,
+    );
+    expect(screen.getByText("2026.03.08 Ням")).toBeTruthy();
+
+    rerender(
+      <LawyerWorkspaceRightRail
+        summary={summary}
+        schedule={{ ...schedule, todayLabel: "2026.03.09 Даваа" }}
+        activity={[]}
+      />,
+    );
+    expect(screen.queryByText("2026.03.08 Ням")).toBeNull();
+    expect(screen.getByText("2026.03.09 Даваа")).toBeTruthy();
   });
 });
