@@ -80,49 +80,49 @@ export function CaseWorkspaceLayout({
     timeline: timelineHref,
   };
   return (
-    <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-      <aside
+    <div className="flex flex-col gap-4">
+      {/* Secondary, in-page nav for the case-review workflow itself (chat /
+          documents / analyze / research / drafting / timeline) — a
+          horizontal bar, not a sidebar, so it never competes visually with
+          WorkspaceShell's single global Lawyer sidebar. */}
+      <nav
         data-testid="case-workspace-nav"
-        className="w-full shrink-0 rounded-2xl bg-[#0B1F3A] p-4 text-[#F7FAF8] lg:sticky lg:top-6 lg:w-56"
+        aria-label="Хэргийн ажлын орчин"
+        className="flex flex-wrap items-center gap-1.5 overflow-x-auto rounded-2xl border border-[#0B1F3A]/10 bg-white p-2 shadow-[0_1px_2px_rgba(11,31,58,0.04)]"
       >
-        <p className="px-2 text-[10px] font-semibold tracking-[0.16em] text-[#C8A45D] uppercase">
-          Ажлын орчин
-        </p>
-        <nav className="mt-4 space-y-1" aria-label="Хэргийн ажлын орчин">
-          {NAV.map((item) => {
-            const Icon = item.icon;
-            const resolvedHref = hrefOverride[item.key] ?? item.href;
-            const isPlaceholder = item.placeholder && !resolvedHref;
-            const href = resolvedHref;
-            const className = cn(
-              "flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition",
-              item.key === active
-                ? "bg-white/10 text-white"
-                : "text-white/70 hover:bg-white/8 hover:text-white",
-              isPlaceholder && "cursor-default opacity-55 hover:bg-transparent",
-            );
+        {NAV.map((item) => {
+          const Icon = item.icon;
+          const resolvedHref = hrefOverride[item.key] ?? item.href;
+          const isPlaceholder = item.placeholder && !resolvedHref;
+          const href = resolvedHref;
+          const className = cn(
+            "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[12.5px] font-medium transition-colors",
+            item.key === active
+              ? "bg-[#0B1F3A] text-white"
+              : "text-[#5C6570] ring-1 ring-[#0B1F3A]/10 hover:bg-[#0B1F3A]/5",
+            isPlaceholder && "cursor-default opacity-55 hover:bg-transparent",
+          );
 
-            if (isPlaceholder || !href) {
-              return (
-                <div key={item.key} className={className}>
-                  <Icon className="size-4 shrink-0" />
-                  <span className="flex-1 text-left">{item.label}</span>
-                  <span className="text-[10px] tracking-wide text-white/40">
-                    Удахгүй
-                  </span>
-                </div>
-              );
-            }
-
+          if (isPlaceholder || !href) {
             return (
-              <Link key={item.key} href={href} className={className}>
-                <Icon className="size-4 shrink-0" />
-                {item.label}
-              </Link>
+              <div key={item.key} className={className}>
+                <Icon className="size-3.5 shrink-0" />
+                <span>{item.label}</span>
+                <span className="text-[9px] tracking-wide text-[#8A939D]">
+                  Удахгүй
+                </span>
+              </div>
             );
-          })}
-        </nav>
-      </aside>
+          }
+
+          return (
+            <Link key={item.key} href={href} className={className}>
+              <Icon className="size-3.5 shrink-0" />
+              {item.label}
+            </Link>
+          );
+        })}
+      </nav>
       <div className="min-w-0 flex-1">{children}</div>
     </div>
   );
