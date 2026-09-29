@@ -69,6 +69,39 @@
      never a wall of blue. */
   --color-ai-accent-bright: var(--ai-accent-bright);
   --color-ai-accent-bright-foreground: var(--ai-accent-bright-foreground);
+  /* Layer 2/3 design-token registration (P0 foundation — not yet consumed
+     by any component; see the :root block below for full layer
+     architecture documentation: Primitive → Semantic → Context → Role). */
+  --color-public-background: var(--public-background);
+  --color-public-surface: var(--public-surface);
+  --color-public-accent: var(--public-accent);
+  --color-public-accent-bright: var(--public-accent-bright);
+  --color-workspace-background: var(--workspace-background);
+  --color-workspace-surface: var(--workspace-surface);
+  --color-workspace-accent: var(--workspace-accent);
+  --color-workspace-sidebar-bg: var(--workspace-sidebar-bg);
+  --color-workspace-sidebar-fg: var(--workspace-sidebar-fg);
+  --color-ai-context-background: var(--ai-context-background);
+  --color-ai-citizen-background: var(--ai-citizen-background);
+  --color-ai-citizen-surface: var(--ai-citizen-surface);
+  --color-ai-citizen-accent: var(--ai-citizen-accent);
+  --color-ai-citizen-text: var(--ai-citizen-text);
+  --color-ai-student-background: var(--ai-student-background);
+  --color-ai-student-surface: var(--ai-student-surface);
+  --color-ai-student-accent: var(--ai-student-accent);
+  --color-ai-student-text: var(--ai-student-text);
+  --color-ai-lawyer-background: var(--ai-lawyer-background);
+  --color-ai-lawyer-surface: var(--ai-lawyer-surface);
+  --color-ai-lawyer-accent: var(--ai-lawyer-accent);
+  --color-ai-lawyer-text: var(--ai-lawyer-text);
+  --color-status-success-bg: var(--status-success-bg);
+  --color-status-success-text: var(--status-success-text);
+  --color-status-warning-bg: var(--status-warning-bg);
+  --color-status-warning-text: var(--status-warning-text);
+  --color-status-info-bg: var(--status-info-bg);
+  --color-status-info-text: var(--status-info-text);
+  --color-status-research-bg: var(--status-research-bg);
+  --color-status-research-text: var(--status-research-text);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -93,20 +126,109 @@
 }
 
 :root {
+  /* ==========================================================
+     TORE Design Token Architecture (P0 — foundation, additive only)
+       Layer 0  Primitive    raw color / spacing / radius / type / shadow
+                             values (--primitive-*)
+       Layer 1  Semantic     --brand / --canvas / --ink / --gold etc.,
+                             aliased onto Layer 0 primitives below
+       Layer 2  Context      --public-* / --workspace-* / --ai-context-*
+                             (background, accent, sidebar/header, density)
+       Layer 3  Role variant --ai-citizen-* / --ai-student-* / --ai-lawyer-*
+     Layer 2 and Layer 3 tokens are declared but not yet consumed by any
+     component — they exist so the next (WorkspaceShell) PR has a single
+     source of truth instead of inventing new ad-hoc values per surface.
+     ========================================================== */
+
+  /* Layer 0 — primitive color ramp. Reconciles the existing
+     --brand/--canvas/--ink/--gold identity with the Stitch Lawyer M3
+     reference (#0F2038 primary, #2563EB secondary, #7C3AED tertiary)
+     and the Stitch status-badge hues. Close-but-distinct values (e.g.
+     the product's #0B5CFF blue vs Stitch's #2563EB blue) are kept as
+     separate adjacent stops rather than merged into one value. */
+  --primitive-neutral-0: #ffffff;
+  --primitive-neutral-50: #f8f9fb;
+  --primitive-neutral-100: #f0f4f2;
+  --primitive-neutral-900: #0a0f14;
+  --primitive-neutral-920: #14181d;
+  --primitive-neutral-930: #191e25;
+  --primitive-neutral-950: #0a0e16;
+  --primitive-neutral-975: #0b0e10;
+
+  --primitive-blue-50: #eef3fb;
+  --primitive-blue-300: #4c8dff;
+  --primitive-blue-500: #0b5cff;
+  --primitive-blue-600: #2563eb;
+
+  --primitive-navy-300: #8fb4dd;
+  --primitive-navy-700: #182236;
+  --primitive-navy-850: #0f2038;
+  --primitive-navy-900: #0b1f3a;
+
+  --primitive-violet-50: #f5f3ff;
+  --primitive-violet-600: #7c3aed;
+  --primitive-violet-700: #6d28d9;
+
+  --primitive-emerald-50: #ecfdf5;
+  --primitive-emerald-700: #047857;
+
+  --primitive-amber-50: #fffbeb;
+  --primitive-amber-700: #b45309;
+
+  --primitive-moss-300: #8fa3c2;
+  --primitive-moss-600: #3a4a63;
+
+  --primitive-gold-300: #d9bb7c;
+  --primitive-gold-500: #c8a45d;
+
+  /* Layer 0 — primitive spacing / radius / type scales (scheme-invariant,
+     so declared once here; .dark inherits them unchanged). Reconciled
+     with the Stitch spacing scale (space-xs..xl, gutter, margin) and
+     typography scale (headline-xl..label-sm). Not yet wired to the
+     existing --page-* / --radius-* / --text-ds-* tokens, which are left
+     untouched by this pass. */
+  --primitive-space-1: 0.25rem;
+  --primitive-space-2: 0.5rem;
+  --primitive-space-3: 0.875rem;
+  --primitive-space-4: 1.25rem;
+  --primitive-space-5: 2rem;
+
+  --primitive-radius-xs: 0.25rem;
+  --primitive-radius-sm: 0.5rem;
+  --primitive-radius-md: 0.75rem;
+  --primitive-radius-lg: 1rem;
+  --primitive-radius-full: 9999px;
+
+  --primitive-text-2xs: 0.6875rem;
+  --primitive-text-xs: 0.75rem;
+  --primitive-text-sm: 0.875rem;
+  --primitive-text-base: 1rem;
+  --primitive-text-lg: 1.25rem;
+  --primitive-text-xl: 1.5rem;
+  --primitive-text-2xl: 2rem;
+
   /* Product UI primitives — deep navy / electric blue / light blue-gray.
      Distinct from the TORE logo (src/components/brand/tokens.ts,
      BRAND_COLORS.forest/gold), which stays forest+gold and never reads
      from these vars — the logo mark is intentionally decoupled so the
      product interface can carry a different visual language than the
-     wordmark, per the approved navy/electric-blue direction. */
-  --brand: #0b5cff;
+     wordmark, per the approved navy/electric-blue direction.
+     Layer 1 — semantic tokens. Per P0 scope, only --brand/--canvas/
+     --ink/--gold are aliased onto Layer 0 primitives below; their
+     resolved values are unchanged by this pass. --brand-foreground/
+     --brand-muted/--brand-subtle/--moss and all --ai-* tokens further
+     down are intentionally left as literals for now. */
+  --brand: var(--primitive-blue-500);
   --brand-foreground: #ffffff;
   --brand-muted: #4a5b73;
   --brand-subtle: #eef3fb;
-  --canvas: #f8f9fb;
-  --ink: #0a0f14;
+  --canvas: var(--primitive-neutral-50);
+  --ink: var(--primitive-neutral-900);
   --moss: #3a4a63;
-  --gold: #c8a45d;
+  --gold: var(--primitive-gold-500);
+  --primitive-shadow-sm: var(--elevate-sm);
+  --primitive-shadow-md: var(--elevate-md);
+  --primitive-shadow-lg: var(--elevate-lg);
   --elevate-sm:
     0 1px 2px rgb(11 31 58 / 0.04), 0 8px 24px -12px rgb(11 31 58 / 0.12);
   --elevate-md:
@@ -174,6 +296,65 @@
   --ai-gold: #8a6b2a;
   --ai-accent-bright: #0b5cff;
   --ai-accent-bright-foreground: #ffffff;
+
+  /* ----------------------------------------------------------
+     Layer 2 — context tokens (Public / Workspace / AI). Not yet
+     consumed by any component. "--ai-context-*" (not "--ai-*") is used
+     deliberately to avoid colliding with the existing, already-in-
+     production --ai-accent/--ai-canvas/--ai-surface/... tokens above —
+     those remain untouched by this pass.
+     ---------------------------------------------------------- */
+  --public-background: var(--primitive-neutral-50);
+  --public-surface: var(--primitive-neutral-0);
+  --public-accent: var(--primitive-navy-900);
+  --public-accent-bright: var(--primitive-blue-500);
+  --public-header-h: 4.75rem;
+  --public-density: 1;
+
+  --workspace-background: var(--canvas);
+  --workspace-surface: var(--primitive-neutral-0);
+  --workspace-accent: var(--primitive-blue-600);
+  --workspace-sidebar-bg: var(--primitive-navy-850);
+  --workspace-sidebar-fg: var(--primitive-neutral-0);
+  --workspace-header-h: 3.5rem;
+  --workspace-density: 0.85;
+
+  --ai-context-background: var(--primitive-neutral-50);
+  --ai-context-header-h: 3.5rem;
+  --ai-context-density: 1;
+
+  /* Layer 3 — AI role variants (Citizen / Student / Lawyer). First-pass
+     values; not yet wired into LegalAiChat, a Student AI composer, or
+     LawyerAiWorkbench. Citizen is dark per the approved product
+     direction; Student and Lawyer stay light — Lawyer's light M3-navy
+     treatment mirrors the Stitch "Legal AI Research" reference (screen
+     3), which does not use a dark surface. */
+  --ai-citizen-background: var(--primitive-neutral-975);
+  --ai-citizen-surface: var(--primitive-neutral-920);
+  --ai-citizen-accent: var(--primitive-blue-500);
+  --ai-citizen-text: var(--primitive-neutral-100);
+
+  --ai-student-background: var(--primitive-neutral-50);
+  --ai-student-surface: var(--primitive-neutral-0);
+  --ai-student-accent: var(--primitive-blue-600);
+  --ai-student-text: var(--primitive-neutral-900);
+
+  --ai-lawyer-background: var(--primitive-neutral-50);
+  --ai-lawyer-surface: var(--primitive-neutral-0);
+  --ai-lawyer-accent: var(--primitive-navy-850);
+  --ai-lawyer-text: var(--primitive-neutral-900);
+
+  /* Status badge tokens — pastel pattern taken directly from the Stitch
+     Lawyer design-md's "Jurisdictional Badges & Chips" spec. Tokens
+     only; no component applies these yet. */
+  --status-success-bg: var(--primitive-emerald-50);
+  --status-success-text: var(--primitive-emerald-700);
+  --status-warning-bg: var(--primitive-amber-50);
+  --status-warning-text: var(--primitive-amber-700);
+  --status-info-bg: var(--primitive-blue-50);
+  --status-info-text: var(--primitive-blue-600);
+  --status-research-bg: var(--primitive-violet-50);
+  --status-research-text: var(--primitive-violet-700);
 }
 
 @media (min-width: 640px) {
@@ -195,15 +376,23 @@
 .dark {
   /* Product UI primitives — dark equivalents. Same navy/electric-blue
      identity as :root, lightened/desaturated for contrast on a dark
-     canvas instead of switching to a different hue family. */
-  --brand: #4c8dff;
+     canvas instead of switching to a different hue family.
+     Layer 1 — semantic tokens, aliased onto the same Layer 0 primitive
+     ramp declared in :root (dark-appropriate stops); resolved values
+     are unchanged by this pass. --brand-foreground/--brand-muted/
+     --brand-subtle/--moss and all --ai-* tokens below are intentionally
+     left as literals, matching :root. */
+  --brand: var(--primitive-blue-300);
   --brand-foreground: #081019;
   --brand-muted: #a7b0ba;
   --brand-subtle: #182236;
-  --canvas: #0a0e16;
-  --ink: #f0f4f2;
+  --canvas: var(--primitive-neutral-950);
+  --ink: var(--primitive-neutral-100);
   --moss: #8fa3c2;
-  --gold: #d9bb7c;
+  --gold: var(--primitive-gold-300);
+  --primitive-shadow-sm: var(--elevate-sm);
+  --primitive-shadow-md: var(--elevate-md);
+  --primitive-shadow-lg: var(--elevate-lg);
   --elevate-sm:
     0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
   --elevate-md:
@@ -260,6 +449,35 @@
   --ai-gold: #d9bb7c;
   --ai-accent-bright: #4c8dff;
   --ai-accent-bright-foreground: #081019;
+
+  /* Layer 2 — context tokens (dark-mode overrides). See :root for the
+     full set and documentation; only values that differ under .dark
+     are redeclared here. */
+  --public-background: var(--primitive-neutral-950);
+  --public-surface: var(--primitive-neutral-920);
+  --public-accent: var(--primitive-navy-300);
+  --public-accent-bright: var(--primitive-blue-300);
+
+  --workspace-surface: var(--primitive-neutral-920);
+  --workspace-accent: var(--primitive-blue-300);
+  --workspace-sidebar-bg: var(--primitive-navy-700);
+  --workspace-sidebar-fg: var(--primitive-neutral-100);
+
+  --ai-context-background: var(--primitive-neutral-950);
+
+  /* Layer 3 — AI role variants (dark-mode overrides). --ai-citizen-* is
+     deliberately NOT redeclared here: Citizen AI stays the same dark
+     surface regardless of the site-wide light/dark toggle, per the
+     "controlled AI context independent of theme" decision. */
+  --ai-student-background: var(--primitive-neutral-950);
+  --ai-student-surface: var(--primitive-neutral-920);
+  --ai-student-accent: var(--primitive-blue-300);
+  --ai-student-text: var(--primitive-neutral-100);
+
+  --ai-lawyer-background: var(--primitive-neutral-950);
+  --ai-lawyer-surface: var(--primitive-neutral-920);
+  --ai-lawyer-accent: var(--primitive-navy-300);
+  --ai-lawyer-text: var(--primitive-neutral-100);
 }
 
 @layer base {
