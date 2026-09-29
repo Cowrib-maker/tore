@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { LogOut } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 
 import { logoutAction } from "@/application/actions/auth.actions";
 import { BrandLink } from "@/components/layout/brand-link";
@@ -25,13 +24,21 @@ import {
 } from "@/components/ui/sidebar";
 import { buttonVariants } from "@/components/ui/button";
 import { WorkspaceNavLink } from "@/components/workspace/workspace-nav-link";
+import type { WorkspaceIconKey } from "@/components/workspace/workspace-icons";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 
 export type WorkspaceNavItem = {
   href: string;
   label: string;
-  icon?: LucideIcon;
+  /**
+   * A key into the shared WORKSPACE_ICONS registry, not a component
+   * reference — WorkspaceShell is a Server Component and WorkspaceNavLink
+   * (which renders the icon) is a Client Component, so the actual icon
+   * component can never be passed as a prop across that boundary. See
+   * workspace-icons.ts.
+   */
+  icon?: WorkspaceIconKey;
   /** Real count only (e.g. unread notifications) — never fabricated. */
   badge?: number;
 };

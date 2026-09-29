@@ -7,6 +7,7 @@ import {
   SidebarMenuBadge,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { WORKSPACE_ICONS } from "@/components/workspace/workspace-icons";
 import type { WorkspaceNavItem } from "@/components/workspace/workspace-shell";
 
 /**
@@ -18,7 +19,9 @@ export function WorkspaceNavLink({ item }: { item: WorkspaceNavItem }) {
   const pathname = usePathname();
   const active =
     pathname === item.href || pathname.startsWith(`${item.href}/`);
-  const Icon = item.icon;
+  // Resolve the serializable icon key to an actual component here, inside
+  // the Client Component — see workspace-icons.ts for why.
+  const Icon = item.icon ? WORKSPACE_ICONS[item.icon] : null;
 
   return (
     <SidebarMenuButton

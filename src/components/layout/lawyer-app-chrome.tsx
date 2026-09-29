@@ -1,18 +1,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import {
-  Bell,
-  Briefcase,
-  Building2,
-  CalendarClock,
-  CreditCard,
-  FolderOpen,
-  LayoutDashboard,
-  LayoutGrid,
-  Sparkles,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 
 import { LawyerWorkspaceFrame } from "@/components/case-review/lawyer-workspace-frame";
 import type { DashboardNavItem } from "@/components/layout/dashboard-shell";
@@ -20,6 +8,7 @@ import {
   WorkspaceShell,
   type WorkspaceNavItem,
 } from "@/components/workspace/workspace-shell";
+import type { WorkspaceIconKey } from "@/components/workspace/workspace-icons";
 import type { Locale } from "@/i18n/config";
 
 type Props = {
@@ -46,17 +35,20 @@ type Props = {
  * /lawyer/workspace keeps its own icon here too even though clicking it
  * navigates to a route rendered by LawyerWorkspaceFrame, not WorkspaceShell
  * — it's still a real outbound link from every other lawyer page.
+ * Values are WORKSPACE_ICONS registry keys, not component references —
+ * WorkspaceShell/WorkspaceNavLink must accept the same serializable shape
+ * regardless of which consumer builds the nav list. See workspace-icons.ts.
  */
-const LAWYER_NAV_ICONS: Record<string, LucideIcon> = {
-  "/lawyer/dashboard": LayoutDashboard,
-  "/lawyer/workspace": LayoutGrid,
-  "/lawyer/workspace/cases": FolderOpen,
-  "/lawyer/offerings": Briefcase,
-  "/lawyer/bookings": CalendarClock,
-  "/billing": CreditCard,
-  "/lawyer/notifications": Bell,
-  "/legal-ai": Sparkles,
-  "/organizations": Building2,
+const LAWYER_NAV_ICONS: Record<string, WorkspaceIconKey> = {
+  "/lawyer/dashboard": "layout-dashboard",
+  "/lawyer/workspace": "layout-grid",
+  "/lawyer/workspace/cases": "folder-open",
+  "/lawyer/offerings": "briefcase",
+  "/lawyer/bookings": "calendar-clock",
+  "/billing": "credit-card",
+  "/lawyer/notifications": "bell",
+  "/legal-ai": "sparkles",
+  "/organizations": "building-2",
 };
 
 export function LawyerAppChrome({

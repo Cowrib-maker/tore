@@ -1,17 +1,4 @@
 import { redirect } from "next/navigation";
-import {
-  Building2,
-  CreditCard,
-  Globe,
-  LayoutDashboard,
-  ScrollText,
-  Settings,
-  ShieldCheck,
-  Tags,
-  Users,
-  Wrench,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 
 import { requirePageSession } from "@/application/common/session";
 import { UserRole } from "@/domain/enums";
@@ -21,23 +8,27 @@ import {
   WorkspaceShell,
   type WorkspaceNavItem,
 } from "@/components/workspace/workspace-shell";
+import type { WorkspaceIconKey } from "@/components/workspace/workspace-icons";
 
 /**
  * Icon-per-route is a WorkspaceShell (sidebar) concern only — the shared
- * nav item list from getShellI18n stays {href,label}, unchanged, so
- * Lawyer/Student (still on DashboardShell) are unaffected.
+ * nav item list from getShellI18n stays {href,label}, unchanged. Values
+ * here are WORKSPACE_ICONS registry keys, not component references —
+ * this map lives in a Server Component, and a component reference can't
+ * cross the Server->Client boundary into WorkspaceNavLink. See
+ * workspace-icons.ts.
  */
-const ADMIN_NAV_ICONS: Record<string, LucideIcon> = {
-  "/admin/dashboard": LayoutDashboard,
-  "/admin/lawyers": ShieldCheck,
-  "/admin/users": Users,
-  "/admin/taxonomy": Tags,
-  "/admin/settings": Settings,
-  "/admin/homepage": Globe,
-  "/admin/audit": ScrollText,
-  "/admin/payments": CreditCard,
-  "/admin/dev": Wrench,
-  "/organizations": Building2,
+const ADMIN_NAV_ICONS: Record<string, WorkspaceIconKey> = {
+  "/admin/dashboard": "layout-dashboard",
+  "/admin/lawyers": "shield-check",
+  "/admin/users": "users",
+  "/admin/taxonomy": "tags",
+  "/admin/settings": "settings",
+  "/admin/homepage": "globe",
+  "/admin/audit": "scroll-text",
+  "/admin/payments": "credit-card",
+  "/admin/dev": "wrench",
+  "/organizations": "building-2",
 };
 
 export default async function AdminLayout({
