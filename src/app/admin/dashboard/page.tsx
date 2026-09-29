@@ -56,9 +56,9 @@ export default async function AdminDashboardPage() {
   return (
     <>
       <h1 className="text-2xl font-bold text-ink sm:text-[1.75rem]">
-        {ad.overviewTitle} — {session.user.name ?? au.roleAdmin}
+        Сайн байна уу, {session.user.name ?? au.roleAdmin} 👋
       </h1>
-      <p className="mt-1 text-sm text-muted-foreground">{i18n.title}</p>
+      <p className="mt-1 text-sm text-muted-foreground">{ad.overviewTitle}</p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <AdminKpiTile icon={Users} label={ad.totalUsers} value={String(userCounts.total)} />
