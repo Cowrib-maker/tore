@@ -3,6 +3,7 @@ import { LandingHeroScene } from "@/components/marketing/landing-hero-scene";
 import { LandingReveal } from "@/components/marketing/landing-reveal";
 import type { HomepageStats } from "@/application/use-cases/homepage/get-homepage-stats";
 import type { Dictionary } from "@/i18n/types";
+import { cn } from "@/lib/utils";
 
 /**
  * Splits off the final word so it can be rendered in the accent color,
@@ -118,21 +119,37 @@ export function LandingHero({
                 suggestions={home.chatSuggestions}
               />
             </div>
-
-            {statEntries.length > 0 ? (
-              <div className="mt-10 flex max-w-[820px] flex-wrap gap-x-10 gap-y-4 border-t border-[#0B1F3A]/10 pt-6">
-                {statEntries.map((entry) => (
-                  <div key={entry.label}>
-                    <p className="text-2xl font-semibold tracking-tight text-[#0B1F3A] sm:text-[1.75rem]">
-                      {entry.value}+
-                    </p>
-                    <p className="mt-0.5 text-[12.5px] text-[#5C6570]">{entry.label}</p>
-                  </div>
-                ))}
-              </div>
-            ) : null}
           </div>
         </div>
+
+        {/* The stat card floats over the institutional scene on desktop
+            (anchored within this section's own `relative` container, so it
+            stacks above the absolutely-positioned scene without touching
+            that component) and drops back into normal flow -- stacked
+            below the composer -- on mobile/tablet, where there is no scene
+            underneath it to float over. Real counts only: each row is
+            already filtered to non-zero live data by `statEntries` above,
+            and the whole card is omitted when every count is unavailable. */}
+        {statEntries.length > 0 ? (
+          <div className="mt-8 max-w-sm pb-8 sm:pb-12 lg:absolute lg:right-16 lg:bottom-16 lg:mt-0 lg:max-w-[280px] lg:pb-0">
+            <div className="rounded-2xl border border-white/10 bg-[#0B1F3A]/90 p-5 shadow-[0_24px_60px_-20px_rgba(11,31,58,0.55)] backdrop-blur-xl">
+              {statEntries.map((entry, index) => (
+                <div
+                  key={entry.label}
+                  className={cn(
+                    "flex items-baseline justify-between gap-4 py-2.5",
+                    index > 0 && "border-t border-white/10",
+                  )}
+                >
+                  <p className="text-[12.5px] text-white/70">{entry.label}</p>
+                  <p className="text-xl font-semibold tracking-tight text-white">
+                    {entry.value}+
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </div>
     </section>
   );

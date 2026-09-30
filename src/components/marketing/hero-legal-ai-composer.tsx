@@ -97,7 +97,7 @@ export function HeroLegalAiComposer({
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-[1.75rem] border border-ai-border bg-ai-surface p-4 shadow-[0_28px_60px_-28px_rgba(11,31,58,0.35)] transition focus-within:border-[#0B5CFF]/45 sm:p-5"
+        className="rounded-3xl border border-ai-border bg-ai-surface p-4 shadow-[0_28px_60px_-28px_rgba(11,31,58,0.35)] transition focus-within:border-[#0B5CFF]/45 sm:p-5"
       >
         <textarea
           ref={textareaRef}
@@ -129,7 +129,7 @@ export function HeroLegalAiComposer({
             type="submit"
             aria-label={submitLabel}
             disabled={!question.trim() || loading}
-            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-ai-accent text-ai-accent-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-ai-accent-bright text-ai-accent-bright-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ArrowUp className="size-4" />
           </button>

@@ -1,5 +1,6 @@
 import { Children, type ReactNode } from "react";
 import Link from "next/link";
+import { BadgeCheck, FileCheck2, Lock, ShieldCheck } from "lucide-react";
 
 import { logoutAction } from "@/application/actions/auth.actions";
 import { BRAND_LOGO_LANDING } from "@/components/brand/tokens";
@@ -7,6 +8,14 @@ import { BrandLink } from "@/components/layout/brand-link";
 import type { LandingAuthUser } from "@/components/marketing/landing-nav";
 import { TORE_LEGAL_ENTITY_NAME } from "@/domain/constants/site-identity";
 import type { Dictionary } from "@/i18n/types";
+
+/** Fixed order into `landing.trustItems` for the compact footer strip --
+ * privacy, security, sourced answers, verified professionals. Labels come
+ * straight from the existing trust-section copy (never new/invented text),
+ * matching an institutional trust-bar composition without claiming any
+ * specific, unverified partner organization. */
+const TRUST_STRIP_INDEXES = [0, 1, 2, 5];
+const TRUST_STRIP_ICONS = [Lock, ShieldCheck, FileCheck2, BadgeCheck];
 
 export function LandingFooter({
   dict,
@@ -18,9 +27,37 @@ export function LandingFooter({
   const t = dict.landing;
   const home = dict.publicHome;
   const year = new Date().getFullYear();
+  const trustStripItems = TRUST_STRIP_INDEXES.map((index) => t.trustItems[index]).filter(
+    (item): item is { title: string; description: string } => Boolean(item),
+  );
 
   return (
     <footer className="border-t border-[#0B1F3A]/8 bg-[#EEF3FB]">
+      {trustStripItems.length > 0 ? (
+        <div className="border-b border-[#0B1F3A]/8 bg-[#0B1F3A]">
+          <div className="mx-auto max-w-6xl px-5 py-5 sm:px-8">
+            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 sm:justify-between">
+              <p className="text-[11px] font-semibold tracking-[0.16em] text-white/50 uppercase">
+                {t.trustEyebrow}
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2.5">
+                {trustStripItems.map((item, index) => {
+                  const Icon = TRUST_STRIP_ICONS[index] ?? ShieldCheck;
+                  return (
+                    <span
+                      key={item.title}
+                      className="inline-flex items-center gap-2 text-[13px] font-medium text-white/85"
+                    >
+                      <Icon className="size-4 text-white/60" />
+                      {item.title}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-14">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           <div>

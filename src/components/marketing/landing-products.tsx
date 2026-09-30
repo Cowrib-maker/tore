@@ -1,20 +1,29 @@
 import Link from "next/link";
-import { Briefcase, Building2, GraduationCap, Users, Users2 } from "lucide-react";
+import {
+  ArrowRight,
+  Briefcase,
+  Building2,
+  GraduationCap,
+  Users,
+  Users2,
+} from "lucide-react";
 
 import { LandingReveal } from "@/components/marketing/landing-reveal";
 import type { Dictionary } from "@/i18n/types";
 
 type ProductKey = "citizen" | "student" | "lawyer" | "firm" | "team";
 
+/** Stitch's role-router color mapping: Citizen/Student share blue (both are
+ * the individual-user track), Lawyer is teal, Firm is amber, Team is purple. */
 const PRODUCT_STYLE: Record<
   ProductKey,
   { icon: typeof Users; tile: string; text: string }
 > = {
   citizen: { icon: Users, tile: "bg-[#E8F0FE]", text: "text-[#0B5CFF]" },
-  student: { icon: GraduationCap, tile: "bg-[#E3F5EA]", text: "text-[#1D9A62]" },
-  lawyer: { icon: Briefcase, tile: "bg-[#FDEEE0]", text: "text-[#C2660B]" },
-  firm: { icon: Building2, tile: "bg-[#F1EAFB]", text: "text-[#7C3AED]" },
-  team: { icon: Users2, tile: "bg-[#EFEAFB]", text: "text-[#6D5BD0]" },
+  student: { icon: GraduationCap, tile: "bg-[#E8F0FE]", text: "text-[#0B5CFF]" },
+  lawyer: { icon: Briefcase, tile: "bg-[#E1F5F2]", text: "text-[#0F766E]" },
+  firm: { icon: Building2, tile: "bg-[#FDF0D5]", text: "text-[#B45309]" },
+  team: { icon: Users2, tile: "bg-[#F1EAFB]", text: "text-[#7C3AED]" },
 };
 
 export function LandingProducts({
@@ -47,7 +56,7 @@ export function LandingProducts({
       id="products"
       className="scroll-mt-24 border-b border-[#0B1F3A]/8 bg-white"
     >
-      <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-16">
+      <div className="mx-auto max-w-6xl px-5 pt-10 pb-14 sm:px-8 sm:pt-12 sm:pb-16">
         <LandingReveal className="mx-auto max-w-xl text-center">
           <p className="text-[12px] font-semibold tracking-[0.16em] text-[#0B5CFF] uppercase">
             {home.productsEyebrow}
@@ -89,9 +98,10 @@ export function LandingProducts({
                   </p>
                   <Link
                     href={hrefs[item.key]}
-                    className="mt-5 inline-flex text-[13px] font-semibold text-[#0B1F3A] transition hover:text-[#0B5CFF]"
+                    className="group mt-5 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#0B1F3A] transition hover:text-[#0B5CFF]"
                   >
                     {item.copy.cta}
+                    <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                 </article>
               </LandingReveal>

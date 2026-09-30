@@ -1,14 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { ChevronDown, Menu, Search, X } from "lucide-react";
 import { useState } from "react";
 
 import { logoutAction } from "@/application/actions/auth.actions";
 import { BRAND_LOGO_LANDING } from "@/components/brand/tokens";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { BrandLink } from "@/components/layout/brand-link";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { buttonVariants } from "@/components/ui/button";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/types";
@@ -28,18 +27,20 @@ type LandingNavProps = {
 export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
   const [open, setOpen] = useState(false);
   const home = dict.publicHome;
+  /** Anchors to on-page sections that group several items get a chevron —
+   * a visual affordance only, matching the Stitch header's menu hierarchy.
+   * No submenu panel is added: there is no distinct link content to show
+   * beyond the anchor scroll the link already performs. */
   const links = [
-    { href: "#products", label: home.navProducts },
-    { href: "#marketplace", label: home.navServices },
-    { href: "/legal-ai", label: home.navLibrary },
-    { href: "/lawyers", label: dict.nav.lawyers },
-    { href: "#intelligence", label: home.navIntelligence },
-    { href: "#faq", label: home.navHelp },
+    { href: "#products", label: home.navProducts, hasMenu: true },
+    { href: "#marketplace", label: home.navServices, hasMenu: true },
+    { href: "/legal-ai", label: home.navLibrary, hasMenu: false },
+    { href: "/lawyers", label: dict.nav.lawyers, hasMenu: false },
   ];
 
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--landing-border)] bg-[color-mix(in_srgb,var(--landing-surface)_90%,transparent)] backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-5 sm:h-[4.25rem] sm:px-8">
+      <div className="mx-auto flex h-[68px] max-w-[1440px] items-center justify-between gap-3 px-5 sm:h-[76px] sm:px-8">
         <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_LANDING} />
 
         <nav
@@ -47,15 +48,28 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
           aria-label="Primary"
         >
           {links.map((item) => (
-            <a key={item.href} href={item.href} className="landing-nav-link">
+            <a
+              key={item.href}
+              href={item.href}
+              className="landing-nav-link inline-flex items-center gap-1"
+            >
               {item.label}
+              {item.hasMenu ? (
+                <ChevronDown className="size-3.5 opacity-60" aria-hidden />
+              ) : null}
             </a>
           ))}
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <a
+            href="#chat"
+            aria-label={home.chatTitle}
+            className="inline-flex size-9 items-center justify-center rounded-full text-[var(--landing-nav-text)] transition-colors hover:bg-[var(--landing-mint)] hover:text-[var(--landing-accent)]"
+          >
+            <Search className="size-4" />
+          </a>
           <LanguageSwitcher locale={locale} label={dict.common.language} />
-          <ThemeToggle />
           {authUser ? (
             <>
               <Link

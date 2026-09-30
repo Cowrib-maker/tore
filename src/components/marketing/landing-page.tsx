@@ -71,8 +71,8 @@ export function LandingPage({
             organizations: home.statsOrganizations,
           }}
         />
-        <LandingIntro home={home} />
         <LandingProducts home={home} hrefs={productHrefs} />
+        <LandingIntro home={home} />
         <LandingMarketplace t={landing} />
         <LandingIntelligence home={home} feed={feed} />
         <LandingSection id="faq">
