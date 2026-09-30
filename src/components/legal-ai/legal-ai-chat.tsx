@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import {
   AlertCircle,
+  Car,
   ChevronDown,
   FileImage,
   FileSpreadsheet,
@@ -123,31 +124,41 @@ const QUICK_ACTIONS = [
   {
     id: "fired",
     label: "Намайг ажлаас халсан.",
+    description: "Хөдөлмөрийн хууль, нөхөн олговор шаардах",
     icon: Scale,
+    tileClassName: "bg-[#E8F0FE] text-[#0B5CFF]",
     prompt: "Намайг ажлаас халсан.",
   },
   {
     id: "unpaid",
     label: "Мөнгө өгөхгүй байна.",
+    description: "Иргэний хууль, шүүхэд нэхэмжлэл гаргах",
     icon: Shield,
+    tileClassName: "bg-[#E3F5EA] text-[#1D9A62]",
     prompt: "Мөнгө өгөхгүй байна.",
   },
   {
     id: "accident",
     label: "Зам тээврийн осолд орсон.",
-    icon: FileText,
+    description: "Даатгалын нөхөн төлбөр, цагдаагийн акт",
+    icon: Car,
+    tileClassName: "bg-[#FDEEE0] text-[#C2660B]",
     prompt: "Зам тээврийн осолд орсон.",
   },
   {
     id: "contract",
     label: "Гэрээтэй холбоотой асуудалтай.",
-    icon: Users,
+    description: "Түрээс, худалдах, үйлчилгээ үзүүлэх гэрээ",
+    icon: FileText,
+    tileClassName: "bg-[#F1EAFB] text-[#7C3AED]",
     prompt: "Гэрээтэй холбоотой асуудалтай.",
   },
   {
     id: "police",
     label: "Цагдаад дуудсан.",
-    icon: Scale,
+    description: "Гэрч, сэжигтний эрх, өмгөөлөгч авах журам",
+    icon: Users,
+    tileClassName: "bg-[#FDEAEA] text-[#C23B3B]",
     prompt: "Цагдаад дуудсан.",
   },
 ] as const;
@@ -1145,16 +1156,28 @@ function EmptyWorkspace({
         </p>
       </div>
 
-      <div className="mt-6 grid gap-2 sm:grid-cols-2">
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {QUICK_ACTIONS.map((action) => (
           <button
             key={action.id}
             type="button"
             onClick={() => onQuickAction(action.prompt)}
-            className="flex items-start gap-3 rounded-2xl border border-ai-border-strong bg-ai-surface px-4 py-3.5 text-left text-sm text-ai-text shadow-[0_10px_24px_-20px_rgba(11,31,58,0.45)] transition hover:border-ai-accent/25 hover:bg-ai-surface-muted"
+            className="flex flex-col items-start gap-1 rounded-2xl border border-ai-border-strong bg-ai-surface p-4 text-left shadow-[0_10px_24px_-20px_rgba(11,31,58,0.45)] transition hover:border-ai-accent/25 hover:bg-ai-surface-muted"
           >
-            <action.icon className="mt-0.5 size-4 shrink-0 text-ai-accent" />
-            <span className="font-medium leading-5">{action.label}</span>
+            <span
+              className={cn(
+                "mb-1 flex size-9 items-center justify-center rounded-xl",
+                action.tileClassName,
+              )}
+            >
+              <action.icon className="size-4.5" />
+            </span>
+            <span className="text-sm font-semibold leading-5 text-ai-text">
+              {action.label}
+            </span>
+            <span className="text-xs leading-5 text-ai-text-muted">
+              {action.description}
+            </span>
           </button>
         ))}
       </div>
