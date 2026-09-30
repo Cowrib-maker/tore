@@ -1,13 +1,19 @@
 "use client";
 
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { ArrowUp, Paperclip, Sparkles } from "lucide-react";
+import { ArrowUp, Briefcase, Car, FileText, Paperclip, Shield, Sparkles, Users } from "lucide-react";
 
 import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
 import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
 import { useLegalAiChatSession } from "@/components/legal-ai/use-legal-ai-chat-session";
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
+
+/** Icon per suggestion, by position -- `home.chatSuggestions` is always
+ * ordered contract / traffic / employment / family / police across every
+ * locale, so indexing is locale-safe (matching on the Mongolian string
+ * itself would silently break for en/zh/ko). */
+const SUGGESTION_ICONS = [FileText, Car, Briefcase, Users, Shield];
 
 export function HeroLegalAiComposer({
   placeholder,
@@ -141,19 +147,23 @@ export function HeroLegalAiComposer({
           <span className="text-xs font-medium text-[#5C6570]">
             {suggestionsLabel}
           </span>
-          {suggestions.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => {
-                setQuestion(item);
-                textareaRef.current?.focus();
-              }}
-              className="rounded-full border border-[#0B1F3A]/10 bg-white px-3 py-1 text-xs font-medium text-[#0B1F3A] transition hover:border-[#0B5CFF]/40 hover:bg-[#E8F0FE] hover:text-[#0B5CFF]"
-            >
-              {item}
-            </button>
-          ))}
+          {suggestions.map((item, index) => {
+            const Icon = SUGGESTION_ICONS[index] ?? FileText;
+            return (
+              <button
+                key={item}
+                type="button"
+                onClick={() => {
+                  setQuestion(item);
+                  textareaRef.current?.focus();
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#0B1F3A]/10 bg-white px-3 py-1 text-xs font-medium text-[#0B1F3A] transition hover:border-[#0B5CFF]/40 hover:bg-[#E8F0FE] hover:text-[#0B5CFF]"
+              >
+                <Icon className="size-3.5 text-[#5C6570]" />
+                {item}
+              </button>
+            );
+          })}
         </div>
       ) : null}
 

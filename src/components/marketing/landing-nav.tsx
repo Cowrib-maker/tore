@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, Menu, Search, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Menu, Search, X } from "lucide-react";
 import { useState } from "react";
 
 import { logoutAction } from "@/application/actions/auth.actions";
@@ -36,6 +36,8 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
     { href: "#marketplace", label: home.navServices, hasMenu: true },
     { href: "/legal-ai", label: home.navLibrary, hasMenu: false },
     { href: "/lawyers", label: dict.nav.lawyers, hasMenu: false },
+    { href: "#intelligence", label: home.navIntelligence, hasMenu: false },
+    { href: "#faq", label: home.navHelp, hasMenu: false },
   ];
 
   return (
@@ -99,10 +101,11 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
                 href="/register/client"
                 className={cn(
                   buttonVariants({ size: "sm" }),
-                  "hidden h-9 rounded-full bg-[var(--landing-accent)] px-4 text-[13px] font-semibold text-[var(--landing-canvas)] hover:opacity-92 sm:inline-flex",
+                  "hidden h-9 items-center gap-1.5 rounded-full bg-[var(--landing-accent)] px-4 text-[13px] font-semibold text-[var(--landing-canvas)] hover:opacity-92 sm:inline-flex",
                 )}
               >
                 {dict.common.getStarted}
+                <ArrowRight className="size-3.5" />
               </Link>
             </>
           )}
@@ -165,10 +168,11 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
                 </Link>
                 <Link
                   href="/register/client"
-                  className="mt-2 inline-flex h-10 items-center justify-center rounded-full bg-[var(--landing-accent)] px-4 text-sm font-semibold text-[var(--landing-canvas)]"
+                  className="mt-2 inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-[var(--landing-accent)] px-4 text-sm font-semibold text-[var(--landing-canvas)]"
                   onClick={() => setOpen(false)}
                 >
                   {dict.common.getStarted}
+                  <ArrowRight className="size-3.5" />
                 </Link>
               </>
             )}

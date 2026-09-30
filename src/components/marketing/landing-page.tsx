@@ -7,7 +7,6 @@ import { LandingIntelligence } from "@/components/marketing/landing-intelligence
 import { LandingIntro } from "@/components/marketing/landing-intro";
 import { LandingMarketplace } from "@/components/marketing/landing-marketplace";
 import { LandingNav, type LandingAuthUser } from "@/components/marketing/landing-nav";
-import { LandingProducts } from "@/components/marketing/landing-products";
 import { LandingReveal } from "@/components/marketing/landing-reveal";
 import {
   LandingEyebrow,
@@ -70,8 +69,8 @@ export function LandingPage({
             practiceAreas: home.statsPracticeAreas,
             organizations: home.statsOrganizations,
           }}
+          productHrefs={productHrefs}
         />
-        <LandingProducts home={home} hrefs={productHrefs} />
         <LandingIntro home={home} />
         <LandingMarketplace t={landing} />
         <LandingIntelligence home={home} feed={feed} />
