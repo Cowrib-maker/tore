@@ -68,7 +68,7 @@ export function LandingHero({
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-white/45" />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_70%,#F7F8FB_100%)]"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_50%,rgba(247,248,251,0.75)_78%,#F7F8FB_100%)]"
         />
       </div>
 
@@ -89,7 +89,11 @@ export function LandingHero({
             with text legible against it because the wash lightens
             everything evenly, not because one side is blocked out. */}
         <div className="absolute inset-0 bg-white/40" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_72%,#F7F8FB_100%)]" />
+        {/* Fades in earlier and across more stops than a single hard cutoff
+            -- softens the seam between the scene's own bottom edge and the
+            plain canvas color so the role cards below feel anchored into
+            the tail of the hero rather than pasted onto a cut-off band. */}
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(247,248,251,0.75)_82%,#F7F8FB_100%)]" />
       </div>
 
       <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-16">
