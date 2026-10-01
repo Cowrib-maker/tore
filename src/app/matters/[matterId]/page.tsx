@@ -7,6 +7,7 @@ import { requirePageSession } from "@/application/common/session";
 import { listMatterDocumentsForActor } from "@/application/use-cases/matters/list-matter-documents";
 import { loadMatterOverviewForActor } from "@/application/use-cases/matters/matter-overview";
 import { MatterDocumentUpload } from "@/components/matters/matter-document-upload";
+import { MatterResearchPanel } from "@/components/matters/matter-research-panel";
 import { MattersShell } from "@/components/matters/matters-shell";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -140,6 +141,15 @@ export default async function MatterOverviewPage({
             >
               AI-тай ажиллах
             </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Хуулийн судалгаа</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <MatterResearchPanel matterId={overview.id} />
           </CardContent>
         </Card>
 

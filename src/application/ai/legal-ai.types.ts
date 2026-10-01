@@ -55,6 +55,14 @@ export type LegalAiCreateTurnInput = {
    * conversation's matterId is already persisted and is never re-derived
    * from client input. */
   matterId?: string;
+  /** TORE Matter Legal Research V1 — set only by researchMatterForActor
+   * after requireOwnedMatter has verified the actor owns `matterId`. Never
+   * accepted from client input directly. When true, skips the ordinary
+   * clarification/intent-routing branches entirely and always produces a
+   * grounded, cited research answer (see legal-ai.service.ts's
+   * completeMatterResearch) — a Research question is already explicit, so
+   * it is never treated as ambiguous chit-chat needing a follow-up. */
+  researchMode?: boolean;
   userContext?: UserTypeContext;
   /**
    * @deprecated Ignored for authorization. Capability is derived from

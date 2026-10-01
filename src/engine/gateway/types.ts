@@ -177,6 +177,15 @@ export type PromptBuildInput = {
     comparativeWithMn: boolean;
     includesPractice: boolean;
   } | null;
+  /**
+   * TORE Matter Legal Research V1 — requests the fixed 5-section research
+   * memo structure (applicable facts / applicable law / Matter-document
+   * observations / conclusion / sources) instead of the normal CITIZEN/
+   * LAWYER output structure, regardless of capability. Additive: every
+   * other prompt section (preamble, safety, corpus, document context,
+   * injection defense) is unchanged.
+   */
+  researchOutput?: boolean;
 };
 
 /** A retrieved statute excerpt that may be cited. */

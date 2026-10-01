@@ -27,6 +27,7 @@ import {
 } from "@/application/ai/resolve-legal-authorities";
 import type {
   LegalAiCompletionPort,
+  LegalAiConversation,
   LegalAiCreateTurnInput,
   LegalAiCreateTurnResult,
   LegalAiConversationDocumentMeta,
@@ -313,6 +314,24 @@ export class LegalAiService {
       }
       return result;
     };
+
+    // Matter Legal Research V1 — an explicit research question (never set by
+    // ordinary chat input, only by researchMatterForActor) always goes
+    // straight to grounded authority resolution. It never enters the
+    // clarification/intent-routing branches below: the user already framed
+    // a specific research question through a dedicated entry point, so
+    // treating it as ambiguous chit-chat needing a follow-up would be wrong.
+    if (input.researchMode) {
+      const { result, override } = await this.completeMatterResearch({
+        conversation,
+        message,
+        capability,
+        input,
+        priorMessages,
+        conversationState,
+      });
+      return afterReply(result, override);
+    }
 
     if (relevance.relevance === LegalRelevance.NON_LEGAL) {
       // Every subject who reached this point already passed the topic-blind
@@ -742,6 +761,195 @@ export class LegalAiService {
       turnKind: PromptTurnKind.GENERAL,
       capability: input.capability,
       retrievalInvoked: false,
+    };
+  }
+
+  /**
+   * TORE Matter Legal Research V1 — grounded, cited research answer for an
+   * explicit Matter research question (see researchMatterForActor). Mirrors
+   * the main createTurn/continueAuthorizedTurn grounded-answer path
+   * (document context → authority resolution → prompt → completion →
+   * citations) but deliberately omits CaseFile context and foreign-legal-
+   * scope handling — Matter Research never touches CaseFile architecture
+   * and is always scoped to TORE's Mongolian legal corpus. `requireRetrieval`
+   * is always true: an explicit research question always attempts grounding,
+   * never conditionally skips it.
+   */
+  private async completeMatterResearch(ctx: {
+    conversation: LegalAiConversation;
+    message: string;
+    capability: LegalAiCapability;
+    input: LegalAiCreateTurnInput;
+    priorMessages: LegalAiStoredMessage[];
+    conversationState: { questionStatus: LegalQuestionStatus };
+  }): Promise<{
+    result: LegalAiCreateTurnResult;
+    override?: { questionStatus?: LegalQuestionStatus; consumesEntitlement?: boolean };
+  }> {
+    const { conversation, message, capability, input, priorMessages, conversationState } = ctx;
+    const history: LegalAiStoredMessage[] = [
+      ...priorMessages,
+      { role: "USER", content: message },
+    ];
+    const userType = this.dependencies.userTypeService.resolve({
+      ...input.userContext,
+      role: input.actorRole ?? input.userContext?.role,
+    });
+
+    const documents = await this.loadDocumentContext(
+      conversation.id,
+      input.userId,
+      conversation.matterId,
+    );
+    const documentContextBlock = wrapUntrustedDocumentAttachments(
+      documents,
+      MAX_DOCUMENT_EXTRACT_CHARS,
+    );
+    const hasDocumentText = documents.some(
+      (item) => item.extractStatus === "OK" && item.extractedText,
+    );
+
+    const intent = await this.dependencies.intent.classify(message);
+    const taskType = classifyLegalAiTask({
+      capability,
+      intent: intent.intent,
+      hasCaseContext: false,
+      hasDocument: hasDocumentText,
+      message,
+    });
+    const reasoningStages = stagesForTask(capability, taskType, {
+      hasCaseContext: false,
+      hasDocument: hasDocumentText,
+    });
+
+    const authorities = await resolveLegalAuthorities({
+      question: message,
+      retriever: this.dependencies.corpusRetriever,
+      requireRetrieval: true,
+      graphRepository: this.dependencies.graphRepository,
+    });
+
+    if (authorities.kind === "refused") {
+      return {
+        result: await this.persistSafeReply({
+          conversationId: conversation.id,
+          content: authorities.message,
+          turnKind: PromptTurnKind.LEGAL,
+          capability,
+          taskType,
+          retrievalInvoked: authorities.retrievalInvoked,
+        }),
+        override: {
+          questionStatus: conversationState.questionStatus,
+          consumesEntitlement: false,
+        },
+      };
+    }
+
+    const verifiedAuthorities =
+      authorities.kind === "verified" ? authorities.authorities : undefined;
+    const authorityConflicts: ConflictFinding[] =
+      authorities.kind === "verified" ? authorities.conflicts : [];
+    const authorityConflictBlock = formatAuthorityConflictBlock(authorityConflicts);
+    const temporalValidityBlock = verifiedAuthorities
+      ? formatTemporalValidityBlock(verifiedAuthorities)
+      : undefined;
+    const missingLegalSourceMessage =
+      authorities.kind === "empty" && authorities.retrievalInvoked
+        ? MISSING_LEGAL_SOURCE_MESSAGE
+        : undefined;
+
+    const reasoningPlan = this.prepareReasoningPlan(message, intent, verifiedAuthorities);
+
+    const prompt = this.dependencies.promptBuilder.build({
+      message,
+      userType,
+      domain: DomainLabel.LEGAL,
+      turnKind: PromptTurnKind.LEGAL,
+      capability,
+      taskType,
+      reasoningStages,
+      intentType: intent.intent,
+      intentConfidence: intent.confidence,
+      missingInformation: verifiedAuthorities?.length
+        ? undefined
+        : reasoningPlan?.missingInformation,
+      missingLegalSourceMessage,
+      corpusAvailable: Boolean(verifiedAuthorities?.length),
+      verifiedAuthorities,
+      authorityConflictBlock,
+      temporalValidityBlock,
+      documentContextBlock,
+      hasReadableDocumentText: documents.length > 0 ? hasDocumentText : undefined,
+      researchOutput: true,
+    });
+
+    const completion = await this.dependencies.completion.complete({
+      systemPrompt: prompt.systemPrompt,
+      messages: toModelHistory(history),
+      onDelta: input.onDelta,
+      signal: input.signal,
+    });
+
+    const assistantMessage = await this.dependencies.store.createAssistantMessage({
+      conversationId: conversation.id,
+      content: completion.content.trim() || "Хариу боловсруулах явцад алдаа гарлаа.",
+      provider: completion.provider,
+      model: completion.model,
+      inputTokens: completion.inputTokens,
+      outputTokens: completion.outputTokens,
+    });
+
+    if (input.userId) {
+      await this.dependencies.store.recordUsage({
+        userId: input.userId,
+        provider: completion.provider,
+        model: completion.model,
+        inputTokens: completion.inputTokens,
+        outputTokens: completion.outputTokens,
+      });
+    }
+
+    let citations: LegalAiSafeCitation[] = [];
+    if (verifiedAuthorities?.length) {
+      citations = await this.dependencies.store.createCitations({
+        messageId: assistantMessage.id,
+        citations: verifiedAuthorities.map((authority) => ({
+          title: authority.title,
+          sourceType: authority.sourceType ?? VERIFIED_SOURCE_TYPE,
+          sourceUrl: nullIfBlank(authority.sourceUrl),
+          reference: [
+            authority.locator,
+            authority.documentId,
+            authority.documentVersionId,
+            authority.nodeId,
+          ].join(" | "),
+          excerpt: authority.excerpt,
+          article: nullIfBlank(authority.article),
+          paragraph: nullIfBlank(authority.paragraph),
+          sourceVersion: nullIfBlank(authority.sourceVersion),
+          validFrom: nullIfBlank(authority.effectiveFrom),
+          validTo: nullIfBlank(authority.effectiveTo),
+        })),
+      });
+    }
+
+    return {
+      result: {
+        conversationId: conversation.id,
+        message: {
+          ...assistantMessage,
+          citations,
+        },
+        usage: {
+          inputTokens: completion.inputTokens,
+          outputTokens: completion.outputTokens,
+        },
+        turnKind: PromptTurnKind.LEGAL,
+        capability,
+        taskType,
+        retrievalInvoked: authorities.retrievalInvoked,
+      },
     };
   }
 
