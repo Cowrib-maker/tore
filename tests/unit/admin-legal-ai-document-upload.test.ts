@@ -232,14 +232,19 @@ function sessionFor(userId: string, role: UserRole) {
 }
 
 function activeCitizenSubscription() {
+  // Relative to the real clock (no fake timers in this file) so the fixture
+  // never goes stale -- a hardcoded past currentPeriodEnd previously made
+  // isSubscriptionActive() correctly, but unintentionally, reject this as
+  // expired once real time caught up to the hardcoded date.
+  const now = Date.now();
   return {
     id: "sub-1",
     ownerUserId: "any",
     planCode: SubscriptionPlanCode.CITIZEN_BASIC,
     status: SubscriptionStatus.ACTIVE,
     seatLimit: 1,
-    currentPeriodStart: new Date("2026-09-01T00:00:00.000Z"),
-    currentPeriodEnd: new Date("2026-10-01T00:00:00.000Z"),
+    currentPeriodStart: new Date(now - 30 * 24 * 60 * 60 * 1000),
+    currentPeriodEnd: new Date(now + 30 * 24 * 60 * 60 * 1000),
   };
 }
 
