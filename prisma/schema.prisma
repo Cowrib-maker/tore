@@ -281,6 +281,7 @@ model User {
   aiConversationDocuments         AIConversationDocument[]
   aiUsage                         AIUsage[]
   caseFiles                       CaseFile[]                       @relation("LawyerCaseFiles")
+  matters                         Matter[]                         @relation("MatterOwner")
   ownedSubscriptions              Subscription[]                   @relation("SubscriptionOwner")
   subscriptionSeats               SubscriptionSeat[]
   deviceSessions                  DeviceSession[]
@@ -961,6 +962,11 @@ model AIConversation {
   guestSessionId      String?             @map("guest_session_id")
   /// Nullable so existing threads stay valid. Set only after CaseFile ownership is verified.
   caseFileId          String?             @map("case_file_id")
+  /// Nullable so existing threads stay valid. Set only after Matter ownership is
+  /// verified (see assertOwnedMatterForAi) -- mirrors caseFileId's own contract.
+  /// A conversation may belong to a Matter, a CaseFile, or neither, but Matter
+  /// is a generic (any-role) container while CaseFile stays lawyer/doctrine-only.
+  matterId            String?             @map("matter_id")
   title               String?
   questionStatus      LegalQuestionStatus @default(NEW) @map("question_status")
   billedQuestionCount Int                 @default(0) @map("billed_question_count")
@@ -970,12 +976,14 @@ model AIConversation {
   user         User?                    @relation(fields: [userId], references: [id], onDelete: Cascade)
   guestSession GuestSession?            @relation(fields: [guestSessionId], references: [id], onDelete: SetNull)
   caseFile     CaseFile?                @relation(fields: [caseFileId], references: [id], onDelete: SetNull)
+  matter       Matter?                  @relation(fields: [matterId], references: [id], onDelete: SetNull)
   messages     AIMessage[]
   documents    AIConversationDocument[]
 
   @@index([userId, updatedAt(sort: Desc)])
   @@index([guestSessionId, updatedAt(sort: Desc)])
   @@index([caseFileId, updatedAt(sort: Desc)])
+  @@index([matterId, updatedAt(sort: Desc)])
   @@map("ai_conversations")
 }
 
@@ -1024,6 +1032,47 @@ model AIConversationDocument {
   @@index([conversationId, createdAt])
   @@index([userId])
   @@map("ai_conversation_documents")
+}
+
+enum MatterStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum MatterType {
+  GENERAL
+  LITIGATION
+  CONTRACT
+  EMPLOYMENT
+  FAMILY
+  CRIMINAL
+  ADMINISTRATIVE
+}
+
+/// TORE Matter Workspace V1 -- the persistent, any-role (citizen or lawyer)
+/// container around one or more Legal AI conversations. Deliberately
+/// separate from CaseFile: CaseFile is a lawyer-only entity deeply coupled
+/// to the doctrine analysis engine (requestJson/reviewJson/mappingLogJson);
+/// Matter is the simple, generic "give TORE a legal matter" container for
+/// V1 and carries none of that engine coupling. Future modules (Facts,
+/// Documents, Issues, Research, Timeline, Work Product) attach here without
+/// requiring new top-level tables for each -- this migration adds only the
+/// Matter itself and its conversation link, per the V1 scope.
+model Matter {
+  id          String       @id @default(cuid())
+  ownerId     String       @map("owner_id")
+  title       String
+  type        MatterType   @default(GENERAL)
+  description String?      @db.Text
+  status      MatterStatus @default(ACTIVE)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  owner         User             @relation("MatterOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  conversations AIConversation[]
+
+  @@index([ownerId, updatedAt(sort: Desc)])
+  @@map("matters")
 }
 
 model AIMessage {

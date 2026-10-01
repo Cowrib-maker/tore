@@ -1187,6 +1187,61 @@ describe("LegalAiService", () => {
     expect(store.conversations.get(result.conversationId)?.caseFileId).toBeUndefined();
   });
 
+  it("attaches a new conversation to the given Matter for any authenticated role", async () => {
+    const { service, store } = createService();
+
+    const result = await service.createTurn({
+      userId: "user-1",
+      actorRole: UserRole.CLIENT,
+      matterId: "matter-owned-1",
+      message: "Хөдөлмөрийн гэрээг хэрхэн цуцлах вэ?",
+    });
+
+    expect(store.conversations.get(result.conversationId)?.matterId).toBe(
+      "matter-owned-1",
+    );
+  });
+
+  it("never attaches a Matter to a guest (unauthenticated) conversation", async () => {
+    const { service, store } = createService();
+
+    const result = await service.createTurn({
+      guestSessionId: "guest-1",
+      matterId: "matter-someone-elses",
+      message: "Хөдөлмөрийн гэрээг хэрхэн цуцлах вэ?",
+    });
+
+    expect(store.conversations.get(result.conversationId)?.matterId).toBeUndefined();
+  });
+
+  it("never re-derives matterId for an existing conversation from client input", async () => {
+    const { service, store } = createService();
+
+    const first = await service.createTurn({
+      userId: "user-1",
+      actorRole: UserRole.CLIENT,
+      matterId: "matter-owned-1",
+      message: "Эхний асуулт",
+    });
+    expect(store.conversations.get(first.conversationId)?.matterId).toBe(
+      "matter-owned-1",
+    );
+
+    await service.createTurn({
+      userId: "user-1",
+      actorRole: UserRole.CLIENT,
+      conversationId: first.conversationId,
+      matterId: "matter-attacker-supplied",
+      message: "Дараагийн асуулт",
+    });
+
+    // The stored matterId is set once at creation and never overwritten by
+    // a later turn's request body, regardless of what that body claims.
+    expect(store.conversations.get(first.conversationId)?.matterId).toBe(
+      "matter-owned-1",
+    );
+  });
+
   it("injects owned CaseFile facts into the lawyer reasoning prompt", async () => {
     const caseFileId = "case-owned-1";
     const { service, completion, corpusRetriever } = createService({

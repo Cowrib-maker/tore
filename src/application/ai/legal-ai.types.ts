@@ -44,6 +44,13 @@ export type LegalAiCreateTurnInput = {
   conversationId?: string;
   /** Set only after the HTTP layer verifies CaseFile.ownerLawyerId === userId. */
   caseFileId?: string;
+  /** Set only after the HTTP layer verifies Matter.ownerId === userId.
+   * Unlike caseFileId this is not restricted to LAWYER actors — Matter is a
+   * generic, any-role container. Only consumed when starting a brand-new
+   * conversation (see legal-ai.service.ts resolveConversation); an existing
+   * conversation's matterId is already persisted and is never re-derived
+   * from client input. */
+  matterId?: string;
   userContext?: UserTypeContext;
   /**
    * @deprecated Ignored for authorization. Capability is derived from
@@ -126,6 +133,9 @@ export type LegalAiStore = {
     guestSessionId?: string;
     title: string;
     caseFileId?: string;
+    /** Set only after the caller has verified Matter.ownerId === userId
+     * (see assertOwnedMatterForAi). Mirrors caseFileId's own contract. */
+    matterId?: string;
   }): Promise<LegalAiConversation>;
   listOwnedCaseConversations(
     userId: string,

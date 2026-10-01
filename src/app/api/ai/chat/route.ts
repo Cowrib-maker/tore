@@ -9,6 +9,7 @@ import { lookupAuthSession } from "@/application/common/session";
 import { assertEmailVerified } from "@/application/common/require-verified-email";
 import { resolveGuestSession } from "@/application/legal-ai/resolve-guest-session";
 import { assertOwnedCaseFileForAi } from "@/application/use-cases/case-review";
+import { assertOwnedMatterForAi } from "@/application/use-cases/matters/matter-conversation";
 import {
   DomainError,
   SessionReplacedError,
@@ -27,6 +28,7 @@ type ChatRequest = {
   message?: string;
   conversationId?: string;
   caseFileId?: string;
+  matterId?: string;
   /** Ignored. Capability is derived from the authenticated role. */
   mode?: "CITIZEN" | "PROFESSIONAL" | "LAWYER";
 };
@@ -122,6 +124,19 @@ export async function POST(request: Request) {
       await assertOwnedCaseFileForAi(actor, caseFileId);
     }
 
+    const requestedMatterId =
+      typeof body.matterId === "string" ? body.matterId.trim() : "";
+    // Any authenticated role may attach a Matter (unlike caseFileId, which
+    // is LAWYER-only) — but only for a brand-new conversation, and only
+    // once ownership is verified below. Guests never attach a Matter.
+    const matterId =
+      actor && requestedMatterId && !body.conversationId
+        ? requestedMatterId
+        : undefined;
+    if (matterId && actor) {
+      await assertOwnedMatterForAi(actor, matterId);
+    }
+
     // Ties the provider-facing AbortSignal to the incoming request's own
     // signal (fires on client disconnect / browser navigating away) AND to
     // the stream's cancel() callback (fires when the reader — our own
@@ -154,6 +169,7 @@ export async function POST(request: Request) {
             message: body.message ?? "",
             conversationId: body.conversationId,
             caseFileId,
+            matterId,
             userContext: actor ? { role: actor.role } : undefined,
             signal: abortController.signal,
             onDelta: (delta) => enqueue("delta", { text: delta }),

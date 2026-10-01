@@ -44,6 +44,7 @@ export function createStore(): LegalAiStore & {
       userId?: string;
       guestSessionId?: string;
       caseFileId?: string;
+      matterId?: string;
       questionStatus: LegalQuestionStatus;
       billedQuestionCount: number;
     }
@@ -74,6 +75,7 @@ export function createStore(): LegalAiStore & {
       userId?: string;
       guestSessionId?: string;
       caseFileId?: string;
+      matterId?: string;
       questionStatus: LegalQuestionStatus;
       billedQuestionCount: number;
     }
@@ -135,6 +137,7 @@ export function createStore(): LegalAiStore & {
         userId: input.userId,
         guestSessionId: input.guestSessionId,
         caseFileId: input.caseFileId,
+        matterId: input.matterId,
         questionStatus: LegalQuestionStatus.NEW,
         billedQuestionCount: 0,
       };

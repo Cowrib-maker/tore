@@ -114,6 +114,14 @@ type LegalAiChatProps = {
   signInLabel: string;
   getStartedLabel: string;
   dashboardLabel: string;
+  /** TORE Matter Workspace V1 — set when this chat was opened from a
+   * Matter's own "AI-тай ажиллах" entry point. Ownership of `matterId` is
+   * verified server-side (see /matters/[matterId]/ai/page.tsx and
+   * assertOwnedMatterForAi) before this component ever sees it; it is only
+   * sent back to /api/ai/chat when starting a brand-new conversation
+   * (conversationId is still unset) — an existing conversation's Matter
+   * link was already persisted at creation and is never re-derived here. */
+  matterContext?: { id: string; title: string } | null;
 };
 
 /** Below this distance (px) from the true bottom, the transcript counts as
@@ -174,6 +182,7 @@ export function LegalAiChat({
   signInLabel,
   getStartedLabel,
   dashboardLabel,
+  matterContext = null,
 }: LegalAiChatProps) {
   const [message, setMessage] = useState(initialQuestion);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
@@ -594,6 +603,12 @@ export function LegalAiChat({
         body: JSON.stringify({
           message: text,
           conversationId: conversationIdRef.current,
+          // Only meaningful for a brand-new conversation -- the server
+          // ignores this once conversationId is set, since an existing
+          // conversation's Matter link was already persisted at creation.
+          ...(matterContext && !conversationIdRef.current
+            ? { matterId: matterContext.id }
+            : {}),
         }),
         signal: controller.signal,
       });
@@ -891,10 +906,19 @@ export function LegalAiChat({
               <p className="text-[11px] font-semibold tracking-[0.16em] text-ai-gold">
                 TORE Chat
               </p>
-              <p className="truncate text-sm font-medium text-ai-text">
-                Таны асуудлыг ойлгож, хуульд тулгуурлан дараагийн алхмыг
-                тодорхойлоход тусална.
-              </p>
+              {matterContext ? (
+                <Link
+                  href={`/matters/${matterContext.id}`}
+                  className="block truncate text-sm font-medium text-ai-text hover:text-ai-accent-bright"
+                >
+                  Хэрэг: {matterContext.title}
+                </Link>
+              ) : (
+                <p className="truncate text-sm font-medium text-ai-text">
+                  Таны асуудлыг ойлгож, хуульд тулгуурлан дараагийн алхмыг
+                  тодорхойлоход тусална.
+                </p>
+              )}
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2 text-sm">

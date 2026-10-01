@@ -686,6 +686,7 @@ export const en: Dictionary = {
     navNotifications: "Notifications",
     navFindLawyers: "Find lawyers",
     navLegalAi: "TORE Legal AI",
+    navMatters: "My Matters",
     navVerification: "Verification",
     navOfferings: "Offerings",
     navAvailability: "Availability",

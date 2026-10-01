@@ -88,6 +88,7 @@ export class PrismaLegalAiStore implements LegalAiStore {
     guestSessionId?: string;
     title: string;
     caseFileId?: string;
+    matterId?: string;
   }): Promise<LegalAiConversation> {
     const created = await prisma.aIConversation.create({
       data: {
@@ -95,6 +96,7 @@ export class PrismaLegalAiStore implements LegalAiStore {
         guestSessionId: input.guestSessionId,
         title: input.title,
         caseFileId: input.caseFileId,
+        matterId: input.matterId,
       },
       select: {
         id: true,

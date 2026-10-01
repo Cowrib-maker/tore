@@ -892,12 +892,17 @@ export class LegalAiService {
       capability === LegalAiCapability.LAWYER && input.userId
         ? input.caseFileId
         : undefined;
+    // Unlike caseFileId, matterId is not gated to LAWYER — Matter is a
+    // generic, any-role container. Ownership was already verified by the
+    // HTTP layer (assertOwnedMatterForAi) before this input reached here.
+    const matterId = input.userId ? input.matterId : undefined;
     if (!input.conversationId) {
       return this.dependencies.store.createConversation({
         userId: input.userId,
         guestSessionId: input.guestSessionId,
         title: message.slice(0, 80),
         caseFileId,
+        matterId,
       });
     }
 

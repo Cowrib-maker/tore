@@ -618,6 +618,7 @@ export const zh: Dictionary = {
     navNotifications: "通知",
     navFindLawyers: "查找律师",
     navLegalAi: "TORE Legal AI",
+    navMatters: "我的案件",
     navVerification: "资质核验",
     navOfferings: "咨询服务",
     navAvailability: "可预约时段",

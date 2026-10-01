@@ -624,6 +624,7 @@ export const ko: Dictionary = {
     navNotifications: "알림",
     navFindLawyers: "변호사 찾기",
     navLegalAi: "TORE Legal AI",
+    navMatters: "내 사건",
     navVerification: "자격 검증",
     navOfferings: "상담 서비스",
     navAvailability: "가능 시간",
