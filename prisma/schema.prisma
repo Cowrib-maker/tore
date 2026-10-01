@@ -1070,9 +1070,44 @@ model Matter {
 
   owner         User             @relation("MatterOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   conversations AIConversation[]
+  documents     MatterDocument[]
 
   @@index([ownerId, updatedAt(sort: Desc)])
   @@map("matters")
+}
+
+/// TORE Matter Workspace M2 -- a document uploaded directly to a Matter,
+/// persistent across every AI conversation under that Matter (unlike
+/// AIConversationDocument, which is scoped to one conversation and
+/// invisible outside it). Deliberately not CaseEvidence: that model is
+/// FK'd to CaseFile and carries fact/citation/timeline relations this
+/// generic, any-role container does not need. A MatterDocument never
+/// exists independently of its Matter (onDelete: Cascade).
+model MatterDocument {
+  id               String                  @id @default(cuid())
+  matterId         String                  @map("matter_id")
+  /// Attribution only (who uploaded this document) -- deliberately not a
+  /// foreign key, matching CaseEvidence/CaseFact's own createdByUserId
+  /// convention: a document's lifecycle is owned by its parent container
+  /// (here, Matter via matterId's own Cascade), never by the uploading
+  /// user's account. A plain FK with onDelete: Cascade here would let
+  /// deleting an unrelated uploader account delete a document whose Matter
+  /// (and owner) still exist.
+  uploadedByUserId String                  @map("uploaded_by_user_id")
+  storageKey       String                  @unique @map("storage_key")
+  fileName         String                  @map("file_name")
+  mimeType         String                  @map("mime_type")
+  sizeBytes        Int                     @map("size_bytes")
+  extractedText    String                  @map("extracted_text") @db.Text
+  pageCount        Int?                    @map("page_count")
+  extractStatus    AIDocumentExtractStatus @map("extract_status")
+  createdAt        DateTime                @default(now()) @map("created_at")
+  updatedAt        DateTime                @updatedAt @map("updated_at")
+
+  matter Matter @relation(fields: [matterId], references: [id], onDelete: Cascade)
+
+  @@index([matterId, createdAt])
+  @@map("matter_documents")
 }
 
 model AIMessage {

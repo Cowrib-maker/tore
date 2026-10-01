@@ -5,6 +5,7 @@ import type {
   LegalAiConversation,
   LegalAiConversationDocumentExtract,
   LegalAiConversationDocumentMeta,
+  LegalAiMatterDocumentExtract,
   LegalAiProvider,
   LegalAiRecentConversationSummary,
   LegalAiStore,
@@ -21,12 +22,14 @@ function toConversation(row: {
   questionStatus: string;
   billedQuestionCount: number;
   caseFileId?: string | null;
+  matterId?: string | null;
 }): LegalAiConversation {
   return {
     id: row.id,
     questionStatus: row.questionStatus as LegalAiConversation["questionStatus"],
     billedQuestionCount: row.billedQuestionCount,
     caseFileId: row.caseFileId ?? null,
+    matterId: row.matterId ?? null,
   };
 }
 
@@ -53,6 +56,7 @@ export class PrismaLegalAiStore implements LegalAiStore {
         questionStatus: true,
         billedQuestionCount: true,
         caseFileId: true,
+        matterId: true,
       },
     });
     return conversation ? toConversation(conversation) : null;
@@ -78,6 +82,7 @@ export class PrismaLegalAiStore implements LegalAiStore {
         questionStatus: true,
         billedQuestionCount: true,
         caseFileId: true,
+        matterId: true,
       },
     });
     return conversation ? toConversation(conversation) : null;
@@ -104,7 +109,9 @@ export class PrismaLegalAiStore implements LegalAiStore {
         billedQuestionCount: true,
       },
     });
-    return toConversation(created);
+    // matterId is already known from the input (just written above) — no
+    // need to round-trip it through another select.
+    return { ...toConversation(created), matterId: input.matterId ?? null };
   }
 
   async listOwnedCaseConversations(
@@ -262,6 +269,17 @@ export class PrismaLegalAiStore implements LegalAiStore {
     return rows.map((row, index) =>
       toSafeLegalAiCitation(row.id, input.citations[index]!),
     );
+  }
+
+  async listOwnedMatterDocumentExtracts(
+    matterId: string,
+    userId: string,
+  ): Promise<LegalAiMatterDocumentExtract[]> {
+    return prisma.matterDocument.findMany({
+      where: { matterId, matter: { ownerId: userId } },
+      orderBy: { createdAt: "asc" },
+      select: { fileName: true, extractedText: true, extractStatus: true },
+    });
   }
 
   async listOwnedDocumentExtracts(

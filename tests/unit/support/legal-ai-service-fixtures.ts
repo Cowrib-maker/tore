@@ -67,6 +67,15 @@ export function createStore(): LegalAiStore & {
       extractStatus?: "OK" | "EMPTY" | "FAILED" | "NEEDS_OCR";
     }>
   >;
+  matterDocumentExtracts: Map<
+    string,
+    Array<{
+      ownerId: string;
+      fileName: string;
+      extractedText: string;
+      extractStatus?: "OK" | "EMPTY" | "FAILED" | "NEEDS_OCR";
+    }>
+  >;
 } {
   const conversations = new Map<
     string,
@@ -90,6 +99,15 @@ export function createStore(): LegalAiStore & {
       extractStatus?: "OK" | "EMPTY" | "FAILED" | "NEEDS_OCR";
     }>
   >();
+  const matterDocumentExtracts = new Map<
+    string,
+    Array<{
+      ownerId: string;
+      fileName: string;
+      extractedText: string;
+      extractStatus?: "OK" | "EMPTY" | "FAILED" | "NEEDS_OCR";
+    }>
+  >();
   let seq = 0;
 
   return {
@@ -99,6 +117,7 @@ export function createStore(): LegalAiStore & {
     usageCount: 0,
     citations: [],
     documentExtracts,
+    matterDocumentExtracts,
 
     async countUserLegalAiQuestions() {
       return this.userMessages.length;
@@ -114,6 +133,7 @@ export function createStore(): LegalAiStore & {
         questionStatus: row.questionStatus,
         billedQuestionCount: row.billedQuestionCount,
         caseFileId: row.caseFileId ?? null,
+        matterId: row.matterId ?? null,
       };
     },
     async findAccessibleConversation(input) {
@@ -128,6 +148,7 @@ export function createStore(): LegalAiStore & {
         questionStatus: row.questionStatus,
         billedQuestionCount: row.billedQuestionCount,
         caseFileId: row.caseFileId ?? null,
+        matterId: row.matterId ?? null,
       };
     },
     async createConversation(input) {
@@ -148,6 +169,7 @@ export function createStore(): LegalAiStore & {
         questionStatus: row.questionStatus,
         billedQuestionCount: 0,
         caseFileId: row.caseFileId ?? null,
+        matterId: row.matterId ?? null,
       };
     },
     async listOwnedCaseConversations(userId, caseFileId) {
@@ -234,6 +256,15 @@ export function createStore(): LegalAiStore & {
     async listOwnedDocumentExtracts(conversationId, userId) {
       return (documentExtracts.get(conversationId) ?? [])
         .filter((row) => row.userId === userId)
+        .map((row) => ({
+          fileName: row.fileName,
+          extractedText: row.extractedText,
+          extractStatus: row.extractStatus ?? "OK",
+        }));
+    },
+    async listOwnedMatterDocumentExtracts(matterId, userId) {
+      return (matterDocumentExtracts.get(matterId) ?? [])
+        .filter((row) => row.ownerId === userId)
         .map((row) => ({
           fileName: row.fileName,
           extractedText: row.extractedText,

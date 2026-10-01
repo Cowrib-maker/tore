@@ -14,6 +14,7 @@ export const FILE_PURPOSES = [
   "message-attachment",
   "homepage-image",
   "legal-ai-document",
+  "matter-document",
 ] as const;
 
 export type FilePurpose = (typeof FILE_PURPOSES)[number];

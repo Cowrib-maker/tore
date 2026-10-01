@@ -22,6 +22,7 @@ export {
 export { emailVerificationTokenRepository } from "./prisma-email-verification-token-repository";
 export { caseFileRepository } from "./prisma-case-file-repository";
 export { matterRepository } from "./prisma-matter-repository";
+export { matterDocumentRepository } from "./prisma-matter-document-repository";
 export { caseAiAnalysisRepository } from "./prisma-case-ai-analysis-repository";
 export { caseTimelineRepository } from "./prisma-case-timeline-repository";
 export { caseDraftRepository } from "./prisma-case-draft-repository";

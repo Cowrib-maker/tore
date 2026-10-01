@@ -2,8 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import type { ActorContext } from "@/application/common/actor-context";
+import { legalAiExtractStatusHint } from "@/application/ai/legal-ai-document-file";
 import { requirePageSession } from "@/application/common/session";
+import { listMatterDocumentsForActor } from "@/application/use-cases/matters/list-matter-documents";
 import { loadMatterOverviewForActor } from "@/application/use-cases/matters/matter-overview";
+import { MatterDocumentUpload } from "@/components/matters/matter-document-upload";
 import { MattersShell } from "@/components/matters/matters-shell";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -26,6 +29,19 @@ function formatDate(value: Date): string {
   return value.toISOString().slice(0, 10);
 }
 
+function formatFileSize(sizeBytes: number): string {
+  if (sizeBytes < 1024) return `${sizeBytes} B`;
+  if (sizeBytes < 1024 * 1024) {
+    return `${Math.round((sizeBytes / 1024) * 10) / 10} KB`;
+  }
+  return `${Math.round((sizeBytes / (1024 * 1024)) * 10) / 10} MB`;
+}
+
+function documentStatusLabel(status: string): string {
+  const hint = legalAiExtractStatusHint(status);
+  return hint ?? "Боловсруулсан";
+}
+
 export default async function MatterOverviewPage({
   params,
 }: {
@@ -41,8 +57,12 @@ export default async function MatterOverviewPage({
   // A missing Matter and one owned by someone else both 404 identically —
   // a guessed id must never distinguish "doesn't exist" from "not yours".
   let overview;
+  let documents;
   try {
-    overview = await loadMatterOverviewForActor(actor, matterId);
+    [overview, documents] = await Promise.all([
+      loadMatterOverviewForActor(actor, matterId),
+      listMatterDocumentsForActor(actor, matterId),
+    ]);
   } catch (error) {
     if (error instanceof DomainError && (error.code === "NOT_FOUND" || error.code === "FORBIDDEN")) {
       notFound();
@@ -127,10 +147,35 @@ export default async function MatterOverviewPage({
           <CardHeader>
             <CardTitle className="text-base">Баримт бичиг</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Баримт бичгийн шинжилгээ удахгүй.
-            </p>
+          <CardContent className="space-y-4">
+            <MatterDocumentUpload matterId={overview.id} />
+            {documents.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Энэ хэрэгт одоогоор баримт хавсаргаагүй байна.
+              </p>
+            ) : (
+              <ul className="divide-y divide-[#0B1F3A]/8 border-t border-[#0B1F3A]/8">
+                {documents.map((document) => (
+                  <li
+                    key={document.id}
+                    className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-[#0A0F14]">
+                        {document.fileName}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {document.mimeType} · {formatFileSize(document.sizeBytes)} ·{" "}
+                        {formatDate(document.createdAt)}
+                      </p>
+                    </div>
+                    <Badge variant={document.extractStatus === "OK" ? "default" : "outline"}>
+                      {documentStatusLabel(document.extractStatus)}
+                    </Badge>
+                  </li>
+                ))}
+              </ul>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -1242,6 +1242,127 @@ describe("LegalAiService", () => {
     );
   });
 
+  it("includes a Matter's persistent MatterDocument extracts in the AI context (document-context test 8/11)", async () => {
+    const { service, store, completion } = createService();
+    store.matterDocumentExtracts.set("matter-owned-1", [
+      {
+        ownerId: "user-1",
+        fileName: "matter-contract.pdf",
+        extractedText: "MATTER_DOCUMENT_CLAUSE_TEXT",
+        extractStatus: "OK",
+      },
+    ]);
+
+    await service.createTurn({
+      userId: "user-1",
+      actorRole: UserRole.CLIENT,
+      matterId: "matter-owned-1",
+      message: "Энэ баримтыг тайлбарлаж өгнө үү?",
+    });
+
+    const systemPrompt = completion.complete.mock.calls[0]?.[0]?.systemPrompt ?? "";
+    expect(systemPrompt).toContain("MATTER_DOCUMENT_CLAUSE_TEXT");
+  });
+
+  it("merges conversation-level and Matter-level documents into one context block without dropping either source (document-context test 10/11)", async () => {
+    const { service, store, completion } = createService();
+    store.matterDocumentExtracts.set("matter-owned-1", [
+      {
+        ownerId: "user-1",
+        fileName: "matter-contract.pdf",
+        extractedText: "MATTER_LEVEL_TEXT",
+        extractStatus: "OK",
+      },
+    ]);
+
+    const first = await service.createTurn({
+      userId: "user-1",
+      actorRole: UserRole.CLIENT,
+      matterId: "matter-owned-1",
+      message: "Эхний асуулт",
+    });
+
+    store.documentExtracts.set(first.conversationId, [
+      {
+        userId: "user-1",
+        fileName: "conversation-attachment.pdf",
+        extractedText: "CONVERSATION_LEVEL_TEXT",
+        extractStatus: "OK",
+      },
+    ]);
+
+    await service.createTurn({
+      userId: "user-1",
+      actorRole: UserRole.CLIENT,
+      conversationId: first.conversationId,
+      message: "Хоёр дахь асуулт",
+    });
+
+    const systemPrompt = completion.complete.mock.calls[1]?.[0]?.systemPrompt ?? "";
+    expect(systemPrompt).toContain("CONVERSATION_LEVEL_TEXT");
+    expect(systemPrompt).toContain("MATTER_LEVEL_TEXT");
+  });
+
+  it("never retrieves another user's MatterDocuments, even for a matterId already on the conversation (document-context test 9)", async () => {
+    const { service, store, completion } = createService();
+    // Simulated as a defense-in-depth check: the document row's owner does
+    // not match the acting user, exactly like the real Prisma query's
+    // `matter: { ownerId: userId }` filter would exclude it.
+    store.matterDocumentExtracts.set("matter-owned-1", [
+      {
+        ownerId: "someone-else",
+        fileName: "not-yours.pdf",
+        extractedText: "SECRET_OTHER_OWNER_TEXT",
+        extractStatus: "OK",
+      },
+    ]);
+
+    await service.createTurn({
+      userId: "user-1",
+      actorRole: UserRole.CLIENT,
+      matterId: "matter-owned-1",
+      message: "Асуулт",
+    });
+
+    const systemPrompt = completion.complete.mock.calls[0]?.[0]?.systemPrompt ?? "";
+    expect(systemPrompt).not.toContain("SECRET_OTHER_OWNER_TEXT");
+  });
+
+  it("keeps the merged conversation + Matter document context deterministically bounded by MAX_DOCUMENT_EXTRACT_CHARS (document-context test 12)", async () => {
+    const { service, store, completion } = createService();
+    const huge = "A".repeat(MAX_DOCUMENT_EXTRACT_CHARS);
+
+    const first = await service.createTurn({
+      userId: "user-1",
+      actorRole: UserRole.CLIENT,
+      matterId: "matter-owned-1",
+      message: "Эхний асуулт",
+    });
+    store.documentExtracts.set(first.conversationId, [
+      { userId: "user-1", fileName: "big-conversation-doc.pdf", extractedText: huge, extractStatus: "OK" },
+    ]);
+    store.matterDocumentExtracts.set("matter-owned-1", [
+      { ownerId: "user-1", fileName: "big-matter-doc.pdf", extractedText: huge, extractStatus: "OK" },
+    ]);
+
+    await service.createTurn({
+      userId: "user-1",
+      actorRole: UserRole.CLIENT,
+      conversationId: first.conversationId,
+      message: "Хоёр дахь асуулт",
+    });
+
+    const systemPrompt = completion.complete.mock.calls[1]?.[0]?.systemPrompt ?? "";
+    // Both documents together are 2x MAX_DOCUMENT_EXTRACT_CHARS — the
+    // wrapped document-context portion of the prompt must still be bounded
+    // by that same ceiling, not the sum of both documents' lengths. A
+    // length-50+ threshold isolates the injected filler from any incidental
+    // scattered capital "A" elsewhere in the prompt (e.g. "AI").
+    const extractedContentLength = (systemPrompt.match(/A{50,}/g) ?? []).join("").length;
+    expect(extractedContentLength).toBeLessThanOrEqual(MAX_DOCUMENT_EXTRACT_CHARS);
+    expect(extractedContentLength).toBeGreaterThan(0);
+  });
+
   it("injects owned CaseFile facts into the lawyer reasoning prompt", async () => {
     const caseFileId = "case-owned-1";
     const { service, completion, corpusRetriever } = createService({

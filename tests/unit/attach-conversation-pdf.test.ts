@@ -74,6 +74,9 @@ function createStore(): LegalAiStore & {
     async listOwnedDocumentExtracts() {
       return [];
     },
+    async listOwnedMatterDocumentExtracts() {
+      return [];
+    },
     async listOwnedDocumentMetas() {
       return [];
     },

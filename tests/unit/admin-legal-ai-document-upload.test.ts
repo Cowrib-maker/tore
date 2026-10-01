@@ -119,6 +119,9 @@ function createFakeStore(
           extractStatus: "OK" as never,
         }));
     },
+    async listOwnedMatterDocumentExtracts() {
+      return [];
+    },
     async listOwnedDocumentMetas() {
       return [];
     },

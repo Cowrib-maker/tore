@@ -25,6 +25,10 @@ export type LegalAiConversation = {
   questionStatus: LegalQuestionStatus;
   billedQuestionCount: number;
   caseFileId?: string | null;
+  /** Set when this conversation belongs to a Matter — used to also load that
+   * Matter's persistent MatterDocument files into the AI document context
+   * (see LegalAiService's document-context loading). */
+  matterId?: string | null;
 };
 
 export type LegalAiAssistantMessage = {
@@ -86,6 +90,15 @@ export type LegalAiDocumentExtractStatus =
   | "NEEDS_OCR";
 
 export type LegalAiConversationDocumentExtract = {
+  fileName: string;
+  extractedText: string;
+  extractStatus: LegalAiDocumentExtractStatus;
+};
+
+/** Same shape as LegalAiConversationDocumentExtract — kept as a separate
+ * type for readability at call sites that merge both sources, not because
+ * the shapes differ. */
+export type LegalAiMatterDocumentExtract = {
   fileName: string;
   extractedText: string;
   extractStatus: LegalAiDocumentExtractStatus;
@@ -182,6 +195,14 @@ export type LegalAiStore = {
     conversationId: string,
     userId: string,
   ): Promise<LegalAiConversationDocumentExtract[]>;
+  /** Persistent MatterDocument extracts for a Matter already verified as
+   * owned by this caller — see assertOwnedMatterForAi. Scoped by matterId
+   * AND the Matter's own ownerId in the same query, mirroring
+   * listOwnedDocumentExtracts's own (conversationId, userId) double scope. */
+  listOwnedMatterDocumentExtracts(
+    matterId: string,
+    userId: string,
+  ): Promise<LegalAiMatterDocumentExtract[]>;
   listOwnedDocumentMetas(
     conversationId: string,
     userId: string,

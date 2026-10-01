@@ -323,6 +323,7 @@ export class LegalAiService {
       return afterReply(
         await this.completeGeneralAnswer({
           conversationId: conversation.id,
+          matterId: conversation.matterId,
           message,
           userContext: input.userContext,
           userId: input.userId,
@@ -442,12 +443,7 @@ export class LegalAiService {
         : undefined;
 
     const [documents, authorities, loadedCase] = await Promise.all([
-      input.userId
-        ? this.dependencies.store.listOwnedDocumentExtracts(
-            conversation.id,
-            input.userId,
-          )
-        : Promise.resolve([]),
+      this.loadDocumentContext(conversation.id, input.userId, conversation.matterId),
       resolveLegalAuthorities({
         question: message,
         retriever: this.dependencies.corpusRetriever,
@@ -672,6 +668,7 @@ export class LegalAiService {
 
   private async completeGeneralAnswer(input: {
     conversationId: string;
+    matterId?: string | null;
     message: string;
     userContext: LegalAiCreateTurnInput["userContext"];
     userId?: string;
@@ -686,12 +683,11 @@ export class LegalAiService {
     const userType = this.dependencies.userTypeService.resolve(
       input.userContext,
     );
-    const documents = input.userId
-      ? await this.dependencies.store.listOwnedDocumentExtracts(
-          input.conversationId,
-          input.userId,
-        )
-      : [];
+    const documents = await this.loadDocumentContext(
+      input.conversationId,
+      input.userId,
+      input.matterId,
+    );
     const hasReadableDocumentText = documents.some(
       (item) => item.extractStatus === "OK" && item.extractedText,
     );
@@ -881,6 +877,35 @@ export class LegalAiService {
       return { kind: "guest", guestSessionId: input.guestSessionId };
     }
     throw new LegalAiError("Асуултаа оруулна уу.", 400);
+  }
+
+  /**
+   * One controlled, bounded document-context source for a turn: this
+   * conversation's own AIConversationDocument attachments PLUS (when the
+   * conversation belongs to a Matter) that Matter's persistent
+   * MatterDocument files — merged into a single array before the existing
+   * wrapUntrustedDocumentAttachments/MAX_DOCUMENT_EXTRACT_CHARS ceiling is
+   * applied, so the total prompt budget is unchanged, not doubled.
+   * Conversation attachments are ordered first (unchanged priority from
+   * before Matter documents existed); Matter documents fill the remaining
+   * budget. Guests (no userId) never see either source, matching the
+   * existing conversation-document behavior.
+   */
+  private async loadDocumentContext(
+    conversationId: string,
+    userId: string | undefined,
+    matterId: string | null | undefined,
+  ) {
+    if (!userId) {
+      return [];
+    }
+    const [conversationDocuments, matterDocuments] = await Promise.all([
+      this.dependencies.store.listOwnedDocumentExtracts(conversationId, userId),
+      matterId
+        ? this.dependencies.store.listOwnedMatterDocumentExtracts(matterId, userId)
+        : Promise.resolve([]),
+    ]);
+    return [...conversationDocuments, ...matterDocuments];
   }
 
   private async resolveConversation(
