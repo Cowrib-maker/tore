@@ -353,6 +353,7 @@ export const ko: Dictionary = {
     navLibrary: "법률 라이브러리",
     navIntelligence: "개요",
     navHelp: "도움말",
+    navSignUp: "회원가입",
     navFeedback: "피드백",
     accountWorkspace: "작업 공간",
     footerTagline: "법을 이해하고, 해결책을 만드십시오.",

@@ -411,6 +411,7 @@ export const en: Dictionary = {
     navLibrary: "Legal Library",
     navIntelligence: "Overview",
     navHelp: "Help",
+    navSignUp: "Sign up",
     navFeedback: "Feedback",
     accountWorkspace: "Workspace",
     footerTagline: "Understand the law, build the solution.",

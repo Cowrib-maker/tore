@@ -58,6 +58,8 @@ export function StudentShell({
   sidebar,
   sidebarFooter,
   wideContent,
+  siteHeader,
+  rail,
 }: {
   brand: Dictionary["common"]["brand"];
   backHref: string;
@@ -77,7 +79,52 @@ export function StudentShell({
    * keep the narrower max-w-3xl reading column by omitting this.
    */
   wideContent?: boolean;
+  /**
+   * Workspace layout (the Student hub): replaces the plain header with the
+   * site-wide header and lays out sidebar | content | optional right rail on
+   * a wide canvas. Other Student routes omit this and render unchanged.
+   */
+  siteHeader?: ReactNode;
+  rail?: ReactNode;
 }) {
+  if (siteHeader) {
+    return (
+      <div className="min-h-screen shrink-0 bg-[#F8FAFC] text-[#0A0F14]">
+        {/* shrink-0 above: <body> is a fixed-height flex column, so without it the
+            wrapper shrinks to the viewport height and its background stops short. */}
+        {/* The landing CSS variables the header uses are scoped to .landing-page. */}
+        <div className="landing-page sticky top-0 z-40">{siteHeader}</div>
+        <div
+          className={cn(
+            "mx-auto grid w-full max-w-[1600px] gap-6 px-4 py-6 lg:px-6",
+            sidebar
+              ? rail
+                ? "md:grid-cols-[240px_minmax(0,1fr)] xl:grid-cols-[240px_minmax(0,1fr)_320px]"
+                : "md:grid-cols-[240px_minmax(0,1fr)]"
+              : "",
+          )}
+        >
+          {sidebar ? (
+            <WorkspaceSideNav
+              icon={GraduationCap}
+              title="TORE Student"
+              subtitle="Хуулийн оюутан"
+              items={sidebar}
+              footer={sidebarFooter}
+              className="hidden border-0 bg-transparent p-0 md:flex md:row-span-2 md:self-start xl:row-span-1 md:sticky md:top-24"
+            />
+          ) : null}
+          <main className="flex min-w-0 flex-col">{children}</main>
+          {rail ? (
+            <aside className="flex min-w-0 flex-col gap-5 md:col-start-2 xl:col-start-3 xl:row-start-1">
+              {rail}
+            </aside>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#F7F6F2] text-[#0A0F14]">
       <header className="border-b border-[#0B1F3A]/8 bg-[#F7F6F2]/90 backdrop-blur-xl">

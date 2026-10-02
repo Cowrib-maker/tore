@@ -27,17 +27,18 @@ type LandingNavProps = {
 export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
   const [open, setOpen] = useState(false);
   const home = dict.publicHome;
-  /** Anchors to on-page sections that group several items get a chevron —
+  /** Hash links are root-relative ("/#id") so the same header works on any
+   * page (e.g. the Student workspace), not just the homepage. Anchors to on-page sections that group several items get a chevron —
    * a visual affordance only, matching the Stitch header's menu hierarchy.
    * No submenu panel is added: there is no distinct link content to show
    * beyond the anchor scroll the link already performs. */
   const links = [
-    { href: "#products", label: home.navProducts, hasMenu: true },
-    { href: "#marketplace", label: home.navServices, hasMenu: true },
+    { href: "/#products", label: home.navProducts, hasMenu: true },
+    { href: "/#marketplace", label: home.navServices, hasMenu: true },
     { href: "/legal-ai", label: home.navLibrary, hasMenu: false },
     { href: "/lawyers", label: dict.nav.lawyers, hasMenu: false },
-    { href: "#intelligence", label: home.navIntelligence, hasMenu: false },
-    { href: "#faq", label: home.navHelp, hasMenu: false },
+    { href: "/#intelligence", label: home.navIntelligence, hasMenu: false },
+    { href: "/#faq", label: home.navHelp, hasMenu: false },
   ];
 
   return (
@@ -64,13 +65,13 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <a
-            href="#chat"
+          <Link
+            href="/#chat"
             aria-label={home.chatTitle}
             className="inline-flex size-9 items-center justify-center rounded-full text-[var(--landing-nav-text)] transition-colors hover:bg-[var(--landing-mint)] hover:text-[var(--landing-accent)]"
           >
             <Search className="size-4" />
-          </a>
+          </Link>
           <LanguageSwitcher locale={locale} label={dict.common.language} />
           {authUser ? (
             <>
@@ -104,7 +105,7 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
                   "hidden h-9 items-center gap-1.5 rounded-full bg-[var(--landing-accent)] px-4 text-[13px] font-semibold text-[var(--landing-canvas)] hover:opacity-92 sm:inline-flex",
                 )}
               >
-                {dict.common.getStarted}
+                {home.navSignUp}
                 <ArrowRight className="size-3.5" />
               </Link>
             </>
@@ -171,7 +172,7 @@ export function LandingNav({ dict, locale, authUser }: LandingNavProps) {
                   className="mt-2 inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-[var(--landing-accent)] px-4 text-sm font-semibold text-[var(--landing-canvas)]"
                   onClick={() => setOpen(false)}
                 >
-                  {dict.common.getStarted}
+                  {home.navSignUp}
                   <ArrowRight className="size-3.5" />
                 </Link>
               </>

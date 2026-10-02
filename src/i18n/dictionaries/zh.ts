@@ -352,6 +352,7 @@ export const zh: Dictionary = {
     navLibrary: "法律库",
     navIntelligence: "概览",
     navHelp: "帮助",
+    navSignUp: "注册",
     navFeedback: "反馈",
     accountWorkspace: "工作区",
     footerTagline: "理解法律，构建解决方案。",

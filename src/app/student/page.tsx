@@ -1,18 +1,68 @@
 import Link from "next/link";
-import { BriefcaseBusiness, FileSearch, GraduationCap, PenSquare } from "lucide-react";
+import {
+  BookOpen,
+  BriefcaseBusiness,
+  ChevronRight,
+  ClipboardCheck,
+  FileSearch,
+  FileText,
+  GraduationCap,
+  NotebookPen,
+  PenSquare,
+  Scale,
+} from "lucide-react";
 
+import { getSessionUser } from "@/application/common/session";
+import { LandingNav } from "@/components/marketing/landing-nav";
 import { StudentOrthographyDraft } from "@/components/student/student-orthography-draft";
 import { StudentShell, studentSidebarItems } from "@/components/student/student-shell";
 import { WorkspaceAiComposer } from "@/components/workspace/workspace-ai-composer";
 import { WorkspaceQuickAction } from "@/components/workspace/workspace-quick-action";
-import { STUDENT_TRACK_IDS } from "@/domain/student";
+import { UserRole } from "@/domain/enums";
+import {
+  getPublicTrackQuiz,
+  listStudentLessons,
+  STUDENT_TRACK_IDS,
+  type StudentTrackId,
+} from "@/domain/student";
+import { getHomepageAccountHref } from "@/domain/services/homepage-routing";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { getLocale } from "@/i18n/get-locale";
+
+/**
+ * Track card visuals. Administrative law deliberately has no photo: the only
+ * candidate was a recognizable foreign (US) Supreme Court building, which must
+ * not represent Mongolian legal education, and the repository has no
+ * project-owned Mongolian imagery. It gets a neutral project-authored
+ * gradient + document icon instead, at the same card size/crop.
+ */
+const TRACK_IMAGE: Record<StudentTrackId, string | null> = {
+  criminal: "/student/track-scales.jpg",
+  civil: "/student/track-books.jpg",
+  administrative: null,
+};
 
 export default async function StudentHubPage() {
-  const dict = await getDictionary();
+  const locale = await getLocale();
+  const [dict, session] = await Promise.all([getDictionary(locale), getSessionUser()]);
   const home = dict.publicHome;
   const student = home.studentPage;
   const org = dict.organizations;
+
+  const role = session?.user?.role as UserRole | undefined;
+  const authUser = session?.user
+    ? {
+        displayName: session.user.name?.trim() || session.user.email || dict.common.brand,
+        dashboardHref: getHomepageAccountHref(role),
+      }
+    : null;
+
+  const firstTrack = STUDENT_TRACK_IDS[0]!;
+  const trackCards = STUDENT_TRACK_IDS.map((trackId) => ({
+    trackId,
+    lessons: listStudentLessons(trackId).length,
+    questions: getPublicTrackQuiz(trackId, "test")?.questions.length ?? 0,
+  }));
 
   return (
     <StudentShell
@@ -20,148 +70,230 @@ export default async function StudentHubPage() {
       backHref="/"
       backLabel={student.backHome}
       sidebar={studentSidebarItems("home")}
-      wideContent
+      siteHeader={<LandingNav dict={dict} locale={locale} authUser={authUser} />}
       sidebarFooter={
-        <div className="rounded-xl border border-[#0B1F3A]/8 bg-[#F7F8FB] p-3.5">
-          <div className="flex items-center gap-2">
-            <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-[#0B1F3A] text-white">
-              <GraduationCap className="size-3.5" />
-            </span>
-            <p className="text-[13px] font-semibold text-[#0B1F3A]">
-              {student.tracksTitle}
-            </p>
-          </div>
-          <p className="mt-2 text-[12px] leading-5 text-[#5C6570]">
+        <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-4">
+          <p className="text-xs font-bold text-slate-900">{student.tracksTitle}</p>
+          <p className="mt-0.5 text-xs text-slate-500">
             {STUDENT_TRACK_IDS.length} салбар нээлттэй байна.
           </p>
           <Link
             href="/student#tracks"
-            className="mt-3 flex h-8 w-full items-center justify-center rounded-lg bg-[#0B1F3A] text-[12px] font-semibold text-white transition hover:bg-[#16365F]"
+            className="mt-3.5 flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#0B192C] px-3 py-2.5 text-xs font-medium text-white shadow-sm transition hover:bg-slate-900"
           >
-            {student.tracksTitle} →
+            {student.tracksTitle}
+            <ChevronRight className="size-3.5" />
           </Link>
         </div>
       }
+      rail={
+        <>
+          <div
+            id="modules"
+            className="scroll-mt-24 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm"
+          >
+            <h3 className="mb-3 text-sm font-bold text-slate-900">{student.modulesTitle}</h3>
+            <ul className="divide-y divide-slate-100">
+              {(
+                [
+                  { key: "theory", icon: BookOpen, tile: "bg-blue-50 text-blue-600" },
+                  { key: "method", icon: NotebookPen, tile: "bg-teal-50 text-teal-600" },
+                  { key: "tests", icon: PenSquare, tile: "bg-purple-50 text-purple-600" },
+                  { key: "problems", icon: ClipboardCheck, tile: "bg-emerald-50 text-emerald-600" },
+                ] as const
+              ).map(({ key, icon: Icon, tile }) => (
+                <li key={key} className="flex items-center gap-3 py-2.5">
+                  <span
+                    className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${tile}`}
+                  >
+                    <Icon className="size-4" />
+                  </span>
+                  <span className="text-xs font-bold text-slate-800">{student.modules[key]}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm">
+            <h3 className="mb-3 text-sm font-bold text-slate-900">Шалгалтын бэлтгэл</h3>
+            <ul className="divide-y divide-slate-100">
+              {[
+                {
+                  href: `/student/${firstTrack}/quiz/test`,
+                  title: student.modules.tests,
+                  note: student.tracks[firstTrack],
+                },
+                {
+                  href: `/student/${firstTrack}/quiz/problem`,
+                  title: student.modules.problems,
+                  note: student.tracks[firstTrack],
+                },
+                {
+                  href: `/student/${firstTrack}/case-study`,
+                  title: home.studentPage.caseStudy.cardTitle,
+                  note: student.tracks[firstTrack],
+                },
+              ].map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="group -mx-1.5 flex items-center justify-between rounded-xl px-1.5 py-2.5 transition-colors hover:bg-slate-50"
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate text-xs font-bold text-slate-800 transition-colors group-hover:text-blue-600">
+                        {item.title}
+                      </span>
+                      <span className="mt-0.5 block text-[11px] text-slate-400">{item.note}</span>
+                    </span>
+                    <ChevronRight className="ml-2 size-4 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      }
     >
-      {/* Hero — same navy "premium legal workspace" identity used across
-          the Legal AI surface and the Firm/Team workspace. */}
-      <div className="rounded-2xl bg-[#0B1F3A] px-6 py-7 text-white sm:px-8 sm:py-8">
-        <p className="text-[11px] font-semibold tracking-[0.22em] text-white/60 uppercase">
-          {home.products.student.audience}
-        </p>
-        <h1 className="mt-3 font-[family-name:var(--font-landing-display)] text-[1.85rem] tracking-[-0.03em] sm:text-[2.2rem]">
-          {home.products.student.name}
-        </h1>
-        <p className="mt-2 inline-flex rounded-full bg-white/10 px-3 py-1 text-[12px] font-semibold text-white/80">
-          {student.comingSoon}
-        </p>
-        <p className="mt-4 max-w-xl text-[15px] leading-7 text-white/70">
-          {student.lead}
-        </p>
+      {/* Hero banner */}
+      <div className="relative flex min-h-[290px] flex-col justify-between overflow-hidden rounded-3xl bg-slate-900 p-7 text-white shadow-md lg:p-9">
+        <div aria-hidden className="absolute inset-0 z-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            alt=""
+            src="/student/hero-library.jpg"
+            className="size-full object-cover object-center opacity-35"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/80 to-transparent" />
+        </div>
+
+        <div className="relative z-10 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+          <div className="max-w-xl">
+            <span className="mb-2 block text-[11px] font-bold tracking-widest text-blue-400 uppercase">
+              TORE STUDENT
+            </span>
+            <h1 className="text-2xl leading-tight font-extrabold tracking-tight text-white sm:text-3xl lg:text-4xl">
+              Хуулийг судалж, <br className="hidden sm:inline" />
+              ирээдүйн шийдлийг <span className="text-blue-500">бүтээ.</span>
+            </h1>
+            <p className="mt-2.5 text-sm font-normal text-slate-300 sm:text-base">
+              Суралцах, судлах, ойлгох — хуулийн замд таны хамт.
+            </p>
+          </div>
+          <div className="mt-2 hidden max-w-[240px] self-start rounded-2xl border border-white/15 bg-white/10 p-4 text-right backdrop-blur-md xl:block">
+            <p className="text-xs leading-relaxed text-slate-200 italic">
+              &ldquo;Хуулийн мэдлэг илүү сайхан нийгмийг бүтээдэг.&rdquo;
+            </p>
+          </div>
+        </div>
+
+        <div className="relative z-10 mt-6 text-[#0B1F3A]">
+          <WorkspaceAiComposer
+            placeholder="Хууль, кейс, ойлголтын талаар асуух..."
+            attachLabel={org.composerAttach}
+            aiLabel="AI сонгох"
+            knowledgeLabel="Вэбээс хайх"
+            comingSoonLabel={org.comingSoonTag}
+          />
+        </div>
       </div>
 
-      <div className="mt-6">
-        <WorkspaceAiComposer
-          placeholder="Хууль, кейс, ойлголтын талаар асуух..."
-          attachLabel={org.composerAttach}
-          aiLabel="AI сонгох"
-          knowledgeLabel="Вэбээс хайх"
-          comingSoonLabel={org.comingSoonTag}
-        />
-      </div>
-
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {/* Quick study cards */}
+      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <WorkspaceQuickAction
           icon={GraduationCap}
-          iconClassName="bg-[#E8F0FE] text-[#0B5CFF]"
+          iconClassName="bg-blue-50 text-blue-600"
           title="Хууль судлах"
-          description="Салбар, зүйл заалт, эх сурвалж"
+          description="Хууль, зүйл заалт, эх сурвалж хайх"
           href="#tracks"
         />
         <WorkspaceQuickAction
           icon={BriefcaseBusiness}
-          iconClassName="bg-[#F1EBFF] text-[#7C5CFC]"
-          title="Кейс судалгаа"
-          description="Шүүхийн шийдвэр, дүн шинжилгээ"
-          comingSoonLabel={org.comingSoonTag}
+          iconClassName="bg-teal-50 text-teal-600"
+          title="Кейс судлах"
+          description="Шүүхийн шийдвэр, кейс дүн шинжилгээ"
+          href={`/student/${firstTrack}/case-study`}
         />
         <WorkspaceQuickAction
           icon={PenSquare}
-          iconClassName="bg-[#E6F7EE] text-[#1F9D5C]"
-          title={student.modules.tests}
-          description="Онолын мэдлэгээ шалгах"
-          href="#modules"
+          iconClassName="bg-purple-50 text-purple-600"
+          title="Тест хийх"
+          description="Шалгалтын бэлтгэл, сорил"
+          href={`/student/${firstTrack}/quiz/test`}
         />
         <WorkspaceQuickAction
           icon={FileSearch}
-          iconClassName="bg-[#E6F7F5] text-[#0F9C8F]"
+          iconClassName="bg-sky-50 text-sky-600"
           title="Баримт бичиг шинжлэх"
-          description="Гэрээ, өргөдөл, маягт шинжлэх"
+          description="PDF, гэрээ, бодлого зэрэг баримт бичгүүд"
           comingSoonLabel={org.comingSoonTag}
         />
       </div>
 
-      <section id="tracks" className="mt-10 scroll-mt-20">
-        <h2 className="text-[13px] font-semibold tracking-[0.12em] text-[#0B5CFF] uppercase">
-          {student.tracksTitle}
-        </h2>
-        <ul className="mt-4 grid gap-3 sm:grid-cols-3">
-          {STUDENT_TRACK_IDS.map((trackId) => (
+      {/* Tracks: real content (lesson / test counts come from the domain data) */}
+      <section id="tracks" className="mt-8 scroll-mt-24 space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+          <h2 className="-mb-2.5 border-b-2 border-blue-600 pb-2 text-sm font-semibold text-blue-600">
+            {student.tracksTitle}
+          </h2>
+        </div>
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {trackCards.map(({ trackId, lessons, questions }) => (
             <li key={trackId}>
               <Link
                 href={`/student/${trackId}`}
-                className="block h-full rounded-2xl border border-[#0B1F3A]/10 bg-white px-5 py-4 transition hover:border-[#0B5CFF]/40"
+                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white transition-all hover:shadow-lg"
               >
-                <p className="text-[16px] font-semibold text-[#0B1F3A]">
-                  {student.tracks[trackId]}
-                </p>
-                <p className="mt-1 text-[13px] leading-6 text-[#5C6570]">
-                  {student.trackLeads[trackId]}
-                </p>
+                <div className="relative h-32 w-full overflow-hidden bg-slate-100">
+                  {TRACK_IMAGE[trackId] ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      alt=""
+                      src={TRACK_IMAGE[trackId]!}
+                      className="size-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div
+                      aria-hidden
+                      className="flex size-full items-center justify-center bg-gradient-to-br from-[#0B192C] via-[#13294B] to-[#2563EB] transition-transform duration-300 group-hover:scale-105"
+                    >
+                      <FileText className="size-12 text-white/85" strokeWidth={1.4} />
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-1 flex-col p-3.5">
+                  <span className="mb-2 inline-block w-fit rounded bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 uppercase">
+                    <Scale className="mr-1 inline size-3 align-[-1px]" />
+                    {student.tracksTitle}
+                  </span>
+                  <h3 className="line-clamp-2 text-sm font-bold text-slate-800 transition-colors group-hover:text-blue-600">
+                    {student.tracks[trackId]}
+                  </h3>
+                  <p className="mt-1 text-xs leading-snug text-slate-500">
+                    {student.trackLeads[trackId]}
+                  </p>
+                  {lessons > 0 || questions > 0 ? (
+                    <p className="mt-auto pt-3 text-xs font-medium text-slate-400">
+                      {[
+                        lessons > 0 ? `${lessons} хичээл` : null,
+                        questions > 0 ? `${questions} асуулт` : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" • ")}
+                    </p>
+                  ) : null}
+                </div>
               </Link>
             </li>
           ))}
         </ul>
       </section>
 
-      <section id="modules" className="mt-10 scroll-mt-20">
-        <h2 className="text-[13px] font-semibold tracking-[0.12em] text-[#0B5CFF] uppercase">
-          {student.modulesTitle}
-        </h2>
-        <ol className="mt-4 grid gap-2 sm:grid-cols-2">
-          {(
-            [
-              "theory",
-              "method",
-              "tests",
-              "problems",
-            ] as const
-          ).map((key, index) => (
-            <li
-              key={key}
-              className="flex items-start gap-3 rounded-xl border border-[#0B1F3A]/8 bg-white px-4 py-3"
-            >
-              <span className="font-mono text-[11px] text-[#8A939D]">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <span className="text-[14px] font-medium text-[#0B1F3A]">
-                {student.modules[key]}
-              </span>
-            </li>
-          ))}
-        </ol>
-      </section>
-
       <div className="mt-10 max-w-2xl">
         <StudentOrthographyDraft billingHref="/#chat" />
       </div>
 
-      <p className="mt-8 max-w-2xl text-[13px] leading-6 text-[#7B8490]">
-        {student.disclaimer}
-      </p>
-      <p className="mt-3 max-w-2xl text-[12px] leading-5 text-[#8A939D]">
-        {student.studyDisclaimer}
-      </p>
+      <p className="mt-8 max-w-2xl text-[13px] leading-6 text-[#7B8490]">{student.disclaimer}</p>
+      <p className="mt-3 max-w-2xl text-[12px] leading-5 text-[#8A939D]">{student.studyDisclaimer}</p>
 
       <div className="mt-8 flex flex-wrap gap-3">
         <Link

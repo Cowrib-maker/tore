@@ -1,7 +1,7 @@
 import { BookOpen, Building2, ShieldCheck } from "lucide-react";
 
-import { HeroLegalAiComposer } from "@/components/marketing/hero-legal-ai-composer";
 import { LandingHeroScene } from "@/components/marketing/landing-hero-scene";
+import { HeroLegalAiComposer } from "@/components/marketing/hero-legal-ai-composer";
 import { LandingProducts } from "@/components/marketing/landing-products";
 import { LandingReveal } from "@/components/marketing/landing-reveal";
 import type { HomepageStats } from "@/application/use-cases/homepage/get-homepage-stats";
@@ -51,92 +51,67 @@ export function LandingHero({
       entry !== null,
   );
 
+  const [eyebrowLead, eyebrowTail] = splitEyebrow(home.brandLine);
+
   return (
     <section
       id="chat"
-      className="relative isolate overflow-hidden scroll-mt-24 border-b border-[#0B1F3A]/8 bg-[#F7F8FB]"
+      className="relative isolate scroll-mt-24 overflow-hidden bg-[radial-gradient(circle_at_20%_15%,#ffffff_0%,#eef4fb_50%,#e0ebf7_100%)] pt-6 pb-16 lg:pt-10"
     >
-      {/* Mobile/tablet: the atmospheric scene is its own compact band,
-          stacked ABOVE the text content. Desktop: the scene bleeds across
-          the whole section as one full-width background, under a single
-          UNIFORM light wash (not a left-side scrim) -- the scene itself is
-          understated enough now (no dominant foreground building) that a
-          flat, even wash keeps text legible everywhere without needing to
-          selectively block one side of the image. */}
-      <div className="relative h-[260px] overflow-hidden sm:h-[340px] lg:hidden">
+      {/* Mobile/tablet: the photo is its own compact band above the text. */}
+      <div className="relative -mt-6 mb-6 h-[220px] overflow-hidden sm:h-[300px] lg:hidden" aria-hidden>
         <LandingHeroScene className="size-full" />
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-white/45" />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_50%,rgba(247,248,251,0.75)_78%,#F7F8FB_100%)]"
-        />
+        <div className="absolute inset-0 bg-white/35" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(248,250,252,0)_45%,#F8FAFC_100%)]" />
       </div>
 
-      {/* The illustration's own box is pinned to its native 1600x900
-          aspect ratio (not stretched to the section's full, content-driven
-          height) -- the composer/stats stack can make the section much
-          taller than it is wide, and stretching a "slice"-cropped SVG into
-          a mismatched box over-zooms it. A bottom fade blends it into the
-          page background for any extra section height below the image. */}
+      {/* Desktop: building photo on the right, dissolving into the page canvas
+          toward the text (left) and toward the role cards (bottom). */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 hidden overflow-hidden lg:block lg:aspect-[1600/900]"
+        className="pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-[64%] select-none overflow-hidden lg:block"
       >
         <LandingHeroScene className="size-full" />
-        {/* One uniform wash across the whole image -- not a gradient that
-            varies by x-position -- so the full-width scene (mountains,
-            city, the upper-right emblem lockup) stays visible everywhere,
-            with text legible against it because the wash lightens
-            everything evenly, not because one side is blocked out. */}
-        <div className="absolute inset-0 bg-white/40" />
-        {/* Fades in earlier and across more stops than a single hard cutoff
-            -- softens the seam between the scene's own bottom edge and the
-            plain canvas color so the role cards below feel anchored into
-            the tail of the hero rather than pasted onto a cut-off band. */}
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(247,248,251,0.75)_82%,#F7F8FB_100%)]" />
       </div>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[1] hidden bg-[linear-gradient(90deg,rgba(248,250,252,1)_0%,rgba(248,250,252,0.96)_42%,rgba(248,250,252,0.35)_65%,rgba(248,250,252,0)_100%),linear-gradient(180deg,rgba(248,250,252,0)_65%,rgba(248,250,252,0.92)_88%,#F8FAFC_100%)] lg:block"
+      />
 
-      <div className="mx-auto max-w-[1600px] px-6 sm:px-10 lg:px-16">
-        {/* Its own `relative` scope, separate from the role-router grid
-            below -- the stat card's `absolute bottom-16` must resolve
-            against the hero's own text/visual height, not against the much
-            taller hero+role-cards container (that mismatch previously sent
-            the card ~450px below the fold, past the role cards). */}
-        <div className="relative">
-        <div className="py-8 sm:py-12 lg:flex lg:min-h-[800px] lg:items-center lg:py-24">
-          <div className="lg:max-w-[56%]">
+      <div className="relative z-10 mx-auto max-w-7xl px-6">
+        <div className="grid grid-cols-12 items-start gap-8 pt-0 lg:pt-6">
+          <div className="col-span-12 pr-0 lg:col-span-7 lg:pr-4">
             <LandingReveal>
-              <p className="text-[13px] font-semibold tracking-[0.24em] text-[#5C6570] uppercase sm:text-sm">
-                {home.brandLine}
-              </p>
+              <div className="mb-4 flex items-center space-x-2 text-xs font-bold tracking-[0.22em] text-blue-600 uppercase">
+                <span>{eyebrowLead}</span>
+                {eyebrowTail ? (
+                  <>
+                    <span className="text-blue-400">•</span>
+                    <span>{eyebrowTail}</span>
+                  </>
+                ) : null}
+              </div>
 
-              <h1 className="mt-5 max-w-[720px] font-[family-name:var(--font-landing-display)] text-[2.75rem] leading-[1.04] font-semibold tracking-[-0.03em] text-[#0B1F3A] sm:text-[3.75rem] lg:text-[4.25rem] xl:text-[4.5rem]">
+              <h1 className="font-[family-name:var(--font-landing-display)] text-4xl leading-[1.18] font-extrabold tracking-tight text-[#0B1D3A] sm:text-5xl lg:text-[54px]">
                 {taglineAccent ? (
                   <>
-                    {taglineLead}
-                    <span className="relative inline-block whitespace-nowrap">
-                      <span
-                        aria-hidden
-                        className="absolute inset-x-[-0.1em] inset-y-[0.12em] -z-10 -rotate-1 rounded-md bg-[#0B5CFF]/15"
-                      />
-                      <span className="text-[#0B5CFF]">{taglineAccent}</span>
-                    </span>
+                    {renderWithBreak(taglineLead)}
+                    <span className="relative inline-block text-[#1B63FF]">{taglineAccent}</span>
                   </>
                 ) : (
                   home.tagline
                 )}
               </h1>
 
-              <p className="mt-6 max-w-xl text-xl font-medium text-[#0B1F3A]/80 sm:text-2xl">
-                {home.chatTitle}
-              </p>
-
-              <p className="mt-3 max-w-lg text-[15px] leading-7 text-[#5C6570] sm:text-base">
-                {home.chatSubtitle}
-              </p>
+              <div className="mt-6 mb-7">
+                <h2 className="mb-1.5 text-xl font-bold text-slate-900 sm:text-2xl">
+                  {home.chatTitle}
+                </h2>
+                <p className="text-[15px] font-normal text-slate-500">{home.chatSubtitle}</p>
+              </div>
             </LandingReveal>
 
-            <div className="mt-8 max-w-[820px]">
+            <div className="w-full max-w-2xl">
               <HeroLegalAiComposer
                 placeholder={home.chatPlaceholder}
                 submitLabel={home.chatSubmit}
@@ -147,55 +122,63 @@ export function LandingHero({
               />
             </div>
           </div>
+
+          {/* Real, live counts only -- each metric is already filtered to
+              non-zero data and the card is omitted when nothing is
+              available. A single metric gets a compact pill. */}
+          <div className="col-span-12 flex flex-col items-end justify-end lg:col-span-5 lg:min-h-[300px] lg:pt-36">
+            {statEntries.length === 1 ? (
+              <div className="inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-[rgba(13,31,60,0.86)] px-5 py-2.5 text-white shadow-2xl backdrop-blur-[14px]">
+                <span className="text-base font-extrabold tracking-tight">
+                  {statEntries[0]!.value}+
+                </span>
+                <span className="text-[12px] font-medium text-slate-200">
+                  {statEntries[0]!.label}
+                </span>
+              </div>
+            ) : statEntries.length > 1 ? (
+              <div
+                className="grid w-full max-w-md divide-x divide-white/20 rounded-2xl border border-white/20 bg-[rgba(13,31,60,0.86)] p-4 text-center text-white shadow-2xl backdrop-blur-[14px]"
+                style={{ gridTemplateColumns: `repeat(${statEntries.length}, minmax(0, 1fr))` }}
+              >
+                {statEntries.map((entry) => {
+                  const Icon = entry.icon;
+                  return (
+                    <div key={entry.label} className="px-2">
+                      <Icon className="mx-auto mb-1 size-4 text-blue-300" />
+                      <p className="text-xl font-extrabold tracking-tight">{entry.value}+</p>
+                      <p className="mt-0.5 text-[11px] font-medium text-slate-300">
+                        {entry.label}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
         </div>
 
-        {/* The stat card floats over the institutional scene on desktop
-            (anchored within this section's own `relative` container, so it
-            stacks above the absolutely-positioned scene without touching
-            that component) and drops back into normal flow -- stacked
-            below the composer -- on mobile/tablet, where there is no scene
-            underneath it to float over. Real counts only: each row is
-            already filtered to non-zero live data by `statEntries` above,
-            and the whole card is omitted when every count is unavailable.
-            A single available metric gets a compact one-line pill instead
-            of a sparse three-row card with two empty slots. */}
-        {statEntries.length === 1 ? (
-          <div className="mt-8 pb-8 sm:pb-12 lg:absolute lg:right-16 lg:bottom-16 lg:mt-0 lg:pb-0">
-            <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-[#0B1F3A]/90 px-4 py-2.5 shadow-[0_24px_60px_-20px_rgba(11,31,58,0.55)] backdrop-blur-xl">
-              <span className="text-base font-semibold tracking-tight text-white">
-                {statEntries[0]!.value}+
-              </span>
-              <span className="text-[12.5px] text-white/70">{statEntries[0]!.label}</span>
-            </div>
-          </div>
-        ) : statEntries.length > 1 ? (
-          <div className="mt-8 pb-8 sm:pb-12 lg:absolute lg:right-16 lg:bottom-16 lg:mt-0 lg:pb-0">
-            <div className="flex divide-x divide-white/10 rounded-2xl border border-white/10 bg-[#0B1F3A]/90 shadow-[0_24px_60px_-20px_rgba(11,31,58,0.55)] backdrop-blur-xl">
-              {statEntries.map((entry) => {
-                const Icon = entry.icon;
-                return (
-                  <div key={entry.label} className="flex-1 px-5 py-4 text-center">
-                    <Icon className="mx-auto size-4 text-white/60" />
-                    <p className="mt-2 text-xl font-semibold tracking-tight text-white">
-                      {entry.value}+
-                    </p>
-                    <p className="mt-0.5 text-[11px] leading-tight text-white/70">
-                      {entry.label}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ) : null}
-        </div>
-
-        {/* The role router is a direct continuation of the hero, not a
-            separate page section -- same canvas, no border, no independent
-            section chrome. See LandingProducts for the (now section-less)
-            card grid markup; hrefs/copy/business logic are unchanged. */}
         <LandingProducts home={home} hrefs={productHrefs} />
       </div>
     </section>
+  );
+}
+
+/** "A FOR B" -> ["A", "FOR B"] so the eyebrow reads "A • FOR B"; otherwise unsplit. */
+function splitEyebrow(text: string): [string, string | null] {
+  const index = text.indexOf(" FOR ");
+  if (index === -1) return [text, null];
+  return [text.slice(0, index), text.slice(index + 1)];
+}
+
+/** Puts the headline's line break after its first comma ("A, / B"). */
+function renderWithBreak(text: string) {
+  const index = text.indexOf(", ");
+  if (index === -1) return text;
+  return (
+    <>
+      {text.slice(0, index + 1)} <br />
+      {text.slice(index + 2)}
+    </>
   );
 }

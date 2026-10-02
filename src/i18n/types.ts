@@ -164,6 +164,7 @@ export type PublicHomeCopy = {
   navLibrary: string;
   navIntelligence: string;
   navHelp: string;
+  navSignUp: string;
   navFeedback: string;
   accountWorkspace: string;
   footerTagline: string;
