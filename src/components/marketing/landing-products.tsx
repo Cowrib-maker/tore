@@ -63,7 +63,7 @@ export function LandingProducts({
             <LandingReveal key={item.key} delayMs={index * 50}>
               <article
                 id={item.id}
-                className="group flex h-full scroll-mt-28 flex-col justify-between rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-lg"
+                className="group flex h-full scroll-mt-28 flex-col justify-between rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-lg"
               >
                 <span
                   className={`flex size-11 items-center justify-center rounded-xl transition-transform group-hover:scale-105 ${style.tile}`}
@@ -73,23 +73,23 @@ export function LandingProducts({
                 {/* Name is the primary heading; the audience label is a
                     smaller, role-colored line beneath it -- matching
                     Stitch's hierarchy (name first, audience second). */}
-                <h3 className="mt-4 text-base leading-tight font-bold text-slate-900">
+                <h3 className="mt-5 text-lg leading-tight font-bold text-slate-900">
                   {item.copy.name}
                 </h3>
                 <div className="mt-1 flex flex-wrap items-center gap-2">
-                  <p className="text-xs font-semibold text-blue-600">{item.copy.audience}</p>
+                  <p className="text-[15px] font-semibold text-blue-600">{item.copy.audience}</p>
                   {item.badge ? (
                     <span className="rounded-full bg-[#F7F8FB] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-[#5C6570]">
                       {item.badge}
                     </span>
                   ) : null}
                 </div>
-                <p className="mt-2.5 flex-1 text-xs leading-relaxed text-slate-500">
+                <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-500">
                   {item.copy.description}
                 </p>
                 <Link
                   href={hrefs[item.key]}
-                  className="mt-5 inline-flex items-center gap-1.5 pt-2 text-xs font-bold text-blue-600 hover:text-blue-700"
+                  className="mt-6 inline-flex items-center gap-1.5 pt-2 text-sm font-bold text-blue-600 hover:text-blue-700"
                 >
                   {item.copy.cta}
                   <ArrowRight className="size-3.5 transition group-hover:translate-x-1" />

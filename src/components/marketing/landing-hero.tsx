@@ -1,11 +1,18 @@
 import { BookOpen, Building2, ShieldCheck } from "lucide-react";
 
-import { LandingHeroScene } from "@/components/marketing/landing-hero-scene";
 import { HeroLegalAiComposer } from "@/components/marketing/hero-legal-ai-composer";
 import { LandingProducts } from "@/components/marketing/landing-products";
 import { LandingReveal } from "@/components/marketing/landing-reveal";
 import type { HomepageStats } from "@/application/use-cases/homepage/get-homepage-stats";
 import type { Dictionary } from "@/i18n/types";
+
+/**
+ * Crop of the building in the approved Stitch Home screen (project-owned,
+ * AI-generated design asset -- a fictional building carrying the TORE
+ * slogan, not a real institution). Replace with a licensed photograph of the
+ * intended building when one exists.
+ */
+const HERO_IMAGE = "/home/hero-building.jpg";
 
 type ProductKey = "citizen" | "student" | "lawyer" | "firm" | "team";
 
@@ -56,29 +63,39 @@ export function LandingHero({
   return (
     <section
       id="chat"
-      className="relative isolate scroll-mt-24 overflow-hidden bg-[radial-gradient(circle_at_20%_15%,#ffffff_0%,#eef4fb_50%,#e0ebf7_100%)] pt-6 pb-16 lg:pt-10"
+      className="relative isolate scroll-mt-24 overflow-hidden bg-[radial-gradient(circle_at_20%_15%,#ffffff_0%,#eef4fb_50%,#e0ebf7_100%)] pt-6 pb-16 lg:pt-12"
     >
-      {/* Mobile/tablet: the photo is its own compact band above the text. */}
+      {/* Mobile/tablet: the image is its own compact band above the text. */}
       <div className="relative -mt-6 mb-6 h-[220px] overflow-hidden sm:h-[300px] lg:hidden" aria-hidden>
-        <LandingHeroScene className="size-full" />
-        <div className="absolute inset-0 bg-white/35" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(248,250,252,0)_45%,#F8FAFC_100%)]" />
+        <div
+          className="absolute inset-0 bg-cover bg-[position:30%_top]"
+          style={{ backgroundImage: `url(${HERO_IMAGE})` }}
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(248,250,252,0)_55%,#F8FAFC_100%)]" />
       </div>
 
-      {/* Desktop: building photo on the right, dissolving into the page canvas
-          toward the text (left) and toward the role cards (bottom). */}
+      {/* Desktop: the building sits on the right of the hero, anchored to the
+          content width, dissolving into the page canvas toward the text (left),
+          the role cards (bottom) and -- on very wide screens -- the right edge. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-[64%] select-none overflow-hidden lg:block"
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 mx-auto hidden max-w-[1600px] select-none lg:block"
       >
-        <LandingHeroScene className="size-full" />
+        <div
+          className="ml-auto aspect-[580/456] w-[46%] bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${HERO_IMAGE})`,
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent 0%, #000 36%, #000 94%, transparent 100%), linear-gradient(to bottom, #000 78%, transparent 100%)",
+            WebkitMaskComposite: "source-in",
+            maskImage:
+              "linear-gradient(to right, transparent 0%, #000 36%, #000 94%, transparent 100%), linear-gradient(to bottom, #000 78%, transparent 100%)",
+            maskComposite: "intersect",
+          }}
+        />
       </div>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-[1] hidden bg-[linear-gradient(90deg,rgba(248,250,252,1)_0%,rgba(248,250,252,0.96)_42%,rgba(248,250,252,0.35)_65%,rgba(248,250,252,0)_100%),linear-gradient(180deg,rgba(248,250,252,0)_65%,rgba(248,250,252,0.92)_88%,#F8FAFC_100%)] lg:block"
-      />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-6">
+      <div className="relative z-10 mx-auto max-w-[1440px] px-6 sm:px-10">
         <div className="grid grid-cols-12 items-start gap-8 pt-0 lg:pt-6">
           <div className="col-span-12 pr-0 lg:col-span-7 lg:pr-4">
             <LandingReveal>
@@ -92,7 +109,7 @@ export function LandingHero({
                 ) : null}
               </div>
 
-              <h1 className="font-[family-name:var(--font-landing-display)] text-4xl leading-[1.18] font-extrabold tracking-tight text-[#0B1D3A] sm:text-5xl lg:text-[54px]">
+              <h1 className="font-[family-name:var(--font-landing-display)] text-4xl leading-[1.18] font-extrabold tracking-tight text-[#0B1D3A] sm:text-5xl lg:text-[58px]">
                 {taglineAccent ? (
                   <>
                     {renderWithBreak(taglineLead)}
@@ -111,7 +128,7 @@ export function LandingHero({
               </div>
             </LandingReveal>
 
-            <div className="w-full max-w-2xl">
+            <div className="w-full max-w-[820px]">
               <HeroLegalAiComposer
                 placeholder={home.chatPlaceholder}
                 submitLabel={home.chatSubmit}
@@ -126,7 +143,7 @@ export function LandingHero({
           {/* Real, live counts only -- each metric is already filtered to
               non-zero data and the card is omitted when nothing is
               available. A single metric gets a compact pill. */}
-          <div className="col-span-12 flex flex-col items-end justify-end lg:col-span-5 lg:min-h-[300px] lg:pt-36">
+          <div className="col-span-12 flex flex-col items-end justify-end lg:col-span-5 lg:min-h-[300px] lg:pt-[clamp(300px,calc(33vw-65px),520px)]">
             {statEntries.length === 1 ? (
               <div className="inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-[rgba(13,31,60,0.86)] px-5 py-2.5 text-white shadow-2xl backdrop-blur-[14px]">
                 <span className="text-base font-extrabold tracking-tight">
