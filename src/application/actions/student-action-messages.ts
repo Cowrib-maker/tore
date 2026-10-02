@@ -4,7 +4,7 @@
 import {
   STUDENT_PROBLEM_ANSWER_MAX_CHARS,
   STUDENT_PROBLEM_ANSWER_MIN_CHARS,
-} from "@/application/use-cases/student/evaluate-student-problem";
+} from "@/domain/student/student-problem-constants";
 
 const PROBLEM_ACTION_ERROR_MESSAGES: Record<string, string> = {
   invalid: "Хариултын мэдээлэл буруу байна. Дахин оролдоно уу.",

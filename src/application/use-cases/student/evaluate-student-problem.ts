@@ -6,8 +6,12 @@ import {
 import { findStudentLegalProblemById } from "@/domain/student/legal-problems";
 import type { StudentProblemGrade } from "@/domain/student/types";
 
-export const STUDENT_PROBLEM_ANSWER_MIN_CHARS = 60;
-export const STUDENT_PROBLEM_ANSWER_MAX_CHARS = 6_000;
+import {
+  STUDENT_PROBLEM_ANSWER_MAX_CHARS,
+  STUDENT_PROBLEM_ANSWER_MIN_CHARS,
+} from "@/domain/student/student-problem-constants";
+
+export { STUDENT_PROBLEM_ANSWER_MAX_CHARS, STUDENT_PROBLEM_ANSWER_MIN_CHARS };
 
 export type EvaluateStudentProblemError =
   | "not_found"
