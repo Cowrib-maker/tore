@@ -1,5 +1,7 @@
 "use client";
 
+import { readUploadJson, UPLOAD_GENERIC_ERROR } from "@/lib/read-upload-response";
+import { useDocumentUploadQueue, type UploadOutcome } from "@/components/legal-ai/use-document-upload-queue";
 import {
   type ChangeEvent,
   type DragEvent,
@@ -113,6 +115,7 @@ const OPEN_SUGGESTIONS = [
   { label: "Баримт бичиг боловсруулах", prompt: "Нэхэмжлэл, хариу, гэрээний төслийг хэрхэн боловсруулах вэ?" },
 ] as const;
 
+const ATTACHMENT_NOT_READY_MESSAGE = "Хавсралт бэлэн болоогүй байна. Устгах эсвэл дахин оролдоод, дараа нь илгээнэ үү.";
 const ATTACHMENT_ANALYSIS_PROMPT = "Хавсаргасан баримт бичгийг тоймлон, гол агуулга, эрсдэл, дараагийн алхмыг шинжил.";
 
 export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, initialDraft, initialMessages = [], initialAttachedDocuments = [], caseContext, history }: Props) {
@@ -122,9 +125,13 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
   const [caseFileId] = useState(initialCaseFileId);
   const [loading, setLoading] = useState(false);
   const thinkingStageLabel = useThinkingStageLabel(loading);
-  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [attachedDocuments, setAttachedDocuments] = useState<AttachedDocument[]>(initialAttachedDocuments);
+  const attachedRef = useRef<AttachedDocument[]>(initialAttachedDocuments);
+  const conversationIdRef = useRef(initialConversationId);
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
+  const { items: uploads, uploading, addFiles, retry: retryUpload, cancel: cancelUpload, settle: settleUploads, hasUnready } = useDocumentUploadQueue(performUpload);
   const [accessGate, setAccessGate] = useState<LegalAiAccessGate | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
@@ -148,7 +155,7 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
 
   useOrthographyAutoCheck(draft, checkOrthography, { enabled: !loading && !uploading, minLength: 10, clear: clearOrthography });
 
-  const conversationMode = messages.length > 0 || draft.trim().length > 0 || loading || Boolean(attachedDocuments.length);
+  const conversationMode = messages.length > 0 || draft.trim().length > 0 || loading || Boolean(attachedDocuments.length) || uploads.length > 0;
 
   useEffect(() => {
     transcriptRef.current?.scrollTo({ top: transcriptRef.current.scrollHeight, behavior: "smooth" });
@@ -163,39 +170,41 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
     if (`${window.location.pathname}${window.location.search}` !== next) window.history.replaceState(null, "", next);
   }, [conversationId, caseFileId]);
 
-  async function uploadDocument(file: File) {
+  /** One upload, run by the shared serial queue (see useDocumentUploadQueue). */
+  async function performUpload(file: File, signal: AbortSignal): Promise<UploadOutcome> {
     const rejected = clientRejectLegalAiDocument(file);
-    if (rejected) { setError(rejected); return; }
-    setError(""); setAccessGate(null); setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      if (conversationId) formData.append("conversationId", conversationId);
-      else if (caseFileId) formData.append("caseFileId", caseFileId);
-      const response = await fetch("/api/lawyer/ai/documents", { method: "POST", credentials: "include", body: formData });
-      const data = (await response.json()) as { error?: string; code?: string; id?: string; conversationId?: string; fileName?: string; mimeType?: string; sizeBytes?: number; extractStatus?: AttachedDocument["extractStatus"]; pageCount?: number | null; storageKey?: string; key?: string };
-      if (response.status === 401) { window.location.assign(loginHrefForLegalAi()); return; }
-      if (response.status === 402 || (response.status === 403 && (data.code === "BILLING_REQUIRED" || data.code === "FEATURE_QUOTA_EXCEEDED" || data.code === "TOKEN_CEILING_REACHED" || data.code === "SUBSCRIPTION_INACTIVE"))) {
-        setAccessGate({ kind: "billing", question: draft.trim() || ATTACHMENT_ANALYSIS_PROMPT, message: data.error ?? "Баримт хавсаргахад төлбөртэй багц хэрэгтэй.", audience: "lawyer" });
-        return;
-      }
-      if (!response.ok) throw new Error(data.error ?? "Баримт хавсаргахад алдаа гарлаа.");
-      if (data.storageKey || data.key) throw new Error("Баримт хавсаргахад алдаа гарлаа.");
-      if (!data.id || !data.fileName || !data.conversationId) throw new Error("Баримт хавсаргахад алдаа гарлаа.");
-      const extractStatus = data.extractStatus ?? "OK";
-      setConversationId(data.conversationId);
-      setAttachedDocuments((current) => [...current, { id: data.id!, fileName: data.fileName!, mimeType: data.mimeType ?? "application/pdf", sizeBytes: data.sizeBytes ?? file.size, extractStatus, pageCount: data.pageCount ?? null }]);
-      if (extractStatus === "NEEDS_OCR") {
-        setError(LEGAL_AI_NEEDS_OCR_WARNING);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Баримт хавсаргахад алдаа гарлаа.");
-    } finally { setUploading(false); }
+    if (rejected) return { status: "error", message: rejected };
+    setError(""); setAccessGate(null);
+    const formData = new FormData();
+    formData.append("file", file);
+    // Read the ref, not state: an earlier queued upload may have just created the conversation.
+    if (conversationIdRef.current) formData.append("conversationId", conversationIdRef.current);
+    else if (caseFileId) formData.append("caseFileId", caseFileId);
+    const response = await fetch("/api/lawyer/ai/documents", { method: "POST", credentials: "include", body: formData, signal });
+    const data = await readUploadJson<{ error?: string; code?: string; id?: string; conversationId?: string; fileName?: string; mimeType?: string; sizeBytes?: number; extractStatus?: AttachedDocument["extractStatus"]; pageCount?: number | null; storageKey?: string; key?: string }>(response);
+    if (response.status === 401) { window.location.assign(loginHrefForLegalAi()); return { status: "removed" }; }
+    if (response.status === 402 || (response.status === 403 && (data.code === "BILLING_REQUIRED" || data.code === "FEATURE_QUOTA_EXCEEDED" || data.code === "TOKEN_CEILING_REACHED" || data.code === "SUBSCRIPTION_INACTIVE"))) {
+      setAccessGate({ kind: "billing", question: draft.trim() || ATTACHMENT_ANALYSIS_PROMPT, message: data.error ?? "Баримт хавсаргахад төлбөртэй багц хэрэгтэй.", audience: "lawyer" });
+      return { status: "removed" };
+    }
+    if (!response.ok) return { status: "error", message: data.error ?? UPLOAD_GENERIC_ERROR };
+    if (data.storageKey || data.key || !data.id || !data.fileName || !data.conversationId) return { status: "error", message: UPLOAD_GENERIC_ERROR };
+    const extractStatus = data.extractStatus ?? "OK";
+    // Synchronous ref update: the next queued upload and a waiting Send resume in this same tick.
+    conversationIdRef.current = data.conversationId;
+    setConversationId(data.conversationId);
+    updateAttached((current) => [...current, { id: data.id!, fileName: data.fileName!, mimeType: data.mimeType ?? "application/pdf", sizeBytes: data.sizeBytes ?? file.size, extractStatus, pageCount: data.pageCount ?? null }]);
+    if (extractStatus === "NEEDS_OCR") {
+      setError(LEGAL_AI_NEEDS_OCR_WARNING);
+    }
+    return { status: "ready" };
   }
 
-  async function handleDocumentChange(event: ChangeEvent<HTMLInputElement>) { const file = event.target.files?.[0]; event.target.value = ""; if (file) await uploadDocument(file); }
-  function handleComposerDrop(event: DragEvent<HTMLDivElement>) { event.preventDefault(); setDragOver(false); if (uploading || loading) return; const file = event.dataTransfer.files?.[0]; if (file) void uploadDocument(file); }
-  function removeAttachedDocument(documentId: string) { setAttachedDocuments((current) => current.filter((document) => document.id !== documentId)); }
+  function handleDocumentChange(event: ChangeEvent<HTMLInputElement>) { const files = Array.from(event.target.files ?? []); event.target.value = ""; if (files.length) addFiles(files); }
+  function handleComposerDrop(event: DragEvent<HTMLDivElement>) { event.preventDefault(); setDragOver(false); if (loading) return; const files = Array.from(event.dataTransfer.files ?? []); if (files.length) addFiles(files); }
+  function removeAttachedDocument(documentId: string) { updateAttached((current) => current.filter((document) => document.id !== documentId)); }
+  /** Mirrors state into a ref so a Send that waited on uploads reads the settled list. */
+  function updateAttached(updater: (current: AttachedDocument[]) => AttachedDocument[]) { attachedRef.current = updater(attachedRef.current); setAttachedDocuments(attachedRef.current); }
 
   async function sendMessage(text: string, options?: { resume?: boolean }) {
     if (!text || loading) return;
@@ -243,7 +252,7 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
     };
 
     try {
-      const response = await fetch("/api/ai/chat", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: text, conversationId, caseFileId: conversationId ? undefined : caseFileId }), signal: controller.signal });
+      const response = await fetch("/api/ai/chat", { method: "POST", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: text, conversationId: conversationIdRef.current, caseFileId: conversationIdRef.current ? undefined : caseFileId }), signal: controller.signal });
 
       const contentType = response.headers.get("content-type") ?? "";
       if (!contentType.includes("text/event-stream")) {
@@ -268,12 +277,13 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
           if (delta) appendStreamingDelta(delta);
         } else if (frame.event === "done") {
           const payload = frame.data as { conversationId?: string; message?: { id?: string; content?: string; citations?: unknown } };
+          conversationIdRef.current = payload.conversationId;
           setConversationId(payload.conversationId);
           finalizeStreamingMessage({ role: "ASSISTANT", content: payload.message?.content ?? "", citations: parseSafeCitationsFromUnknown(payload.message?.citations) });
           // Composer's attachment strip is a "about to send" tray, not a
           // running list — clear it once the turn lands. The document stays
           // attached to the conversation server-side either way.
-          setAttachedDocuments([]);
+          updateAttached(() => []);
         } else if (frame.event === "error") {
           removeStreamingPlaceholder();
           throw new Error("stream error");
@@ -296,12 +306,20 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const text = draft.trim();
-    if (text) { await sendMessage(text); return; }
-    if (attachedDocuments.length > 0 && !loading && !uploading) await sendMessage(ATTACHMENT_ANALYSIS_PROMPT);
+    const typed = draft.trim();
+    if ((!typed && attachedRef.current.length === 0 && uploads.length === 0) || loading || submittingRef.current) return;
+    // One guarded entry point: wait for every queued upload, and never fall back
+    // to a text-only turn past a failed attachment (its chip stays, retryable).
+    submittingRef.current = true; setSubmitting(true);
+    try {
+      await settleUploads();
+      if (hasUnready()) { setError(ATTACHMENT_NOT_READY_MESSAGE); return; }
+      const text = typed || (attachedRef.current.length > 0 ? ATTACHMENT_ANALYSIS_PROMPT : "");
+      if (text) await sendMessage(text);
+    } finally { submittingRef.current = false; setSubmitting(false); }
   }
 
-  const canSend = !loading && !uploading && (draft.trim().length > 0 || attachedDocuments.length > 0);
+  const canSend = !loading && !submitting && (draft.trim().length > 0 || attachedDocuments.length > 0 || uploads.length > 0);
   const suggestions = caseContext ? CASE_SUGGESTIONS : OPEN_SUGGESTIONS;
   const caseHref = caseContext ? `/lawyer/workspace/case-review?caseId=${encodeURIComponent(caseContext.caseId)}` : null;
 
@@ -351,8 +369,8 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
           <div className="shrink-0 pb-4 pt-2 sm:pb-6">
             <form onSubmit={handleSubmit} className="mx-auto w-full max-w-[1040px] px-4 sm:px-6" data-testid="lawyer-ai-composer">
               {!conversationMode ? <div className="mb-4"><LegalAiEntitlementBanner /></div> : null}
-              <div className={cn("rounded-2xl border border-[#0B1F3A]/10 bg-white p-2 shadow-[0_16px_40px_-28px_rgba(11,31,58,0.45)] focus-within:border-[#0B5CFF]/40", dragOver && "border-[#0B5CFF]/40 bg-[#E8F0FE]")} onDragOver={(event) => { event.preventDefault(); if (!uploading && !loading) setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={handleComposerDrop}>
-                {attachedDocuments.length || uploading ? <ul className="mb-2 flex max-h-24 flex-wrap gap-2 overflow-y-auto px-0.5 pt-0.5">{attachedDocuments.map((document) => { const hint = legalAiExtractStatusHint(document.extractStatus); return <li key={document.id} className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#F8FAFC] py-1 pr-1.5 pl-2.5 text-xs text-[#3F4852] ring-1 ring-[#0B1F3A]/10"><Paperclip className="size-3.5" /><span className="truncate">{document.fileName}</span>{hint ? <span className="shrink-0 text-[10px] text-amber-700">{hint}</span> : null}<button type="button" aria-label={`${document.fileName} хасах`} className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[#66717D] hover:bg-[#0B1F3A]/8 hover:text-[#0B1F3A]" onClick={() => removeAttachedDocument(document.id)}><X className="size-3" /></button></li>; })}{uploading ? <li className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#F8FAFC] px-2.5 py-1 text-xs text-[#3F4852] ring-1 ring-[#0B1F3A]/10"><Paperclip className="size-3.5" /><span>Файл хавсаргаж байна...</span></li> : null}</ul> : null}
+              <div className={cn("rounded-2xl border border-[#0B1F3A]/10 bg-white p-2 shadow-[0_16px_40px_-28px_rgba(11,31,58,0.45)] focus-within:border-[#0B5CFF]/40", dragOver && "border-[#0B5CFF]/40 bg-[#E8F0FE]")} onDragOver={(event) => { event.preventDefault(); if (!loading) setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={handleComposerDrop}>
+                {attachedDocuments.length || uploads.length ? <ul className="mb-2 flex max-h-24 flex-wrap gap-2 overflow-y-auto px-0.5 pt-0.5">{[...uploads].sort((x, y) => Number(y.status === "error") - Number(x.status === "error")).map((item) => item.status === "error" ? <li key={item.id} role="alert" className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-red-50 py-1 pr-1.5 pl-2.5 text-xs text-red-700 ring-1 ring-red-200"><Paperclip className="size-3.5 shrink-0" /><span className="truncate">{item.file.name}</span><span className="min-w-0 break-words">{item.errorMessage}</span><button type="button" aria-label={`${item.file.name} дахин оролдох`} className="shrink-0 rounded-full px-1.5 py-0.5 font-medium hover:bg-red-100" onClick={() => retryUpload(item.id)}>Дахин</button><button type="button" aria-label={`${item.file.name} хасах`} className="inline-flex size-5 shrink-0 items-center justify-center rounded-full hover:bg-red-100" onClick={() => cancelUpload(item.id)}><X className="size-3" /></button></li> : <li key={item.id} className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#F8FAFC] py-1 pr-1.5 pl-2.5 text-xs text-[#3F4852] ring-1 ring-[#0B1F3A]/10"><LoaderCircle className="size-3.5 shrink-0 animate-spin text-[#0B5CFF]" /><span className="truncate">{item.file.name}</span><span className="shrink-0 text-[10px] text-[#66717D]">Файл хавсаргаж байна...</span><button type="button" aria-label={`${item.file.name} цуцлах`} className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[#66717D] hover:bg-[#0B1F3A]/8" onClick={() => cancelUpload(item.id)}><X className="size-3" /></button></li>)}{attachedDocuments.map((document) => { const hint = legalAiExtractStatusHint(document.extractStatus); return <li key={document.id} className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#F8FAFC] py-1 pr-1.5 pl-2.5 text-xs text-[#3F4852] ring-1 ring-[#0B1F3A]/10"><Paperclip className="size-3.5" /><span className="truncate">{document.fileName}</span>{hint ? <span className="shrink-0 text-[10px] text-amber-700">{hint}</span> : null}<button type="button" aria-label={`${document.fileName} хасах`} className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[#66717D] hover:bg-[#0B1F3A]/8 hover:text-[#0B1F3A]" onClick={() => removeAttachedDocument(document.id)}><X className="size-3" /></button></li>; })}</ul> : null}
                 <SpellcheckTextarea
                   inputRef={textareaRef}
                   value={draft}
@@ -362,12 +380,12 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
                   placeholder={caseContext ? "Энэ хэрэг дээр юу хийх вэ?" : "Юу дээр ажиллах вэ?"}
                   rows={conversationMode ? 2 : 4}
                   className="min-h-16 w-full"
-                  disabled={loading || uploading}
+                  disabled={loading}
                 />
                 <div className="flex items-center justify-between gap-2 px-1 pb-1">
                   <div className="flex items-center gap-0.5">
-                    <input ref={documentInputRef} type="file" accept={LEGAL_AI_DOCUMENT_FILE_ACCEPT} className="sr-only" onChange={handleDocumentChange} />
-                    <button type="button" aria-label="Баримт хавсаргах" onClick={() => { if (!uploading) documentInputRef.current?.click(); }} className="inline-flex size-9 items-center justify-center rounded-lg text-[#5C6570] transition hover:bg-[#E8F0FE] hover:text-[#0B5CFF]"><Paperclip className="size-4" /></button>
+                    <input ref={documentInputRef} type="file" multiple accept={LEGAL_AI_DOCUMENT_FILE_ACCEPT} className="sr-only" onChange={handleDocumentChange} />
+                    <button type="button" aria-label="Баримт хавсаргах" onClick={() => documentInputRef.current?.click()} className="inline-flex size-9 items-center justify-center rounded-lg text-[#5C6570] transition hover:bg-[#E8F0FE] hover:text-[#0B5CFF]"><Paperclip className="size-4" /></button>
                     <OrthographyCheckButton loading={orthographyLoading} disabled={loading || uploading} pressed={orthographyOpen} onClick={() => void checkOrthography(draft, { mode: "manual" })} />
                   </div>
                   {loading ? (

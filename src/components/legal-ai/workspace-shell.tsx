@@ -1,5 +1,6 @@
 "use client";
 
+import { readUploadJson } from "@/lib/read-upload-response";
 import {
   type ChangeEvent,
   type DragEvent,
@@ -90,14 +91,14 @@ export function WorkspaceShell() {
         method: "POST",
         body: formData,
       });
-      const data = (await response.json()) as {
+      const data = await readUploadJson<{
         error?: string;
         id?: string;
         conversationId?: string;
         fileName?: string;
         extractStatus?: AttachedDocument["extractStatus"];
         pageCount?: number | null;
-      };
+      }>(response);
 
       if (!response.ok) {
         throw new Error(data.error ?? "Файл хавсаргахад алдаа гарлаа.");

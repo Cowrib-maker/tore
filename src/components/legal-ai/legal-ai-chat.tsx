@@ -55,6 +55,14 @@ import {
 } from "@/application/ai/legal-ai-citation";
 import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-list";
 import { LEGAL_AI_CHAT_RETRY_MESSAGE } from "@/components/legal-ai/legal-ai-chat-errors";
+import { readUploadResponse, UPLOAD_GENERIC_ERROR } from "@/lib/read-upload-response";
+import {
+  useDocumentUploadQueue,
+  type UploadOutcome,
+} from "@/components/legal-ai/use-document-upload-queue";
+
+const ATTACHMENT_NOT_READY_MESSAGE =
+  "Хавсралт бэлэн болоогүй байна. Устгах эсвэл дахин оролдоод, дараа нь илгээнэ үү.";
 import { useThinkingStageLabel } from "@/components/legal-ai/legal-ai-thinking-stages";
 import {
   interpretLegalAiChatAccess,
@@ -92,15 +100,6 @@ type AttachedDocument = {
   sizeBytes: number;
   extractStatus: "OK" | "EMPTY" | "FAILED" | "NEEDS_OCR";
   pageCount: number | null;
-};
-
-/** The single in-flight (or just-failed) upload shown as its own attachment
- * card — distinct from `attachedDocuments`, which only ever holds documents
- * the server has already accepted. */
-type PendingUpload = {
-  file: File;
-  status: "uploading" | "error";
-  errorMessage?: string;
 };
 
 type LegalAiChatProps = {
@@ -191,8 +190,16 @@ export function LegalAiChat({
   );
   const [loading, setLoading] = useState(false);
   const thinkingStageLabel = useThinkingStageLabel(loading);
-  const [pendingUpload, setPendingUpload] = useState<PendingUpload | null>(null);
-  const uploading = pendingUpload?.status === "uploading";
+  const {
+    items: uploads,
+    uploading,
+    addFiles,
+    retry: retryUpload,
+    cancel: cancelUpload,
+    settle: settleUploads,
+    hasUnready,
+    reset: resetUploads,
+  } = useDocumentUploadQueue(performUpload);
   const [error, setError] = useState("");
   const [attachedDocuments, setAttachedDocuments] = useState<AttachedDocument[]>(
     initialAttachedDocuments,
@@ -220,12 +227,13 @@ export function LegalAiChat({
 
   const documentInputRef = useRef<HTMLInputElement>(null);
   const messageTextareaRef = useRef<HTMLTextAreaElement>(null);
-  const pendingUploadRef = useRef<File | null>(null);
+  const heldUploadsRef = useRef<File[]>([]);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<{ stop: () => void } | null>(null);
   const conversationIdRef = useRef(conversationId);
   const abortRef = useRef<AbortController | null>(null);
-  const uploadAbortRef = useRef<AbortController | null>(null);
+  const submittingRef = useRef(false);
+  const [submitting, setSubmitting] = useState(false);
 
   // Whether the transcript is scrolled near its bottom — drives whether new
   // content auto-follows (scrolls down with it) or, if the user has
@@ -324,27 +332,24 @@ export function LegalAiChat({
     };
   }, []);
 
-  const resetConversation = useCallback(() => {
+  function resetConversation() {
     recognitionRef.current?.stop();
-    uploadAbortRef.current?.abort();
+    resetUploads();
+    heldUploadsRef.current = [];
     setMessages([]);
     setConversationId(undefined);
     setError("");
     setAccessGate(null);
     setAttachedDocuments([]);
-    setPendingUpload(null);
     setMessage("");
     setListening(false);
     setMobileNavOpen(false);
     clearOrthography();
-  }, [clearOrthography]);
+  }
 
   function openDocumentPicker() {
     if (!documentUploadEnabled) {
       toast.message("Файл хавсаргахын тулд нэвтэрнэ үү.");
-      return;
-    }
-    if (uploading) {
       return;
     }
     documentInputRef.current?.click();
@@ -356,21 +361,11 @@ export function LegalAiChat({
     );
   }
 
-  function cancelPendingUpload() {
-    uploadAbortRef.current?.abort();
-    setPendingUpload(null);
-  }
-
-  function retryPendingUpload() {
-    if (!pendingUpload) return;
-    void uploadDocument(pendingUpload.file);
-  }
-
   function resumeAfterAccessGate() {
-    if (pendingUploadRef.current) {
-      const file = pendingUploadRef.current;
-      pendingUploadRef.current = null;
-      void uploadDocument(file);
+    if (heldUploadsRef.current.length) {
+      const files = heldUploadsRef.current;
+      heldUploadsRef.current = [];
+      addFiles(files);
       return;
     }
     if (accessGate?.question) {
@@ -378,120 +373,91 @@ export function LegalAiChat({
     }
   }
 
-  async function handleDocumentChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
+  function handleDocumentChange(event: ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(event.target.files ?? []);
     event.target.value = "";
-    if (!file) {
-      return;
+    if (files.length) {
+      addFiles(files);
     }
-    await uploadDocument(file);
   }
 
-  async function uploadDocument(file: File) {
+  /** One upload, run by the shared serial queue (see useDocumentUploadQueue). */
+  async function performUpload(file: File, signal: AbortSignal): Promise<UploadOutcome> {
     if (!documentUploadEnabled) {
-      setPendingUpload({
-        file,
-        status: "error",
-        errorMessage: "Файл хавсаргахын тулд нэвтэрнэ үү.",
-      });
-      return;
+      return { status: "error", message: "Файл хавсаргахын тулд нэвтэрнэ үү." };
     }
     const rejected = clientRejectLegalAiDocument(file);
     if (rejected) {
-      setPendingUpload({ file, status: "error", errorMessage: rejected });
-      return;
+      return { status: "error", message: rejected };
     }
 
     setError("");
-    setPendingUpload({ file, status: "uploading" });
-    const controller = new AbortController();
-    uploadAbortRef.current = controller;
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      if (conversationId) {
-        formData.append("conversationId", conversationId);
-      }
-
-      const response = await fetch("/api/ai/documents", {
-        method: "POST",
-        body: formData,
-        signal: controller.signal,
-      });
-      const data = (await response.json()) as {
-        error?: string;
-        id?: string;
-        conversationId?: string;
-        fileName?: string;
-        mimeType?: string;
-        sizeBytes?: number;
-        extractStatus?: AttachedDocument["extractStatus"];
-        pageCount?: number | null;
-        storageKey?: string;
-        key?: string;
-      };
-
-      if (response.status === 401) {
-        window.location.assign(loginHrefForLegalAi());
-        return;
-      }
-
-      if (response.status === 402) {
-        pendingUploadRef.current = file;
-        setPendingUpload(null);
-        setAccessGate({
-          kind: "billing",
-          question: "",
-          message: data.error ?? "Баримт хавсаргахад төлбөртэй багц хэрэгтэй.",
-        });
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error(data.error ?? "Баримт хавсаргахад алдаа гарлаа.");
-      }
-
-      if (data.storageKey || data.key) {
-        throw new Error("Баримт хавсаргахад алдаа гарлаа.");
-      }
-
-      if (!data.id || !data.fileName || !data.conversationId) {
-        throw new Error("Баримт хавсаргахад алдаа гарлаа.");
-      }
-
-      const documentId = data.id;
-      const documentFileName = data.fileName;
-      const extractStatus = data.extractStatus ?? "OK";
-      setConversationId(data.conversationId);
-      setAttachedDocuments((current) => [
-        ...current,
-        {
-          id: documentId,
-          fileName: documentFileName,
-          mimeType: data.mimeType ?? "application/octet-stream",
-          sizeBytes: data.sizeBytes ?? file.size,
-          extractStatus,
-          pageCount: data.pageCount ?? null,
-        },
-      ]);
-      // The hint (e.g. NEEDS_OCR) now renders directly on the attached
-      // document's own card — no separate top-level banner needed.
-      setPendingUpload(null);
-    } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") {
-        // Cancelled by the user via the card's remove button —
-        // pendingUpload was already cleared by cancelPendingUpload().
-        return;
-      }
-      setPendingUpload({
-        file,
-        status: "error",
-        errorMessage:
-          err instanceof Error ? err.message : "Баримт хавсаргахад алдаа гарлаа.",
-      });
-    } finally {
-      uploadAbortRef.current = null;
+    const formData = new FormData();
+    formData.append("file", file);
+    if (conversationIdRef.current) {
+      formData.append("conversationId", conversationIdRef.current);
     }
+
+    const response = await fetch("/api/ai/documents", {
+      method: "POST",
+      body: formData,
+      signal,
+    });
+    const result = await readUploadResponse<{
+      error?: string;
+      id?: string;
+      conversationId?: string;
+      fileName?: string;
+      mimeType?: string;
+      sizeBytes?: number;
+      extractStatus?: AttachedDocument["extractStatus"];
+      pageCount?: number | null;
+      storageKey?: string;
+      key?: string;
+    }>(response);
+    const data = result.data ?? {};
+
+    if (response.status === 401) {
+      window.location.assign(loginHrefForLegalAi());
+      return { status: "removed" };
+    }
+
+    if (response.status === 402) {
+      heldUploadsRef.current.push(file);
+      setAccessGate({
+        kind: "billing",
+        question: "",
+        message: data.error ?? "Баримт хавсаргахад төлбөртэй багц хэрэгтэй.",
+      });
+      return { status: "removed" };
+    }
+
+    if (!result.ok) {
+      return { status: "error", message: result.errorMessage ?? UPLOAD_GENERIC_ERROR };
+    }
+
+    if (data.storageKey || data.key || !data.id || !data.fileName || !data.conversationId) {
+      return { status: "error", message: UPLOAD_GENERIC_ERROR };
+    }
+
+    // Update the ref synchronously: the next queued upload and a waiting
+    // Send resume in the same tick and must see this conversation, not
+    // wait for the ref-syncing effect to run.
+    conversationIdRef.current = data.conversationId;
+    setConversationId(data.conversationId);
+    setAttachedDocuments((current) => [
+      ...current,
+      {
+        id: data.id!,
+        fileName: data.fileName!,
+        mimeType: data.mimeType ?? "application/octet-stream",
+        sizeBytes: data.sizeBytes ?? file.size,
+        extractStatus: data.extractStatus ?? "OK",
+        pageCount: data.pageCount ?? null,
+      },
+    ]);
+    // The hint (e.g. NEEDS_OCR) renders on the attached document's own card.
+    return { status: "ready" };
   }
 
   function toggleMicrophone() {
@@ -717,10 +683,28 @@ export function LegalAiChat({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const text = message.trim();
-    if (!text) {
+    if (!text || loading || submittingRef.current) {
       return;
     }
-    await sendMessage(text);
+    // One guarded entry point for text + attachment: wait for any upload
+    // still in flight, and never fall back to a text-only turn if the
+    // attachment failed (its card stays in the composer, retryable).
+    submittingRef.current = true;
+    setSubmitting(true);
+    try {
+      // Wait for every queued upload (a retry may extend the chain while
+      // waiting). Anything still listed afterwards is failed, and a 402-held
+      // file is waiting on checkout — neither is attached, so no text-only send.
+      await settleUploads();
+      if (hasUnready() || heldUploadsRef.current.length > 0) {
+        setError(ATTACHMENT_NOT_READY_MESSAGE);
+        return;
+      }
+      await sendMessage(text);
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
+    }
   }
 
   const sidebar = (
@@ -729,6 +713,19 @@ export function LegalAiChat({
       onNavigate={() => setMobileNavOpen(false)}
       conversations={recentConversations}
       activeConversationId={conversationId}
+    />
+  );
+
+  const renderUploadCard = (item: (typeof uploads)[number]) => (
+    <AttachedDocumentCard
+      key={item.id}
+      fileName={item.file.name}
+      mimeType={item.file.type}
+      sizeBytes={item.file.size}
+      status={item.status}
+      errorMessage={item.errorMessage}
+      onRemove={() => cancelUpload(item.id)}
+      onRetry={item.status === "error" ? () => retryUpload(item.id) : undefined}
     />
   );
 
@@ -745,11 +742,14 @@ export function LegalAiChat({
     >
       <div className={cn(isEmpty ? "w-full" : "mx-auto w-full max-w-3xl")}>
         <div className="rounded-2xl border border-ai-border-strong bg-ai-surface-muted p-2 shadow-[0_12px_32px_-24px_rgba(11,31,58,0.45)] focus-within:border-ai-accent/35">
-          {attachedDocuments.length || pendingUpload ? (
+          {attachedDocuments.length || uploads.length ? (
             <div
               className="mb-2 flex gap-2 overflow-x-auto px-0.5 pt-0.5 pb-1"
               aria-label="Хавсаргасан баримт"
             >
+              {/* Failed uploads lead the strip: on a narrow screen the strip scrolls
+                  horizontally, and a failed attachment must never sit off-screen. */}
+              {uploads.filter((item) => item.status === "error").map(renderUploadCard)}
               {attachedDocuments.map((document) => (
                 <AttachedDocumentCard
                   key={document.id}
@@ -765,21 +765,7 @@ export function LegalAiChat({
                   onRemove={() => removeAttachedDocument(document.id)}
                 />
               ))}
-              {pendingUpload ? (
-                <AttachedDocumentCard
-                  fileName={pendingUpload.file.name}
-                  mimeType={pendingUpload.file.type}
-                  sizeBytes={pendingUpload.file.size}
-                  status={pendingUpload.status}
-                  errorMessage={pendingUpload.errorMessage}
-                  onRemove={cancelPendingUpload}
-                  onRetry={
-                    pendingUpload.status === "error"
-                      ? retryPendingUpload
-                      : undefined
-                  }
-                />
-              ) : null}
+              {uploads.filter((item) => item.status !== "error").map(renderUploadCard)}
             </div>
           ) : null}
           <SpellcheckTextarea
@@ -796,13 +782,14 @@ export function LegalAiChat({
             placeholder="Асуудлаа өөрийнхөөрөө бичээрэй. Хуулийн нэр томъёо мэдэх шаардлагагүй."
             rows={1}
             className="min-h-12 w-full text-sm text-ai-text"
-            disabled={loading || uploading}
+            disabled={loading}
           />
           <div className="flex items-center justify-between gap-2 px-1 pb-1">
             <div className="flex items-center gap-0.5">
               <input
                 ref={documentInputRef}
                 type="file"
+                multiple
                 accept={LEGAL_AI_DOCUMENT_FILE_ACCEPT}
                 className="sr-only"
                 onChange={handleDocumentChange}
@@ -843,11 +830,11 @@ export function LegalAiChat({
               <Button
                 type="submit"
                 size="sm"
-                disabled={!message.trim() || uploading}
+                disabled={!message.trim() || submitting}
                 className="gap-1.5 bg-ai-accent text-ai-accent-foreground hover:opacity-90"
               >
                 <Send className="size-3.5" />
-                Илгээх
+                {submitting && uploading ? "Хавсралтыг хүлээж байна…" : "Илгээх"}
               </Button>
             )}
           </div>
