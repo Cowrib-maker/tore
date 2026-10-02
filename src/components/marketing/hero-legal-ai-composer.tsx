@@ -1,10 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { ArrowUp, Briefcase, Car, FileText, Paperclip, Shield, Sparkles, Users } from "lucide-react";
 
 import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
-import { LegalAiDutyNotice } from "@/components/legal-ai/legal-ai-duty-notice";
 import { LegalAiEntitlementBanner } from "@/components/legal-ai/legal-ai-entitlement-banner";
 import { useLegalAiChatSession } from "@/components/legal-ai/use-legal-ai-chat-session";
 import { useAutoResizeTextarea } from "@/hooks/use-auto-resize-textarea";
@@ -167,7 +167,17 @@ export function HeroLegalAiComposer({
         </div>
       ) : null}
 
-      <LegalAiDutyNotice variant="citizen" className="px-1 text-left" />
+      <p className="px-1 text-left text-[12px] leading-5 text-[#66717D]">
+        TORE Chat мэргэжлийн хуульч, өмгөөлөгчийн зөвлөгөөг орлохгүй. Та өөрт
+        тулгарсан асуудалд мэргэжлийн туслалцаа хэрэгтэй бол манайхаар дамжуулан{" "}
+        <Link
+          href="/lawyers"
+          className="font-medium text-[#0B1F3A] underline-offset-2 hover:underline"
+        >
+          баталгаажсан хуульч, өмгөөлөгчтэй холбогдоно уу
+        </Link>
+        .
+      </p>
     </div>
   );
 }
