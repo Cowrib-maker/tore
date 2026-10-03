@@ -42,7 +42,8 @@ function statusMessage(
     return copy.approvedRecordMsg;
   }
   if (status === LawyerVerificationStatus.PENDING) {
-    return copy.pendingReviewMsg;
+    // Nothing submitted yet: do not claim an admin review is under way.
+    return credentials.length === 0 ? copy.emptyBody : copy.pendingReviewMsg;
   }
   if (status === LawyerVerificationStatus.SUSPENDED) {
     return copy.suspendedListingMsg;

@@ -1,19 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { searchListedLawyers } from "@/application/use-cases/discovery/public-directory";
 import { getMarketplaceFilterOptions } from "@/application/actions/marketplace.actions";
 import { getSessionUser } from "@/application/common/session";
-import { BRAND_LOGO_SHELL } from "@/components/brand/tokens";
-import { BrandLink } from "@/components/layout/brand-link";
-import { Badge } from "@/components/ui/badge";
+import { LawyerCard } from "@/components/marketplace/lawyer-card";
+import { LandingNav } from "@/components/marketing/landing-nav";
 import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { NativeSelect } from "@/components/ui/native-select";
 import { PageHeader } from "@/components/ui/page-header";
-import { UserRole } from "@/domain/enums";
-import { getDashboardPath } from "@/domain/services/rbac";
+import { ConsultationModality, type UserRole } from "@/domain/enums";
+import { getHomepageAccountHref } from "@/domain/services/homepage-routing";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 import {
@@ -42,6 +42,13 @@ const discoveryDeps = {
   userRepository,
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  const dict = await getDictionary();
+  const d = dict.marketplace.directory;
+  // Root layout title template appends " | TORE".
+  return { title: d.title, description: d.support };
+}
+
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 export default async function LawyersDirectoryPage({
@@ -63,15 +70,27 @@ export default async function LawyersDirectoryPage({
   const locale = await getLocale();
   const m = dict.marketplace;
   const d = m.directory;
-  const pYears = m.publicProfile.yearsExperience;
+  const cardCopy = {
+    verified: m.common.verifiedAttorney,
+    fallbackTitle: m.common.legalCounsel,
+    yearsExperience: m.publicProfile.yearsExperience,
+    ratingCount: m.review.ratingCount,
+    online: m.common.online,
+    fromPrice: d.fromPrice,
+    viewOfferings: d.viewOfferings,
+    viewProfile: d.viewProfile,
+    getConsultation: d.getConsultation,
+  };
   const session = await getSessionUser();
-  const dashboardHref =
-    session?.user?.role &&
-    (session.user.role === UserRole.CLIENT ||
-      session.user.role === UserRole.LAWYER ||
-      session.user.role === UserRole.ADMIN)
-      ? getDashboardPath(session.user.role as UserRole)
-      : null;
+  const authUser = session?.user
+    ? {
+        displayName:
+          session.user.name?.trim() || session.user.email || dict.common.brand,
+        dashboardHref: getHomepageAccountHref(
+          session.user.role as UserRole | undefined,
+        ),
+      }
+    : null;
 
   const [{ practiceAreas, languages }, lawyers] = await Promise.all([
     getMarketplaceFilterOptions(),
@@ -90,33 +109,7 @@ export default async function LawyersDirectoryPage({
 
   return (
     <div className="ds-shell">
-      <header className="ds-chrome">
-        <div className="ds-chrome-inner justify-between">
-          <BrandLink brand={dict.common.brand} logo={BRAND_LOGO_SHELL} />
-          <div className="flex items-center gap-3 text-sm">
-            {dashboardHref ? (
-              <Link href={dashboardHref} className={buttonVariants({ size: "sm" })}>
-                {dict.dashboard.navDashboard}
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="cursor-pointer text-brand-muted hover:text-brand"
-                >
-                  {dict.common.signIn}
-                </Link>
-                <Link
-                  href="/register/client"
-                  className={buttonVariants({ size: "sm" })}
-                >
-                  {dict.common.getStarted}
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <LandingNav dict={dict} locale={locale} authUser={authUser} />
 
       <main className="ds-page ds-page-y">
         <PageHeader eyebrow={d.eyebrow} title={d.title} description={d.support} />
@@ -192,7 +185,11 @@ export default async function LawyersDirectoryPage({
           </div>
         </form>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <p className="mt-8 text-sm text-brand-muted" aria-live="polite">
+          {d.resultCount.replace("{n}", String(lawyers.length))}
+        </p>
+
+        <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {lawyers.length === 0 ? (
             <EmptyState
               wide
@@ -209,62 +206,24 @@ export default async function LawyersDirectoryPage({
             />
           ) : (
             lawyers.map((card) => (
-              <Link
+              <LawyerCard
                 key={card.profile.id}
-                href={`/lawyers/${card.profile.slug}`}
-                className="ds-surface p-5 transition-colors hover:border-brand/28"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-start gap-3">
-                    {card.imageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={card.imageUrl}
-                        alt=""
-                        className="size-12 rounded-full object-cover"
-                      />
-                    ) : null}
-                    <div>
-                      <h2 className="font-semibold text-ink">{card.displayName}</h2>
-                      <p className="mt-1 text-sm text-brand-muted">
-                        {card.profile.headline ?? m.common.legalCounsel}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge>{m.common.verified}</Badge>
-                </div>
-                {card.profile.yearsOfExperience != null && (
-                  <p className="mt-3 text-xs text-brand-muted">
-                    {pYears.replace("{n}", String(card.profile.yearsOfExperience))}
-                  </p>
-                )}
-                {card.phone && (
-                  <p className="mt-1 text-xs text-brand-muted">{card.phone}</p>
-                )}
-                {card.licenseNumber && (
-                  <p className="mt-1 text-xs text-brand-muted">
-                    {d.license}: {card.licenseNumber}
-                  </p>
-                )}
-                {card.profile.city && (
-                  <p className="mt-3 text-xs text-brand-muted">{card.profile.city}</p>
-                )}
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {card.practiceAreaNames.slice(0, 3).map((name) => (
-                    <span key={name} className="ds-chip">
-                      {name}
-                    </span>
-                  ))}
-                </div>
-                <p className="mt-4 text-sm font-medium text-brand">
-                  {card.minPriceMnt != null
-                    ? d.fromPrice.replace(
-                        "{price}",
-                        card.minPriceMnt.toLocaleString(),
-                      )
-                    : d.viewOfferings}
-                </p>
-              </Link>
+                copy={cardCopy}
+                lawyer={{
+                  slug: card.profile.slug,
+                  displayName: card.displayName,
+                  imageUrl: card.imageUrl,
+                  headline: card.profile.headline,
+                  verificationStatus: card.profile.verificationStatus,
+                  yearsOfExperience: card.profile.yearsOfExperience,
+                  averageRating: card.profile.averageRating,
+                  reviewCount: card.profile.reviewCount,
+                  city: card.profile.city,
+                  practiceAreaNames: card.practiceAreaNames,
+                  offersOnline: card.modalities.includes(ConsultationModality.ONLINE),
+                  minPriceMnt: card.minPriceMnt,
+                }}
+              />
             ))
           )}
         </div>

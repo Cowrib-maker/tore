@@ -6,6 +6,7 @@ import { getClientProfileForSession } from "@/application/actions/profile-sessio
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { ConsultationPaymentCard } from "@/components/marketplace/consultation-payment-card";
+import { ReviewForm } from "@/components/marketplace/review-form";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -22,6 +23,7 @@ import {
   bookingRepository,
   invoiceRepository,
   lawyerProfileRepository,
+  reviewRepository,
 } from "@/infrastructure/repositories";
 import {
   formatBookingStatus,
@@ -98,6 +100,15 @@ export default async function ClientBookingsPage() {
   const lawyerSlugs = new Map(
     lawyers.map((profile) => [profile.id, profile.slug]),
   );
+  const completedBookingIds = bookings
+    .filter((booking) => booking.status === BookingStatus.COMPLETED)
+    .map((booking) => booking.id);
+  const existingReviews = await Promise.all(
+    completedBookingIds.map((id) => reviewRepository.findByBookingId(id)),
+  );
+  const reviewedBookingIds = new Set(
+    existingReviews.filter(Boolean).map((review) => review!.bookingId),
+  );
 
   return (
     <>
@@ -171,6 +182,18 @@ export default async function ClientBookingsPage() {
                         ) : null;
                       })()
                     : null}
+                  {booking.status === BookingStatus.COMPLETED ? (
+                    reviewedBookingIds.has(booking.id) ? (
+                      <p className="text-sm text-muted-foreground">
+                        {m.review.alreadyReviewed}
+                      </p>
+                    ) : (
+                      <div className="rounded-md border border-brand/12 p-3">
+                        <p className="mb-2 text-sm font-medium">{m.review.prompt}</p>
+                        <ReviewForm bookingId={booking.id} copy={m.review} />
+                      </div>
+                    )
+                  ) : null}
                 </CardContent>
               </Card>
             );

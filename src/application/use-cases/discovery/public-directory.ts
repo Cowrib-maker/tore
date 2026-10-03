@@ -1,5 +1,5 @@
 import type { ConsultationOffering } from "@/domain/entities/consultation-offering";
-import type { LawyerCredential, LawyerProfile } from "@/domain/entities/profile";
+import type { LawyerProfile } from "@/domain/entities/profile";
 import type { Language, PracticeArea } from "@/domain/entities/taxonomy";
 import type { InstantSlot } from "@/domain/value-objects/time-slot";
 import type { AvailabilityRepository } from "@/domain/repositories/availability-repository";
@@ -10,7 +10,10 @@ import type {
   LawyerDiscoveryFilters,
   LawyerProfileRepository,
 } from "@/domain/repositories/profile-repository";
-import { CredentialReviewStatus, LawyerPosition } from "@/domain/enums";
+import {
+  LawyerPosition,
+  type ConsultationModality,
+} from "@/domain/enums";
 import type {
   LanguageRepository,
   LawyerTaxonomyRepository,
@@ -26,13 +29,18 @@ import type { Locale } from "@/i18n/config";
 import { localizedTaxonomyName } from "@/lib/localized-content";
 import { resolveProfilePhotoUrl } from "@/infrastructure/storage/file-access";
 
+/**
+ * Public directory card. Deliberately carries no phone or license number
+ * (neither does PublicLawyerProfileView): contact goes through the booking
+ * flow and verification is shown only as a status badge.
+ */
 export type DirectoryLawyerCard = {
   profile: LawyerProfile;
   displayName: string;
   imageUrl: string | null;
-  phone: string | null;
-  licenseNumber: string | null;
   minPriceMnt: number | null;
+  /** Distinct modalities across the lawyer's active offerings. */
+  modalities: ConsultationModality[];
   practiceAreaNames: string[];
   languageCodes: string[];
 };
@@ -41,8 +49,6 @@ export type PublicLawyerProfileView = {
   profile: LawyerProfile;
   displayName: string;
   imageUrl: string | null;
-  phone: string | null;
-  licenseNumber: string | null;
   offerings: ConsultationOffering[];
   practiceAreas: PracticeArea[];
   languages: Language[];
@@ -79,7 +85,6 @@ export async function searchListedLawyers(
     languageLinks,
     allPracticeAreas,
     allLanguages,
-    allCredentials,
   ] = await Promise.all([
     deps.userRepository.findByIds(userIds),
     deps.consultationOfferingRepository.findActiveByLawyerProfileIds(
@@ -89,15 +94,7 @@ export async function searchListedLawyers(
     deps.lawyerTaxonomyRepository.getLanguagesForProfiles(profileIds),
     deps.practiceAreaRepository.findAllActive(),
     deps.languageRepository.findAllActive(),
-    deps.lawyerCredentialRepository.findByLawyerProfileIds(profileIds),
   ]);
-
-  const credentialsByProfile = new Map<string, LawyerCredential[]>();
-  for (const credential of allCredentials) {
-    const list = credentialsByProfile.get(credential.lawyerProfileId) ?? [];
-    list.push(credential);
-    credentialsByProfile.set(credential.lawyerProfileId, list);
-  }
 
   const userById = new Map(users.map((u) => [u.id, u]));
   const offeringsByProfile = new Map<string, ConsultationOffering[]>();
@@ -136,12 +133,11 @@ export async function searchListedLawyers(
       profile,
       displayName: user?.name ?? profile.slug,
       imageUrl: resolveProfilePhotoUrl(user?.image ?? null),
-      phone: profile.phone,
-      licenseNumber: publicLicenseNumber(credentialsByProfile.get(profile.id) ?? []),
       minPriceMnt:
         profileOfferings.length > 0
           ? Math.min(...profileOfferings.map((o) => o.priceMnt))
           : null,
+      modalities: [...new Set(profileOfferings.map((o) => o.modality))],
       practiceAreaNames: practiceAreas.map((p) =>
         localizedTaxonomyName(p, locale),
       ),
@@ -177,7 +173,6 @@ export async function getPublicLawyerProfile(
     rules,
     allPracticeAreas,
     allLanguages,
-    credentials,
   ] = await Promise.all([
     deps.userRepository.findById(profile.userId),
     deps.consultationOfferingRepository.findActiveByLawyerProfileId(
@@ -188,7 +183,6 @@ export async function getPublicLawyerProfile(
     deps.availabilityRepository.findActiveRulesByLawyerProfileId(profile.id),
     deps.practiceAreaRepository.findAllActive(),
     deps.languageRepository.findAllActive(),
-    deps.lawyerCredentialRepository.findByLawyerProfileId(profile.id),
   ]);
 
   const duration = offerings[0]?.durationMinutes ?? 60;
@@ -233,19 +227,9 @@ export async function getPublicLawyerProfile(
     profile,
     displayName: user?.name ?? profile.slug,
     imageUrl: resolveProfilePhotoUrl(user?.image ?? null),
-    phone: profile.phone,
-    licenseNumber: publicLicenseNumber(credentials),
     offerings,
     practiceAreas,
     languages,
     slots,
   };
-}
-
-function publicLicenseNumber(credentials: LawyerCredential[]): string | null {
-  return (
-    credentials.find(
-      (credential) => credential.status === CredentialReviewStatus.APPROVED,
-    )?.licenseNumber ?? null
-  );
 }

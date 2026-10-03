@@ -47,25 +47,39 @@ function credential(lawyerProfileId: string, licenseNumber: string) {
   };
 }
 
-describe("searchListedLawyers — batched credential lookup (N+1 regression)", () => {
-  it("fetches credentials for all profiles in a single batched call, not one per profile", async () => {
-    const profiles = [profile("lp1", "u1"), profile("lp2", "u2"), profile("lp3", "u3")];
-    const findByLawyerProfileIds = vi.fn(async () => [
-      credential("lp1", "LIC-1"),
-      credential("lp3", "LIC-3"),
-    ]);
-    const findByLawyerProfileId = vi.fn();
+function offering(lawyerProfileId: string, priceMnt: number, modality: "ONLINE" | "IN_PERSON") {
+  return {
+    id: `off-${lawyerProfileId}-${priceMnt}`,
+    lawyerProfileId,
+    titleMn: "Зөвлөгөө",
+    titleEn: null,
+    descriptionMn: null,
+    durationMinutes: 60,
+    priceMnt,
+    modality,
+    isActive: true,
+    deletedAt: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+}
+
+describe("searchListedLawyers — public card data", () => {
+  it("never exposes phone or license number on the card and does not query credentials", async () => {
+    const profiles = [
+      { ...profile("lp1", "u1"), phone: "99112233" },
+      profile("lp2", "u2"),
+    ];
+    const findByLawyerProfileIds = vi.fn(async () => [credential("lp1", "LIC-1")]);
 
     const deps = {
-      lawyerProfileRepository: {
-        findListed: vi.fn(async () => profiles),
-      },
-      lawyerCredentialRepository: {
-        findByLawyerProfileId,
-        findByLawyerProfileIds,
-      },
+      lawyerProfileRepository: { findListed: vi.fn(async () => profiles) },
+      lawyerCredentialRepository: { findByLawyerProfileIds },
       consultationOfferingRepository: {
-        findActiveByLawyerProfileIds: vi.fn(async () => []),
+        findActiveByLawyerProfileIds: vi.fn(async () => [
+          offering("lp1", 120000, "IN_PERSON"),
+          offering("lp1", 80000, "ONLINE"),
+        ]),
       },
       lawyerTaxonomyRepository: {
         getPracticeAreasForProfiles: vi.fn(async () => []),
@@ -73,21 +87,22 @@ describe("searchListedLawyers — batched credential lookup (N+1 regression)", (
       },
       practiceAreaRepository: { findAllActive: vi.fn(async () => []) },
       languageRepository: { findAllActive: vi.fn(async () => []) },
-      userRepository: {
-        findByIds: vi.fn(async () => [user("u1"), user("u2"), user("u3")]),
-      },
+      userRepository: { findByIds: vi.fn(async () => [user("u1"), user("u2")]) },
     };
 
     const cards = await searchListedLawyers({}, deps as never);
 
-    expect(findByLawyerProfileIds).toHaveBeenCalledTimes(1);
-    expect(findByLawyerProfileIds).toHaveBeenCalledWith(["lp1", "lp2", "lp3"]);
-    expect(findByLawyerProfileId).not.toHaveBeenCalled();
-
+    expect(findByLawyerProfileIds).not.toHaveBeenCalled();
+    for (const card of cards) {
+      expect(card).not.toHaveProperty("phone");
+      expect(card).not.toHaveProperty("licenseNumber");
+    }
     const byId = new Map(cards.map((card) => [card.profile.id, card]));
-    expect(byId.get("lp1")?.licenseNumber).toBe("LIC-1");
-    expect(byId.get("lp2")?.licenseNumber).toBeNull();
-    expect(byId.get("lp3")?.licenseNumber).toBe("LIC-3");
+    // Real persisted data only: price from offerings, none invented for lp2.
+    expect(byId.get("lp1")?.minPriceMnt).toBe(80000);
+    expect([...(byId.get("lp1")?.modalities ?? [])].sort()).toEqual(["IN_PERSON", "ONLINE"]);
+    expect(byId.get("lp2")?.minPriceMnt).toBeNull();
+    expect(byId.get("lp2")?.modalities).toEqual([]);
   });
 
   it("returns an empty list without querying dependents when no lawyers are listed", async () => {

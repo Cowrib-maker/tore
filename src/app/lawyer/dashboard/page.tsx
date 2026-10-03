@@ -32,11 +32,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { LawyerOnboardingCard } from "@/components/marketplace/lawyer-onboarding-card";
 import { LawyerListingActions } from "@/components/verification/lawyer-listing-actions";
 import { LawyerPosition, UserRole } from "@/domain/enums";
 import { isLawyerVerified } from "@/domain/services/lawyer-eligibility";
+import {
+  computeLawyerOnboarding,
+  isListedForDisplay,
+} from "@/domain/services/lawyer-onboarding";
 import { getDashboardPath, LEGAL_AI_PATH } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
+import {
+  availabilityRepository,
+  lawyerCredentialRepository,
+  lawyerTaxonomyRepository,
+} from "@/infrastructure/repositories";
 import { formatVerificationStatus } from "@/lib/format-labels";
 import { cn } from "@/lib/utils";
 
@@ -116,15 +126,61 @@ export default async function LawyerDashboardPage() {
     );
   }
 
+  const [credentials, practiceLinks, languageLinks, activeRules] =
+    await Promise.all([
+      lawyerCredentialRepository.findByLawyerProfileId(data.profile.id),
+      lawyerTaxonomyRepository.getPracticeAreas(data.profile.id),
+      lawyerTaxonomyRepository.getLanguages(data.profile.id),
+      availabilityRepository.findActiveRulesByLawyerProfileId(data.profile.id),
+    ]);
+  const onboarding = computeLawyerOnboarding({
+    profile: data.profile,
+    credentials,
+    hasPhoto: Boolean(data.photoUrl),
+    practiceAreaCount: practiceLinks.length,
+    languageCount: languageLinks.length,
+    activeAvailabilityRuleCount: activeRules.length,
+    hasActiveOffering: data.hasActiveOffering,
+  });
   const emailVerified = Boolean(data.user.emailVerified);
   const profileFilled = Boolean(data.profile.headline || data.profile.bio);
   const verificationStatus = data.profile.verificationStatus;
   const verified = isLawyerVerified(data.profile);
   const hasActiveOffering = data.hasActiveOffering;
-  const listed = data.profile.isListed;
+  const listed = isListedForDisplay(data.profile);
   const isAttorney = data.profile.position === LawyerPosition.ATTORNEY;
   const ld = m.lawyerDashboard;
   const pf = m.lawyerProfileForm;
+  const verificationMessage = {
+    SUBMIT_LICENSE: ld.statusSubmit,
+    UNDER_REVIEW: ld.statusReview,
+    APPROVED: ld.statusApproved,
+    REJECTED: ld.statusRejected,
+    SUSPENDED: ld.statusSuspended,
+  }[onboarding.verificationState];
+  const onboardingCopy = {
+    title: ld.onboardingTitle,
+    help: ld.onboardingHelp,
+    groupVerification: ld.groupVerification,
+    groupListing: ld.groupListing,
+    groupRecommended: ld.groupRecommended,
+    visibleNow: ld.visibleNow,
+    items: {
+      license: ld.itemLicense,
+      approved: ld.listingGateVerification,
+      offering: ld.listingGateOffering,
+      optedIn: ld.listingGateOptIn,
+      headline: pf.headline,
+      bio: pf.bio,
+      years: pf.years,
+      city: pf.city,
+      education: pf.education,
+      photo: ld.itemPhoto,
+      practiceAreas: ld.itemPracticeAreas,
+      languages: ld.itemLanguages,
+      schedule: ld.itemSchedule,
+    },
+  };
 
   const profileSummary = [
     { label: pf.headline, value: data.profile.headline },
@@ -278,6 +334,7 @@ export default async function LawyerDashboardPage() {
         </Card>
         {isAttorney ? (
         <>
+        <LawyerOnboardingCard onboarding={onboarding} copy={onboardingCopy} />
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between gap-2">
@@ -287,7 +344,7 @@ export default async function LawyerDashboardPage() {
               </Badge>
             </div>
             <CardDescription>
-              {verified ? ld.verificationApproved : ld.verificationPending}
+              {verificationMessage}
             </CardDescription>
           </CardHeader>
           <CardFooter>

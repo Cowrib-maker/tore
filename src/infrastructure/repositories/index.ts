@@ -11,6 +11,7 @@ export { clientProfileRepository } from "./prisma-client-profile-repository";
 export { lawyerProfileRepository } from "./prisma-lawyer-profile-repository";
 export { lawyerCredentialRepository } from "./prisma-lawyer-credential-repository";
 export { notificationRepository } from "./prisma-notification-repository";
+export { reviewRepository } from "./prisma-review-repository";
 export { consultationOfferingRepository } from "./prisma-consultation-offering-repository";
 export { availabilityRepository } from "./prisma-availability-repository";
 export { bookingRepository } from "./prisma-booking-repository";

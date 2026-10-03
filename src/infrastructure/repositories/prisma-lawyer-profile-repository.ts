@@ -227,7 +227,11 @@ export class PrismaLawyerProfileRepository implements LawyerProfileRepository {
           : {}),
       },
       select: lawyerProfileSelect,
-      orderBy: [{ averageRating: "desc" }, { createdAt: "desc" }],
+      // Postgres sorts NULL first on DESC; unrated lawyers must come last.
+      orderBy: [
+        { averageRating: { sort: "desc", nulls: "last" } },
+        { createdAt: "desc" },
+      ],
       take: filters?.limit,
       skip: filters?.offset,
     });

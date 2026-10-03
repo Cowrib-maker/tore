@@ -12,6 +12,7 @@ export type MarketplaceDictionary = {
     complete: string;
     incomplete: string;
     verified: string;
+    verifiedAttorney: string;
     pending: string;
     confirmed: string;
     editProfile: string;
@@ -148,6 +149,22 @@ export type MarketplaceDictionary = {
     workspaceTitle: string;
     workspaceHelp: string;
     openLegalAi: string;
+    statusSubmit: string;
+    statusReview: string;
+    statusApproved: string;
+    statusRejected: string;
+    statusSuspended: string;
+    onboardingTitle: string;
+    onboardingHelp: string;
+    groupVerification: string;
+    groupListing: string;
+    groupRecommended: string;
+    visibleNow: string;
+    itemLicense: string;
+    itemPhoto: string;
+    itemPracticeAreas: string;
+    itemLanguages: string;
+    itemSchedule: string;
   };
   clientDashboard: {
     intro: string;
@@ -398,6 +415,21 @@ export type MarketplaceDictionary = {
     lawyerProfile: string;
     declined: string;
   };
+  review: {
+    ratingLabel: string;
+    commentLabel: string;
+    commentPlaceholder: string;
+    submit: string;
+    submitting: string;
+    success: string;
+    prompt: string;
+    alreadyReviewed: string;
+    sectionTitle: string;
+    noReviews: string;
+    ratingSummary: string;
+    ratingCount: string;
+    noRatings: string;
+  };
   bookingActions: {
     success: string;
     accept: string;
@@ -436,10 +468,19 @@ export type MarketplaceDictionary = {
     clear: string;
     fromPrice: string;
     viewOfferings: string;
+    resultCount: string;
+    viewProfile: string;
+    getConsultation: string;
     license: string;
   };
   publicProfile: {
     back: string;
+    aboutTitle: string;
+    practiceAreasTitle: string;
+    languagesTitle: string;
+    availableOnline: string;
+    availableInPerson: string;
+    getConsultation: string;
     yearsExperience: string;
     phone: string;
     license: string;

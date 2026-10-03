@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -25,6 +25,20 @@ export function WorkspaceTabs({
 }) {
   const [active, setActive] = useState(defaultValue ?? items[0]?.value);
   const activeItem = items.find((item) => item.value === active) ?? items[0];
+
+  // Deep links such as /lawyer/profile#verification open that tab. Read after
+  // mount so server and first client render agree (no hydration mismatch).
+  useEffect(() => {
+    const openFromHash = () => {
+      const hash = window.location.hash.replace(/^#/, "");
+      if (hash && items.some((item) => item.value === hash)) {
+        setActive(hash);
+      }
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
+  }, [items]);
 
   return (
     <div className="overflow-hidden rounded-2xl border border-[#0B1F3A]/10 bg-white shadow-[0_18px_50px_rgba(11,31,58,0.06)]">
