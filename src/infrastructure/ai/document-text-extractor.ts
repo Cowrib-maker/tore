@@ -34,6 +34,11 @@ export type LegalAiDocumentExtractor = {
   extract(input: {
     format: LegalAiDocumentFormat;
     body: Uint8Array;
+    /**
+     * Default true. When false OCR is never started: images and scanned
+     * PDFs come back as NEEDS_OCR instead of invoking Tesseract.
+     */
+    allowOcr?: boolean;
   }): Promise<DocumentExtractResult>;
 };
 
@@ -60,14 +65,22 @@ export class LegalAiDocumentExtractorService implements LegalAiDocumentExtractor
   async extract(input: {
     format: LegalAiDocumentFormat;
     body: Uint8Array;
+    allowOcr?: boolean;
   }): Promise<DocumentExtractResult> {
+    const allowOcr = input.allowOcr !== false;
     if (IMAGE_FORMATS.has(input.format)) {
+      if (!allowOcr) {
+        return { status: "NEEDS_OCR", text: "", pageCount: null };
+      }
       return this.ocrImage(input.body);
     }
 
     if (input.format === "pdf") {
       const extracted = await this.pdf.extract(input.body);
       if (extracted.status === "EMPTY") {
+        if (!allowOcr) {
+          return { status: "NEEDS_OCR", text: "", pageCount: extracted.pageCount };
+        }
         return this.ocrScannedPdf(input.body, extracted.pageCount);
       }
       return extracted;
