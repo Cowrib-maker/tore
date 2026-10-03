@@ -10,10 +10,7 @@ import { enforceRateLimit } from "@/application/common/rate-limit-action";
 import { requireActor } from "@/application/common/require-actor";
 import { updateClientProfileUseCase } from "@/application/use-cases/profiles/update-client-profile";
 import { updateLawyerProfileUseCase } from "@/application/use-cases/profiles/update-lawyer-profile";
-import { uploadProfilePhotoUseCase } from "@/application/use-cases/profiles/upload-profile-photo";
 import {
-  PROFILE_PHOTO_ALLOWED_TYPES,
-  PROFILE_PHOTO_MAX_BYTES,
   updateClientProfileSchema,
   updateLawyerProfileSchema,
 } from "@/application/validators/profile.schema";
@@ -25,7 +22,6 @@ import {
   userRepository,
 } from "@/infrastructure/repositories";
 import { PROFILE_WRITE_RATE_LIMIT } from "@/infrastructure/security/rate-limiter";
-import { getFileStorage } from "@/infrastructure/storage";
 
 const updateClientDeps = {
   clientProfileRepository,
@@ -36,12 +32,6 @@ const updateLawyerDeps = {
   lawyerProfileRepository,
   userRepository,
   auditLogRepository,
-};
-
-const uploadPhotoDeps = {
-  userRepository,
-  auditLogRepository,
-  fileStorage: getFileStorage(),
 };
 
 export async function updateClientProfileAction(
@@ -116,53 +106,3 @@ export async function updateLawyerProfileAction(
     return mapActionError(error);
   }
 }
-
-export async function uploadProfilePhotoAction(
-  _prev: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
-  try {
-    const actor = await requireActor(UserRole.LAWYER);
-    const limited = await enforceRateLimit(
-      `profile:photo:${actor.userId}`,
-      PROFILE_WRITE_RATE_LIMIT,
-    );
-    if (limited) return limited;
-
-    const file = formData.get("photo");
-    if (!(file instanceof File) || file.size === 0) {
-      return { error: "Photo is required" };
-    }
-    if (file.size > PROFILE_PHOTO_MAX_BYTES) {
-      return { error: "Photo must be 5MB or smaller" };
-    }
-    if (
-      !PROFILE_PHOTO_ALLOWED_TYPES.includes(
-        file.type as (typeof PROFILE_PHOTO_ALLOWED_TYPES)[number],
-      )
-    ) {
-      return { error: "Photo must be JPEG, PNG, or WebP" };
-    }
-
-    const buffer = new Uint8Array(await file.arrayBuffer());
-    const ipAddress = await getClientIp();
-    await uploadProfilePhotoUseCase(
-      actor,
-      {
-        fileName: file.name || "photo.jpg",
-        contentType: file.type,
-        body: buffer,
-      },
-      uploadPhotoDeps,
-      ipAddress,
-    );
-
-    revalidatePath("/lawyer/profile");
-    revalidatePath("/lawyer/dashboard");
-    revalidatePath("/lawyers");
-    return { success: true };
-  } catch (error) {
-    return mapActionError(error);
-  }
-}
-

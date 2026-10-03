@@ -339,6 +339,10 @@ export type MarketplaceDictionary = {
     uploading: string;
     submit: string;
     success: string;
+    errorTooLarge: string;
+    errorType: string;
+    errorGeneric: string;
+    previewNote: string;
   };
   reviewCredential: {
     saved: string;

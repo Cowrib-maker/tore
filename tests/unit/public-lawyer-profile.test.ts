@@ -49,7 +49,11 @@ const offering = {
   updatedAt: new Date(),
 };
 
-function deps(p: ReturnType<typeof profile> | null, hasActiveOffering = true) {
+function deps(
+  p: ReturnType<typeof profile> | null,
+  hasActiveOffering = true,
+  image: string | null = null,
+) {
   return {
     lawyerProfileRepository: {
       findBySlug: vi.fn(async () => p),
@@ -71,7 +75,7 @@ function deps(p: ReturnType<typeof profile> | null, hasActiveOffering = true) {
       getLanguages: vi.fn(async () => []),
     },
     userRepository: {
-      findById: vi.fn(async () => ({ id: "u1", name: "Бат", image: null })),
+      findById: vi.fn(async () => ({ id: "u1", name: "Бат", image })),
     },
   } as never;
 }
@@ -115,6 +119,22 @@ describe("getPublicLawyerProfile — public eligibility", () => {
     expect(view).not.toHaveProperty("phone");
     expect(view).not.toHaveProperty("licenseNumber");
     expect(view.profile.phone).toBeNull();
+  });
+});
+
+describe("getPublicLawyerProfile — profile photo", () => {
+  it("uses the persisted upload through the public photo route (never the owner-only file route)", async () => {
+    const view = await getPublicLawyerProfile(
+      "bat",
+      deps(profile(), true, "profile-photo/u1/uuid-me.png"),
+    );
+    expect(view.imageUrl).toBe("/api/profile-photos/profile-photo/u1/uuid-me.png");
+    expect(view.imageUrl).not.toContain("/api/files/");
+  });
+
+  it("has no image (initials fallback) when no photo is stored", async () => {
+    const view = await getPublicLawyerProfile("bat", deps(profile()));
+    expect(view.imageUrl).toBeNull();
   });
 });
 

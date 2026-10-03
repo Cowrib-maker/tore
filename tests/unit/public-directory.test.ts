@@ -105,6 +105,32 @@ describe("searchListedLawyers — public card data", () => {
     expect(byId.get("lp2")?.modalities).toEqual([]);
   });
 
+  it("shows the persisted profile photo on the card, and none when unset", async () => {
+    const deps = {
+      lawyerProfileRepository: {
+        findListed: vi.fn(async () => [profile("lp1", "u1"), profile("lp2", "u2")]),
+      },
+      lawyerCredentialRepository: {},
+      consultationOfferingRepository: { findActiveByLawyerProfileIds: vi.fn(async () => []) },
+      lawyerTaxonomyRepository: {
+        getPracticeAreasForProfiles: vi.fn(async () => []),
+        getLanguagesForProfiles: vi.fn(async () => []),
+      },
+      practiceAreaRepository: { findAllActive: vi.fn(async () => []) },
+      languageRepository: { findAllActive: vi.fn(async () => []) },
+      userRepository: {
+        findByIds: vi.fn(async () => [
+          { id: "u1", name: "A", image: "profile-photo/u1/uuid-a.png" },
+          { id: "u2", name: "B", image: null },
+        ]),
+      },
+    };
+    const cards = await searchListedLawyers({}, deps as never);
+    const byId = new Map(cards.map((c) => [c.profile.id, c]));
+    expect(byId.get("lp1")?.imageUrl).toBe("/api/profile-photos/profile-photo/u1/uuid-a.png");
+    expect(byId.get("lp2")?.imageUrl).toBeNull();
+  });
+
   it("returns an empty list without querying dependents when no lawyers are listed", async () => {
     const findByLawyerProfileIds = vi.fn();
     const deps = {
