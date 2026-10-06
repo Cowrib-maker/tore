@@ -1,0 +1,22 @@
+{
+  "schema": "tore-spell-beta-corpus/1",
+  "note": "Release regression corpus for TORE Spell Beta. TORE-authored text, NOT statistically representative of Mongolian. Clean passages must produce zero MISSPELLED issues; `errors` are deliberate mistakes with the engine's required behaviour (MISSPELLED with a given top suggestion, or UNKNOWN = must abstain).",
+  "passages": [
+    { "id": "prose-1", "kind": "ordinary prose", "text": "Өчигдөр бид хотоос гарч, хөдөө очлоо. Хүүхдүүд маш их баярласан. Орой нь гэртээ харьж, хамт хоол идсэн." },
+    { "id": "legal-1", "kind": "legal prose", "text": "Шүүх хэргийг хянан шийдвэрлэхдээ нотлох баримтыг үнэлнэ. Гэрээний нөхцөлийг зөрчсөн тал хариуцлага хүлээнэ." },
+    { "id": "business-1", "kind": "business prose", "text": "Компани шинэ төслийн төлөвлөгөөг баталлаа. Хурал маргааш өглөө болно. Бүх ажилтан оролцоно уу." },
+    { "id": "government-1", "kind": "government-style prose", "text": "Засгийн газрын тогтоолоор тус байгууллагад шинэ чиг үүрэг өгсөн. Иргэд өргөдлөө хуулийн дагуу гаргана." },
+    { "id": "email-1", "kind": "email-style", "text": "Сайн байна уу. Гэрээний төслийг хавсаргав. Санал байвал надад мэдэгдээрэй. Баярлалаа." },
+    { "id": "punct-1", "kind": "mixed punctuation", "text": "«Хууль — бүгдэд адил» гэж тэр хэллээ; гэвч үүнийг (зарим хүн) үгүйсгэв... Үнэн үү? Тийм!" },
+    { "id": "numbers-1", "kind": "numbers and dates", "text": "2026.10.05 өдөр 12:30 цагт 3,5 сая төгрөгийн гэрээ байгуулав. Хуудас 10-р, зүйл 17.1." },
+    { "id": "names-1", "kind": "names", "text": "Бат-Эрдэнэ болон Сарангэрэл нар Улаанбаатар хотод уулзав." },
+    { "id": "abbr-1", "kind": "abbreviations", "text": "НҮБ, ХХК, ТӨҮГ болон УИХ-ын тогтоолыг иш татав." },
+    { "id": "url-1", "kind": "URLs and e-mail", "text": "Дэлгэрэнгүйг https://www.tore.mn/spell хаягаас эсвэл info@tore.mn имэйлээр аваарай." },
+    { "id": "english-1", "kind": "English terms", "text": "Манай app дээр login хийж, PDF файлаа upload хийнэ." },
+    { "id": "citation-1", "kind": "legal citations", "text": "Эрүүгийн хуулийн 17.1 дэх хэсэг, Иргэний хуулийн 5-р зүйл, УИХ-ын 2017 оны 12 дугаар тогтоол." }
+  ],
+  "errors": [
+    { "id": "err-double-final", "text": "Тэр маш сайнн ажилласан.", "token": "сайнн", "expect": "MISSPELLED", "top": "сайн" },
+    { "id": "err-unknown-word", "text": "Энэ нь докумнт юм.", "token": "докумнт", "expect": "UNKNOWN" }
+  ]
+}

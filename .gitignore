@@ -49,3 +49,11 @@ next-env.d.ts
 .data/
 
 tmp/
+
+# desktop app build output
+/desktop/node_modules
+/desktop/dist
+/desktop/release
+
+# secrets (never commit)
+/.secrets/

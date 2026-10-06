@@ -1,0 +1,146 @@
+/**
+ * TORE Spell Language Engine V1 — public analysis contract.
+ *
+ * Three verdicts, deliberately:
+ *   VALID      — the token is accepted (lexicon, morphology, user dictionary,
+ *                or a protected non-linguistic token such as a number/URL).
+ *   MISSPELLED — there is POSITIVE evidence of an error (a deterministic rule
+ *                fired and its correction is itself valid). Only this verdict
+ *                ever carries suggestions.
+ *   UNKNOWN    — the engine cannot decide. This is NOT an error: the word may
+ *                be a name, a loanword, a rare word, or simply absent from the
+ *                loaded data. UNKNOWN never produces a replacement.
+ *
+ * Precision over recall: when in doubt the answer is UNKNOWN.
+ */
+
+export type WordVerdict = "VALID" | "MISSPELLED" | "UNKNOWN";
+
+export type TokenKind =
+  | "WORD" // Cyrillic word, checkable
+  | "ACRONYM" // ALL-CAPS (optionally with a hyphenated suffix: НҮБ-ын)
+  | "NUMBER" // digits, dates, decimals, ordinals with suffix (10-р)
+  | "URL"
+  | "EMAIL"
+  | "LATIN" // Latin-script word (foreign / identifier)
+  | "MIXED" // Cyrillic + Latin / digits in one token
+  | "PUNCT"
+  | "SPACE";
+
+export type CaseShape = "LOWER" | "TITLE" | "UPPER" | "MIXED" | "NONE";
+
+export type LexiconLayer =
+  | "GENERAL"
+  | "LEGAL"
+  | "PROPER_NOUN"
+  | "ABBREVIATION"
+  | "USER_DEFINED";
+
+/**
+ * Why a verdict was reached. Every issue carries one, so each correction has
+ * a measurable category and the benchmark can report per-reason precision.
+ */
+export type ReasonCode =
+  // VALID
+  | "LEXICON"
+  | "MORPHOLOGY"
+  | "USER_DICTIONARY"
+  | "PROTECTED_NUMBER"
+  | "PROTECTED_URL"
+  | "PROTECTED_EMAIL"
+  | "PROTECTED_LATIN"
+  | "PROTECTED_ACRONYM"
+  | "PROTECTED_PROPER_NOUN"
+  | "PROTECTED_MIXED"
+  // UNKNOWN
+  | "NOT_IN_LEXICON"
+  | "PROPER_NOUN_CANDIDATE"
+  | "ACRONYM_UNLISTED"
+  | "UPPERCASE_UNLISTED"
+  // MISSPELLED
+  | "TYPO_PAIR"
+  | "HARMONY_SUFFIX"
+  | "SUFFIX_CONSONANT_CONFUSION"
+  | "STEM_VOWEL_MISSING"
+  | "YI_FEMININE_STEM"
+  | "DOUBLED_FINAL_LETTER"
+  | "DIGIT_GLUED"
+  | "MIXED_SCRIPT_LOOKALIKE"
+  | "DIGRAPH_II_FOR_IY"
+  | "HARMONY_VIOLATION_NEIGHBOR"
+  | "EDIT_DISTANCE_UNIQUE";
+
+export type Severity = "ERROR" | "WARNING" | "INFO";
+
+export type Suggestion = {
+  text: string;
+  /** 0..1 — confidence this exact replacement is right, given the word IS wrong. */
+  confidence: number;
+};
+
+export type TextRange = { start: number; end: number };
+
+export type Token = {
+  kind: TokenKind;
+  /** Exactly as it appears in the input (offsets are into the ORIGINAL text). */
+  text: string;
+  range: TextRange;
+  caseShape: CaseShape;
+  /** True when the token opens a sentence (so Title-case is not evidence of a name). */
+  sentenceInitial: boolean;
+};
+
+export type TokenAnalysis = {
+  token: Token;
+  normalizedToken: string;
+  verdict: WordVerdict;
+  reasonCode: ReasonCode;
+  /** Confidence in the VERDICT itself (not in any suggestion). */
+  detectionConfidence: number;
+  /** Lemma when morphology recognised the word. */
+  lemma?: string;
+  layer?: LexiconLayer;
+};
+
+export type SpellIssue = {
+  token: string;
+  normalizedToken: string;
+  verdict: "MISSPELLED" | "UNKNOWN";
+  reasonCode: ReasonCode;
+  detectionConfidence: number;
+  suggestions: readonly Suggestion[];
+  /** Confidence of the top suggestion (0 when there is none). */
+  suggestionConfidence: number;
+  severity: Severity;
+  range: TextRange;
+  /** Always false until a benchmark proves a reason code safe to auto-apply. */
+  autoApplySafe: boolean;
+  /** Mongolian explanation for the user. */
+  message: string;
+};
+
+export type AnalysisOptions = {
+  /** Also return UNKNOWN tokens as INFO issues (default false: they are not errors). */
+  reportUnknown?: boolean;
+  /** Minimum detection confidence for a MISSPELLED issue (default from policy). */
+  minDetectionConfidence?: number;
+  /** Maximum suggestions per issue (default 3). */
+  maxSuggestions?: number;
+};
+
+export type AnalysisStats = {
+  characterCount: number;
+  wordCount: number;
+  validCount: number;
+  misspelledCount: number;
+  unknownCount: number;
+  protectedCount: number;
+};
+
+export type AnalysisResult = {
+  engineVersion: string;
+  dataPackVersion: string;
+  tokens: readonly TokenAnalysis[];
+  issues: readonly SpellIssue[];
+  stats: AnalysisStats;
+};

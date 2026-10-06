@@ -18,6 +18,9 @@ They do **not** authorize code by themselves.
 | [ADR-003](./adr-003-organization-model.md) | Organization model | Accepted | 2026-08-11 |
 | [ADR-004](./adr-004-membership-model.md) | Membership model | Accepted | 2026-08-11 |
 | [ADR-005](./adr-005-lawyer-profile-compatibility.md) | Compatibility strategy for LawyerProfile | Accepted | 2026-08-11 |
+| [ADR-006](./adr-006-spell-licensing-activation.md) | TORE Spell licensing & activation | Accepted | 2026-10-05 |
+| [ADR-007](./adr-007-spell-device-identity.md) | TORE Spell device identity | Accepted | 2026-10-05 |
+| [ADR-008](./adr-008-spell-entitlement-token.md) | TORE Spell entitlement token & offline policy | Accepted | 2026-10-05 |
 
 ## Template (required sections)
 

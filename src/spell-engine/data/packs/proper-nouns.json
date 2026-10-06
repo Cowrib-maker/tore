@@ -1,0 +1,92 @@
+{
+ "schema": "tore-spell-pack/1",
+ "id": "tore-names-seed",
+ "version": "2026.10.1",
+ "layer": "PROPER_NOUN",
+ "language": "mn-Cyrl",
+ "coverage": "SEED",
+ "provenance": {
+  "source": "proper-nouns.tsv",
+  "license": "TORE proprietary (original work)",
+  "redistributable": true,
+  "notes": "Names / places."
+ },
+ "entries": [
+  {
+   "w": "Архангай",
+   "pos": "N"
+  },
+  {
+   "w": "Бат",
+   "pos": "N"
+  },
+  {
+   "w": "Болд",
+   "pos": "N"
+  },
+  {
+   "w": "Дархан",
+   "pos": "N"
+  },
+  {
+   "w": "Дорж",
+   "pos": "N"
+  },
+  {
+   "w": "Дорнод",
+   "pos": "N"
+  },
+  {
+   "w": "Завхан",
+   "pos": "N"
+  },
+  {
+   "w": "Монгол",
+   "pos": "N"
+  },
+  {
+   "w": "Нарантуяа",
+   "pos": "N"
+  },
+  {
+   "w": "Оюун",
+   "pos": "N"
+  },
+  {
+   "w": "Сараа",
+   "pos": "N"
+  },
+  {
+   "w": "Сүхбаатар",
+   "pos": "N"
+  },
+  {
+   "w": "Тогтох",
+   "pos": "N"
+  },
+  {
+   "w": "Тэмүүжин",
+   "pos": "N"
+  },
+  {
+   "w": "Улаанбаатар",
+   "pos": "N"
+  },
+  {
+   "w": "Хаан",
+   "pos": "N"
+  },
+  {
+   "w": "Хөвсгөл",
+   "pos": "N"
+  },
+  {
+   "w": "Чингис",
+   "pos": "N"
+  },
+  {
+   "w": "Эрдэнэт",
+   "pos": "N"
+  }
+ ]
+}
