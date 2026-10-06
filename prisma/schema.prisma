@@ -1275,6 +1275,10 @@ model Invoice {
   subscriptionId    String?               @map("subscription_id")
   bookingId         String?               @unique @map("booking_id")
   planCode          SubscriptionPlanCode? @map("plan_code")
+  /// TORE Spell licence purchase (mutually exclusive with plan/booking). The
+  /// server-side price lives in amountMnt; the licence is issued only after
+  /// verified payment and is linked from SpellLicense.purchaseInvoiceId.
+  spellPlanCode     SpellPlanCode?        @map("spell_plan_code")
   amountMnt         Int                   @map("amount_mnt")
   currency          String                @default("MNT")
   provider          String
@@ -1914,6 +1918,10 @@ model SpellLicense {
   revokedReason      String?            @map("revoked_reason") @db.VarChar(500)
   /// Admin who issued it. Not a relation: admin lifecycle must not cascade.
   issuedByUserId     String?            @map("issued_by_user_id")
+  /// Invoice that paid for this licence (PURCHASE source). UNIQUE: a repeated
+  /// callback / retry can never create a second licence for one payment.
+  /// Not a relation: payment history must outlive account lifecycle.
+  purchaseInvoiceId  String?            @unique @map("purchase_invoice_id")
   createdAt          DateTime           @default(now()) @map("created_at")
   updatedAt          DateTime           @updatedAt @map("updated_at")
 

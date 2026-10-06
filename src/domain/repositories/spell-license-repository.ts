@@ -25,6 +25,8 @@ export type ListSpellLicensesInput = {
 export interface SpellLicenseRepository {
   create(input: CreateSpellLicenseInput): Promise<SpellLicense>;
   findById(id: string): Promise<SpellLicense | null>;
+  /** The licence minted for this invoice, if any (idempotent fulfilment). */
+  findByPurchaseInvoiceId(invoiceId: string): Promise<SpellLicense | null>;
   /** Hashes under every configured HMAC key (supports key rotation). */
   findByCodeHashes(hashes: string[]): Promise<SpellLicense | null>;
   listByOwner(ownerUserId: string): Promise<SpellLicense[]>;

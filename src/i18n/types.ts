@@ -461,6 +461,28 @@ export type SpellCopy = {
   features: { eyebrow: string; title: string; support: string; items: { title: string; description: string }[] };
   roadmap: { eyebrow: string; title: string; support: string; items: { title: string; description: string }[] };
   beta: { eyebrow: string; title: string; description: string; points: string[]; cta: string; ctaNote: string };
-  pricing: { eyebrow: string; title: string; description: string; durations: string[]; note: string };
+  pricing: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    /** Labels for 1 / 3 / 6 / 12 month licences, in that order. */
+    durations: string[];
+    note: string;
+    soon: string;
+    buy: string;
+    loginToBuy: string;
+    unavailable: string;
+    checkout: {
+      title: string;
+      scan: string;
+      openApp: string;
+      waiting: string;
+      paid: string;
+      paidNote: string;
+      myLicense: string;
+      error: string;
+      cancel: string;
+    };
+  };
   honesty: { title: string; body: string };
 };

@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import { getSessionUser } from "@/application/common/session";
 import { SpellLanding } from "@/components/marketing/spell-landing";
 import type { UserRole } from "@/domain/enums";
+import { isQpayConfigured } from "@/infrastructure/billing/create-qpay-gateway";
+import { getSpellPriceList } from "@/domain/spell/pricing";
+import { isSpellV1Enabled } from "@/lib/feature-flags";
 import { getHomepageAccountHref } from "@/domain/services/homepage-routing";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
@@ -37,5 +40,10 @@ export default async function SpellPage() {
       }
     : null;
 
-  return <SpellLanding dict={dict} locale={locale} authUser={authUser} />;
+  // Server-side configuration only: the browser never supplies a price.
+  const labels = dict.spell.pricing.durations;
+  const plans = getSpellPriceList().map((p, i) => ({ code: p.code, label: labels[i] ?? `${p.durationMonths}`, priceMnt: p.priceMnt }));
+  const purchaseAvailable = isSpellV1Enabled() && isQpayConfigured();
+
+  return <SpellLanding dict={dict} locale={locale} authUser={authUser} plans={plans} purchaseAvailable={purchaseAvailable} />;
 }

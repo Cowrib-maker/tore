@@ -71,6 +71,7 @@ class MemLicenses implements SpellLicenseRepository {
   async create(input: CreateSpellLicenseInput) {
     for (const l of this.s.licenses.values()) {
       if (l.codeHash === input.codeHash) throw new Error("duplicate code hash");
+      if (input.purchaseInvoiceId && l.purchaseInvoiceId === input.purchaseInvoiceId) throw new Error("duplicate purchase invoice");
     }
     const now = new Date();
     const license: SpellLicense = {
@@ -90,6 +91,12 @@ class MemLicenses implements SpellLicenseRepository {
   async findById(id: string) {
     const l = this.s.licenses.get(id);
     return l ? { ...l } : null;
+  }
+  async findByPurchaseInvoiceId(invoiceId: string) {
+    for (const l of this.s.licenses.values()) {
+      if (l.purchaseInvoiceId === invoiceId) return { ...l };
+    }
+    return null;
   }
   async findByCodeHashes(hashes: string[]) {
     for (const l of this.s.licenses.values()) {

@@ -15,10 +15,10 @@
 <p class="positioning">Монгол хэлний зөв бичих алдааг шалгах, засварлахад зориулсан бета хувилбар. Тодорхойгүй үгийг автоматаар засахгүй.</p>
 
 <section id="lock" hidden>
-  <h2>Лиценз идэвхжүүлэх</h2>
+  <h2>Лицензийн кодоо оруулна уу</h2>
   <p id="lock-msg"></p>
   <form id="act-form">
-    <label for="code">Лиценз код</label>
+    <label for="code" class="sr-only">Лицензийн код</label>
     <input id="code" autocomplete="off" spellcheck="false" placeholder="TORE-XXXX-XXXX-XXXX-XXXX">
     <button type="submit">Идэвхжүүлэх</button>
   </form>
@@ -40,6 +40,7 @@
     <button id="validate" class="ghost">Эрх шалгах</button>
     <button id="deactivate" class="ghost">Энэ компьютерээс чөлөөлөх</button>
   </div>
+  <div id="ready-note" class="notice ok" role="status" hidden>TORE Spell бэлэн боллоо.</div>
   <div id="offline-note" class="notice" hidden></div>
   <div class="cols">
     <div class="editor">

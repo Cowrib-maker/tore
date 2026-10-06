@@ -22,17 +22,18 @@ describe("TORE Spell public product copy", () => {
     expect(mn.spell.relation.statement).toBe(
       "TORE Spell нь TORE.MN-ийн хууль зүйн платформоос тусдаа бүтээгдэхүүн бөгөөд Монгол хэлээр ажиллахад зориулсан desktop алдаа шалгагч юм.",
     );
-    expect(mn.spell.pricing.title).toBe("Үнэ удахгүй");
-    expect(mn.spell.hero.primaryCta).toBe("Бета хувилбарыг үзэх");
+    expect(mn.spell.pricing.soon).toBe("Үнэ удахгүй");
+    expect(mn.spell.pricing.durations).toEqual(["1 сар", "3 сар", "6 сар", "1 жил"]);
+    expect(mn.spell.hero.primaryCta).toBe("TORE Spell авах");
   });
 
   it("makes no claim the beta cannot back (no accuracy numbers, no integrations, no prices, no AI rewriting)", () => {
     const text = JSON.stringify([mn.spell, en.spell]);
     expect(text).not.toMatch(/100\s*%|\d+\s*%/);
     expect(text).not.toMatch(/Microsoft|MS Word|Word-|Google Docs|системийн хэмжээнд|system-wide/);
-    expect(text).not.toMatch(/₮|төгрөг|MNT|\$\s?\d|\d\s?(USD|EUR)/i);
+    // Prices are server configuration, never copy: no amounts in any dictionary string.
+    expect(text).not.toMatch(/\d[\d\s,.]*\s?(₮|төгрөг|MNT|USD|EUR)|\$\s?\d/i);
     expect(text).not.toMatch(/AI-?аар|AI rewrit|rewrit|хиймэл оюун/i);
-    expect(text).not.toMatch(/авах\b.*checkout|худалдан авах бол/i);
   });
 
   it("states the beta limits and that stylistic checking and macOS are NOT available yet", () => {

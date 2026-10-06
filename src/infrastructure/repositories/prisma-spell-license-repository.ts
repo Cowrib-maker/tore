@@ -35,6 +35,7 @@ type Row = {
   revokedAt: Date | null;
   revokedReason: string | null;
   issuedByUserId: string | null;
+  purchaseInvoiceId: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -62,6 +63,11 @@ export class PrismaSpellLicenseRepository implements SpellLicenseRepository {
 
   async findById(id: string) {
     const row = await this.db.spellLicense.findUnique({ where: { id } });
+    return row ? mapSpellLicense(row) : null;
+  }
+
+  async findByPurchaseInvoiceId(invoiceId: string) {
+    const row = await this.db.spellLicense.findUnique({ where: { purchaseInvoiceId: invoiceId } });
     return row ? mapSpellLicense(row) : null;
   }
 

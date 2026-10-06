@@ -5,10 +5,11 @@ const api = window.spell;
 let issues = [];
 let pendingTransferId = null;
 let timer = null;
+let justActivated = false;
 let versions = { engineVersion: "", dataPackVersion: "" };
 
 const MSG = {
-  default: "TORE Spell ашиглахын тулд лиценз кодоо оруулна уу.",
+  default: "Худалдан авсан лицензийн кодоо оруулж идэвхжүүлнэ үү.",
   OFFLINE_LIMIT: "Офлайн горимд ажиллах хугацаа дууссан. Интернет холболт шаардлагатай: холбогдоод «Эрх шалгах» дарна уу.",
   CLOCK_ROLLBACK: "Компьютерийн цаг буцсан байна. Интернет холболт шаардлагатай: холбогдож эрхээ шалгана уу.",
   TOKEN_INVALID: "Эрхийн мэдээлэл баталгаажсангүй. Интернет холболт шаардлагатай: эрхээ дахин шалгана уу.",
@@ -38,6 +39,7 @@ async function refresh() {
   const badge = $("lic-badge");
   if (active) {
     badge.textContent = `Идэвхтэй · ${state.licenseExpiresAtLocal} хүртэл`;
+    if (justActivated) { $("ready-note").hidden = false; }
     const note = $("offline-note");
     if (state.refreshDue) {
       note.hidden = false;
@@ -46,6 +48,8 @@ async function refresh() {
     await loadDict();
     return;
   }
+  $("ready-note").hidden = true;
+  justActivated = false;
   let msg = MSG.default;
   if (!state) { badge.textContent = "Алдаа"; msg = (r && r.message) || msg; }
   else if (state.kind === "EXPIRED") { badge.textContent = "Хугацаа дууссан"; msg = MSG.EXPIRED; }
@@ -61,7 +65,7 @@ $("act-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   showErr(null);
   const r = await api.activate($("code").value);
-  if (r.ok) { $("code").value = ""; return refresh(); }
+  if (r.ok) { $("code").value = ""; justActivated = true; return refresh(); }
   if (r.code === "TRANSFER_CONFIRMATION_REQUIRED") {
     pendingTransferId = r.details && r.details.replacesActivationId;
     $("transfer-warning").textContent = r.message;
@@ -73,7 +77,7 @@ $("act-form").addEventListener("submit", async (e) => {
 $("transfer-yes").addEventListener("click", async () => {
   $("transfer").hidden = true;
   const r = await api.activate($("code").value, pendingTransferId || undefined);
-  if (r.ok) { $("code").value = ""; pendingTransferId = null; return refresh(); }
+  if (r.ok) { $("code").value = ""; pendingTransferId = null; justActivated = true; return refresh(); }
   showErr(r);
 });
 $("transfer-no").addEventListener("click", () => { $("transfer").hidden = true; pendingTransferId = null; });

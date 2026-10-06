@@ -52,8 +52,10 @@ describe("spell licensing migration safety", () => {
     expect(ddl).toContain('"code_hint" TEXT NOT NULL');
   });
 
-  it("is the newest migration (no ordering conflict with existing ones)", () => {
+  it("sorts after every non-Spell migration (no ordering conflict); only later Spell migrations follow it", () => {
     const all = readdirSync(MIGRATIONS).filter((d) => /^\d{14}_/.test(d)).sort();
-    expect(all[all.length - 1]).toBe(dir);
+    const after = all.slice(all.indexOf(dir) + 1);
+    expect(all).toContain(dir);
+    expect(after.every((d) => /_spell_/.test(d))).toBe(true);
   });
 });

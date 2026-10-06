@@ -129,6 +129,7 @@ export async function issueSpellLicense(
       codeHint: licenseCodeHint(canonical),
       redeemBy: addDays(now, deps.policy.redeemByDays),
       issuedByUserId: actor.userId,
+      purchaseInvoiceId: null,
     });
     await repos.eventRepository.append({
       licenseId: created.id,

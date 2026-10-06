@@ -38,6 +38,8 @@ export interface SpellLicense {
   revokedAt: Date | null;
   revokedReason: string | null;
   issuedByUserId: string | null;
+  /** Paying invoice for a PURCHASE licence (unique: one licence per payment). */
+  purchaseInvoiceId: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

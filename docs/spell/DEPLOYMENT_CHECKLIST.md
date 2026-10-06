@@ -28,6 +28,19 @@ State observed on **2026-10-06** via read-only Vercel inspection (project `tore`
 4. Redeploy, then run the read-only preflight from any machine: `BASE=https://www.tore.mn npx tsx scripts/spell-live-smoke.ts` → must show `Spell enabled and configured` and `server serves the pinned key id`.
 5. Issue a throw-away beta license (admin API/UI), then run the full smoke: `BASE=https://www.tore.mn LICENSE_CODE=… npx tsx scripts/spell-live-smoke.ts` (14 steps; uses the shipped pinned key). Revoke/deactivate afterwards.
 
+## Selling TORE Spell (purchase flow) — additional configuration
+Flow: `/spell` → sign in → pick 1 / 3 / 6 / 12 months → QPay invoice (server price) → server-to-server payment check → licence issued **after** verified payment → `/spell/license` (code reveal, Windows download) → desktop activation.
+
+| Variable / change | Notes |
+|---|---|
+| Migration `20261006120000_spell_purchase_fields` | additive: `invoices.spell_plan_code`, `spell_licenses.purchase_invoice_id` (UNIQUE). Apply with the first migration, before enabling the flag. |
+| `SPELL_PRICES_MNT` | the ONLY price source. JSON, whole tugrik, e.g. `{"SPELL_1M":<n>,"SPELL_3M":<n>,"SPELL_6M":<n>,"SPELL_12M":<n>}`. A plan without a valid price shows «Үнэ удахгүй» and cannot be bought. **No price is committed to the repository.** |
+| `SPELL_WINDOWS_INSTALLER_URL` | https URL of the installer produced by the Windows CI workflow (e.g. a GitHub release asset). Unset → «Beta installer удахгүй». |
+| `QPAY_BASE_URL`, `QPAY_CLIENT_ID`, `QPAY_CLIENT_SECRET`, `QPAY_INVOICE_CODE`, `QPAY_CALLBACK_URL` | existing TORE QPay configuration (none is set in production today). The callback stays `/api/billing/qpay/callback`. |
+| `TORE_SPELL_V1=1` | purchases are refused (404) while Spell is disabled, so no money moves when the licence could not be issued. |
+
+Security properties (tested): the browser sends only a plan code; price/duration/product are server-resolved; payment is verified with QPay `payment/check` against the invoice's server-set amount; licence issuance is idempotent per invoice (UNIQUE index), so repeated or concurrent callbacks never create a second licence; a failed fulfilment is retried by the next callback / status poll / account-page visit; licences, purchase status, code reveal and download are owner-only.
+
 ## Key split (must never be crossed)
 | | Server (Vercel production env) | Desktop installer |
 |---|---|---|

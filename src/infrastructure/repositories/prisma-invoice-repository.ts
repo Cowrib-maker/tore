@@ -46,6 +46,7 @@ function mapInvoice(record: {
   subscriptionId: string | null;
   bookingId: string | null;
   planCode: string | null;
+  spellPlanCode: string | null;
   amountMnt: number;
   currency: string;
   provider: string;
@@ -69,6 +70,7 @@ function mapInvoice(record: {
     subscriptionId: record.subscriptionId,
     bookingId: record.bookingId,
     planCode: record.planCode as Invoice["planCode"],
+    spellPlanCode: record.spellPlanCode as Invoice["spellPlanCode"],
     amountMnt: record.amountMnt,
     currency: record.currency,
     provider: record.provider,
@@ -100,6 +102,7 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
           subscriptionId: input.subscriptionId ?? null,
           bookingId: input.bookingId ?? null,
           planCode: input.planCode ?? null,
+          spellPlanCode: input.spellPlanCode ?? null,
           amountMnt: input.amountMnt,
           currency: input.currency,
           provider: input.provider,

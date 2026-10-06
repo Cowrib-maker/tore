@@ -37,3 +37,6 @@ li.issue .w { font-weight:600; } li.issue .m { color:var(--mut); font-size:13px;
 .actions { display:flex; gap:6px; flex-wrap:wrap; }
 .notice { border:1px solid var(--line); border-left:4px solid var(--unk); padding:8px 12px; border-radius:6px; margin:8px 0; background:var(--unkbg); color:var(--fg); }
 #err { color:var(--bad); } .note { color:var(--mut); font-size:13px; }
+
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.notice.ok { border-left-color:var(--ok); background:transparent; color:var(--ok); font-weight:600; }

@@ -12,6 +12,7 @@ import {
 
 import { LandingFooter } from "@/components/marketing/landing-footer";
 import { LandingNav, type LandingAuthUser } from "@/components/marketing/landing-nav";
+import { SpellPurchase, type SpellPlanOption } from "@/components/marketing/spell-purchase";
 import { LandingReveal } from "@/components/marketing/landing-reveal";
 import {
   LandingEyebrow,
@@ -35,10 +36,15 @@ export function SpellLanding({
   dict,
   locale,
   authUser,
+  plans,
+  purchaseAvailable,
 }: {
   dict: Dictionary;
   locale: Locale;
   authUser?: LandingAuthUser | null;
+  plans: SpellPlanOption[];
+  /** Spell enabled and QPay configured on the server. */
+  purchaseAvailable: boolean;
 }) {
   const t = dict.spell;
 
@@ -65,7 +71,7 @@ export function SpellLanding({
                 {t.hero.support}
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a href="#beta" className={PRIMARY_CTA}>
+                <a href="#pricing" className={PRIMARY_CTA}>
                   {t.hero.primaryCta}
                   <ArrowRight className="size-4" />
                 </a>
@@ -226,24 +232,15 @@ export function SpellLanding({
           </div>
         </LandingSection>
 
-        {/* Pricing (no invented prices) */}
+        {/* Licence + purchase (prices come from server configuration only) */}
         <LandingSection id="pricing" muted>
           <LandingReveal className="mx-auto max-w-2xl text-center">
             <LandingEyebrow>{t.pricing.eyebrow}</LandingEyebrow>
             <LandingHeading>{t.pricing.title}</LandingHeading>
             <LandingLead className="mx-auto">{t.pricing.description}</LandingLead>
-            <ul className="mt-6 flex flex-wrap items-center justify-center gap-2">
-              {t.pricing.durations.map((d) => (
-                <li
-                  key={d}
-                  className="rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-semibold text-slate-700"
-                >
-                  {d}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-4 text-sm text-slate-500">{t.pricing.note}</p>
           </LandingReveal>
+          <SpellPurchase plans={plans} loggedIn={Boolean(authUser)} available={purchaseAvailable} copy={t.pricing} />
+          <p className="mt-6 text-center text-sm text-slate-500">{t.pricing.note}</p>
         </LandingSection>
       </main>
       <LandingFooter dict={dict} authUser={authUser} />
