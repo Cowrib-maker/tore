@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:;">
+<title>TORE Spell Бета</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>TORE Spell <span class="beta">Бета</span></h1>
+  <span id="lic-badge" class="badge">…</span>
+  <span id="net-badge" class="badge" hidden></span>
+</header>
+<p class="positioning">Монгол хэлний зөв бичих алдааг шалгах, засварлахад зориулсан бета хувилбар. Тодорхойгүй үгийг автоматаар засахгүй.</p>
+
+<section id="lock" hidden>
+  <h2>Лиценз идэвхжүүлэх</h2>
+  <p id="lock-msg"></p>
+  <form id="act-form">
+    <label for="code">Лиценз код</label>
+    <input id="code" autocomplete="off" spellcheck="false" placeholder="TORE-XXXX-XXXX-XXXX-XXXX">
+    <button type="submit">Идэвхжүүлэх</button>
+  </form>
+  <div id="transfer" class="notice" hidden>
+    <h3>Компьютер шилжүүлэх</h3>
+    <p id="transfer-warning"></p>
+    <button id="transfer-yes">Шилжүүлэх</button> <button id="transfer-no" class="ghost">Болих</button>
+  </div>
+  <button id="validate-lock" class="ghost" hidden>Эрх шалгах</button>
+  <p id="err" role="alert"></p>
+</section>
+
+<main id="app" hidden>
+  <div class="bar">
+    <button id="check">Шалгах</button>
+    <label class="inline"><input type="checkbox" id="unknown"> Тодорхойгүй үгсийг харуулах</label>
+    <span id="stats" aria-live="polite"></span>
+    <span class="grow"></span>
+    <button id="validate" class="ghost">Эрх шалгах</button>
+    <button id="deactivate" class="ghost">Энэ компьютерээс чөлөөлөх</button>
+  </div>
+  <div id="offline-note" class="notice" hidden></div>
+  <div class="cols">
+    <div class="editor">
+      <div id="backdrop" aria-hidden="true"></div>
+      <textarea id="text" spellcheck="false" placeholder="Текстээ энд оруулна уу…"></textarea>
+    </div>
+    <aside>
+      <h3>Санал <span id="count"></span></h3>
+      <ul id="issues"></ul>
+      <h3>Миний толь</h3>
+      <ul id="dict"></ul>
+      <h3>Алдаа мэдээлэх</h3>
+      <p class="note">Зөвхөн нэг үг болон шалгалтын үр дүн таны компьютерт хадгалагдана. Автоматаар илгээгдэхгүй; файлыг өөрөө экспортолж илгээнэ.</p>
+      <div class="fb">
+        <input id="fb-word" type="text" placeholder="Илрээгүй алдаатай үг" maxlength="40">
+        <button id="fb-missed" class="sm ghost">Алдаа илрээгүй</button>
+      </div>
+      <button id="fb-export" class="sm ghost">Мэдээлэл экспортлох <span id="fb-count"></span></button>
+      <span id="fb-msg" class="note"></span>
+    </aside>
+  </div>
+  <p class="note">Таны текст компьютерээс гадагш гарахгүй. Лицензийн шалгалтад зөвхөн лиценз болон компьютерийн мэдээлэл дамжина.</p>
+</main>
+<script src="renderer.js"></script>
+</body>
+</html>

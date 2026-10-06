@@ -1,0 +1,50 @@
+{
+  "name": "tore-spell-desktop",
+  "productName": "TORE Spell",
+  "version": "0.1.0-rc.1",
+  "private": true,
+  "description": "TORE Spell — offline Mongolian spelling checker (Windows desktop)",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "npm run build && electron .",
+    "build:release": "node build.mjs --release",
+    "dist:win": "node build.mjs --release && electron-builder --win nsis --x64"
+  },
+  "devDependencies": {
+    "electron": "^44.5.1",
+    "electron-builder": "^26.0.0",
+    "esbuild": "^0.25.0"
+  },
+  "build": {
+    "appId": "mn.tore.spell",
+    "productName": "TORE Spell",
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "TORE-Spell-Beta-Setup-${version}.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "shortcutName": "TORE Spell Beta"
+    },
+    "publish": null
+  },
+  "author": "TORE"
+}

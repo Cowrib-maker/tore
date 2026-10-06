@@ -1,0 +1,121 @@
+name: spell-desktop-windows
+
+# TORE Spell BETA — native Windows build, install, launch, uninstall.
+#
+# The installer is UNSIGNED (no code-signing certificate yet): Windows
+# SmartScreen will warn. Controlled-beta distribution only. When a
+# certificate exists, add CSC_LINK / CSC_KEY_PASSWORD secrets; electron-builder
+# signs automatically and nothing else here changes.
+#
+# What this job proves:  build · installer size/hash · silent install ·
+#   launch of the INSTALLED app (--selftest: engine, personal dictionary,
+#   DPAPI secret storage, Mongolian UI render) · silent uninstall.
+# What it does NOT prove: activation against the live server, interactive UI,
+#   IME input. Those are the manual QA checklist in docs/spell/WINDOWS_QA.md.
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["spell-v*"]
+  pull_request:
+    paths:
+      - "desktop/**"
+      - "src/spell-engine/**"
+      - ".github/workflows/spell-desktop-windows.yml"
+
+concurrency:
+  group: spell-desktop-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    env:
+      # `npm ci` runs `prisma generate` (postinstall); it needs a URL string, never connects.
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tore?schema=public
+      TORE_SPELL_ENV: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            desktop/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install desktop dependencies
+        run: npm ci
+        working-directory: desktop
+
+      - name: Spell + desktop tests
+        run: npx vitest run tests/unit/spell-desktop-client.test.ts tests/unit/spell-engine-v1.test.ts tests/unit/spell-engine-v1-benchmark-gate.test.ts tests/unit/spell-morphology-hardening.test.ts
+
+      - name: Build + package (NSIS, x64, production config)
+        run: npm run dist:win
+        working-directory: desktop
+
+      - name: Verify installer artifact
+        shell: pwsh
+        run: |
+          $f = Get-ChildItem desktop/release -Filter "TORE-Spell-Beta-Setup-*.exe" | Select-Object -First 1
+          if (-not $f) { throw "installer not found" }
+          $mb = [math]::Round($f.Length / 1MB, 1)
+          Write-Host "installer: $($f.Name) $mb MB"
+          if ($f.Length -lt 50MB) { throw "installer implausibly small ($mb MB)" }
+          $h = (Get-FileHash $f.FullName -Algorithm SHA256).Hash
+          "$h  $($f.Name)" | Out-File -Encoding ascii desktop/release/SHA256SUMS.txt
+          Write-Host "sha256: $h"
+          $sig = Get-AuthenticodeSignature $f.FullName
+          Write-Host "authenticode: $($sig.Status) (NotSigned is expected for the beta)"
+
+      - name: Silent install
+        shell: pwsh
+        run: |
+          $f = Get-ChildItem desktop/release -Filter "TORE-Spell-Beta-Setup-*.exe" | Select-Object -First 1
+          $dir = Join-Path $env:RUNNER_TEMP "tore-spell-install"
+          $p = Start-Process -FilePath $f.FullName -ArgumentList "/S", "/D=$dir" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "installer exit code $($p.ExitCode)" }
+          $exe = Get-ChildItem $dir -Filter "TORE Spell*.exe" -Recurse | Where-Object { $_.Name -notlike "Uninstall*" } | Select-Object -First 1
+          if (-not $exe) { throw "installed executable not found in $dir" }
+          "INSTALL_DIR=$dir" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+          "INSTALLED_EXE=$($exe.FullName)" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+
+      - name: Launch installed app (--selftest)
+        shell: pwsh
+        run: |
+          $out = Join-Path $env:RUNNER_TEMP "selftest.json"
+          $ud = Join-Path $env:RUNNER_TEMP "ud"
+          $p = Start-Process -FilePath $env:INSTALLED_EXE -ArgumentList "--selftest=$out", "--user-data-dir=$ud" -Wait -PassThru
+          if (Test-Path $out) { Get-Content $out | Write-Host; Copy-Item $out desktop/release/selftest-windows.json }
+          if ($p.ExitCode -ne 0) { throw "selftest exit code $($p.ExitCode)" }
+          $r = Get-Content $out | ConvertFrom-Json
+          if (-not $r.ok) { throw "selftest reported failure" }
+          $dpapi = $r.checks | Where-Object { $_.name -eq "os-secret-storage" }
+          if (-not $dpapi.ok) { throw "DPAPI secret storage unavailable on Windows" }
+
+      - name: Silent uninstall
+        shell: pwsh
+        run: |
+          $u = Get-ChildItem $env:INSTALL_DIR -Filter "Uninstall*.exe" -Recurse | Select-Object -First 1
+          if (-not $u) { throw "uninstaller not found" }
+          $p = Start-Process -FilePath $u.FullName -ArgumentList "/S" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "uninstaller exit code $($p.ExitCode)" }
+          # NSIS silent uninstall re-launches itself from %TEMP% and returns early: poll.
+          $deadline = (Get-Date).AddSeconds(90)
+          while ((Test-Path $env:INSTALLED_EXE) -and ((Get-Date) -lt $deadline)) { Start-Sleep -Seconds 2 }
+          if (Test-Path $env:INSTALLED_EXE) { throw "app executable still present after uninstall" }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tore-spell-beta-windows-unsigned
+          path: |
+            desktop/release/TORE-Spell-Beta-Setup-*.exe
+            desktop/release/SHA256SUMS.txt
+            desktop/release/selftest-windows.json
+          if-no-files-found: error
