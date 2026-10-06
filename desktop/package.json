@@ -9,7 +9,8 @@
     "build": "node build.mjs",
     "start": "npm run build && electron .",
     "build:release": "node build.mjs --release",
-    "dist:win": "node build.mjs --release && electron-builder --win nsis --x64"
+    "dist:win": "npm run typecheck && node build.mjs --release && electron-builder --win nsis --x64",
+    "typecheck": "tsc -p tsconfig.json"
   },
   "devDependencies": {
     "electron": "^44.5.1",

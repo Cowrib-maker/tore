@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "typecheck:desktop": "npm --prefix desktop run typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:spell-db": "vitest run --config vitest.db.config.ts",
