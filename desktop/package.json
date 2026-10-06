@@ -10,7 +10,8 @@
     "start": "npm run build && electron .",
     "build:release": "node build.mjs --release",
     "dist:win": "npm run typecheck && node build.mjs --release && electron-builder --win nsis --x64",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "verify:package": "node scripts/verify-package.mjs release/win-unpacked/resources/app.asar"
   },
   "devDependencies": {
     "electron": "^44.5.1",
@@ -36,7 +37,7 @@
           ]
         }
       ],
-      "artifactName": "TORE-Spell-Beta-Setup-${version}.exe"
+      "artifactName": "TORE-Spell-Setup.exe"
     },
     "nsis": {
       "oneClick": false,

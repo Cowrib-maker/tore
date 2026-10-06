@@ -53,22 +53,33 @@ jobs:
         run: npm ci
         working-directory: desktop
 
-      - name: Spell + desktop tests
-        run: npx vitest run tests/unit/spell-desktop-client.test.ts tests/unit/spell-engine-v1.test.ts tests/unit/spell-engine-v1-benchmark-gate.test.ts tests/unit/spell-morphology-hardening.test.ts
+      - name: Desktop typecheck (Electron code, desktop toolchain)
+        run: npm run typecheck
+        working-directory: desktop
+
+      - name: Desktop + Spell tests
+        run: npx vitest run tests/unit/spell-desktop-client.test.ts tests/unit/spell-beta-release-gate.test.ts tests/unit/spell-engine-v1.test.ts tests/unit/spell-engine-v1-benchmark-gate.test.ts tests/unit/spell-morphology-hardening.test.ts tests/unit/spell-purchase.test.ts
 
       - name: Build + package (NSIS, x64, production config)
         run: npm run dist:win
         working-directory: desktop
 
+      - name: Verify packaged app content (no secrets, production origin, pinned PUBLIC key)
+        run: npm run verify:package
+        working-directory: desktop
+
       - name: Verify installer artifact
         shell: pwsh
         run: |
-          $f = Get-ChildItem desktop/release -Filter "TORE-Spell-Beta-Setup-*.exe" | Select-Object -First 1
+          $f = Get-ChildItem desktop/release -Filter "TORE-Spell-Setup*.exe" | Select-Object -First 1
           if (-not $f) { throw "installer not found" }
           $mb = [math]::Round($f.Length / 1MB, 1)
           Write-Host "installer: $($f.Name) $mb MB"
           if ($f.Length -lt 50MB) { throw "installer implausibly small ($mb MB)" }
+          "INSTALLER_NAME=$($f.Name)" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+          "INSTALLER_BYTES=$($f.Length)" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
           $h = (Get-FileHash $f.FullName -Algorithm SHA256).Hash
+          "INSTALLER_SHA256=$h" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
           "$h  $($f.Name)" | Out-File -Encoding ascii desktop/release/SHA256SUMS.txt
           Write-Host "sha256: $h"
           $sig = Get-AuthenticodeSignature $f.FullName
@@ -77,7 +88,7 @@ jobs:
       - name: Silent install
         shell: pwsh
         run: |
-          $f = Get-ChildItem desktop/release -Filter "TORE-Spell-Beta-Setup-*.exe" | Select-Object -First 1
+          $f = Get-ChildItem desktop/release -Filter "TORE-Spell-Setup*.exe" | Select-Object -First 1
           $dir = Join-Path $env:RUNNER_TEMP "tore-spell-install"
           $p = Start-Process -FilePath $f.FullName -ArgumentList "/S", "/D=$dir" -Wait -PassThru
           if ($p.ExitCode -ne 0) { throw "installer exit code $($p.ExitCode)" }
@@ -111,11 +122,19 @@ jobs:
           while ((Test-Path $env:INSTALLED_EXE) -and ((Get-Date) -lt $deadline)) { Start-Sleep -Seconds 2 }
           if (Test-Path $env:INSTALLED_EXE) { throw "app executable still present after uninstall" }
 
+      - name: Summary (installer, size, SHA-256, self-test)
+        if: always()
+        shell: pwsh
+        run: |
+          $lines = @("## TORE Spell Windows build", "", "- installer: ``$env:INSTALLER_NAME``", "- size: $env:INSTALLER_BYTES bytes", "- sha256: ``$env:INSTALLER_SHA256``", "- signed: no (beta)")
+          if (Test-Path desktop/release/selftest-windows.json) { $lines += "- selftest: ``" + ((Get-Content desktop/release/selftest-windows.json | ConvertFrom-Json).ok) + "``" }
+          $lines | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+
       - uses: actions/upload-artifact@v4
         with:
           name: tore-spell-beta-windows-unsigned
           path: |
-            desktop/release/TORE-Spell-Beta-Setup-*.exe
+            desktop/release/TORE-Spell-Setup*.exe
             desktop/release/SHA256SUMS.txt
             desktop/release/selftest-windows.json
           if-no-files-found: error

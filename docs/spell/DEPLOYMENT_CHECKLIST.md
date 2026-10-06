@@ -41,6 +41,12 @@ Flow: `/spell` → sign in → pick 1 / 3 / 6 / 12 months → QPay invoice (serv
 
 Security properties (tested): the browser sends only a plan code; price/duration/product are server-resolved; payment is verified with QPay `payment/check` against the invoice's server-set amount; licence issuance is idempotent per invoice (UNIQUE index), so repeated or concurrent callbacks never create a second licence; a failed fulfilment is retried by the next callback / status poll / account-page visit; licences, purchase status, code reveal and download are owner-only.
 
+## Windows installer: build, host, link
+* **Build:** `.github/workflows/spell-desktop-windows.yml` (windows-latest). A branch push alone does not run it. It runs on (a) a pull request touching `desktop/**` or `src/spell-engine/**`, (b) a pushed tag `spell-v*` (no merge needed), (c) manual dispatch once the file is on the default branch. Output artifact `tore-spell-beta-windows-unsigned` → `TORE-Spell-Setup.exe`, `SHA256SUMS.txt`, `selftest-windows.json`.
+* **What CI proves:** typecheck of the Electron code, desktop/Spell tests, NSIS build, **package content check** (no private key / vault / QPay / database strings, production origin and pinned *public* key present), installer size + SHA-256, silent install, `--selftest` of the INSTALLED app (exit 0), silent uninstall.
+* **Host:** a CI artifact is not a public download (it expires and needs GitHub login). Publish `TORE-Spell-Setup.exe` at a permanent **https** URL you control (e.g. object storage / CDN / a public release asset), verify its SHA-256 against `SHA256SUMS.txt`, then set `SPELL_WINDOWS_INSTALLER_URL` to it. Until that variable is set the account page says «Beta installer удахгүй» and `/api/spell/download` answers 404. **No URL is committed or invented.**
+* **Unsigned:** Windows SmartScreen will warn until a code-signing certificate exists (`CSC_LINK` / `CSC_KEY_PASSWORD` secrets are picked up automatically).
+
 ## Key split (must never be crossed)
 | | Server (Vercel production env) | Desktop installer |
 |---|---|---|
