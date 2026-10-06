@@ -1,4 +1,5 @@
 import type { Dictionary } from "@/i18n/types";
+import { spellMn } from "@/i18n/dictionaries/spell";
 import { marketplaceMn } from "@/i18n/dictionaries/marketplace/mn";
 
 /**
@@ -206,6 +207,7 @@ ctaStart: "Өмгөөлөгч хайх",
     footerRights: "Бүх эрх хуулиар хамгаалагдсан.",
     footerBuilt: "Монгол болон олон улсын үйлчлүүлэгчид · MN / EN / ZH / KO",
   },
+  spell: spellMn,
   publicHome: {
     brandLine: "LEGAL INTELLIGENCE FOR A STRONGER MONGOLIA",
     tagline: "Хуулийг ойлгож, шийдлийг бүтээ.",

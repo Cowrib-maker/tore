@@ -198,6 +198,7 @@ export type Dictionary = {
   };
   landing: HomepageLandingContent;
   publicHome: PublicHomeCopy;
+  spell: SpellCopy;
   auth: {
     loginTitle: string;
     loginDescription: string;
@@ -426,4 +427,40 @@ export type Dictionary = {
     personalMissing: string;
   };
   marketplace: MarketplaceDictionary;
+};
+
+/** TORE Spell: a separate commercial product, introduced (not hosted) by TORE.MN. */
+export type SpellCopy = {
+  /** Card shown next to the TORE.MN products on the home page. */
+  home: {
+    name: string;
+    tag: string;
+    audience: string;
+    description: string;
+    standalone: string;
+    cta: string;
+  };
+  meta: { title: string; description: string };
+  hero: {
+    eyebrow: string;
+    title: string;
+    support: string;
+    primaryCta: string;
+    secondaryCta: string;
+    betaNote: string;
+    mockCaption: string;
+    mockText: string;
+    mockWrong: string;
+    mockRight: string;
+    mockSuggestionLabel: string;
+    mockWrongLabel: string;
+    mockUnknownWord: string;
+    mockUnknownLabel: string;
+  };
+  relation: { title: string; statement: string; back: string };
+  features: { eyebrow: string; title: string; support: string; items: { title: string; description: string }[] };
+  roadmap: { eyebrow: string; title: string; support: string; items: { title: string; description: string }[] };
+  beta: { eyebrow: string; title: string; description: string; points: string[]; cta: string; ctaNote: string };
+  pricing: { eyebrow: string; title: string; description: string; durations: string[]; note: string };
+  honesty: { title: string; body: string };
 };
