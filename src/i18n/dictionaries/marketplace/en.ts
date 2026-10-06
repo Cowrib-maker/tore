@@ -7,7 +7,7 @@ export const marketplaceEn: MarketplaceDictionary = {
     submitting: "Submitting…",
     removing: "Removing…",
     updating: "Updating…",
-    utc: "UTC",
+    utc: "(Ulaanbaatar time, UTC+8)",
     yes: "Yes",
     no: "No",
     complete: "Complete",
@@ -422,7 +422,7 @@ export const marketplaceEn: MarketplaceDictionary = {
       "Weekly hours generate bookable slots. Exceptions block days or open one-off windows.",
     weeklyTitle: "Weekly schedule",
     weeklyHelp:
-      "Enter times as HH:mm. Slot generation uses a UTC reference clock; set your timezone on your profile for display context.",
+      "Enter times as HH:mm in UTC. Ulaanbaatar time is UTC+8 (e.g. 01:00 UTC = 09:00 Ulaanbaatar). Clients see slots in Ulaanbaatar time.",
     exceptionsTitle: "Exceptions",
     exceptionsHelp: "Holidays, leave, or additional open hours outside the weekly rule.",
   },

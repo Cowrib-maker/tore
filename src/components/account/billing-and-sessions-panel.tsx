@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/card";
 import { AccountSharingRiskState } from "@/domain/enums";
 import type { MarketplaceDictionary } from "@/i18n/marketplace-types";
-import { formatDateTimeUtc } from "@/lib/format-labels";
+import { formatDateTimeUlaanbaatar } from "@/lib/format-labels";
 import type { Locale } from "@/i18n/config";
 
 type SessionRow = {
@@ -290,7 +290,7 @@ export function BillingAndSessionsPanel({
                   <span className="text-muted-foreground">
                     {copy.expiresAtLabel}:{" "}
                   </span>
-                  {formatDateTimeUtc(new Date(data.expiresAt), locale)}
+                  {formatDateTimeUlaanbaatar(new Date(data.expiresAt), locale)}
                 </p>
               ) : null}
               <ul className="list-inside list-disc space-y-1">
@@ -513,7 +513,7 @@ export function BillingAndSessionsPanel({
               <p>{current.deviceLabel}</p>
               <p className="text-muted-foreground">
                 {copy.lastActive}:{" "}
-                {formatDateTimeUtc(new Date(current.lastSeenAt), locale)}
+                {formatDateTimeUlaanbaatar(new Date(current.lastSeenAt), locale)}
               </p>
             </div>
           ) : null}
@@ -555,7 +555,7 @@ export function BillingAndSessionsPanel({
                     <p>{session.deviceLabel}</p>
                     <p className="text-muted-foreground">
                       {copy.lastActive}:{" "}
-                      {formatDateTimeUtc(new Date(session.lastSeenAt), locale)}
+                      {formatDateTimeUlaanbaatar(new Date(session.lastSeenAt), locale)}
                     </p>
                   </div>
                   <Button

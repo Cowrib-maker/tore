@@ -31,12 +31,13 @@ const REQUEST_OVERHEAD_BYTES = 64 * 1024;
 /**
  * Own-photo upload. A route handler rather than a Server Action: Server
  * Actions are capped at 1 MB by default, which silently broke ordinary phone
- * photos. The actor comes from the session only — there is no user id in the
- * request, so a lawyer can never address another user's photo.
+ * photos. The actor comes from the session only. A LAWYER always edits their
+ * own photo (naming anyone else is 403); an ADMIN may name a lawyer account
+ * via `targetUserId`.
  */
 export async function POST(request: Request) {
   try {
-    const actor = await requireActor(UserRole.LAWYER);
+    const actor = await requireActor([UserRole.LAWYER, UserRole.ADMIN]);
 
     const rate = await consumeRateLimit(
       `profile:photo:${actor.userId}`,
@@ -59,8 +60,12 @@ export async function POST(request: Request) {
     }
 
     let file: FormDataEntryValue | null = null;
+    let target: string | undefined;
     try {
-      file = (await request.formData()).get("photo");
+      const form = await request.formData();
+      file = form.get("photo");
+      const t = form.get("targetUserId");
+      target = typeof t === "string" && t.trim() ? t.trim() : undefined;
     } catch {
       file = null;
     }
@@ -80,6 +85,7 @@ export async function POST(request: Request) {
       },
       { userRepository, auditLogRepository, fileStorage: getFileStorage() },
       await getClientIp(),
+      target,
     );
 
     revalidatePath("/lawyer/profile");

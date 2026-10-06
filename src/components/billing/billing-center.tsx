@@ -7,7 +7,7 @@ import { Check, Clock, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SOLO_PLAN } from "@/domain/constants/subscription-plans";
-import { formatDateTimeUtc } from "@/lib/format-labels";
+import { formatDateTimeUlaanbaatar } from "@/lib/format-labels";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 
@@ -301,7 +301,7 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
         ) : null}
         {expiresAt ? (
           <p className="mt-1 text-sm text-[#5C6570]">
-            Дуусах хугацаа: {formatDateTimeUtc(new Date(expiresAt), locale)}
+            Дуусах хугацаа: {formatDateTimeUlaanbaatar(new Date(expiresAt), locale)}
           </p>
         ) : null}
       </section>
@@ -493,7 +493,7 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
                     <td className="py-2.5 pr-3">{methodLabelMn(row.method)}</td>
                     <td className="py-2.5 pr-3">{statusLabelMn(row.status)}</td>
                     <td className="py-2.5 pr-3 text-[#7B8490]">
-                      {formatDateTimeUtc(new Date(row.createdAt), locale)}
+                      {formatDateTimeUlaanbaatar(new Date(row.createdAt), locale)}
                     </td>
                     <td className="py-2.5 font-mono text-[#7B8490]">{row.paymentCode ?? "—"}</td>
                   </tr>

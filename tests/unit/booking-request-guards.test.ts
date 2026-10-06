@@ -56,7 +56,8 @@ describe("booking-request guards", () => {
 
   beforeEach(() => {
     const bookingRepository = {
-      findOverlappingForLawyer: vi.fn().mockResolvedValue([]),
+      lockLawyerSchedule: vi.fn().mockResolvedValue(undefined),
+        findOverlappingForLawyer: vi.fn().mockResolvedValue([]),
       bookingNumberExists: vi.fn().mockResolvedValue(false),
       create: vi.fn(),
       recordStatusChange: vi.fn(),

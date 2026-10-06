@@ -28,6 +28,12 @@ export interface BookingRepository {
     from: Date,
     to: Date,
   ): Promise<Booking[]>;
+  /**
+   * Serialise concurrent schedule changes for one lawyer for the rest of the
+   * current transaction. Callers MUST invoke this before the overlap check;
+   * check-then-insert alone double-books under READ COMMITTED.
+   */
+  lockLawyerSchedule(lawyerProfileId: string): Promise<void>;
   findOverlappingForLawyer(
     lawyerProfileId: string,
     slot: InstantSlot,
