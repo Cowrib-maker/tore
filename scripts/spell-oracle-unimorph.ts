@@ -52,13 +52,13 @@ const mkLexicon = (verbFlags: Map<string, string[]>) =>
       layer: "GENERAL",
       language: "mn-Cyrl",
       coverage: "SEED",
-      provenance: { source: "UniMorph khk (in-memory)", license: "CC BY-SA 3.0", redistributable: false },
+      provenance: { source: "UniMorph khk (in-memory)", license: "CC BY-SA 3.0", redistributable: false, dataClass: "D_BENCHMARK_ONLY" },
       entries: [
         ...lemmasOf(true).map((w) => ({ w, pos: "N" }) as PackEntry),
         ...lemmasOf(false).map((w) => ({ w, pos: "V", flags: verbFlags.get(w) }) as PackEntry),
       ],
     } as never,
-  ]);
+  ], { allowResearchData: true });
 
 const verbFlags = new Map<string, string[]>();
 if (infer) {

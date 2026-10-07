@@ -1,10 +1,15 @@
 {
  "schema": "tore-spell-typos/1",
- "version": "2026.10.1",
+ "version": "2026.10.3",
  "provenance": {
   "source": "typo-pairs.tsv",
   "license": "TORE proprietary (original work)",
-  "redistributable": true
+  "redistributable": true,
+  "dataClass": "A_TORE_OWNED",
+  "sourceIds": [
+   "tore-core-seed"
+  ],
+  "reviewStatus": "PENDING_NATIVE_REVIEW"
  },
  "pairs": [
   {

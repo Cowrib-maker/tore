@@ -31,27 +31,45 @@ export class MemoryStore<T> implements DocumentStore<T> {
   }
 }
 
-/** Atomic JSON file store (write temp → rename). Corrupt files read as null. */
+/**
+ * Atomic JSON file store (write temp → rename) with a last-good backup.
+ * A corrupt main file falls back to `<file>.bak` (the previous good write), so
+ * a crash or a damaged disk sector never silently wipes the user's data; only
+ * when both are unreadable does `read` return null.
+ */
 export class FileStore<T> implements DocumentStore<T> {
   constructor(private readonly file: string) {}
-  read(): T | null {
+  private parse(file: string): T | null {
     try {
-      return JSON.parse(fs.readFileSync(this.file, "utf8")) as T;
+      return JSON.parse(fs.readFileSync(file, "utf8")) as T;
     } catch {
       return null;
     }
+  }
+  read(): T | null {
+    return this.parse(this.file) ?? this.parse(`${this.file}.bak`);
   }
   write(value: T): void {
     fs.mkdirSync(path.dirname(this.file), { recursive: true });
     const tmp = `${this.file}.${process.pid}.tmp`;
     fs.writeFileSync(tmp, JSON.stringify(value), { mode: 0o600 });
+    // Keep the previous GOOD file as the backup (never overwrite it with a corrupt one).
+    if (this.parse(this.file) !== null) {
+      try {
+        fs.copyFileSync(this.file, `${this.file}.bak`);
+      } catch {
+        /* backup is best effort; the atomic rename below is what matters */
+      }
+    }
     fs.renameSync(tmp, this.file);
   }
   clear(): void {
-    try {
-      fs.unlinkSync(this.file);
-    } catch {
-      /* already gone */
+    for (const f of [this.file, `${this.file}.bak`]) {
+      try {
+        fs.unlinkSync(f);
+      } catch {
+        /* already gone */
+      }
     }
   }
 }

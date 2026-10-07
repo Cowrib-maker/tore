@@ -108,6 +108,13 @@ export const NOUN_PLURAL: Record<StemClass, readonly Variant[]> = {
   SOFT: [], // soft stems use SOFT_I_* (the «и»-stem) instead
 };
 
+/**
+ * R-GEN-NMLZ-X (genitive nominalizer «-ынх / -ийнх»: «belonging to», «the people of»): хот → хотынх, хотынхон, багийнхан, хэвшлийнхэн;
+ * the «-х» then behaves as a consonant stem (оныхоос, үеийнхээс, бүтээлийнх, өөрсдийнхөө). The collective «-ан/-эн/-он/-өн» only follows
+ * this nominalizer. ~1% of the tokens of a news corpus; evidence: corpus attestation + second-opinion dictionary (41% of lexicon nouns carry it).
+ */
+export const NOUN_COLLECTIVE: readonly Variant[] = [v("ан", "эн"), v("он", "өн", { round: true })];
+
 /** CASE, by class of the stem it attaches to. */
 export const NOUN_CASE: Record<StemClass, readonly SuffixGroup[]> = {
   C: [
@@ -165,7 +172,9 @@ export const NOUN_CASE: Record<StemClass, readonly SuffixGroup[]> = {
     { tag: "PRIV", variants: [v("гүй", "гүй")] },
   ],
   V: [
-    { tag: "GEN", variants: [v("ны", "ний")] },
+    // R-GEN-LONG-GIIN: a stem ending in a LONG vowel also takes «гийн» (Болормаагийн, байгаагийн, хүүгийн, удаагийн).
+    // «ны/ний» remains valid for all vowel stems. Counter-example: a SHORT final vowel never takes «гийн» (хаалгагийн ✗, хаалганы ✓).
+    { tag: "GEN", variants: [v("ны", "ний"), v("гийн", "гийн", { when: "long-final" })] },
     { tag: "DAT", variants: [v("нд", "нд"), v("д", "д")] },
     { tag: "ACC", variants: [v("г", "г")] },
     { tag: "ABL", variants: [v("наас", "нээс"), v("ноос", "нөөс", { round: true }), v("гаас", "гээс")] },
@@ -240,6 +249,8 @@ export type VerbGroup = {
   consonantConfusion?: boolean;
   /** May be followed by noun case suffixes (verbal noun). */
   nominal?: boolean;
+  /** The participle's vowel drops before a vowel-initial case suffix (байдгийг, never байдагийг). */
+  elides?: boolean;
 };
 
 export const VERB_GROUPS: readonly VerbGroup[] = [
@@ -297,6 +308,21 @@ export const VERB_GROUPS: readonly VerbGroup[] = [
     afterC: strictly([v("саар", "сээр", { noRound: true }), v("соор", "сөөр", { round: true })]),
     afterV: strictly([v("саар", "сээр", { noRound: true }), v("соор", "сөөр", { round: true })]),
   },
+  {
+    // R-CVB-N: the «by doing / while doing» converb is the infinitive minus «х» plus «н»: ашиглах → ашиглан, оруулах → оруулан,
+    // эхлэх → эхлэн, дэмжих → дэмжин, холбох → холбон, бүтээх → бүтээн. Evidence: 100% of the 700+ lexicon verbs the second-opinion
+    // dictionary knows have the form accepted, in every stem class (scripts/spell-data, 2026-10-07). The linking vowel is the lemma's own («~»).
+    tag: "CVB_N",
+    afterC: [v("~н", "~н")],
+    afterV: [v("н", "н")],
+  },
+  {
+    // R-CVB-HDAA: «while doing»: the future participle «-х» + «дaa/дээ/доо/дөө» (хэлэхдээ, ажиллахдаа, авахдаа, хийхдээ). Productive: accepted by the
+    // second-opinion dictionary for ~80% of lexicon verbs; ~1,500 tokens (0.07%) of the news corpus.
+    tag: "CVB_HDAA",
+    afterC: lab("~хдаа", "~хдээ", "~хдоо", "~хдөө"),
+    afterV: lab("хдаа", "хдээ", "хдоо", "хдөө"),
+  },
   // ── participles ──
   {
     tag: "PTCP_PAST",
@@ -312,9 +338,12 @@ export const VERB_GROUPS: readonly VerbGroup[] = [
     afterV: lab("гаагүй", "гээгүй", "гоогүй", "гөөгүй", { when: "long-final" }),
   },
   {
+    // habitual participle; used as a noun: байдаггүй, байдгийг, хийдэгт (R-HAB-DAG-NOMINAL)
     tag: "HAB_DAG",
     afterC: lab("даг", "дэг", "дог", "дөг"),
     afterV: lab("даг", "дэг", "дог", "дөг"),
+    nominal: true,
+    elides: true,
   },
 
   // ── finite forms ──

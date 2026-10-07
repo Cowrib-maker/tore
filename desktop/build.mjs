@@ -45,7 +45,7 @@ const common = {
     __TORE_API_BASE__: JSON.stringify(apiBase ?? ""),
     __TORE_PINNED_JWKS__: JSON.stringify(pinned),
   },
-  bundle: true, platform: "node", target: "node22", sourcemap: false, external: ["electron"], logLevel: "info", loader: { ".json": "json" },
+  bundle: true, platform: "node", target: "node22", sourcemap: false, external: envName === "development" ? ["electron", "hunspell-asm"] : ["electron"], logLevel: "info", loader: { ".json": "json" },
 };
 await build({ ...common, entryPoints: ["app/main.ts"], outfile: "dist/main.js" });
 await build({ ...common, entryPoints: ["app/preload.ts"], outfile: "dist/preload.js" });

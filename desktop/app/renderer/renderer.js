@@ -92,20 +92,22 @@ $("deactivate").addEventListener("click", async () => {
 // ── checking ────────────────────────────────────────────────────────────────
 async function runCheck() {
   const text = $("text").value;
-  const r = await api.check(text, $("unknown").checked);
+  const r = await api.check(text, $("unknown").checked, $("advisory") ? $("advisory").checked : false);
   if (!r.ok) { $("stats").textContent = r.message; return; }
   if (r.value.locked) return refresh();
   issues = r.value.issues;
   versions = { engineVersion: r.value.engineVersion, dataPackVersion: r.value.dataPackVersion };
   const bad = issues.filter((i) => i.verdict === "MISSPELLED").length;
-  const unk = issues.length - bad;
-  $("stats").textContent = `${r.value.stats.words} үг · Алдаатай: ${bad}` + ($("unknown").checked ? ` · Тодорхойгүй: ${unk}` : "");
+  const unk = issues.filter((i) => i.verdict === "UNKNOWN").length;
+  const adv = issues.filter((i) => i.verdict === "ADVISORY").length;
+  $("stats").textContent = `${r.value.stats.words} үг · Алдаатай: ${bad}` + ($("unknown").checked ? ` · Тодорхойгүй: ${unk}` : "") + ($("advisory") && $("advisory").checked ? ` · Зөвлөмж: ${adv}` : "");
   $("count").textContent = issues.length ? `(${issues.length})` : "";
   paintBackdrop(text);
   render();
 }
 $("check").addEventListener("click", runCheck);
 $("unknown").addEventListener("change", runCheck);
+if ($("advisory")) $("advisory").addEventListener("change", runCheck);
 $("text").addEventListener("input", () => {
   paintBackdrop($("text").value, true);
   clearTimeout(timer);
@@ -123,7 +125,7 @@ function paintBackdrop(text, stale) {
     if (i.range.start < pos) continue;
     bd.append(document.createTextNode(text.slice(pos, i.range.start)));
     const m = document.createElement("mark");
-    m.className = i.verdict === "MISSPELLED" ? "bad" : "unk";
+    m.className = i.verdict === "MISSPELLED" ? "bad" : i.verdict === "ADVISORY" ? "adv" : "unk";
     m.textContent = text.slice(i.range.start, i.range.end);
     bd.append(m);
     pos = i.range.end;
@@ -139,12 +141,14 @@ function render() {
   ul.textContent = "";
   issues.forEach((issue, idx) => {
     const bad = issue.verdict === "MISSPELLED";
+    const adv = issue.verdict === "ADVISORY";
+    const ambiguous = issue.suggestionStatus === "AMBIGUOUS";
     const li = document.createElement("li");
-    li.className = `issue ${bad ? "bad" : "unk"}`;
+    li.className = `issue ${bad ? "bad" : adv ? "adv" : "unk"}`;
     const head = document.createElement("div");
     const tag = document.createElement("span");
-    tag.className = `tag ${bad ? "bad" : "unk"}`;
-    tag.textContent = bad ? "Алдаатай" : "Тодорхойгүй";
+    tag.className = `tag ${bad ? "bad" : adv ? "adv" : "unk"}`;
+    tag.textContent = bad ? "Алдаатай" : adv ? "Зөвлөмж" : "Тодорхойгүй";
     const w = document.createElement("span");
     w.className = "w"; w.textContent = issue.token;
     head.append(tag, w);
@@ -157,21 +161,34 @@ function render() {
     }
     const actions = document.createElement("div");
     actions.className = "actions";
-    if (bad && issue.suggestions.length) {
+    if ((bad || adv) && issue.suggestions.length) {
       const sugs = document.createElement("div"); sugs.className = "sugs";
-      const lbl = document.createElement("span"); lbl.textContent = "Санал:"; sugs.append(lbl);
+      const lbl = document.createElement("span"); lbl.textContent = ambiguous ? "Тодорхойгүй — сонгоно уу:" : "Санал:"; sugs.append(lbl);
       issue.suggestions.forEach((s, k) => {
         const l = document.createElement("label");
-        const r = document.createElement("input"); r.type = "radio"; r.name = `s${idx}`; r.value = s; r.checked = k === 0;
-        l.append(r, document.createTextNode(s)); sugs.append(l);
+        // an ambiguous list claims no best: nothing is pre-selected, the user must choose
+        const r = document.createElement("input"); r.type = "radio"; r.name = `s${idx}`; r.value = s; r.checked = !ambiguous && k === 0;
+        l.append(r, document.createTextNode(s === "" ? "(устгах)" : s === " " ? "(нэг зай)" : s)); sugs.append(l);
       });
       li.append(sugs);
+      const pick = () => { const c = li.querySelector(`input[name="s${idx}"]:checked`); return c ? c.value : null; };
       actions.append(btn("Солих", async () => {
-        const chosen = li.querySelector(`input[name="s${idx}"]:checked`);
-        const rr = await api.replace($("text").value, issue, chosen ? chosen.value : issue.suggestions[0]);
+        const v = pick();
+        if (v === null) { $("stats").textContent = "Санал сонгоно уу."; return; }
+        const rr = await api.replace($("text").value, issue, v);
         if (!rr.ok) { $("stats").textContent = rr.message; return; }
         $("text").value = rr.value.text; runCheck();
       }, "sm"));
+      // Replace-all only for MISSPELLED words with ONE clearly best fix, and only when the word occurs more than once.
+      const same = issues.filter((x) => x.normalizedToken === issue.normalizedToken && x.verdict === "MISSPELLED" && x.suggestionStatus === "CONFIDENT");
+      if (bad && !ambiguous && same.length > 1) {
+        actions.append(btn(`Бүгдийг солих (${same.length})`, async () => {
+          const v = pick() ?? issue.suggestions[0];
+          const rr = await api.replaceAll($("text").value, same, v);
+          if (!rr.ok) { $("stats").textContent = rr.message; return; }
+          $("text").value = rr.value.text; runCheck();
+        }));
+      }
     }
     const report = async (kind) => {
       const r = await api.feedbackAdd({ kind, word: issue.token, verdict: issue.verdict, suggestion: issue.suggestions[0] || null, reasonCode: issue.reasonCode || null, ...versions });
@@ -190,7 +207,8 @@ function render() {
 }
 
 async function loadDict() {
-  const r = await api.words();
+  const q = ($("dict-q") && $("dict-q").value || "").trim();
+  const r = q ? await api.searchWords(q) : await api.words();
   const ul = $("dict"); ul.textContent = "";
   if (!r.ok) return;
   if (!r.value.length) { const li = document.createElement("li"); li.className = "note"; li.textContent = "Хоосон байна."; ul.append(li); return; }
@@ -200,6 +218,8 @@ async function loadDict() {
     ul.append(li);
   }
 }
+
+$("dict-q").addEventListener("input", () => loadDict());
 
 async function updateFeedbackCount() {
   const r = await api.feedbackCount();

@@ -1,7 +1,7 @@
 {
  "schema": "tore-spell-pack/1",
  "id": "tore-corpus-forms",
- "version": "2026.10.1",
+ "version": "2026.10.3",
  "layer": "GENERAL",
  "language": "mn-Cyrl",
  "coverage": "SEED",
@@ -9,6427 +9,7262 @@
   "source": "corpus-forms.tsv (TORE-authored UI copy, messages, curriculum)",
   "license": "TORE proprietary (original work)",
   "redistributable": true,
+  "dataClass": "A_TORE_OWNED",
+  "tier": "PROVISIONAL",
+  "sourceIds": [
+   "tore-ui-corpus-forms"
+  ],
+  "reviewStatus": "PENDING_NATIVE_REVIEW",
   "notes": "Surface forms only (no paradigm), attested in TORE-authored text; frequency is evidence, not truth. SEED: absence proves nothing."
  },
  "entries": [
-  {
-   "w": "аар",
-   "pos": "X",
-   "flags": [
-    "form"
-   ]
-  },
-  {
-   "w": "аас",
-   "pos": "X",
-   "flags": [
-    "form"
-   ]
-  },
   {
    "w": "автомат",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "автоматаар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "агуулга",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "агуулгаар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "агуулгыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "агуулгын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "агуулж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "админ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ажиллуулах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "акт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "актад",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "актыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "актын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "албадна",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "алга",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "алгасах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "алдаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "алдааг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "алдааны",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "алдагдсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "алдсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "алхам",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "алхмыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "аль",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "амжилтгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "амжилттай",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "анхаарах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "анхдагч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "апп",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "аргачлал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "аргачлалаар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "аргачлалд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "аргачлалыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "аргумент",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "асрамж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ачаалал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ачаалж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ачаална",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ашгийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ашиг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ашигла",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ашиглагдана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ашиглаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ашиглана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ашиглах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ашиглахгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ашиглахын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "аюулгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "байгуулагч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "байгуулах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "байсныг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "байцаалт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бараа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "барааны",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баримтална",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баримтгүйгээр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "барих",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "барсны",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баруун",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баталгаагүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баталгаажаагүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баталгаажлаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баталгаажсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баталгаажуулаагүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баталгаажуулалтыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баталгаажуулалтын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баталгаажуулах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баталгаажуулж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баталгаажуулна",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баталгаажуулсны",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "баталгаатай",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "батлагдсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бие",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "биелүүлэхгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "биелэгдсэнгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бий",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бичвэр",
    "pos": "X",
    "flags": [
     "form"
-   ]
-  },
-  {
-   "w": "бичгэн",
-   "pos": "X",
-   "flags": [
-    "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бичлэг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "биш",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "богино",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "богинохон",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бодит",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бодитоор",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "болгож",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "болгоно",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "болгосон",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "болгох",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "болзошгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "боловсруул",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "боловсруулах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "боловсруулж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "боломж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "боломжгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "боломжийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "боломжит",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "боломжтой",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "боломжууд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "буй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бус",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бусад",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бусдын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "буцаагдсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "буцааж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "буцаан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "буцаах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүлийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүлэг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүрдсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүрдэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүрдээ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүрдээгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүрийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүрийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүрт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүртгүүлнэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүртгүүлэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүртгэгдсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүртгэгдээгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүртгэж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүртгэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүртгэлийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүртгэлийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүртгэлээр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүртгэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүрэлдэхүүн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүрэлдэхүүнд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүрэлдэхүүний",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүрэлдэхүүнийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүрэлдэхүүнтэй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүрэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүрээр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүтцийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүтцийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүтэц",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүтэцтэй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүтээ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бүхэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бэлтгэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бэлтгэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бэлтгэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "бэлэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гааль",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гадаад",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гадаадын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гадагш",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гарга",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гаргаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гаргана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гаргасан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гаргах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гаргахгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гаргахыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гарч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гарын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гол",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гомдлын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гомдол",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гуравдагч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гурван",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гүйлгэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гүйлгээ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гүйцэтгэгч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гүйцэтгэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гүйцэтгэсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гэдгийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гэдэг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гэмтэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гэрлэлт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "гээд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "даалгаврыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "даалгах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "давтан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дагавар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дагаврыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дагуу",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дамжуулан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дансаар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дараалал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дарааллыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дараалуулна",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дарж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дарна",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дахин",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дахь",
    "pos": "X",
    "flags": [
     "form"
-   ]
-  },
-  {
-   "w": "дискрец",
-   "pos": "X",
-   "flags": [
-    "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "доор",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дор",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дотоод",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дотор",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дөрвөн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дурд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дурдаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дурдсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дутуу",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дутууг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дуусгавар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дуусгаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дуусгана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дуусгах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дүгээр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дүн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дүнг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дүнгээс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дүрмийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дэвсгэрийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дэд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дэлгэц",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дэмжинэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дэмжих",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дэмжихгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "дээр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ерөнхий",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ёсны",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ёсоор",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ёстой",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "жагсаалт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "жагсаалтад",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "жишиг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "жолооны",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "журам",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "журмыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "журмын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "заавал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "заавар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зааврыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "заадаг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "завдлага",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "загвар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "задал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "задлана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "задрал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зайлшгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "залгамжлал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зарим",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зарчим",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "засварлах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "захиалах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "захиалгад",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "захиалгын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "захирах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зогсоо",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зорилго",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зорилгоос",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зорилтот",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зориулагдсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зориулалттай",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зориулсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зохио",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зохиож",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зохиомол",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зохион",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зохионо",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зохистой",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зохицуулалт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зохицуулалттай",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зохицуулалтыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөвлөгөө",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөвлөгөөг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөвлөгөөний",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөвлөмж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөвлөх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөвхөн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөвшөөрлийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөвшөөрөгдлөө",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөвшөөрөгдөх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөвшөөрөгдсөн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөвшөөрөл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөрч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөрчигдсөн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөрчигдсөнийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөрчих",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зөрчсөн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зүйлс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "зэрэг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "идэвхгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "идэвхжинэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "идэвхжсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "идэвхжүүлнэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "идэвхжүүлэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "идэвхтэй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ижил",
    "pos": "X",
    "flags": [
     "form"
-   ]
-  },
-  {
-   "w": "ийг",
-   "pos": "X",
-   "flags": [
-    "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ийм",
    "pos": "X",
    "flags": [
     "form"
-   ]
-  },
-  {
-   "w": "ийн",
-   "pos": "X",
-   "flags": [
-    "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "илгээгдлээ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "илгээгдэхгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "илрүүлсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "илт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "илүү",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "илэрсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "илэрхий",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "имэйл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "индекслэнэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "интеграц",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "итгэмжлэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "итгэмжлэлийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ихдээ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ихэвчлэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ишлэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ишлэлийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ишлэнэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "кейс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "код",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "кодоор",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "кодыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "кодын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "контекст",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "корпус",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "лавлагаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "лавлах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "лавлахаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "лавлахад",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "латин",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "лиценз",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "лицензийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "лицензтэй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "лог",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "логик",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "локал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "массив",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "материал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "материаллаг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "машин",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мессеж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "метадата",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мөнгөн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мөр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мөрийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мэдлэг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мэдлэгийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мэдрэмж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мэдрэмжээр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мэдэгдэж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мэдэгдэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мэдэгдэнэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мэдэгдэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мэйл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мэйлээ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мэргэжилтэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мэргэжлийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мэргэшсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "мэт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "найдвартай",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нарийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нийтийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нийтлээд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нийтэд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нийцсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нийцэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ноорог",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нотолгоо",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нотолгооны",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нөгөө",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нөгөөгийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нөөц",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нөхөж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нөхөөд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нөхөхгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нуух",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нүүр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нэвтэрч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нэгдсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нэгтгэж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нэгтгэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нэмэгдэнэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нэмэлт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нэр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нэрийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нэршил",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нэхэмжилсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нэхэмжлэгчийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нээлттэй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нягтал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нягталж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нягтална",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нягталсны",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "нягтлах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "объектив",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "овог",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "огноо",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "одоогоор",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ойлголтоос",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ойлголтын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ойлгомжтой",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ойн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ойролцоо",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "олгогч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "олгоно",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "олгосон",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "олгохгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "олдоогүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "олдсонгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "олон",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "онлайн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "онол",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "онолын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "оноогоод",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "онооно",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "оноох",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "орж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "орлохгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "оролдоно",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "оролдоод",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "оролдох",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "оролцоо",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "оролцоог",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "орох",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "орсон",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "оруул",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "оруулаагүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "оруулалт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "оруулах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "оруулна",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "орхисон",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "орчин",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "орчинд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "осол",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "осолд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "очих",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "өгөгдлөөс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "өгөгдөл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "өгөгдсөн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "өмгөөлөгчдийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "өөр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "өөрийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "өөрийнхөөрөө",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "өөрөө",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "өөрчилсөн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "өөрчлөлт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "өөрчлөх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "өрөө",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "патент",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "платформ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "платформд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "платформыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "практик",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "профайл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "профайлаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "процедур",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "процесс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "руу",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "рүү",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "саад",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "салбар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "салбарын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "салгаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "салгана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "самбар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "санаанаасаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "санамж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сесс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сессийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
-  },
-  {
-   "w": "сессэд",
-   "pos": "X",
-   "flags": [
-    "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "скан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "солих",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "солонгос",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сонголт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сонирхол",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сонсгол",
    "pos": "X",
    "flags": [
     "form"
-   ]
-  },
-  {
-   "w": "статемент",
-   "pos": "X",
-   "flags": [
-    "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "субъектив",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "судалгаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "судалгаагаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "судалж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "судлах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сунгана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сурвалж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сурвалжаас",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сурвалжид",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сурвалжийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сурвалжийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сурвалжтай",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "суртахууны",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "суурийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "суурийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "суурилсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "суурь",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сууц",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сэжигтэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сэргээх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "сэтгэгдэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тааж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "таамаг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "таамаглаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "таамаглал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "таамаглалаас",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "таамагласан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "таамгаар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тааруулж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тайлбарла",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тайлбарлан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тайлбарлана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тайлбарлах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тайлбарлахгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "талаар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "талбар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "талбарын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "талд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "талууд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "талыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "талын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тамга",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "таныг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "татгалзагдлаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "татгалзал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "татгалзах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "текст",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "текстээс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тест",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тийм",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "товч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тогтворгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тогтмол",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тогтоогдоогүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тогтооно",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тогтоох",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тод",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тодорхой",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тодорхойгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тодорхойл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тодорхойлж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тодорхойлно",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тодорхойлолт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тодорхойлох",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тодруул",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тодруулаад",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тодруулах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тодруулга",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тодруулж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тодруулна",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "томъёо",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "томьёо",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "томьёогоор",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тоо",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тоомсорлож",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тоомсорлоно",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тооцоолно",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тооцох",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тохиолдлын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тохиолдол",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тохиолдолд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тохиолдсон",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тохиргоо",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тохирох",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тохирсон",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тохируулагдаагүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "төв",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "төвлөрүүл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "төгрөгийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "төгсгөлд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "төгссөн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "төдий",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "төлөгдөөгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "төлөөлөл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "төлөөлөх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "төрөл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "төстэй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "төхөөрөмж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "төхөөрөмжийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "төхөөрөмжөөс",
    "pos": "X",
    "flags": [
     "form"
-   ]
-  },
-  {
-   "w": "трайс",
-   "pos": "X",
-   "flags": [
-    "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тул",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тулгаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тулгана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тулгарсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тулгах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тулгуурлан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тулгуурласан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тулд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "туршлага",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тус",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тусад",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тусдаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "туслагч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тусламж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тухайлсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тушаал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "түвшинд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "түвшний",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "түдгэлзүүлсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "түрээс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "түүн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "түүний",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "түүнээс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "түүхэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
-  },
-  {
-   "w": "тэй",
-   "pos": "X",
-   "flags": [
-    "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тэмдэг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тэмдэглэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тэмдэглэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тэмдэглэнэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тэмдэгт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тэмдэгтээс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "тэтгэлэг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "удаагийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "удахгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "удирдана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "уншигдах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "урсгал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "урт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "уршиг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "урьдчилан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "урьдчилсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "устгах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ухаалаг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үгүйсгэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үед",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үеийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үзэмж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үйл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үйлдэхүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үйлчлүүлэгч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үйлчлүүлэгчид",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үйлчлэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үлдсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үлдэгдэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үлдэнэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үлдээнэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үлдээсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үндсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үндэслэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үндэслэлгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үндэслэлийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үндэслэлийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үндэслэлтэй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үндэслэлээр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үндэслэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үндэслэсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үнэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үнэлгээ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үнэлэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үнэмлэхийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үнэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үргэлжлүүлнэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үргэлжлүүлэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үсрэхгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үсэг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үүний",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үүнийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үүсгэж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үүсгэсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үүсгэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үүсгээгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үүсгээд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үүссэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "үүсээгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "фактийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "фирм",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "формат",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хаагдсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хавсаргаагүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хавсаргаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хавсаргана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хавсаргасан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хавсаргах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хавсаргахад",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хагалсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хадгалагдана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хадгалагдлаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хадгалагдсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хадгалж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хайлт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "халсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хамаарал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хамаарч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хамгаалагдсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хамгаалалт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хамгаалалтын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хамгийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хамт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хамтран",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хамтын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хангагдсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хангалтгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хангалттай",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хангана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хангасан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хангах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хандана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хараахан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "харагдаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "харагдана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "харагдахгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "харагдац",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "харилцаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "харилцааг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "харилцаанд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хариуцагч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "харуулах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "харуулахгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "харуулна",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "харьяалал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "харьяаллын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хатгагч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хатуу",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хаяг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хаягаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хаяж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хийгдсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хийгдээгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хийсвэр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хийсний",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хичээл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хоёуланг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "холбогдоно",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "холбогдоогүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "холбогдох",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "холбогдоход",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "холбогдсон",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "холбож",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "холбоно",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "холбоо",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "холбоогүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "холбооны",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "холбоос",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "холбоосоор",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хольж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хоногийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хооронд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хоорондын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хоосон",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хориглоно",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хориглосон",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хориотой",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хөгжүүлэгчийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хөдөлгүүрийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хөдөлмөрийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хөөн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хөрөнгөжих",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хуваарь",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хувилбар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хувилбарыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хулгай",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хурдасгах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хуудас",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хуудсанд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хуудсыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хуулагдлаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хуульч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хуульчтай",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хуурамч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хүрээ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хүсэлт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хүсэлтийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хүчингүйд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэв",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэвшлийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэвшлээр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэвээр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэдийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэдэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэзээ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэлбэр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэлбэрийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэлбэрийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэлбэрээр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэлхээс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэлцэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэлэлцэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэм",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэмнэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэрэгжээгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэрэглэгдэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэрэглэнэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэрэглэсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэрэглэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэрэглээний",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэтрэхгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэтэрлээ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хэтэрсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хязгаар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хязгаарлаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хязгаарт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хянагдаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хянана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хянах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "хянуулахаар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "цаашид",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "цагаатгаад",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "цалингаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "цоорхой",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "цуцалбал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "цуцалсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "цуцлалт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "цуцлах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "цэвэрлэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "цэгцлэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "цэгцэлж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "цэс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "цэц",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "цээжлэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "чадаагүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "чадаагүйгээ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "чадамж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "чадахгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "чадвар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "чадвартай",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "чадсангүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "чат",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "чиг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "чиглэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "чиглэсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "чирж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "чухал",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шаардаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шаардана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шаарддаг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шаардлага",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шаардлагагүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шаардлагатай",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шаардлагыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шаардлагын",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шаардсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шалгагдаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шалгагдана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шалгагч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шалгалт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шалгуур",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шалгуураар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шалтгаан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шалтгаант",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шалтгааныг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шат",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шатанд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шатлан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шатны",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шаттай",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шатыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шийдвэрлүүлэхийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шийдлийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шийднэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шийдэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шилжинэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шилжүүлнэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шилжүүлэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шилжүүлэхгүй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шинжилж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шинэчилсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шинэчлэгдлээ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шинэчлэгдсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шинэчлэгдэнэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шинэчлэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шууд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шуух",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шүүгдэгч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шүүлтүүр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "шүүлтүүрт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эвдэхийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эдгээр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "элемент",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "элементийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "элементүүд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "элементүүдийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "элементэд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "элементээр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "энгийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "энд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эндээс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "энэхүү",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эрсдэл",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эрсдэлт",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эрсдэлтэй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эрүү",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эрхлэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эсрэг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эсэргүүцэх",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эсэхийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "этгээд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "этгээдийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "этгээдийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "этгээдэд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эхийг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эхлүүлнэ",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эхлүүлсэн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эхлүүлээрэй",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эхний",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эхэлж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эхэнд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эхээр",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эхээс",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эцсийн",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "эцэст",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ээлжид",
    "pos": "X",
    "flags": [
     "form"
-   ]
-  },
-  {
-   "w": "ээс",
-   "pos": "X",
-   "flags": [
-    "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "юуг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "яаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "яах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "явуулахыг",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "явцад",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ялах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ялга",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ялгаа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ялгаад",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ялгаж",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ялгана",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ялгах",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "яллагдагч",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ялна",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ямар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "яриа",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "яриагаар",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ярианууд",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   },
   {
    "w": "ярилцсан",
    "pos": "X",
    "flags": [
     "form"
-   ]
+   ],
+   "conf": "HIGH"
   }
  ]
 }

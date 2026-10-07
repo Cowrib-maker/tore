@@ -1,0 +1,2121 @@
+{
+ "schema": "tore-spell-gold/1",
+ "datasetVersion": "spell-gold-v3.0",
+ "set": "C_LEGAL",
+ "provenanceDir": "model",
+ "note": "MODEL_ADJUDICATED candidates: authored and judged by the AI assistant. NOT native-reviewed; NOT gold.",
+ "items": [
+  {
+   "id": "C_LEGAL:01:талууд",
+   "token": "Талууд",
+   "sentence": "Талууд гэрээний үүргээ биелүүлээгүй тохиолдолд хохирлыг нөхөн төлөх үүрэгтэй.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:01:гэрээний",
+   "token": "гэрээний",
+   "sentence": "Талууд гэрээний үүргээ биелүүлээгүй тохиолдолд хохирлыг нөхөн төлөх үүрэгтэй.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:01:үүргээ",
+   "token": "үүргээ",
+   "sentence": "Талууд гэрээний үүргээ биелүүлээгүй тохиолдолд хохирлыг нөхөн төлөх үүрэгтэй.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:01:биелүүлээгүй",
+   "token": "биелүүлээгүй",
+   "sentence": "Талууд гэрээний үүргээ биелүүлээгүй тохиолдолд хохирлыг нөхөн төлөх үүрэгтэй.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:01:тохиолдолд",
+   "token": "тохиолдолд",
+   "sentence": "Талууд гэрээний үүргээ биелүүлээгүй тохиолдолд хохирлыг нөхөн төлөх үүрэгтэй.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:01:хохирлыг",
+   "token": "хохирлыг",
+   "sentence": "Талууд гэрээний үүргээ биелүүлээгүй тохиолдолд хохирлыг нөхөн төлөх үүрэгтэй.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:01:нөхөн",
+   "token": "нөхөн",
+   "sentence": "Талууд гэрээний үүргээ биелүүлээгүй тохиолдолд хохирлыг нөхөн төлөх үүрэгтэй.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:01:төлөх",
+   "token": "төлөх",
+   "sentence": "Талууд гэрээний үүргээ биелүүлээгүй тохиолдолд хохирлыг нөхөн төлөх үүрэгтэй.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:01:үүрэгтэй",
+   "token": "үүрэгтэй",
+   "sentence": "Талууд гэрээний үүргээ биелүүлээгүй тохиолдолд хохирлыг нөхөн төлөх үүрэгтэй.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:02:шүүх",
+   "token": "Шүүх",
+   "sentence": "Шүүх нотлох баримтыг үнэлж, хуульд заасны дагуу шийдвэр гаргана.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:02:нотлох",
+   "token": "нотлох",
+   "sentence": "Шүүх нотлох баримтыг үнэлж, хуульд заасны дагуу шийдвэр гаргана.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:02:баримтыг",
+   "token": "баримтыг",
+   "sentence": "Шүүх нотлох баримтыг үнэлж, хуульд заасны дагуу шийдвэр гаргана.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:02:үнэлж",
+   "token": "үнэлж",
+   "sentence": "Шүүх нотлох баримтыг үнэлж, хуульд заасны дагуу шийдвэр гаргана.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:02:хуульд",
+   "token": "хуульд",
+   "sentence": "Шүүх нотлох баримтыг үнэлж, хуульд заасны дагуу шийдвэр гаргана.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:02:заасны",
+   "token": "заасны",
+   "sentence": "Шүүх нотлох баримтыг үнэлж, хуульд заасны дагуу шийдвэр гаргана.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:02:дагуу",
+   "token": "дагуу",
+   "sentence": "Шүүх нотлох баримтыг үнэлж, хуульд заасны дагуу шийдвэр гаргана.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:02:шийдвэр",
+   "token": "шийдвэр",
+   "sentence": "Шүүх нотлох баримтыг үнэлж, хуульд заасны дагуу шийдвэр гаргана.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:02:гаргана",
+   "token": "гаргана",
+   "sentence": "Шүүх нотлох баримтыг үнэлж, хуульд заасны дагуу шийдвэр гаргана.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:03:нэхэмжлэгч",
+   "token": "Нэхэмжлэгч",
+   "sentence": "Нэхэмжлэгч хариуцагчийн эсрэг иргэний хэрэг үүсгүүлэх хүсэлт гаргасан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:03:хариуцагчийн",
+   "token": "хариуцагчийн",
+   "sentence": "Нэхэмжлэгч хариуцагчийн эсрэг иргэний хэрэг үүсгүүлэх хүсэлт гаргасан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:03:эсрэг",
+   "token": "эсрэг",
+   "sentence": "Нэхэмжлэгч хариуцагчийн эсрэг иргэний хэрэг үүсгүүлэх хүсэлт гаргасан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:03:иргэний",
+   "token": "иргэний",
+   "sentence": "Нэхэмжлэгч хариуцагчийн эсрэг иргэний хэрэг үүсгүүлэх хүсэлт гаргасан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:03:хэрэг",
+   "token": "хэрэг",
+   "sentence": "Нэхэмжлэгч хариуцагчийн эсрэг иргэний хэрэг үүсгүүлэх хүсэлт гаргасан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:03:үүсгүүлэх",
+   "token": "үүсгүүлэх",
+   "sentence": "Нэхэмжлэгч хариуцагчийн эсрэг иргэний хэрэг үүсгүүлэх хүсэлт гаргасан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:03:хүсэлт",
+   "token": "хүсэлт",
+   "sentence": "Нэхэмжлэгч хариуцагчийн эсрэг иргэний хэрэг үүсгүүлэх хүсэлт гаргасан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:03:гаргасан",
+   "token": "гаргасан",
+   "sentence": "Нэхэмжлэгч хариуцагчийн эсрэг иргэний хэрэг үүсгүүлэх хүсэлт гаргасан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:04:хуулийн",
+   "token": "Хуулийн",
+   "sentence": "Хуулийн этгээд өөрийн нэрийн өмнөөс эрх эдэлж, үүрэг хүлээнэ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:04:этгээд",
+   "token": "этгээд",
+   "sentence": "Хуулийн этгээд өөрийн нэрийн өмнөөс эрх эдэлж, үүрэг хүлээнэ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:04:өөрийн",
+   "token": "өөрийн",
+   "sentence": "Хуулийн этгээд өөрийн нэрийн өмнөөс эрх эдэлж, үүрэг хүлээнэ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:04:нэрийн",
+   "token": "нэрийн",
+   "sentence": "Хуулийн этгээд өөрийн нэрийн өмнөөс эрх эдэлж, үүрэг хүлээнэ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:04:өмнөөс",
+   "token": "өмнөөс",
+   "sentence": "Хуулийн этгээд өөрийн нэрийн өмнөөс эрх эдэлж, үүрэг хүлээнэ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:04:эрх",
+   "token": "эрх",
+   "sentence": "Хуулийн этгээд өөрийн нэрийн өмнөөс эрх эдэлж, үүрэг хүлээнэ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:04:эдэлж",
+   "token": "эдэлж",
+   "sentence": "Хуулийн этгээд өөрийн нэрийн өмнөөс эрх эдэлж, үүрэг хүлээнэ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:04:үүрэг",
+   "token": "үүрэг",
+   "sentence": "Хуулийн этгээд өөрийн нэрийн өмнөөс эрх эдэлж, үүрэг хүлээнэ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:04:хүлээнэ",
+   "token": "хүлээнэ",
+   "sentence": "Хуулийн этгээд өөрийн нэрийн өмнөөс эрх эдэлж, үүрэг хүлээнэ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:05:хэлэлцээрийн",
+   "token": "Хэлэлцээрийн",
+   "sentence": "Хэлэлцээрийн нууцыг задруулсан тал хариуцлага хүлээх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:05:нууцыг",
+   "token": "нууцыг",
+   "sentence": "Хэлэлцээрийн нууцыг задруулсан тал хариуцлага хүлээх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:05:задруулсан",
+   "token": "задруулсан",
+   "sentence": "Хэлэлцээрийн нууцыг задруулсан тал хариуцлага хүлээх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts C_LEGAL s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:05:тал",
+   "token": "тал",
+   "sentence": "Хэлэлцээрийн нууцыг задруулсан тал хариуцлага хүлээх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:05:хариуцлага",
+   "token": "хариуцлага",
+   "sentence": "Хэлэлцээрийн нууцыг задруулсан тал хариуцлага хүлээх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:05:хүлээх",
+   "token": "хүлээх",
+   "sentence": "Хэлэлцээрийн нууцыг задруулсан тал хариуцлага хүлээх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:05:болно",
+   "token": "болно",
+   "sentence": "Хэлэлцээрийн нууцыг задруулсан тал хариуцлага хүлээх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:06:гомдол",
+   "token": "Гомдол",
+   "sentence": "Гомдол гаргах хугацаа хэрэг шийдвэрлэсэн өдрөөс хойш тоологдоно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:06:гаргах",
+   "token": "гаргах",
+   "sentence": "Гомдол гаргах хугацаа хэрэг шийдвэрлэсэн өдрөөс хойш тоологдоно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:06:хугацаа",
+   "token": "хугацаа",
+   "sentence": "Гомдол гаргах хугацаа хэрэг шийдвэрлэсэн өдрөөс хойш тоологдоно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:06:хэрэг",
+   "token": "хэрэг",
+   "sentence": "Гомдол гаргах хугацаа хэрэг шийдвэрлэсэн өдрөөс хойш тоологдоно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:06:шийдвэрлэсэн",
+   "token": "шийдвэрлэсэн",
+   "sentence": "Гомдол гаргах хугацаа хэрэг шийдвэрлэсэн өдрөөс хойш тоологдоно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:06:өдрөөс",
+   "token": "өдрөөс",
+   "sentence": "Гомдол гаргах хугацаа хэрэг шийдвэрлэсэн өдрөөс хойш тоологдоно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:06:хойш",
+   "token": "хойш",
+   "sentence": "Гомдол гаргах хугацаа хэрэг шийдвэрлэсэн өдрөөс хойш тоологдоно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:06:тоологдоно",
+   "token": "тоологдоно",
+   "sentence": "Гомдол гаргах хугацаа хэрэг шийдвэрлэсэн өдрөөс хойш тоологдоно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts C_LEGAL s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:07:өмгөөлөгч",
+   "token": "Өмгөөлөгч",
+   "sentence": "Өмгөөлөгч үйлчлүүлэгчийнхээ эрх ашгийг хамгаалж, хуулийн зөвлөгөө өгнө.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:07:үйлчлүүлэгчийнхээ",
+   "token": "үйлчлүүлэгчийнхээ",
+   "sentence": "Өмгөөлөгч үйлчлүүлэгчийнхээ эрх ашгийг хамгаалж, хуулийн зөвлөгөө өгнө.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts C_LEGAL s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:07:эрх",
+   "token": "эрх",
+   "sentence": "Өмгөөлөгч үйлчлүүлэгчийнхээ эрх ашгийг хамгаалж, хуулийн зөвлөгөө өгнө.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:07:ашгийг",
+   "token": "ашгийг",
+   "sentence": "Өмгөөлөгч үйлчлүүлэгчийнхээ эрх ашгийг хамгаалж, хуулийн зөвлөгөө өгнө.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:07:хамгаалж",
+   "token": "хамгаалж",
+   "sentence": "Өмгөөлөгч үйлчлүүлэгчийнхээ эрх ашгийг хамгаалж, хуулийн зөвлөгөө өгнө.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:07:хуулийн",
+   "token": "хуулийн",
+   "sentence": "Өмгөөлөгч үйлчлүүлэгчийнхээ эрх ашгийг хамгаалж, хуулийн зөвлөгөө өгнө.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:07:зөвлөгөө",
+   "token": "зөвлөгөө",
+   "sentence": "Өмгөөлөгч үйлчлүүлэгчийнхээ эрх ашгийг хамгаалж, хуулийн зөвлөгөө өгнө.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:07:өгнө",
+   "token": "өгнө",
+   "sentence": "Өмгөөлөгч үйлчлүүлэгчийнхээ эрх ашгийг хамгаалж, хуулийн зөвлөгөө өгнө.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:08:тус",
+   "token": "Тус",
+   "sentence": "Тус гэрээ нь талуудын гарын үсэг зурсан өдрөөс эхлэн хүчин төгөлдөр болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:08:гэрээ",
+   "token": "гэрээ",
+   "sentence": "Тус гэрээ нь талуудын гарын үсэг зурсан өдрөөс эхлэн хүчин төгөлдөр болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:08:нь",
+   "token": "нь",
+   "sentence": "Тус гэрээ нь талуудын гарын үсэг зурсан өдрөөс эхлэн хүчин төгөлдөр болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:08:талуудын",
+   "token": "талуудын",
+   "sentence": "Тус гэрээ нь талуудын гарын үсэг зурсан өдрөөс эхлэн хүчин төгөлдөр болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:08:гарын",
+   "token": "гарын",
+   "sentence": "Тус гэрээ нь талуудын гарын үсэг зурсан өдрөөс эхлэн хүчин төгөлдөр болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:08:үсэг",
+   "token": "үсэг",
+   "sentence": "Тус гэрээ нь талуудын гарын үсэг зурсан өдрөөс эхлэн хүчин төгөлдөр болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:08:зурсан",
+   "token": "зурсан",
+   "sentence": "Тус гэрээ нь талуудын гарын үсэг зурсан өдрөөс эхлэн хүчин төгөлдөр болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:08:өдрөөс",
+   "token": "өдрөөс",
+   "sentence": "Тус гэрээ нь талуудын гарын үсэг зурсан өдрөөс эхлэн хүчин төгөлдөр болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:08:эхлэн",
+   "token": "эхлэн",
+   "sentence": "Тус гэрээ нь талуудын гарын үсэг зурсан өдрөөс эхлэн хүчин төгөлдөр болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:08:хүчин",
+   "token": "хүчин",
+   "sentence": "Тус гэрээ нь талуудын гарын үсэг зурсан өдрөөс эхлэн хүчин төгөлдөр болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:08:төгөлдөр",
+   "token": "төгөлдөр",
+   "sentence": "Тус гэрээ нь талуудын гарын үсэг зурсан өдрөөс эхлэн хүчин төгөлдөр болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:08:болно",
+   "token": "болно",
+   "sentence": "Тус гэрээ нь талуудын гарын үсэг зурсан өдрөөс эхлэн хүчин төгөлдөр болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:09:шийдвэрийг",
+   "token": "Шийдвэрийг",
+   "sentence": "Шийдвэрийг биелүүлээгүй бол албадан гүйцэтгэх ажиллагаа явуулна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s9",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:09:биелүүлээгүй",
+   "token": "биелүүлээгүй",
+   "sentence": "Шийдвэрийг биелүүлээгүй бол албадан гүйцэтгэх ажиллагаа явуулна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s9",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:09:бол",
+   "token": "бол",
+   "sentence": "Шийдвэрийг биелүүлээгүй бол албадан гүйцэтгэх ажиллагаа явуулна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s9",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:09:албадан",
+   "token": "албадан",
+   "sentence": "Шийдвэрийг биелүүлээгүй бол албадан гүйцэтгэх ажиллагаа явуулна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s9",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:09:гүйцэтгэх",
+   "token": "гүйцэтгэх",
+   "sentence": "Шийдвэрийг биелүүлээгүй бол албадан гүйцэтгэх ажиллагаа явуулна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s9",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:09:ажиллагаа",
+   "token": "ажиллагаа",
+   "sentence": "Шийдвэрийг биелүүлээгүй бол албадан гүйцэтгэх ажиллагаа явуулна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s9",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:09:явуулна",
+   "token": "явуулна",
+   "sentence": "Шийдвэрийг биелүүлээгүй бол албадан гүйцэтгэх ажиллагаа явуулна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s9",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:10:хууль",
+   "token": "Хууль",
+   "sentence": "Хууль зүйн дүгнэлтэд тусгагдсан санал нь заавал биелүүлэх хүчинтэй биш юм.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:10:зүйн",
+   "token": "зүйн",
+   "sentence": "Хууль зүйн дүгнэлтэд тусгагдсан санал нь заавал биелүүлэх хүчинтэй биш юм.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:10:дүгнэлтэд",
+   "token": "дүгнэлтэд",
+   "sentence": "Хууль зүйн дүгнэлтэд тусгагдсан санал нь заавал биелүүлэх хүчинтэй биш юм.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:10:тусгагдсан",
+   "token": "тусгагдсан",
+   "sentence": "Хууль зүйн дүгнэлтэд тусгагдсан санал нь заавал биелүүлэх хүчинтэй биш юм.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:10:санал",
+   "token": "санал",
+   "sentence": "Хууль зүйн дүгнэлтэд тусгагдсан санал нь заавал биелүүлэх хүчинтэй биш юм.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:10:нь",
+   "token": "нь",
+   "sentence": "Хууль зүйн дүгнэлтэд тусгагдсан санал нь заавал биелүүлэх хүчинтэй биш юм.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:10:заавал",
+   "token": "заавал",
+   "sentence": "Хууль зүйн дүгнэлтэд тусгагдсан санал нь заавал биелүүлэх хүчинтэй биш юм.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:10:биелүүлэх",
+   "token": "биелүүлэх",
+   "sentence": "Хууль зүйн дүгнэлтэд тусгагдсан санал нь заавал биелүүлэх хүчинтэй биш юм.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:10:хүчинтэй",
+   "token": "хүчинтэй",
+   "sentence": "Хууль зүйн дүгнэлтэд тусгагдсан санал нь заавал биелүүлэх хүчинтэй биш юм.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:10:биш",
+   "token": "биш",
+   "sentence": "Хууль зүйн дүгнэлтэд тусгагдсан санал нь заавал биелүүлэх хүчинтэй биш юм.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "C_LEGAL:10:юм",
+   "token": "юм",
+   "sentence": "Хууль зүйн дүгнэлтэд тусгагдсан санал нь заавал биелүүлэх хүчинтэй биш юм.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts C_LEGAL s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  }
+ ]
+}

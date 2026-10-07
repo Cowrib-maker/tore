@@ -27,7 +27,13 @@ describe("precision gates (bundled SEED packs)", () => {
   it("synthetic errors: suggestion precision ≥ 0.99 and top-3 = top-1 hits", () => {
     expect(report.synthetic.suggestionPrecision).toBeGreaterThanOrEqual(0.99);
     expect(report.synthetic.top3).toBeGreaterThanOrEqual(report.synthetic.top1);
-    expect(report.synthetic.detectionRate).toBeGreaterThan(0.25);
+    // Floor lowered 0.25 → 0.24 (2026-10-07) on purpose: R-DOUBLE-FINAL-LOAN-GUARD no longer accuses a double final л н м с т ф б п р з к
+    // (холл, хилл, тонн, билл are loanwords/names), trading ~1 point of detection for fewer false accusations.
+    expect(report.synthetic.detectionRate).toBeGreaterThan(0.24);
+  });
+  it("AI-drafted vocabulary: suggestion precision ≥ 0.99 too (recall has no floor there — only hand-curated words may ground accusations)", () => {
+    expect(report.syntheticDraft.suggestionPrecision).toBeGreaterThanOrEqual(0.99);
+    expect(report.syntheticDraft.injected).toBeGreaterThan(500);
   });
   it("legacy gold sets: no VALID/LEGAL/UNKNOWN/PROPER_NOUN/ABBREVIATION/REGRESSION case is flagged", () => {
     for (const cls of ["VALID", "LEGAL", "UNKNOWN", "PROPER_NOUN", "ABBREVIATION", "REGRESSION"]) {

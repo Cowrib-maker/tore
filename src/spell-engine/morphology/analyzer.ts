@@ -10,6 +10,7 @@ import {
 } from "./phonology";
 import {
   NOUN_CASE,
+  NOUN_COLLECTIVE,
   NOUN_PLURAL,
   REFLEXIVE_AFTER_CONSONANT,
   REFLEXIVE_AFTER_GENITIVE,
@@ -61,6 +62,8 @@ export type MorphParse = {
 export type ViolationKind = "HARMONY" | "CONSONANT_CONFUSION" | "STEM_VOWEL";
 
 export type MorphViolation = {
+  /** Harmony gender of the stem the suffix attached to (the analyzer's own reading, incl. verb linking vowels). */
+  stemGender: "M" | "F" | "MIXED";
   lemma: string;
   entry: LexiconEntry;
   kind: ViolationKind;
@@ -97,7 +100,20 @@ type Ctx = {
   stem: string;
 };
 
+/**
+ * Lexical harmony override: harmony:M / harmony:F force a gender; «loan» marks a
+ * loanword whose suffix vowels speakers do not agree on (клуб → клубаас / клубээс):
+ * both are accepted and neither is ever accused.
+ */
+function forcedHarmony(flags: ReadonlySet<string>): Gender | "MIXED" | undefined {
+  if (flags.has("loan")) return "MIXED";
+  if (flags.has("harmony:M")) return "M";
+  if (flags.has("harmony:F")) return "F";
+  return undefined;
+}
+
 function genderOf(entry: LexiconEntry, lemma: string): Gender | "MIXED" {
+  if (entry.flags.has("loan")) return "MIXED";
   if (entry.flags.has("harmony:M")) return "M";
   if (entry.flags.has("harmony:F")) return "F";
   return harmonyOf(lemma).gender;
@@ -122,7 +138,40 @@ function ownStrings(vr: Variant, g: Gender, ctx: Ctx): string[] {
   return [s];
 }
 
+/**
+ * optionsFor is a pure function of (tag, variants, the context features below). Memoised per variants array: the noun tables are
+ * constants, so every noun chain after the first reuses the licensed options (it was a top-3 cost of an uncached word).
+ * Features that ownStrings/optionsFor read: gender, hasO/hasOE, lastRound, the stem's last two letters, the stem's last vowel
+ * (takesIForm) and the lemma flags.
+ */
+const OPTION_CACHE = new WeakMap<readonly Variant[], Map<string, Opt[]>>();
+
+const FLAGS_KEY = new WeakMap<ReadonlySet<string>, string>();
+function flagsKey(flags: ReadonlySet<string> | undefined): string {
+  if (!flags || flags.size === 0) return "";
+  let k = FLAGS_KEY.get(flags);
+  if (k === undefined) FLAGS_KEY.set(flags, (k = [...flags].sort().join(",")));
+  return k;
+}
+
+function lastVowelOfStem(stem: string): string {
+  for (let i = stem.length - 1; i >= 0; i -= 1) if (isVowel(stem[i]!)) return stem[i]!;
+  return "";
+}
+
 function optionsFor(tag: string, variants: readonly Variant[], ctx: Ctx): Opt[] {
+  let byKey = OPTION_CACHE.get(variants);
+  if (!byKey) OPTION_CACHE.set(variants, (byKey = new Map()));
+  const flags = flagsKey(ctx.flags);
+  const key = `${tag}|${ctx.gender}|${ctx.h.hasO ? 1 : 0}${ctx.h.hasOE ? 1 : 0}|${ctx.lastRound === undefined ? "-" : ctx.lastRound ? 1 : 0}|${ctx.stem.slice(-2)}|${lastVowelOfStem(ctx.stem)}|${flags}`;
+  const hit = byKey.get(key);
+  if (hit) return hit;
+  const built = buildOptions(tag, variants, ctx);
+  byKey.set(key, built);
+  return built;
+}
+
+function buildOptions(tag: string, variants: readonly Variant[], ctx: Ctx): Opt[] {
   const out: Opt[] = [];
   const seen = new Set<string>();
   const push = (o: Opt) => {
@@ -178,6 +227,9 @@ function skeleton(s: string): string {
 
 const VOWEL_LETTERS = ["а", "э", "и", "о", "ө", "у", "ү"] as const;
 
+type VerbGroupPlan = { g: (typeof VERB_GROUPS)[number]; opts: Opt[]; repairOpts: Opt[] | null };
+type VerbPlan = { ctx: Ctx; groups: VerbGroupPlan[] };
+
 type BaseMode = "plain" | "soft-i" | "elided" | "hiddenG" | "vdrop";
 
 type NounMatch = { tags: string[]; swap?: NonNullable<Opt["swap"]>; repairedSuffixes: string[] };
@@ -188,9 +240,14 @@ function matchNounChain(
   ctx: Ctx,
   mode: BaseMode,
   allowPlural: boolean,
+  nominalized = false,
 ): NounMatch[] {
   const results: NounMatch[] = [];
   const plurals: (Opt | null)[] = [null];
+  if (nominalized) {
+    // after «-ынх»: the collective (хотынхон, багийнхан) is the only «plural» of a person-group noun besides ууд/үүд
+    for (const o of optionsFor("COLL", NOUN_COLLECTIVE, ctx)) plurals.push(o);
+  }
   if (allowPlural) {
     const variants = baseClass === "SOFTI" ? SOFT_I_PLURAL : NOUN_PLURAL[baseClass as StemClass];
     for (const o of optionsFor("PL", variants, ctx)) {
@@ -214,6 +271,16 @@ function matchNounChain(
     for (const cs of cases) {
       if (cs && !afterPl.startsWith(cs.s)) continue;
       const afterCase = cs ? afterPl.slice(cs.s.length) : afterPl;
+      // R-GEN-NMLZ-X: genitive + «х» = «the one of …» (a consonant stem again; no harmony slip is ever claimed inside it).
+      if (!nominalized && cs?.tag === "GEN" && !cs.swap && !pl?.swap && afterCase.startsWith("х")) {
+        const tail = afterCase.slice(1);
+        const tags = [...(pl ? [pl.tag] : []), "GEN", "NMLZ"];
+        if (tail === "") results.push({ tags, repairedSuffixes: [] });
+        else {
+          const nctx: Ctx = { ...ctx, stem: `${ctx.stem}${pl?.s ?? ""}${cs.s}х` };
+          for (const m of matchNounChain("C", tail, nctx, "plain", true, true)) if (!m.swap) results.push({ tags: [...tags, ...m.tags], repairedSuffixes: [] });
+        }
+      }
       const refl: (Opt | null)[] = [null];
       if (cs?.tag !== "PRIV") {
         const prevEnd = (pl?.s ?? "") + (cs?.s ?? "");
@@ -305,7 +372,18 @@ type VerbAllomorph = {
    * repair to. Absent for default-class lemmas: nothing is claimed about them.
    */
   repairStem?: string;
+  /** Derived «<stem>чих» auxiliary stem: matched for parses only. */
+  aux?: boolean;
 };
+
+/**
+ * Endings licensed after the «чих» auxiliary. Measured against the second-opinion dictionary over 798 lexicon verbs (2026-10-08): these accept
+ * ≥90% (the round converb «-оод» 47%, attested ~0.01% of news); the remaining endings (vowel-initial converbs / imperatives / «чих» again) are
+ * accepted for ≤30% or 0% and stay UNKNOWN: ирчихэв, болчихчих, болчихаач are NOT licensed.
+ */
+const AUX_CHIH_ENDINGS = new Set(
+  "сан сэн сон сөн даг дэг дог дөг лаа лээ лоо лөө жээ вал вэл вол вөл тал тэл тол төл магц мэгц могц мөгц саар сээр соор сөөр маар мээр моор мөөр оод".split(" "),
+);
 
 const LINKING_VOWELS = "аэоөиуү";
 const HIDDEN_VOWEL_CLUSTER_START = "дтжзсшцчх";
@@ -418,8 +496,26 @@ export class MorphAnalyzer {
   private readonly verbForms = new Map<string, VerbAllomorph[]>();
   private readonly cache = new Map<string, MorphResult>();
 
+  /**
+   * Cheap necessary conditions for the stem-alternation paths in collect() (each is a SUPERSET filter: a hit still goes through
+   * paradigmEntries): which prefixes could be an elided / vowel-dropped / ь-softened / hidden-г base of some lexicon key. They replace
+   * ~13 failed lexicon lookups per candidate split with one Set probe — the largest cost of analysing a word that is NOT a lemma.
+   */
+  private readonly elidedBases = new Set<string>();
+  private readonly vowelDropBases = new Set<string>();
+  private readonly softBases = new Set<string>();
+  private readonly hiddenGBases = new Set<string>();
+
   constructor(private readonly lex: Lexicon) {
     for (const key of lex.keys()) {
+      const n = key.length;
+      if (n >= 3) {
+        const last = key[n - 1]!;
+        if (isVowel(key[n - 2]!) && !isVowel(last)) this.elidedBases.add(key.slice(0, n - 2) + last);
+        if ("аэоө".includes(last)) this.vowelDropBases.add(key.slice(0, -1));
+        if (last === "ь") this.softBases.add(key.slice(0, -1));
+        if (last === "н") this.hiddenGBases.add(`${key}г`);
+      }
       for (const entry of lex.lookup(key)) {
         if (entry.pos !== "V" || entry.formOnly) continue;
         for (const allo of verbAllomorphsOf(entry)) {
@@ -498,16 +594,18 @@ export class MorphAnalyzer {
     ) => {
       const ctx: Ctx = {
         gender: genderOf(entry, lemma),
-        h: harmonyOf(lemma, entry.flags.has("harmony:M") ? "M" : entry.flags.has("harmony:F") ? "F" : undefined),
+        h: harmonyOf(lemma, forcedHarmony(entry.flags)),
         stem: base,
       };
-      for (const m of matchNounChain(baseClass, rest, ctx, mode, allowPlural)) {
+      // «no-plural»: a pseudo-lemma that IS the plural stem (зохиолчид) takes no second plural (зохиолчидууд ✗).
+      for (const m of matchNounChain(baseClass, rest, ctx, mode, allowPlural && !entry.flags.has("no-plural"))) {
         if (!m.swap) {
           parses.push({ lemma, entry, tags: m.tags });
         } else {
           violations.push({
             lemma,
             entry,
+            stemGender: ctx.h.gender,
             kind: m.swap.kind,
             tags: m.tags,
             observed: m.swap.observed,
@@ -518,6 +616,13 @@ export class MorphAnalyzer {
       }
     };
 
+    // R-HIDDEN-G-ACC: the bare accusative of a hidden-г noun is «lemma + г» (тайлан → тайланг, цалин → цалинг, үзэсгэлэн → үзэсгэлэнг, байшин → байшинг).
+    // ~700 news tokens; the hidden-г flag is the evidence, so this never touches an unflagged lemma.
+    if (surface.length >= 5 && surface.endsWith("г")) {
+      for (const e of this.lex.paradigmEntries(surface.slice(0, -1))) {
+        if (e.pos !== "V" && e.flags.has("hidden-g")) parses.push({ lemma: surface.slice(0, -1), entry: e, tags: ["ACC"] });
+      }
+    }
     for (let i = n - 1; i >= 2; i -= 1) {
       const prefix = surface.slice(0, i);
       const rest = surface.slice(i);
@@ -530,7 +635,7 @@ export class MorphAnalyzer {
         else addNoun(e, prefix, prefix, stemClassOf(prefix), rest, "plain", true);
       }
       // (b) ь-stem in its «и»-form: хуули- ← хууль
-      if (prefix.endsWith("и") && prefix.length >= 3) {
+      if (prefix.endsWith("и") && prefix.length >= 3 && this.softBases.has(prefix.slice(0, -1))) {
         const lemma = `${prefix.slice(0, -1)}ь`;
         for (const e of this.lex.paradigmEntries(lemma)) {
           if (e.pos === "V") continue;
@@ -538,15 +643,17 @@ export class MorphAnalyzer {
         }
       }
       // (b2) и/е-final lemma behaves like the soft «и»-stem: химийн, экологиор, үеийн
-      if (/[ие]$/u.test(prefix) && prefix.length >= 3) {
+      if (/[ие]$/u.test(prefix) && prefix.length >= 2) {
         for (const e of this.lex.paradigmEntries(prefix)) {
           if (e.pos === "V") continue;
+          // two-letter lemmas never ground a guess unless explicitly flagged (үе → үеийн, үеийг, үеэс)
+          if (prefix.length < 3 && !e.flags.has("soft-i")) continue;
           addNoun(e, prefix, prefix, "SOFTI", rest, "soft-i", true);
         }
       }
       // (c) vowel elision: ажл- ← ажил, хэрг- ← хэрэг. Only stems of 4+ letters elide: хот, ном, гэр,
       // хүн never do (M1.1: «хтын» was accepted as a form of хот).
-      if (prefix.length >= 3 && /[бвгджзклмнпрстфхцчшщ]{2}$/u.test(prefix) && isVowel(rest[0] ?? "")) {
+      if (prefix.length >= 3 && isVowel(rest[0] ?? "") && this.elidedBases.has(prefix) && /[бвгджзклмнпрстфхцчшщ]{2}$/u.test(prefix)) {
         for (const v of VOWEL_LETTERS) {
           const lemma = `${prefix.slice(0, -1)}${v}${prefix.slice(-1)}`;
           for (const e of this.lex.paradigmEntries(lemma)) {
@@ -556,7 +663,7 @@ export class MorphAnalyzer {
         }
       }
       // (c2) short final vowel dropped: хандлага + ын → хандлагын
-      if (isVowel(rest[0] ?? "") && !isVowel(prefix[prefix.length - 1] ?? "")) {
+      if (isVowel(rest[0] ?? "") && !isVowel(prefix[prefix.length - 1] ?? "") && this.vowelDropBases.has(prefix)) {
         for (const v of ["а", "э", "о", "ө"] as const) {
           const lemma = `${prefix}${v}`;
           for (const e of this.lex.paradigmEntries(lemma)) {
@@ -566,7 +673,7 @@ export class MorphAnalyzer {
         }
       }
       // (d) hidden г: байшингийн ← байшин
-      if (prefix.endsWith("г") && prefix.length >= 4) {
+      if (prefix.endsWith("г") && prefix.length >= 4 && this.hiddenGBases.has(prefix)) {
         const lemma = prefix.slice(0, -1);
         for (const e of this.lex.paradigmEntries(lemma)) {
           if (e.pos === "V" || !e.flags.has("hidden-g")) continue;
@@ -580,12 +687,20 @@ export class MorphAnalyzer {
     return { parses, violations };
   }
 
-  private matchVerb(allo: VerbAllomorph, rest: string, parses: MorphParse[], violations: MorphViolation[]): void {
+  /**
+   * Everything about an allomorph that does NOT depend on the suffix string being matched (harmony context and the licensed
+   * suffix options per group). Built once per allomorph: optionsFor/expandLink were ~60% of the time of every uncached word.
+   */
+  private readonly verbPlans = new WeakMap<VerbAllomorph, VerbPlan>();
+
+  private verbPlan(allo: VerbAllomorph): VerbPlan {
+    const cached = this.verbPlans.get(allo);
+    if (cached) return cached;
     const { entry, lemma, stem } = allo;
     // The linking vowel и (барих, унших, хорих) is neutral and must not turn a back-vowel stem into a
     // «mixed» one (last vowel и), so harmony is read from the stem alone. Any other linking vowel
     // belongs to the lemma's harmony (ажиллах: the final а). A stem with no vowel falls back to the lemma.
-    const forced = entry.flags.has("harmony:M") ? "M" : entry.flags.has("harmony:F") ? "F" : undefined;
+    const forced = forcedHarmony(entry.flags);
     const harmonyWord = allo.link === "и" && [...allo.base].some((ch) => isVowel(ch)) ? allo.base : lemma;
     const h = harmonyOf(harmonyWord, forced);
     // Stem conditions (р/в/л …) are about the root consonant, not the ь of a soft stem.
@@ -598,13 +713,8 @@ export class MorphAnalyzer {
     };
     const last = stem[stem.length - 1] ?? "";
     const vowelFinal = last === "й" || isVowel(last);
-    const mkParse = (chain: { tag: string; text: string }[], tags: string[]): MorphParse => ({
-      lemma,
-      entry,
-      tags,
-      analysis: { lemma, stem, stemKind: allo.kind, linkingVowel: allo.link, chain },
-    });
     const lexicalConverb = entry.flags.has("cvb:ж") || entry.flags.has("cvb:ч");
+    const groups: VerbGroupPlan[] = [];
     for (const g of VERB_GROUPS) {
       // A lemma that lexically takes the bare converb (явж, авч) does not take the linked one (яваж).
       if (g.tag === "CVB_J" && lexicalConverb && !vowelFinal) continue;
@@ -638,13 +748,52 @@ export class MorphAnalyzer {
           }
         }
       });
+      const repairOpts = allo.kind === "BASE" && allo.repairStem && !vowelFinal ? optionsFor(g.tag, expandLink(raw, allo.link), ctx) : null;
+      groups.push({ g, opts, repairOpts });
+    }
+    const plan: VerbPlan = { ctx, groups };
+    this.verbPlans.set(allo, plan);
+    return plan;
+  }
+
+  /** Derived «<stem>чих» allomorphs (auxiliary chain), one per base allomorph. */
+  private readonly auxAllomorphs = new WeakMap<VerbAllomorph, VerbAllomorph>();
+
+  private matchVerb(allo: VerbAllomorph, rest: string, parses: MorphParse[], violations: MorphViolation[]): void {
+    // R-AUX-CHIH: the perfective auxiliary «чих» builds a new consonant-final stem which takes the ordinary verb endings:
+    // болчихсон, болчихоод, орчихсон, эхэлчихсэн, явчихсан (accepted by the second-opinion dictionary for 70% of verbs; ~0.14% of news tokens).
+    // Only PARSES are taken from the derived stem: an auxiliary chain never produces a harmony / stem-vowel accusation.
+    if (!allo.aux && rest.length > 4 && rest.startsWith("чих") && (allo.kind === "NATIVE" || allo.kind === "VOWEL_STEM" || allo.kind === "EPENTHETIC" || (allo.kind === "BASE" && allo.consonantInitialOk))) {
+      let derived = this.auxAllomorphs.get(allo);
+      if (!derived) {
+        derived = { ...allo, stem: `${allo.stem}чих`, base: `${allo.base}чих`, kind: "NATIVE", consonantInitialOk: true, repairStem: undefined, aux: true };
+        this.auxAllomorphs.set(allo, derived);
+      }
+      const tail = rest.slice(3);
+      if (AUX_CHIH_ENDINGS.has(tail)) {
+        const inner: MorphParse[] = [];
+        this.matchVerb(derived, tail, inner, []);
+        for (const p of inner) parses.push({ ...p, tags: ["AUX_CHIH", ...p.tags] });
+      }
+    }
+    const { entry, lemma, stem } = allo;
+    const plan = this.verbPlan(allo);
+    const ctx = plan.ctx;
+    const mkParse = (chain: { tag: string; text: string }[], tags: string[]): MorphParse => ({
+      lemma,
+      entry,
+      tags,
+      analysis: { lemma, stem, stemKind: allo.kind, linkingVowel: allo.link, chain },
+    });
+    for (const { g, opts, repairOpts } of plan.groups) {
       // Explicitly flagged lemma written without its stem vowel (ажиллсан, нотлсон).
-      if (allo.kind === "BASE" && allo.repairStem && !vowelFinal) {
-        for (const o of optionsFor(g.tag, expandLink(raw, allo.link), ctx)) {
+      if (repairOpts && allo.repairStem) {
+        for (const o of repairOpts) {
           if (o.swap || startsWithVowel(o.s) || rest !== o.s) continue;
           violations.push({
             lemma,
             entry,
+            stemGender: ctx.h.gender,
             kind: "STEM_VOWEL",
             tags: [g.tag],
             observed: stem,
@@ -660,6 +809,7 @@ export class MorphAnalyzer {
             violations.push({
               lemma,
               entry,
+              stemGender: ctx.h.gender,
               kind: o.swap.kind,
               tags: [g.tag],
               observed: o.swap.observed,
@@ -675,6 +825,7 @@ export class MorphAnalyzer {
             violations.push({
               lemma,
               entry,
+              stemGender: ctx.h.gender,
               kind: o.swap.kind,
               tags: [g.tag],
               observed: o.swap.observed,
@@ -686,6 +837,9 @@ export class MorphAnalyzer {
           // Verbal noun (бичсэн → бичсэнийг): noun suffixes after the participle.
           const base = stem + o.s;
           const tail = rest.slice(o.s.length);
+          // байдагийг ✗ / мэддэгний ✗ — before a vowel-initial (or ны/ний) case suffix the elided байдгийг is the form (handled below);
+          // the un-elided participle only takes the consonant-initial «гүй, т, тай/тэй/той/төй» (байдаггүй, байдагт, хийдэгтэй).
+          if (g.elides && !/^(гүй|т|тай|тэй|той|төй)$/u.test(tail)) continue;
           const nctx: Ctx = { ...ctx, stem: base };
           for (const m of matchNounChain("C", tail, nctx, "plain", false)) {
             if (!m.swap) parses.push(mkParse([{ tag: g.tag, text: o.s }, { tag: m.tags.join("+"), text: tail }], [g.tag, ...m.tags]));
@@ -693,12 +847,31 @@ export class MorphAnalyzer {
               violations.push({
                 lemma,
                 entry,
+                stemGender: ctx.h.gender,
                 kind: m.swap.kind,
                 tags: [g.tag, ...m.tags],
                 observed: m.swap.observed,
                 expected: m.swap.own,
                 repaired: m.repairedSuffixes.map((x) => base + x),
               });
+          }
+        }
+      }
+      // R-PTCP-ELISION: a participle in -VC (сан сэн сон сөн даг дэг дог дөг) drops its vowel before a vowel-initial case suffix:
+      // болсон → болсны, болсныг, болсноос; байдаг → байдгийг, хийдэг → хийдгийн. Only the nominal participles.
+      if (g.nominal) {
+        for (const o of opts) {
+          if (o.swap || o.s.length < 3) continue;
+          const lastCh = o.s[o.s.length - 1]!;
+          const vow = o.s[o.s.length - 2]!;
+          if (isVowel(lastCh) || !isVowel(vow)) continue;
+          const el = o.s.slice(0, -2) + lastCh; // сон → сн, даг → дг
+          if (!rest.startsWith(el) || rest.length === el.length) continue;
+          const tail = rest.slice(el.length);
+          if (!startsWithVowel(tail)) continue;
+          const nctx: Ctx = { ...ctx, stem: stem + el };
+          for (const m of matchNounChain("C", tail, nctx, "elided", false)) {
+            if (!m.swap) parses.push(mkParse([{ tag: g.tag, text: o.s }, { tag: m.tags.join("+"), text: tail }], [g.tag, ...m.tags]));
           }
         }
       }
@@ -710,6 +883,7 @@ export class MorphAnalyzer {
             violations.push({
               lemma,
               entry,
+              stemGender: ctx.h.gender,
               kind: "CONSONANT_CONFUSION",
               tags: [g.tag],
               observed: slipped,

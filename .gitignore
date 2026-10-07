@@ -57,3 +57,7 @@ tmp/
 
 # secrets (never commit)
 /.secrets/
+
+# TORE Spell: local-only research data (never commit, never bundle)
+/.spell-research/
+/dist/spell-pack/

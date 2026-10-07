@@ -28,6 +28,7 @@ export type Pos =
  *  - "no-infl"   closed-class word; never inflected
  *  - "hidden-g"  noun with a hidden г (байшин → байшингийн)
  *  - "hidden-n"  noun with a hidden н (ногоон → ногооны)
+ *  - "no-plural" pseudo-lemma that already IS a plural stem (зохиолчид): takes no second plural
  *  - "soft"      ь-final noun (хууль) — set automatically from spelling
  *  - "harmony:M" / "harmony:F"  force suffix harmony (loanwords)
  *  Verb stem-class flags (pos "V", see morphology/analyzer.ts «VERB STEM MODEL»):
@@ -43,13 +44,52 @@ export type PackEntry = {
   flags?: string[];
   /** Relative frequency (any positive scale), when the source provides one. */
   freq?: number;
+  /** For form-only entries: the lemma this surface form belongs to (structured lexicon). */
+  lemma?: string;
+  /** Author's confidence in this entry; LOW entries are accepted but never used to ACCUSE another word. */
+  conf?: "HIGH" | "MEDIUM" | "LOW";
 };
 
+/**
+ * Where the data came from, and therefore where it may go (docs/spell/DATA-SOURCES.md).
+ *   A TORE_OWNED · B EXTERNAL_LICENSED   → may ship in the product
+ *   C RESEARCH_ONLY · D BENCHMARK_ONLY   → local use only; never bundled
+ */
+export type DataClass = "A_TORE_OWNED" | "B_EXTERNAL_LICENSED" | "C_RESEARCH_ONLY" | "D_BENCHMARK_ONLY";
+export const SHIPPABLE_DATA_CLASSES: readonly DataClass[] = ["A_TORE_OWNED", "B_EXTERNAL_LICENSED"];
+const DATA_CLASSES: readonly DataClass[] = ["A_TORE_OWNED", "B_EXTERNAL_LICENSED", "C_RESEARCH_ONLY", "D_BENCHMARK_ONLY"];
+
+/**
+ * Trust tier of a pack's CONTENT (docs/spell/PHASE-3-DATA-TIERS.md). Ordered best → worst:
+ *   REVIEWED     ≥2 distinct NATIVE reviewers approved it through the review pipeline (none exist yet)
+ *   TRUSTED      human-authored, committed to the repository's production dictionaries BEFORE the language-engine work
+ *                (CORE_DICTIONARY_WORDS, legal-lexicon). Engineer-vetted; NOT native-validated.
+ *   PROVISIONAL  AI-drafted or rule-generated from provisional data. Usable by the engine, but EXCLUDED from release-quality claims.
+ *   REJECTED     reviewed and refused; kept for history, never loaded.
+ */
+export type DataTier = "REVIEWED" | "TRUSTED" | "PROVISIONAL" | "REJECTED";
+export const DATA_TIERS: readonly DataTier[] = ["REVIEWED", "TRUSTED", "PROVISIONAL", "REJECTED"];
+const TIER_RANK: Record<DataTier, number> = { REVIEWED: 3, TRUSTED: 2, PROVISIONAL: 1, REJECTED: 0 };
+/** A pack with no declared tier is PROVISIONAL (never silently trusted). */
+export const tierOf = (pack: { provenance: { tier?: DataTier } }): DataTier => pack.provenance.tier ?? "PROVISIONAL";
+/** Packs whose tier is at least `min` (REJECTED is never included). */
+export function packsAtTier<T extends { provenance: { tier?: DataTier } }>(packs: readonly T[], min: DataTier): T[] {
+  return packs.filter((p) => tierOf(p) !== "REJECTED" && TIER_RANK[tierOf(p)] >= TIER_RANK[min]);
+}
+
 export type PackProvenance = {
+  /** Trust tier of the content; see DataTier. Omitted = PROVISIONAL. */
+  tier?: DataTier;
   source: string;
   license: string;
   /** May this data ship inside the paid desktop product? */
   redistributable: boolean;
+  /** Required for anything that ships; class C/D data must be `redistributable: false`. */
+  dataClass?: DataClass;
+  /** Registry ids (scripts/spell-data/sources.ts). The release gate requires every one to be VERIFIED_SHIPPABLE. */
+  sourceIds?: string[];
+  /** Linguistic review state of the CONTENT (licence status is separate). */
+  reviewStatus?: "NATIVE_REVIEWED" | "PENDING_NATIVE_REVIEW" | "DISPUTED";
   notes?: string;
 };
 
@@ -70,9 +110,17 @@ export type DataPack = {
   entries: PackEntry[];
 };
 
+/** Word-bearing domain layers (the rest are protected/user layers). */
+export const DOMAIN_LAYERS: readonly LexiconLayer[] = ["GENERAL", "LEGAL", "GOVERNMENT", "BUSINESS", "ACADEMIC", "TECH", "MEDICAL"];
+
 const LAYERS: readonly LexiconLayer[] = [
   "GENERAL",
   "LEGAL",
+  "GOVERNMENT",
+  "BUSINESS",
+  "ACADEMIC",
+  "TECH",
+  "MEDICAL",
   "PROPER_NOUN",
   "ABBREVIATION",
   "USER_DEFINED",
@@ -99,6 +147,19 @@ export function validatePack(pack: unknown): string[] {
     problems.push("provenance.source and provenance.license are required");
   } else if (typeof p.provenance.redistributable !== "boolean") {
     problems.push("provenance.redistributable must be a boolean");
+  } else {
+    const dc = p.provenance.dataClass;
+    if (dc !== undefined && !DATA_CLASSES.includes(dc)) problems.push(`provenance.dataClass "${String(dc)}" is invalid`);
+    const tier = p.provenance.tier;
+    if (tier !== undefined && !DATA_TIERS.includes(tier)) problems.push(`provenance.tier "${String(tier)}" is invalid`);
+    // REVIEWED means native-reviewed: never claimable without the review status to back it.
+    if (tier === "REVIEWED" && p.provenance.reviewStatus !== "NATIVE_REVIEWED") problems.push("tier REVIEWED requires reviewStatus NATIVE_REVIEWED");
+    if (dc && !SHIPPABLE_DATA_CLASSES.includes(dc) && p.provenance.redistributable) {
+      problems.push(`class ${dc} data can never be redistributable`);
+    }
+    if (dc && SHIPPABLE_DATA_CLASSES.includes(dc) && !p.provenance.redistributable) {
+      problems.push(`class ${dc} data must be redistributable`);
+    }
   }
   if (!Array.isArray(p.entries)) {
     problems.push("entries must be an array");

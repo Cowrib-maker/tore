@@ -1,5 +1,7 @@
 # TORE Spell — Language data sources & licensing decision
 
+> The wider research register (four data classes A–D, per-source licence status, what could and could not be verified) is **[DATA-SOURCES.md](DATA-SOURCES.md)** (2026-10-06). This file remains the *shipping* decision.
+
 Status: **decision recorded 2026-10-05** · scope: Language Engine V1 · reviewer: legal sign-off still required before any change to the bundled set.
 
 Principle: **source-code license ≠ data license.** A permissive license on a repo's code says nothing about its word lists. Anything with an ambiguous or share-alike data license is **not bundled** into the paid desktop product.

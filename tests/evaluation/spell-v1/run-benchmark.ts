@@ -118,19 +118,21 @@ export function runBenchmark(engine: SpellEngineV1, opts: { seed?: number; sampl
     protectedFlaggedList: protBadList,
   };
 
-  // ── C. synthetic seeded error injection on lexicon words ───────────────
+  const runSynthetic = (confFilter: (c: string) => boolean) => {
   const rng = mulberry32(seed);
   const kinds: ErrorKind[] = ["DELETE", "TRANSPOSE", "VOWEL_SWAP", "DOUBLE_FINAL", "INSERT"];
   const pool: string[] = [];
   for (const k of engine.lexicon.keys()) {
     const e = engine.lexicon.lookup(k)[0]!;
-    if ((e.layer === "GENERAL" || e.layer === "LEGAL") && k.length >= 5 && !e.formOnly) pool.push(k);
+    if ((e.layer === "GENERAL" || e.layer === "LEGAL") && k.length >= 5 && !e.formOnly && confFilter(e.conf)) pool.push(k);
   }
   pool.sort();
   const conf: Confusion = { tp: 0, fp: 0, fn: 0, tn: 0 };
   const ranks: (number | null)[] = [];
   let abstain = 0;
   let injected = 0;
+  let ambiguousFlagged = 0; // wrong word, several equally plausible repairs: listed without a best (not a precision event)
+  let ambiguousHasTruth = 0;
   const perKind: Record<string, { n: number; flagged: number; top1: number }> = {};
   for (let s = 0; s < samples && pool.length > 0; s += 1) {
     const w = pool[Math.floor(rng() * pool.length)]!;
@@ -145,6 +147,11 @@ export function runBenchmark(engine: SpellEngineV1, opts: { seed?: number; sampl
       pk.flagged += 1;
       const sug = a.issue?.suggestions.map((x) => x.text) ?? [];
       const idx = sug.indexOf(w);
+      if (a.issue?.suggestionStatus === "AMBIGUOUS") {
+        ambiguousFlagged += 1;
+        if (idx !== -1) ambiguousHasTruth += 1;
+        continue;
+      }
       ranks.push(idx === -1 ? null : idx + 1);
       if (idx === 0) {
         conf.tp += 1;
@@ -155,10 +162,13 @@ export function runBenchmark(engine: SpellEngineV1, opts: { seed?: number; sampl
       if (a.verdict === "UNKNOWN") abstain += 1;
     }
   }
-  const synthetic = {
+  return {
     injected,
-    detected: ranks.length,
-    detectionRate: injected ? ranks.length / injected : 0,
+    detected: ranks.length + ambiguousFlagged,
+    detectionRate: injected ? (ranks.length + ambiguousFlagged) / injected : 0,
+    ambiguousFlagged,
+    ambiguousHasTruth,
+    confidentDetectionRate: injected ? ranks.length / injected : 0,
     suggestionPrecision: precision(conf),
     suggestionRecall: recall(conf),
     f05: fBeta(conf, 0.5),
@@ -168,6 +178,10 @@ export function runBenchmark(engine: SpellEngineV1, opts: { seed?: number; sampl
     abstentionRate: injected ? abstain / injected : 0,
     perKind,
   };
+  };
+  // HIGH = hand-curated seed words (recall floor protects them); DRAFT = AI-drafted vocabulary (precision floor only).
+  const synthetic = runSynthetic((c) => c === "HIGH");
+  const syntheticDraft = runSynthetic((c) => c !== "HIGH");
 
   // ── D. legacy gold sets ────────────────────────────────────────────────
   const gold: Record<string, { total: number; ok: number; failures: string[] }> = {};
@@ -195,7 +209,13 @@ export function runBenchmark(engine: SpellEngineV1, opts: { seed?: number; sampl
   }
 
   // ── E. performance ─────────────────────────────────────────────────────
-  const sample = [...pool].slice(0, 400);
+  const perfPool: string[] = [];
+  for (const k of engine.lexicon.keys()) {
+    const e = engine.lexicon.lookup(k)[0]!;
+    if ((e.layer === "GENERAL" || e.layer === "LEGAL") && k.length >= 5 && !e.formOnly) perfPool.push(k);
+  }
+  perfPool.sort();
+  const sample = perfPool.slice(0, 400);
   const perWord: number[] = [];
   for (const w of sample) {
     const t0 = performance.now();
@@ -219,7 +239,7 @@ export function runBenchmark(engine: SpellEngineV1, opts: { seed?: number; sampl
     lexiconSize: engine.lexicon.size,
   };
 
-  return { engineVersion: engine.engineVersion, dataPackVersion: engine.dataPackVersion, seed, clean, paradigms, synthetic, gold, dangerous: { pairs: DANGEROUS_PAIRS.length, flagged: dangerousFlagged, list: dangerousList }, perf, verbGold: runVerbGold(), regression: runRegression(), mutation: (() => { const m = runMutationSuite({ seed: 20261006, perEntry: 6 }); return { mutated: m.mutated, valid: m.valid, collisions: m.collisions, suspects: m.suspects.length, misspelled: m.misspelled, wrongRepairs: m.wrongRepairs.length, unknown: m.unknown, byKind: m.byKind }; })() };
+  return { engineVersion: engine.engineVersion, dataPackVersion: engine.dataPackVersion, seed, clean, paradigms, synthetic, gold, syntheticDraft, dangerous: { pairs: DANGEROUS_PAIRS.length, flagged: dangerousFlagged, list: dangerousList }, perf, verbGold: runVerbGold(), regression: runRegression(), mutation: (() => { const m = runMutationSuite({ seed: 20261006, perEntry: 6 }); return { mutated: m.mutated, valid: m.valid, collisions: m.collisions, suspects: m.suspects.length, misspelled: m.misspelled, wrongRepairs: m.wrongRepairs.length, unknown: m.unknown, byKind: m.byKind }; })() };
 }
 
 /**

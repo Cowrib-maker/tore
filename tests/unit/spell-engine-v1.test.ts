@@ -173,7 +173,8 @@ describe("verdict contract", () => {
     expect(r.issues.some((i) => i.verdict === "MISSPELLED")).toBe(true);
   });
   it("UNKNOWN is not reported by default and gets no replacement", () => {
-    const r = engine.analyze("захирамж хөмсөг");
+    // invented strings: stay UNKNOWN however much real vocabulary the packs gain
+    const r = engine.analyze("бүлжирэн хөлгөйтөр");
     expect(r.issues).toEqual([]);
     expect(r.stats.unknownCount).toBe(2);
   });

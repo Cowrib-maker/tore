@@ -40,3 +40,8 @@ li.issue .w { font-weight:600; } li.issue .m { color:var(--mut); font-size:13px;
 
 .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 .notice.ok { border-left-color:var(--ok); background:transparent; color:var(--ok); font-weight:600; }
+
+/* advisory (spacing / capitalization): informational, never an error colour */
+mark.adv { background:transparent; border-bottom:2px dashed var(--mut); }
+li.issue.adv { border-left:4px solid var(--mut); }
+.tag.adv { background:var(--unkbg); color:var(--mut); }

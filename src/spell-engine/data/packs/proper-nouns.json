@@ -1,7 +1,7 @@
 {
  "schema": "tore-spell-pack/1",
  "id": "tore-names-seed",
- "version": "2026.10.1",
+ "version": "2026.10.3",
  "layer": "PROPER_NOUN",
  "language": "mn-Cyrl",
  "coverage": "SEED",
@@ -9,84 +9,109 @@
   "source": "proper-nouns.tsv",
   "license": "TORE proprietary (original work)",
   "redistributable": true,
+  "dataClass": "A_TORE_OWNED",
+  "tier": "PROVISIONAL",
+  "sourceIds": [
+   "tore-names-abbr"
+  ],
+  "reviewStatus": "PENDING_NATIVE_REVIEW",
   "notes": "Names / places."
  },
  "entries": [
   {
    "w": "Архангай",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Бат",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Болд",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Дархан",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Дорж",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Дорнод",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Завхан",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Монгол",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Нарантуяа",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Оюун",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Сараа",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Сүхбаатар",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Тогтох",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Тэмүүжин",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Улаанбаатар",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Хаан",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Хөвсгөл",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Чингис",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   },
   {
    "w": "Эрдэнэт",
-   "pos": "N"
+   "pos": "N",
+   "conf": "HIGH"
   }
  ]
 }

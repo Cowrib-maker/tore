@@ -37,6 +37,12 @@ const FORBIDDEN = [
   ["QPay credential variable", /QPAY_CLIENT_(ID|SECRET)\s*[=:]/],
   ["database URL", /postgres(?:ql)?:\/\/[^\s"']+/],
   ["development API origin", /http:\/\/localhost:3000/],
+  // Development-only conveniences and class C/D research data must never ship (docs/spell/DATA-SOURCES.md).
+  ["development licence switch", /TORE_SPELL_DEV_LICENSE/],
+  ["research lexicon loader / variables", /TORE_SPELL_RESEARCH_(DIR|FREQ)/],
+  ["Hunspell research runtime", /hunspell-asm/i],
+  ["research dictionary files", /mn_MN\.(dic|aff)/],
+  ["research provider id", /research:dict-mn/],
   ["JWT", /eyJ[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}/],
 ];
 const REQUIRED = [

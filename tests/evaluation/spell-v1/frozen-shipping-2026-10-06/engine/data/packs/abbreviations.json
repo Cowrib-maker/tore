@@ -1,0 +1,192 @@
+{
+ "schema": "tore-spell-pack/1",
+ "id": "tore-abbr-seed",
+ "version": "2026.10.1",
+ "layer": "ABBREVIATION",
+ "language": "mn-Cyrl",
+ "coverage": "SEED",
+ "provenance": {
+  "source": "abbreviations.tsv",
+  "license": "TORE proprietary (original work)",
+  "redistributable": true,
+  "dataClass": "A_TORE_OWNED",
+  "notes": "Abbreviations / acronyms."
+ },
+ "entries": [
+  {
+   "w": "ААНОАТ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "АНУ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "БНХАУ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ДНБ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ДХБ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ЕХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ЗГ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ИТХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "МУ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "НИТХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "НӨАТ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "НҮБ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ОУХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ОХУ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ТЕГ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ТОРЕ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ТӨК",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "УИХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ХЗХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ХК",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ХНХЯ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ХХК",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ЦЕГ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ШШГЕГ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  },
+  {
+   "w": "ЭЗХЯ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ]
+  }
+ ]
+}

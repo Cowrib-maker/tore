@@ -102,6 +102,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
+    "hunspell-asm": "^4.0.2",
     "jsdom": "^30.0.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.11",

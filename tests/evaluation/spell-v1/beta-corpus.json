@@ -16,7 +16,8 @@
     { "id": "citation-1", "kind": "legal citations", "text": "Эрүүгийн хуулийн 17.1 дэх хэсэг, Иргэний хуулийн 5-р зүйл, УИХ-ын 2017 оны 12 дугаар тогтоол." }
   ],
   "errors": [
-    { "id": "err-double-final", "text": "Тэр маш сайнн ажилласан.", "token": "сайнн", "expect": "MISSPELLED", "top": "сайн" },
+    { "id": "err-double-final", "text": "Тэр шинэ цомогг гаргасан.", "token": "цомогг", "expect": "MISSPELLED", "top": "цомог" },
+    { "id": "guard-double-final-loan", "text": "Тэр хилл дээр очсон.", "token": "хилл", "expect": "UNKNOWN" },
     { "id": "err-unknown-word", "text": "Энэ нь докумнт юм.", "token": "докумнт", "expect": "UNKNOWN" }
   ]
 }

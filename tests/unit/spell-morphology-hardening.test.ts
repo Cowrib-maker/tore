@@ -86,7 +86,7 @@ describe("negative-mutation gate", () => {
     }
   });
   it("every adjudication carries a reason class", () => {
-    for (const [m, why] of Object.entries(ADJUDICATED_LEGITIMATE)) expect(why, m).toMatch(/^(PARTICIPLE_CASE_CHAIN|VERBAL_NOUN_CASE|OTHER_LEMMA_FORM):/);
+    for (const [m, why] of Object.entries(ADJUDICATED_LEGITIMATE)) expect(why, m).toMatch(/^(PARTICIPLE_CASE_CHAIN|VERBAL_NOUN_CASE|OTHER_LEMMA_FORM|CONVERB_N|AUX_CHIH_CHAIN):/);
   });
   it("is deterministic", () => {
     const a = runMutationSuite({ seed: 7, perEntry: 4 });

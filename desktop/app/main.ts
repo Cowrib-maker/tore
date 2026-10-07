@@ -11,6 +11,7 @@ import { FeedbackLog, type FeedbackDoc, type FeedbackEntry } from "../core/feedb
 import { FileStore, type SecretProtector } from "../core/store";
 import { runSelfTest } from "./selftest";
 import { createSpellEngineV1 } from "../../src/spell-engine/bundled";
+import { DEV_LICENSE_STATE, devOptionsFromEnv, NO_DEV } from "../core/dev-mode";
 
 /** Baked at build time by build.mjs (see config/environments.json). No secrets. */
 declare const __TORE_ENV__: string;
@@ -51,6 +52,14 @@ async function start() {
     await runSelfTest(selftest.slice("--selftest=".length), { name: __TORE_ENV__, apiBase: __TORE_API_BASE__, pinned: __TORE_PINNED_JWKS__, release: RELEASE });
   }
   const dir = app.getPath("userData");
+  // Developer conveniences exist only in a development build (dead code — and verified absent — in release).
+  const dev = __TORE_ENV__ === "development" ? devOptionsFromEnv(process.env) : NO_DEV;
+  let engine = createSpellEngineV1();
+  if (__TORE_ENV__ === "development" && dev.researchDir) {
+    const { loadDevResearch } = await import("../core/research-dev");
+    engine = createSpellEngineV1({ research: await loadDevResearch(dev.researchDir, dev.frequencyFile), environment: "development" });
+    console.log(`[spell-desktop] DEV research lexicon active (${dev.researchDir}) — not a shippable configuration`);
+  }
   const client = new SpellLicenseClient({
     store: new FileStore<ClientRecord>(path.join(dir, "license.json")),
     protector,
@@ -60,11 +69,12 @@ async function start() {
     pinnedJwks: __TORE_PINNED_JWKS__.keys.length > 0 ? __TORE_PINNED_JWKS__ : undefined,
     requirePinned: RELEASE,
   });
-  const spell = new DesktopSpellSession(createSpellEngineV1(), new FileStore<DictionaryDoc>(path.join(dir, "dictionary.json")), client);
+  const spell = new DesktopSpellSession(engine, new FileStore<DictionaryDoc>(path.join(dir, "dictionary.json")), dev.devLicense ? { isEntitled: async () => true } : client);
 
   const feedback = new FeedbackLog(new FileStore<FeedbackDoc>(path.join(dir, "feedback.json")));
 
   const view = async () => {
+    if (dev.devLicense) return { ...DEV_LICENSE_STATE, licenseExpiresAtLocal: "DEV", offlineUntilLocal: "DEV" };
     const st = await client.state();
     return st.kind === "ACTIVE" ? { ...st, licenseExpiresAtLocal: formatUlaanbaatar(st.licenseExpiresAt), offlineUntilLocal: formatUlaanbaatar(st.offlineUntil) } : st;
   };
@@ -83,7 +93,8 @@ async function start() {
   }));
   ipcMain.handle("license:validate", wrap(async () => (await client.validate(), view())));
   ipcMain.handle("license:deactivate", wrap(async () => (await client.deactivate(), view())));
-  ipcMain.handle("spell:check", wrap((text: string, unknown: boolean) => spell.check(String(text).slice(0, 2_000_000), { reportUnknown: !!unknown })));
+  ipcMain.handle("spell:check", wrap((text: string, unknown: boolean, advisory?: boolean) => spell.check(String(text).slice(0, 2_000_000), { reportUnknown: !!unknown, advisory: !!advisory })));
+  ipcMain.handle("spell:replaceAll", wrap((text: string, issues: DesktopIssue[], replacement: string) => spell.applyReplacementAll(text, issues, replacement)));
   ipcMain.handle("spell:replace", wrap((text: string, issue: DesktopIssue, replacement: string) => spell.applyReplacement(text, issue, replacement)));
   ipcMain.handle("spell:ignoreOnce", wrap((issue: DesktopIssue) => spell.ignoreOnce(issue)));
   ipcMain.handle("spell:ignoreAll", wrap((issue: DesktopIssue) => spell.ignoreAll(issue)));
@@ -99,13 +110,14 @@ async function start() {
     return { saved: true, count: feedback.count() };
   }));
   ipcMain.handle("dict:words", wrap(() => spell.dictionaryWords()));
+  ipcMain.handle("dict:search", wrap((q: string) => spell.searchDictionary(String(q))));
 
   // No remote content, no navigation, no permission grants.
   session.defaultSession.setPermissionRequestHandler((_wc, _p, cb) => cb(false));
   const win = new BrowserWindow({
     width: 980,
     height: 720,
-    title: RELEASE ? "TORE Spell Бета" : "TORE Spell (dev)",
+    title: RELEASE ? "TORE Spell Бета" : `TORE Spell (dev${dev.researchDir ? " + судалгааны толь" : ""}${dev.devLicense ? ", dev licence" : ""})`,
     webPreferences: { preload: path.join(__dirname, "preload.js"), contextIsolation: true, nodeIntegration: false, sandbox: true },
   });
   win.webContents.on("will-navigate", (e) => e.preventDefault());

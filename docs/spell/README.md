@@ -2,6 +2,8 @@
 
 TORE Spell is a standalone desktop spelling/writing product. This directory documents the **licensing and activation backend** that ships in Phase 1. The desktop client, QPay purchase flow, TORE-subscriber entitlement and any new language work are **not** part of Phase 1 (see [Out of scope](#out-of-scope)).
 
+Language/data work and the private developer flow: [DATA-SOURCES.md](DATA-SOURCES.md) (research register, data classes A–D) · [DEV_FLOW.md](DEV_FLOW.md) (run it on your own Windows PC) · [BENCHMARK.md](BENCHMARK.md) (measured quality, incl. M2 real-text results).
+
 Related ADRs: [ADR-006 licensing & activation](../architecture/adr-006-spell-licensing-activation.md) · [ADR-007 device identity](../architecture/adr-007-spell-device-identity.md) · [ADR-008 entitlement token & offline policy](../architecture/adr-008-spell-entitlement-token.md).
 
 ## Architecture
