@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:;">
-<title>TORE Spell Бета</title>
+<title>TORE Spell</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
   <span id="lic-badge" class="badge">…</span>
   <span id="net-badge" class="badge" hidden></span>
 </header>
-<p class="positioning">Монгол хэлний зөв бичих алдааг шалгах, засварлахад зориулсан бета хувилбар. Тодорхойгүй үгийг автоматаар засахгүй.</p>
+
 
 <section id="lock" hidden>
   <h2>Лицензийн кодоо оруулна уу</h2>
@@ -33,38 +33,45 @@
 
 <main id="app" hidden>
   <div class="bar">
-    <button id="check">Шалгах</button>
-    <label class="inline"><input type="checkbox" id="unknown"> Тодорхойгүй үгсийг харуулах</label>
-    <label class="inline"><input type="checkbox" id="advisory"> Зай, том үсгийн зөвлөмж</label>
-    <span id="stats" aria-live="polite"></span>
+    <span id="stats" aria-live="polite">Текстээ бичнэ үү</span>
     <span class="grow"></span>
-    <button id="validate" class="ghost">Эрх шалгах</button>
-    <button id="deactivate" class="ghost">Энэ компьютерээс чөлөөлөх</button>
+    <details class="menu">
+      <summary>Тохиргоо</summary>
+      <div class="menu-body">
+        <label class="inline"><input type="checkbox" id="unknown"> Мэдэхгүй үгсийг тэмдэглэх</label>
+        <label class="inline"><input type="checkbox" id="advisory"> Зай, том үсгийн зөвлөмж</label>
+        <button id="validate" class="ghost sm">Эрх шалгах</button>
+        <button id="deactivate" class="ghost sm">Энэ компьютерээс чөлөөлөх</button>
+      </div>
+    </details>
   </div>
   <div id="ready-note" class="notice ok" role="status" hidden>TORE Spell бэлэн боллоо.</div>
   <div id="offline-note" class="notice" hidden></div>
   <div class="cols">
     <div class="editor">
       <div id="backdrop" aria-hidden="true"></div>
-      <textarea id="text" spellcheck="false" placeholder="Текстээ энд оруулна уу…"></textarea>
+      <textarea id="text" spellcheck="false" placeholder="Текстээ энд бичнэ үү эсвэл буулгана уу…"></textarea>
+      <div id="pop" class="pop" role="dialog" aria-label="Засвар" hidden></div>
     </div>
     <aside>
-      <h3>Санал <span id="count"></span></h3>
+      <h3>Алдаа <span id="count"></span></h3>
       <ul id="issues"></ul>
       <h3>Миний толь</h3>
       <input id="dict-q" type="search" placeholder="Толиос хайх…" maxlength="40" aria-label="Миний толиос хайх">
       <ul id="dict"></ul>
-      <h3>Алдаа мэдээлэх</h3>
-      <p class="note">Зөвхөн нэг үг болон шалгалтын үр дүн таны компьютерт хадгалагдана. Автоматаар илгээгдэхгүй; файлыг өөрөө экспортолж илгээнэ.</p>
-      <div class="fb">
-        <input id="fb-word" type="text" placeholder="Илрээгүй алдаатай үг" maxlength="40">
-        <button id="fb-missed" class="sm ghost">Алдаа илрээгүй</button>
-      </div>
-      <button id="fb-export" class="sm ghost">Мэдээлэл экспортлох <span id="fb-count"></span></button>
-      <span id="fb-msg" class="note"></span>
+      <details class="menu">
+        <summary>Алдаа мэдээлэх</summary>
+        <p class="note">Зөвхөн нэг үг таны компьютерт хадгалагдана. Автоматаар илгээгдэхгүй; файлыг өөрөө экспортолж илгээнэ.</p>
+        <div class="fb">
+          <input id="fb-word" type="text" placeholder="Илрээгүй алдаатай үг" maxlength="40">
+          <button id="fb-missed" class="sm ghost">Алдаа илрээгүй</button>
+        </div>
+        <button id="fb-export" class="sm ghost">Мэдээлэл экспортлох <span id="fb-count"></span></button>
+        <span id="fb-msg" class="note"></span>
+      </details>
     </aside>
   </div>
-  <p class="note">Таны текст компьютерээс гадагш гарахгүй. Лицензийн шалгалтад зөвхөн лиценз болон компьютерийн мэдээлэл дамжина.</p>
+  <p class="note">Таны текст компьютерээс гадагш гарахгүй.</p>
 </main>
 <script src="renderer.js"></script>
 </body>

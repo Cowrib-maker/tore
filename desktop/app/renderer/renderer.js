@@ -90,30 +90,43 @@ $("deactivate").addEventListener("click", async () => {
 });
 
 // ── checking ────────────────────────────────────────────────────────────────
+const MAX_SUGS = 3;
 async function runCheck() {
   const text = $("text").value;
-  const r = await api.check(text, $("unknown").checked, $("advisory") ? $("advisory").checked : false);
+  const r = await api.check(text, $("unknown").checked, $("advisory").checked);
   if (!r.ok) { $("stats").textContent = r.message; return; }
   if (r.value.locked) return refresh();
+  if (text !== $("text").value) return; // typing continued: a newer check is already scheduled
   issues = r.value.issues;
   versions = { engineVersion: r.value.engineVersion, dataPackVersion: r.value.dataPackVersion };
   const bad = issues.filter((i) => i.verdict === "MISSPELLED").length;
-  const unk = issues.filter((i) => i.verdict === "UNKNOWN").length;
-  const adv = issues.filter((i) => i.verdict === "ADVISORY").length;
-  $("stats").textContent = `${r.value.stats.words} үг · Алдаатай: ${bad}` + ($("unknown").checked ? ` · Тодорхойгүй: ${unk}` : "") + ($("advisory") && $("advisory").checked ? ` · Зөвлөмж: ${adv}` : "");
+  $("stats").textContent = text.trim()
+    ? `${r.value.stats.words} үг · ` + (bad ? `${bad} алдаа` : "Алдаа олдсонгүй")
+    : "Текстээ бичнэ үү";
   $("count").textContent = issues.length ? `(${issues.length})` : "";
+  closePop();
   paintBackdrop(text);
   render();
 }
-$("check").addEventListener("click", runCheck);
 $("unknown").addEventListener("change", runCheck);
-if ($("advisory")) $("advisory").addEventListener("change", runCheck);
+$("advisory").addEventListener("change", runCheck);
 $("text").addEventListener("input", () => {
   paintBackdrop($("text").value, true);
+  closePop();
   clearTimeout(timer);
-  timer = setTimeout(runCheck, 900);
+  timer = setTimeout(runCheck, 350);
 });
-$("text").addEventListener("scroll", () => { $("backdrop").scrollTop = $("text").scrollTop; });
+$("text").addEventListener("scroll", () => { $("backdrop").scrollTop = $("text").scrollTop; closePop(); });
+// A click (or caret move) inside a marked word opens the correction popover; Escape closes it.
+const caretIssue = () => {
+  const t = $("text");
+  if (t.selectionStart !== t.selectionEnd) return -1;
+  const p = t.selectionStart;
+  return issues.findIndex((i) => p >= i.range.start && p <= i.range.end);
+};
+$("text").addEventListener("click", () => { const k = caretIssue(); if (k >= 0) openPop(k); else closePop(); });
+$("text").addEventListener("keyup", (e) => { if (e.key === "Escape") closePop(); else if (e.key.startsWith("Arrow")) { const k = caretIssue(); if (k >= 0) openPop(k); else closePop(); } });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closePop(); });
 
 // Underline layer under the textarea. `stale` hides marks while the text is being edited.
 function paintBackdrop(text, stale) {
@@ -121,11 +134,14 @@ function paintBackdrop(text, stale) {
   bd.textContent = "";
   if (stale) { bd.append(document.createTextNode(text + "\n")); return; }
   let pos = 0;
-  for (const i of [...issues].sort((a, b) => a.range.start - b.range.start)) {
+  const order = issues.map((_, k) => k).sort((a, b) => issues[a].range.start - issues[b].range.start);
+  for (const k of order) {
+    const i = issues[k];
     if (i.range.start < pos) continue;
     bd.append(document.createTextNode(text.slice(pos, i.range.start)));
     const m = document.createElement("mark");
     m.className = i.verdict === "MISSPELLED" ? "bad" : i.verdict === "ADVISORY" ? "adv" : "unk";
+    m.dataset.i = String(k);
     m.textContent = text.slice(i.range.start, i.range.end);
     bd.append(m);
     pos = i.range.end;
@@ -134,74 +150,96 @@ function paintBackdrop(text, stale) {
   bd.scrollTop = $("text").scrollTop;
 }
 
-const btn = (label, fn, cls) => { const b = document.createElement("button"); b.textContent = label; b.className = cls || "sm ghost"; b.addEventListener("click", fn); return b; };
+const btn = (label, fn, cls) => { const b = document.createElement("button"); b.type = "button"; b.textContent = label; b.className = cls || "sm ghost"; b.addEventListener("click", fn); return b; };
+const sugLabel = (s) => (s === "" ? "(устгах)" : s === " " ? "(нэг зай)" : s);
 
+async function applyFix(issue, value) {
+  const rr = await api.replace($("text").value, issue, value);
+  if (!rr.ok) { $("stats").textContent = rr.message; return; }
+  const t = $("text");
+  t.value = rr.value.text;
+  const caret = issue.range.start + value.length;
+  t.focus(); t.setSelectionRange(caret, caret);
+  runCheck();
+}
+
+function closePop() { const p = $("pop"); p.hidden = true; p.textContent = ""; }
+
+function openPop(k) {
+  const issue = issues[k];
+  const pop = $("pop");
+  pop.textContent = "";
+  const bad = issue.verdict === "MISSPELLED";
+  const adv = issue.verdict === "ADVISORY";
+  const w = document.createElement("div"); w.className = "pw"; w.textContent = issue.token; pop.append(w);
+  if (issue.suggestions.length && (bad || adv)) {
+    const note = document.createElement("div"); note.className = "pn";
+    note.textContent = issue.suggestionStatus === "AMBIGUOUS" ? "Аль нь зөв бэ?" : "Зөв хувилбар";
+    pop.append(note);
+    const row = document.createElement("div"); row.className = "psug";
+    issue.suggestions.slice(0, MAX_SUGS).forEach((s) => row.append(btn(sugLabel(s), () => applyFix(issue, s), "sm")));
+    pop.append(row);
+    const same = issues.filter((x) => x.normalizedToken === issue.normalizedToken && x.verdict === "MISSPELLED" && x.suggestionStatus === "CONFIDENT");
+    if (bad && issue.suggestionStatus === "CONFIDENT" && same.length > 1) {
+      pop.append(btn(`Бүгдийг солих (${same.length})`, async () => {
+        const rr = await api.replaceAll($("text").value, same, issue.suggestions[0]);
+        if (!rr.ok) { $("stats").textContent = rr.message; return; }
+        $("text").value = rr.value.text; runCheck();
+      }, "sm ghost"));
+    }
+  } else {
+    const note = document.createElement("div"); note.className = "pn";
+    note.textContent = bad ? "Санал олдсонгүй" : issue.message || "Энэ үгийг танихгүй байна";
+    pop.append(note);
+  }
+  const foot = document.createElement("div"); foot.className = "pfoot";
+  const drop = (fn) => async () => { await fn(); closePop(); runCheck(); };
+  foot.append(
+    btn("Үл тоох", drop(() => api.ignoreOnce(issue))),
+    btn("Тольд нэмэх", async () => { const r = await api.addWord(issue.token); if (!r.ok) { $("stats").textContent = r.message; return; } closePop(); runCheck(); loadDict(); }),
+    btn("Алдаа мэдээлэх", async () => {
+      const kind = bad ? (issue.suggestions.length ? "WRONG_SUGGESTION" : "VALID_WORD_FLAGGED") : "UNKNOWN_WORD";
+      const r = await api.feedbackAdd({ kind, word: issue.token, verdict: issue.verdict, suggestion: issue.suggestions[0] || null, reasonCode: issue.reasonCode || null, ...versions });
+      $("fb-msg").textContent = r.ok ? "Мэдээлэл хадгалагдлаа." : (r.message || "Хадгалж чадсангүй.");
+      updateFeedbackCount(); closePop();
+    }),
+  );
+  pop.append(foot);
+  pop.hidden = false;
+  const mark = $("backdrop").querySelector(`mark[data-i="${k}"]`);
+  const ed = $("pop").parentElement.getBoundingClientRect();
+  if (mark) {
+    const r = mark.getBoundingClientRect();
+    pop.style.left = `${Math.max(4, Math.min(r.left - ed.left, ed.width - pop.offsetWidth - 4))}px`;
+    pop.style.top = `${r.bottom - ed.top + 4}px`;
+  }
+}
+
+// Side list: compact «word → fix». Selecting a row puts the caret on the word and opens the popover.
 function render() {
   const ul = $("issues");
   ul.textContent = "";
-  issues.forEach((issue, idx) => {
-    const bad = issue.verdict === "MISSPELLED";
-    const adv = issue.verdict === "ADVISORY";
-    const ambiguous = issue.suggestionStatus === "AMBIGUOUS";
+  if (!issues.length) { const li = document.createElement("li"); li.className = "note"; li.textContent = $("text").value.trim() ? "Алдаа олдсонгүй." : ""; ul.append(li); return; }
+  issues.forEach((issue, k) => {
     const li = document.createElement("li");
-    li.className = `issue ${bad ? "bad" : adv ? "adv" : "unk"}`;
-    const head = document.createElement("div");
-    const tag = document.createElement("span");
-    tag.className = `tag ${bad ? "bad" : adv ? "adv" : "unk"}`;
-    tag.textContent = bad ? "Алдаатай" : adv ? "Зөвлөмж" : "Тодорхойгүй";
-    const w = document.createElement("span");
-    w.className = "w"; w.textContent = issue.token;
-    head.append(tag, w);
-    li.append(head);
-    // Reason text only when the engine supplied a reason code (no invented explanations).
-    if (issue.reasonCode && issue.message) {
-      const m = document.createElement("div"); m.className = "m"; m.textContent = issue.message; li.append(m);
-    } else if (!bad) {
-      const m = document.createElement("div"); m.className = "m"; m.textContent = "Тодорхойгүй үг. Автоматаар засахгүй."; li.append(m);
+    li.className = `row ${issue.verdict === "MISSPELLED" ? "bad" : issue.verdict === "ADVISORY" ? "adv" : "unk"}`;
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "rowbtn";
+    const w = document.createElement("span"); w.className = "w"; w.textContent = issue.token;
+    b.append(w);
+    if (issue.suggestions.length) {
+      const f = document.createElement("span"); f.className = "fix";
+      f.textContent = ` → ${issue.suggestionStatus === "AMBIGUOUS" ? issue.suggestions.slice(0, MAX_SUGS).map(sugLabel).join(" / ") : sugLabel(issue.suggestions[0])}`;
+      b.append(f);
     }
-    const actions = document.createElement("div");
-    actions.className = "actions";
-    if ((bad || adv) && issue.suggestions.length) {
-      const sugs = document.createElement("div"); sugs.className = "sugs";
-      const lbl = document.createElement("span"); lbl.textContent = ambiguous ? "Тодорхойгүй — сонгоно уу:" : "Санал:"; sugs.append(lbl);
-      issue.suggestions.forEach((s, k) => {
-        const l = document.createElement("label");
-        // an ambiguous list claims no best: nothing is pre-selected, the user must choose
-        const r = document.createElement("input"); r.type = "radio"; r.name = `s${idx}`; r.value = s; r.checked = !ambiguous && k === 0;
-        l.append(r, document.createTextNode(s === "" ? "(устгах)" : s === " " ? "(нэг зай)" : s)); sugs.append(l);
-      });
-      li.append(sugs);
-      const pick = () => { const c = li.querySelector(`input[name="s${idx}"]:checked`); return c ? c.value : null; };
-      actions.append(btn("Солих", async () => {
-        const v = pick();
-        if (v === null) { $("stats").textContent = "Санал сонгоно уу."; return; }
-        const rr = await api.replace($("text").value, issue, v);
-        if (!rr.ok) { $("stats").textContent = rr.message; return; }
-        $("text").value = rr.value.text; runCheck();
-      }, "sm"));
-      // Replace-all only for MISSPELLED words with ONE clearly best fix, and only when the word occurs more than once.
-      const same = issues.filter((x) => x.normalizedToken === issue.normalizedToken && x.verdict === "MISSPELLED" && x.suggestionStatus === "CONFIDENT");
-      if (bad && !ambiguous && same.length > 1) {
-        actions.append(btn(`Бүгдийг солих (${same.length})`, async () => {
-          const v = pick() ?? issue.suggestions[0];
-          const rr = await api.replaceAll($("text").value, same, v);
-          if (!rr.ok) { $("stats").textContent = rr.message; return; }
-          $("text").value = rr.value.text; runCheck();
-        }));
-      }
-    }
-    const report = async (kind) => {
-      const r = await api.feedbackAdd({ kind, word: issue.token, verdict: issue.verdict, suggestion: issue.suggestions[0] || null, reasonCode: issue.reasonCode || null, ...versions });
-      $("fb-msg").textContent = r.ok ? "Мэдээлэл хадгалагдлаа." : (r.message || "Хадгалж чадсангүй.");
-      updateFeedbackCount();
-    };
-    actions.append(
-      btn("Үл тоох", async () => { await api.ignoreOnce(issue); issues = issues.filter((x) => x !== issue); paintBackdrop($("text").value); render(); }),
-      btn("Үргэлж үл тоох", async () => { await api.ignoreAll(issue); issues = issues.filter((x) => x.normalizedToken !== issue.normalizedToken); paintBackdrop($("text").value); render(); }),
-      btn(bad ? (issue.suggestions.length ? "Буруу санал" : "Зөв үг") : "Зөв үг", () => report(bad ? (issue.suggestions.length ? "WRONG_SUGGESTION" : "VALID_WORD_FLAGGED") : "UNKNOWN_WORD")),
-      btn("Тольд нэмэх", async () => { const r = await api.addWord(issue.token); if (!r.ok) { $("stats").textContent = r.message; return; } runCheck(); loadDict(); }),
-    );
-    li.append(actions);
+    b.addEventListener("click", () => {
+      const t = $("text"); t.focus(); t.setSelectionRange(issue.range.start, issue.range.end);
+      const y = $("backdrop").querySelector(`mark[data-i="${k}"]`);
+      if (y) y.scrollIntoView({ block: "nearest" });
+      t.setSelectionRange(issue.range.start, issue.range.start);
+      openPop(k);
+    });
+    li.append(b);
     ul.append(li);
   });
 }

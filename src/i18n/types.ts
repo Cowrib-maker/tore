@@ -447,20 +447,17 @@ export type SpellCopy = {
     support: string;
     primaryCta: string;
     secondaryCta: string;
-    betaNote: string;
+    platform: string;
+    /** Contains the {price} placeholder; shown only when a server-configured price exists. */
+    priceFrom: string;
     mockCaption: string;
     mockText: string;
     mockWrong: string;
     mockRight: string;
     mockSuggestionLabel: string;
-    mockWrongLabel: string;
-    mockUnknownWord: string;
-    mockUnknownLabel: string;
   };
-  relation: { title: string; statement: string; back: string };
-  features: { eyebrow: string; title: string; support: string; items: { title: string; description: string }[] };
-  roadmap: { eyebrow: string; title: string; support: string; items: { title: string; description: string }[] };
-  beta: { eyebrow: string; title: string; description: string; points: string[]; cta: string; ctaNote: string };
+  features: { title: string; items: { title: string; description: string }[] };
+  steps: { title: string; items: { title: string; description: string }[] };
   pricing: {
     eyebrow: string;
     title: string;
@@ -484,5 +481,4 @@ export type SpellCopy = {
       cancel: string;
     };
   };
-  honesty: { title: string; body: string };
 };

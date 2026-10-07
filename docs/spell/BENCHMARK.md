@@ -173,9 +173,9 @@ the engine accepts», not «share of valid Mongolian», and a «lexically valid�
 
 | | Phase 2 frozen | Phase 3 start | Phase 3 final |
 |---|---|---|---|
-| lexical coverage, frozen holdout | 89.02% | 89.12% | **89.88%** |
+| lexical coverage, frozen holdout (VALID share; 89.88% excluding 1,412 structurally protected tokens) | 89.12% (89.02% excl. structural) | 89.12% | **89.98%** (89.88% excl. structural) |
 | lexical coverage, dev slice | – | – | 89.75% (89.98% artifact-free subset) |
-| UNKNOWN, frozen holdout | – | – | **~8.4%** |
+| UNKNOWN, frozen holdout | 10.87% | 10.87% | **10.01%** (MISSPELLED 0.10%) |
 | release-claim coverage (TRUSTED + REVIEWED data only) | – | – | **~33.3%** |
 | CONFIDENT suggestion precision (synthetic, shipping) | 99.7% | – | **99.7%** (fresh seeds: 99.68%, 99.73%; floor 99.5%) |
 | clean-text FP baseline (Phase 2) | 0.0060% | – | 0.0060%, no regression |
@@ -194,3 +194,7 @@ native), valid-paradigm acceptance, nonsense-word gate. Proper-name set: 0 accus
 
 **Performance.** 20k-character document stayed within the 25 ms target in a clean process (`scripts/spell-data/perf-v3.ts`); see PHASE-3-REPORT.md.
 **Not verified:** Windows. **Not changed:** production, QPay, secrets, feature flags.
+
+**Correction (Phase 4 audit, 2026-10-07).** An earlier summary of this phase quoted «~8.4% UNKNOWN». Re-running `benchmark-v3 --slice holdout` shows
+UNKNOWN is **10.01%** of word tokens on the frozen holdout (Phase 2 frozen engine on the same holdout: 10.87%). The «90.76% / 9.23%» figures in M4 come
+from a different, smaller held-out sample (`--skip 40000`) and are not comparable with the Phase 3 holdout. Use the table above.

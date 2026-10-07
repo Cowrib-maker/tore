@@ -9,7 +9,7 @@ deployment changes. Windows is **not** verified. The 95% held-out coverage targe
 |---|---|
 | Tests | 3,083 / 3,083 pass |
 | Lexical coverage, frozen holdout | 89.88% (Phase 2 frozen 89.02%, Phase 3 start 89.12%) |
-| UNKNOWN, frozen holdout | ~8.4% |
+| UNKNOWN, frozen holdout | 10.01% of word tokens (Phase 2 frozen engine on the same holdout: 10.87%); MISSPELLED 0.10% |
 | CONFIDENT suggestion precision (synthetic) | 99.7% (floor 99.5%) |
 | Clean-text FP baseline | 0.0060% (Phase 2), no regression |
 | Release-claim coverage (TRUSTED + REVIEWED only) | ~33.3% |

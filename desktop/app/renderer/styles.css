@@ -18,8 +18,8 @@ section, main { padding:8px 16px 16px; }
 #backdrop { color:transparent; pointer-events:none; }
 textarea { width:100%; height:100%; background:transparent; color:inherit; resize:none; outline:none; }
 mark { color:transparent; border-radius:2px; }
-mark.bad { background:transparent; border-bottom:2px wavy var(--bad); }
-mark.unk { background:transparent; border-bottom:2px dotted var(--unk); }
+mark.bad { background:transparent; text-decoration:underline wavy var(--bad) 1.5px; text-underline-offset:3px; }
+mark.unk { background:transparent; text-decoration:underline dotted var(--unk) 1.5px; text-underline-offset:3px; }
 mark.sel { background:var(--unkbg); }
 button { font:inherit; padding:6px 12px; border-radius:6px; border:1px solid var(--acc); background:var(--acc); color:var(--bg); cursor:pointer; }
 button.ghost { background:transparent; color:var(--acc); }
@@ -42,6 +42,18 @@ li.issue .w { font-weight:600; } li.issue .m { color:var(--mut); font-size:13px;
 .notice.ok { border-left-color:var(--ok); background:transparent; color:var(--ok); font-weight:600; }
 
 /* advisory (spacing / capitalization): informational, never an error colour */
-mark.adv { background:transparent; border-bottom:2px dashed var(--mut); }
+mark.adv { background:transparent; text-decoration:underline dashed var(--mut) 1.5px; text-underline-offset:3px; }
 li.issue.adv { border-left:4px solid var(--mut); }
 .tag.adv { background:var(--unkbg); color:var(--mut); }
+
+/* popover correction (click a marked word) */
+.pop { position:absolute; z-index:5; min-width:200px; max-width:320px; padding:10px; border:1px solid var(--line); border-radius:10px; background:var(--bg); box-shadow:0 8px 24px rgba(0,0,0,.18); }
+.pop[hidden] { display:none; }
+.pop .pw { font-weight:600; } .pop .pn { color:var(--mut); font-size:12px; margin:2px 0 6px; }
+.pop .psug { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
+.pop .pfoot { display:flex; gap:6px; flex-wrap:wrap; border-top:1px solid var(--line); padding-top:8px; margin-top:6px; }
+details.menu { margin:8px 0; } details.menu summary { cursor:pointer; color:var(--mut); font-size:13px; }
+.menu-body { display:flex; gap:12px; flex-wrap:wrap; align-items:center; padding:8px 0; }
+li.row { margin-bottom:4px; } li.row.bad .rowbtn { border-left:4px solid var(--bad); } li.row.unk .rowbtn { border-left:4px solid var(--unk); } li.row.adv .rowbtn { border-left:4px solid var(--mut); }
+.rowbtn { display:block; width:100%; text-align:left; background:transparent; color:var(--fg); border:1px solid var(--line); padding:6px 10px; }
+.rowbtn .fix { color:var(--acc); }
