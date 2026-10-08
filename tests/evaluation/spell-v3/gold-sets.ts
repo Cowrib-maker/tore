@@ -21,7 +21,7 @@ export function dirFor(status: ReviewStatus): Dir {
     case "NATIVE_REVIEWED": return "native";
     case "ENGINEER_REVIEWED": return "engineer";
     case "AUTO_GENERATED": return "auto";
-    default: return "model"; // MODEL_ADJUDICATED, NATIVE_PENDING, DISPUTED, UNREVIEWED: still candidates
+    default: return "model"; // MODEL_ADJUDICATED, NATIVE_PENDING, FLAGGED, DISPUTED, UNREVIEWED: still candidates (a flag withdraws an item from native gold)
   }
 }
 

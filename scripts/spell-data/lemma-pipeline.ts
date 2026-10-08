@@ -56,16 +56,21 @@ function exportProvisional() {
 }
 
 function ingest() {
-  const sets = loadAll().filter((s) => s.set === SET && s.provenanceDir === "native");
+  const sets = loadAll().filter((s) => (s.set === SET || s.set === "P_LEMMA_CANDIDATES") && s.provenanceDir === "native");
+  let skippedCandidates = 0;
   const lines: string[] = ["# REVIEWED lemmas: every line is backed by a NATIVE_REVIEWED item in tests/evaluation/spell-v3/gold/native/P_LEMMAS_PROVISIONAL.json (≥2 distinct native reviewers).", "# word\tpos\tflags\tdomain"];
   for (const s of sets) for (const i of s.items) {
     const st = itemState(i);
     if (st.status !== "NATIVE_REVIEWED" || st.verdict !== "VALID" || !i.lemma) continue;
-    lines.push([i.token, i.lemma.pos, (i.lemma.flags ?? []).join(","), i.lemma.domain].join("\t"));
+    // Two natives who AGREED on a corrected record (spelling of the lemma, POS, flags, domain) define the reviewed lemma; otherwise the proposal stands.
+    const c = st.lemmaCorrection;
+    // A corpus CANDIDATE is only a surface form (maybe inflected): it enters the lexicon only when the agreeing natives named the LEMMA and its POS.
+    if (i.id.startsWith("LEMMA_CANDIDATE:") && (!c?.lemma || !c.pos || c.pos === "X")) { skippedCandidates += 1; continue; }
+    lines.push([c?.lemma ?? i.token, c?.pos ?? i.lemma.pos, (c?.flags ?? i.lemma.flags ?? []).join(","), c?.domain ?? i.lemma.domain].join("\t"));
   }
   fs.mkdirSync(REVIEWED_DIR, { recursive: true });
   fs.writeFileSync(path.join(REVIEWED_DIR, "lemmas.tsv"), lines.join("\n") + "\n");
-  console.log(`ingested ${lines.length - 2} NATIVE_REVIEWED lemmas → vocab-reviewed/lemmas.tsv`);
+  console.log(`ingested ${lines.length - 2} NATIVE_REVIEWED lemmas → vocab-reviewed/lemmas.tsv` + (skippedCandidates ? `; skipped ${skippedCandidates} reviewed candidates with no named lemma/POS` : ""));
 }
 
 async function candidates() {

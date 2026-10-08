@@ -53,7 +53,9 @@ export type { ContextModel, NGramData } from "./context/types";
 
 // ── Review pipeline (native review infrastructure; honest status labels) ──
 export {
-  REVIEW_SCHEMA, REVIEW_CATEGORIES, EXPORT_COLUMNS, appendDecision, exportQueueTsv, importDecisionsTsv, isNativeGold, itemState,
+  REVIEW_SCHEMA, REVIEW_CATEGORIES, EXPORT_COLUMNS, actionOf, appendDecision, exportQueueTsv, importDecisionsTsv, isNativeGold, itemState,
   reviewQueue, standingDecisions, summarize as summarizeReview, validateDecision, validateItem,
 } from "./review/review";
-export type { ItemState, LemmaProposal, ReviewCategory, ReviewDecision, ReviewerKind, ReviewStatus, SentenceOrigin, SpellReviewItem, Verdict as ReviewVerdict } from "./review/review";
+export type { FormJudgment, ItemState, LemmaCorrection, LemmaProposal, ReviewAction, ReviewCategory, ReviewDecision, ReviewerKind, ReviewStatus, SentenceOrigin, SpellReviewItem, Verdict as ReviewVerdict } from "./review/review";
+export { paradigmAudit, paradigmGold } from "./review/paradigm-audit";
+export type { ParadigmAudit, ParadigmGoldForm } from "./review/paradigm-audit";
