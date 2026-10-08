@@ -90,7 +90,7 @@ describe("TSV round trip carries the new columns", () => {
   it("exports the columns and imports action, FLAG, corrected POS/flags and forms", () => {
     const items = [lemma("ном"), lemma("цонх")];
     const tsv = exportQueueTsv(items);
-    const header = tsv.split("\n")[0]!.split("\t");
+    const header = tsv.split("\n").find((l) => l.startsWith("id\t"))!.split("\t");
     for (const c of ["action", "lemmaPos", "lemmaFlags", "validForms", "invalidForms"]) expect(header).toContain(c);
     const row = (id: string, cells: Record<string, string>) => header.map((h) => (h === "id" ? id : cells[h] ?? "")).join("\t");
     const filled = [header.join("\t"), row(items[0]!.id, { decision: "VALID", validForms: "номын; номд", invalidForms: "номийн", lemmaPos: "N" }), row(items[1]!.id, { decision: "FLAG", note: "ask a second linguist" })].join("\n");
@@ -105,7 +105,7 @@ describe("TSV round trip carries the new columns", () => {
   });
   it("a file can never promote itself: the caller supplies the reviewer kind", () => {
     const items = [lemma()];
-    const header = exportQueueTsv(items).split("\n")[0]!.split("\t");
+    const header = exportQueueTsv(items).split("\n").find((l) => l.startsWith("id\t"))!.split("\t");
     const filled = [header.join("\t"), header.map((h) => (h === "id" ? items[0]!.id : h === "decision" ? "VALID" : h === "validForms" ? "номын" : "")).join("\t")].join("\n");
     const r = importDecisionsTsv(items, filled, { id: "claude", kind: "MODEL_ASSISTANT" }, at);
     expect(itemState(r.items[0]!).status).toBe("MODEL_ADJUDICATED");

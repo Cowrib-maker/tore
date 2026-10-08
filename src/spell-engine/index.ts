@@ -53,9 +53,13 @@ export type { ContextModel, NGramData } from "./context/types";
 
 // ── Review pipeline (native review infrastructure; honest status labels) ──
 export {
-  REVIEW_SCHEMA, REVIEW_CATEGORIES, EXPORT_COLUMNS, actionOf, appendDecision, exportQueueTsv, importDecisionsTsv, isNativeGold, itemState,
+  REVIEW_SCHEMA, REVIEW_CATEGORIES, EXPORT_COLUMNS, actionOf, appendDecision, goldStats, REVIEW_SHEET_BANNER, withEnginePredictions, exportQueueTsv, importDecisionsTsv, isNativeGold, itemState,
   reviewQueue, standingDecisions, summarize as summarizeReview, validateDecision, validateItem,
 } from "./review/review";
-export type { FormJudgment, ItemState, LemmaCorrection, LemmaProposal, ReviewAction, ReviewCategory, ReviewDecision, ReviewerKind, ReviewStatus, SentenceOrigin, SpellReviewItem, Verdict as ReviewVerdict } from "./review/review";
+export type { Adjudication, FormJudgment, GoldStats, ItemState, LemmaCorrection, LemmaProposal, ReviewAction, ReviewCategory, ReviewDecision, ReviewerKind, ReviewStatus, SentenceOrigin, SpellReviewItem, Verdict as ReviewVerdict } from "./review/review";
 export { paradigmAudit, paradigmGold } from "./review/paradigm-audit";
 export type { ParadigmAudit, ParadigmGoldForm } from "./review/paradigm-audit";
+export { exportMorphologySheet, importMorphologySheet, MORPH_COLUMNS } from "./review/morphology-sheet";
+export type { MorphImportResult } from "./review/morphology-sheet";
+export { QUEUE_IDS, SCORE_WEIGHTS as QUEUE_SCORE_WEIGHTS, buildQueues, impactScore, maxCoverageGain, queueToReviewItems, queuesOf } from "./review/queue";
+export type { Candidate as QueueCandidate, Contradiction, MorphLemma, QueueId, QueueInput, QueueItem } from "./review/queue";

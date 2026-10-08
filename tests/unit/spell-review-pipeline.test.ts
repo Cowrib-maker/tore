@@ -75,7 +75,7 @@ describe("items, queue, export / import", () => {
   it("never exports local-corpus (class D) sentences", () => {
     const tsv = exportQueueTsv([base("h", { sentenceOrigin: "LOCAL_CORPUS_D" }), base("i")]);
     expect(tsv).not.toMatch(/Энэ надэд хэрэгтэй\.\t.*\n.*h/);
-    const rows = tsv.trim().split("\n").slice(1).map((l) => l.split("\t"));
+    const rows = tsv.trim().split("\n").filter((l) => !l.startsWith("#")).slice(1).map((l) => l.split("\t"));
     expect(rows[0]![3]).toBe("");
     expect(rows[1]![3]).toBe("Энэ надэд хэрэгтэй.");
   });

@@ -50,3 +50,17 @@ Dev VALID is ≈89.9%, so ≈95% needs on the order of **10,000 approved word ty
 ## Open linguistic questions found while building (engine behaviour observed, no native opinion yet)
 - «багшыг» is accepted as valid (багш + ыг); is «багшийг» the only standard spelling?
 - Doubled final consonant after н («сайнн»): the engine treats it as UNKNOWN because loans are written that way (тонн); is it ever acceptable in a native word?
+
+## Phase 6: disputes, uncertainty, morphology sheets, queues
+
+**Disputes (append-only).** Two natives who disagree → `DISPUTED`; it never enters gold and never resolves by majority. It resolves only when an **additional** native records a decision carrying `adjudication: { reason }` that **agrees with at least one** of the disputing natives (verdict, correction, lemma record, no contradicting form). The result is `NATIVE_REVIEWED` with a `resolution` naming the resolver, the reason, the time, who it agreed with and who was overruled; all decisions stay in the log. An adjudicator who agrees with nobody, a missing reason, a second adjudicator, an engineer or a model → still `DISPUTED`.
+
+**Uncertain forms.** A form marked FLAG is never a vote either way; it stays *pending* even if every reviewer flags it. A whole item marked FLAG makes it `FLAGGED` (not gold) until that reviewer decides again.
+
+**Engine prediction vs native judgment.** Items carry `enginePredictions` (form, verdict, engine version), attached once and never edited (`withEnginePredictions` refuses to overwrite). Judgments live only in `decisions`. `paradigm-audit.ts` compares the two; a form natives call invalid that the engine accepts is a **false accept**. Example shape (fixture reviewers in the tests, NOT real review): engine accepts «багшыг»; two natives mark it INVALID and «багшийг» VALID → the audit reports one false accept. If a future change makes the engine reject «багшыг», that test must be updated on purpose.
+
+**Morphology sheet** (`exportMorphologySheet` / `importMorphologySheet`): one row per (lemma, form) with `engineSays` in its own column; the reviewer first states `lemmaDecision` (VALID | REJECT | FLAG) on each lemma, then `judgment` (VALID | INVALID | FLAG) per form. Forms judged without a lemma decision are skipped, not assumed. Every sheet starts with a banner (ignored by the importer): *this data becomes release-grade only after the required native-review agreement is satisfied; engine columns are not answers; nothing is pre-filled.*
+
+**Queues** (`npx tsx scripts/spell-data/review-queues.ts`, dev slice only, local files under `.spell-research/review-queue/queues/`, never committed because the source corpus has no stated licence): twelve separate queues — HIGH_IMPACT_MISSING_LEMMAS, MORPHOLOGY_VALIDATION, MORPHOLOGY_CONTRADICTIONS, HIGH_FREQUENCY_UNKNOWN, POSSIBLE_FALSE_POSITIVE, PROPER_NAMES, LOANWORDS, COMPOUNDS, DERIVATIONS, LEGAL_GOVERNMENT, DISPUTED_ITEMS, REVIEWED_REGRESSION. Ranking is deterministic (same input → byte-identical output; ties by code point) and every row says why it is high: `score = (occurrences + 2·documents + 5·fanOut) × (1 + 0.5·professionalShare) × 1.1 if the engine accuses the word`. Queue rows are ordinary review items with provenance AUTOMATIC; the score is shown next to, never inside, the decision columns.
+
+**Gold accounting** (`goldStats`, `benchmark-report.ts`): native-review count, agreement rate, disagreement, resolution rate, reviewed/pending forms. A rate with nothing to divide is **NOT MEASURED**, never 0 or 1.

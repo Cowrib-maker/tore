@@ -47,7 +47,19 @@ export type SentenceOrigin = "MODEL_AUTHORED" | "ENGINEER_AUTHORED" | "NATIVE_AU
 export type ReviewAction = "ACCEPT" | "REJECT" | "CORRECT" | "FLAG";
 
 /** One inflected / derived form judged by a reviewer (paradigm review). */
-export type FormJudgment = { form: string; valid: boolean; note?: string };
+export type FormJudgment = {
+  form: string;
+  valid: boolean;
+  /** «I cannot tell» for this form: never counts as a vote either way; the form stays pending. */
+  uncertain?: boolean;
+  note?: string;
+};
+
+/**
+ * An explicit adjudication of a DISPUTED item by an ADDITIONAL native reviewer. It is an ordinary decision plus a mandatory reason; it
+ * never replaces the disputed judgments (they stay in the log and in `ItemState.resolution`).
+ */
+export type Adjudication = { reason: string };
 
 /** A reviewer's correction of the PROPOSED lemma record. Absent fields are accepted as proposed. */
 export type LemmaCorrection = {
@@ -75,6 +87,8 @@ export type ReviewDecision = {
   forms?: FormJudgment[];
   /** Corrected lemma record (only with verdict VALID). */
   lemmaCorrection?: LemmaCorrection;
+  /** Present only on the decision of a third, distinct native who resolves a dispute. */
+  adjudication?: Adjudication;
   /** ISO date-time. */
   at: string;
 };
@@ -125,6 +139,11 @@ export type SpellReviewItem = {
   priority?: number;
   /** For LEMMA review items (token = the lemma): the proposed lexicon record. A native VALID decision approves exactly this record. */
   lemma?: LemmaProposal;
+  /**
+   * What the ENGINE predicted for each form when the item was created (never edited afterwards: it is the audit record that lets a later
+   * native judgment be compared with the prediction). A reviewer's judgments live in `decisions`, never here.
+   */
+  enginePredictions?: { form: string; verdict: Verdict; engineVersion: string }[];
   decisions: ReviewDecision[];
 };
 
@@ -136,6 +155,8 @@ export type ItemState = {
   suggestion?: string;
   /** Corrected lemma record the agreeing natives gave (NATIVE_REVIEWED only). */
   lemmaCorrection?: LemmaCorrection;
+  /** Set when a DISPUTED item was resolved by an explicit adjudication: the original disagreement and the resolver stay visible. */
+  resolution?: { resolverId: string; reason: string; at: string; agreedWith: string[]; overruled: string[] };
   /** Forms judged the SAME way by ≥2 natives: the only forms that count as reviewed. */
   reviewedForms?: FormJudgment[];
   /** Forms only one native has judged so far (pending a second opinion). */
@@ -159,7 +180,7 @@ const normForm = (f: string) => f.trim().toLowerCase();
 /** Forms judged by the decisions: form → valid[] (one entry per reviewer who judged it). */
 function judgments(ds: readonly ReviewDecision[]): Map<string, boolean[]> {
   const m = new Map<string, boolean[]>();
-  for (const d of ds) for (const f of d.forms ?? []) (m.get(normForm(f.form)) ?? m.set(normForm(f.form), []).get(normForm(f.form))!).push(f.valid);
+  for (const d of ds) for (const f of d.forms ?? []) if (!f.uncertain) (m.get(normForm(f.form)) ?? m.set(normForm(f.form), []).get(normForm(f.form))!).push(f.valid);
   return m;
 }
 
@@ -172,10 +193,35 @@ const agree = (ds: readonly ReviewDecision[]): boolean => {
   return true;
 };
 
+const coreSig = (d: ReviewDecision) => `${d.verdict}|${d.verdict === "MISSPELLED" ? d.suggestion ?? "" : ""}|${canon(d.lemmaCorrection)}`;
+
+/**
+ * Resolve a dispute only through an explicit adjudication: exactly one native decision carries `adjudication` (with a reason), at least two
+ * natives remain besides it, and the adjudicator AGREES (verdict, correction, lemma record, and no contradicting form) with at least one of
+ * them. The result is the adjudicator plus the natives it agrees with; the overruled natives stay named in `resolution`. An adjudicator who
+ * agrees with nobody, or two adjudicators, leave the item DISPUTED. Never a silent majority.
+ */
+function adjudicate(natives: readonly ReviewDecision[]): { group: ReviewDecision[]; resolution: NonNullable<ItemState["resolution"]> } | null {
+  const adj = natives.filter((d) => d.adjudication?.reason?.trim());
+  if (adj.length !== 1 || natives.length < 3) return null;
+  const a = adj[0]!;
+  const others = natives.filter((d) => d !== a);
+  const allies = others.filter((d) => coreSig(d) === coreSig(a) && agree([a, d]));
+  if (allies.length === 0) return null;
+  const group = [a, ...allies];
+  if (!agree(group)) return null;
+  return {
+    group,
+    resolution: { resolverId: a.reviewerId, reason: a.adjudication!.reason.trim(), at: a.at, agreedWith: allies.map((d) => d.reviewerId), overruled: others.filter((d) => !allies.includes(d)).map((d) => d.reviewerId) },
+  };
+}
+
 function formsOf(ds: readonly ReviewDecision[]): { reviewed: FormJudgment[]; pending: FormJudgment[] } {
   const reviewed: FormJudgment[] = [];
   const pending: FormJudgment[] = [];
   for (const [form, votes] of [...judgments(ds)].sort((a, b) => a[0].localeCompare(b[0]))) (votes.length >= 2 ? reviewed : pending).push({ form, valid: votes[0]! });
+  const judged = new Set([...reviewed, ...pending].map((f) => f.form));
+  for (const d of ds) for (const f of d.forms ?? []) if (f.uncertain && !judged.has(normForm(f.form))) { judged.add(normForm(f.form)); pending.push({ form: normForm(f.form), valid: f.valid, uncertain: true }); }
   return { reviewed, pending };
 }
 
@@ -188,7 +234,13 @@ export function itemState(item: Pick<SpellReviewItem, "id" | "decisions">): Item
   // A standing native FLAG ("someone else must look") blocks consensus until that reviewer records a new decision.
   if (natives.some((d) => actionOf(d) === "FLAG")) return { id: item.id, status: "FLAGGED", reviewers };
   if (natives.length >= 2) {
-    if (!agree(natives)) return { id: item.id, status: "DISPUTED", reviewers };
+    if (!agree(natives)) {
+      const resolved = adjudicate(natives);
+      if (!resolved) return { id: item.id, status: "DISPUTED", reviewers };
+      const { reviewed, pending } = formsOf(resolved.group);
+      const first = resolved.group[0]!;
+      return { id: item.id, status: "NATIVE_REVIEWED", verdict: first.verdict, suggestion: first.suggestion, lemmaCorrection: first.lemmaCorrection, reviewedForms: reviewed, pendingForms: pending, resolution: resolved.resolution, reviewers };
+    }
     const { reviewed, pending } = formsOf(natives);
     return { id: item.id, status: "NATIVE_REVIEWED", verdict: natives[0]!.verdict, suggestion: natives[0]!.suggestion, lemmaCorrection: natives[0]!.lemmaCorrection, reviewedForms: reviewed, pendingForms: pending, reviewers };
   }
@@ -229,6 +281,10 @@ export function validateDecision(d: Omit<ReviewDecision, "seq">): string[] {
     else if (d.action === "CORRECT" && !((d.verdict === "MISSPELLED" && d.suggestion) || (d.verdict === "VALID" && d.lemmaCorrection))) p.push("CORRECT needs a correction (MISSPELLED + suggestion, or VALID + lemmaCorrection)");
     else if (d.action === "FLAG" && d.verdict !== "UNKNOWN") p.push("FLAG means verdict UNKNOWN");
   }
+  if (d.adjudication) {
+    if (d.reviewerKind !== "NATIVE_HUMAN") p.push("only a native reviewer can adjudicate");
+    if (!d.adjudication.reason?.trim()) p.push("an adjudication needs a reason");
+  }
   if (d.lemmaCorrection && d.verdict !== "VALID") p.push("a lemma correction is only allowed with verdict VALID");
   if (d.lemmaCorrection && !Object.values(d.lemmaCorrection).some((v) => v !== undefined && !(Array.isArray(v) && v.length === 0) && v !== "")) p.push("a lemma correction must change something");
   if (d.forms?.length) {
@@ -240,6 +296,7 @@ export function validateDecision(d: Omit<ReviewDecision, "seq">): string[] {
       else if (seen.has(k)) p.push(`form "${f.form}" is judged twice in one decision`);
       seen.add(k);
       if (typeof f.valid !== "boolean") p.push(`form "${f.form}" needs valid true/false`);
+      if (f.uncertain && f.valid) p.push(`form "${f.form}": an uncertain form carries valid=false`);
     }
   }
   // an assistant must never present itself as a human reviewer
@@ -299,10 +356,21 @@ export const isNativeGold = (i: Pick<SpellReviewItem, "id" | "decisions">): bool
  * (inflected forms separated by «;» or spaces). FLAG may be written as the decision itself ("FLAG" = UNKNOWN + action FLAG).
  */
 export const EXPORT_COLUMNS = ["id", "category", "token", "sentence", "engineVerdict", "engineSuggestion", "engineReason", "proposedVerdict", "proposedSuggestion", "decision", "correction", "note", "action", "lemmaPos", "lemmaFlags", "validForms", "invalidForms"] as const;
+/**
+ * Printed at the top of every reviewer sheet (lines starting with «#» are ignored by the importer). It states what a decision means and keeps
+ * the engine's opinion out of the decision columns.
+ */
+export const REVIEW_SHEET_BANNER: readonly string[] = [
+  "# TORE Spell — linguistic review sheet. You are judging Mongolian language data; your decision may become part of the product's reference data.",
+  "# This data becomes release-grade only after the required native-review agreement is satisfied (two distinct native reviewers who agree).",
+  "# Columns starting with «engine» show what the SOFTWARE guessed. They are NOT answers and may be wrong. Leave a cell blank when you are not sure, or write FLAG.",
+  "# Nothing is pre-filled. Your reviewer identity is recorded by whoever imports this file; the file itself cannot promote anything.",
+];
+
 export function exportQueueTsv(items: readonly SpellReviewItem[], opts: { includeLocalCorpusSentences?: boolean } = {}): string {
   const esc = (s: string | undefined) => (s ?? "").replace(/[\t\r\n]+/g, " ");
   const rows = items.map((i) => [i.id, i.category, i.token, i.sentenceOrigin === "LOCAL_CORPUS_D" && !opts.includeLocalCorpusSentences ? "" : i.sentence, i.currentVerdict, i.currentSuggestion, i.currentReason, i.proposedVerdict, i.proposedSuggestion, "", "", "", "", "", "", "", ""].map((x) => esc(x as string | undefined)).join("\t"));
-  return [EXPORT_COLUMNS.join("\t"), ...rows].join("\n") + "\n";
+  return [...REVIEW_SHEET_BANNER, EXPORT_COLUMNS.join("\t"), ...rows].join("\n") + "\n";
 }
 
 export type ImportResult = { applied: number; skipped: { line: number; reason: string }[]; items: SpellReviewItem[] };
@@ -312,7 +380,7 @@ export type ImportResult = { applied: number; skipped: { line: number; reason: s
  * decisions are reported, never guessed. The reviewer identity and KIND are supplied by the CALLER (a file cannot promote itself to native).
  */
 export function importDecisionsTsv(items: readonly SpellReviewItem[], tsv: string, reviewer: { id: string; kind: ReviewerKind }, at: string): ImportResult {
-  const lines = tsv.split(/\r?\n/).filter((l) => l.length > 0);
+  const lines = tsv.split(/\r?\n/).filter((l) => l.length > 0 && !l.startsWith("#"));
   const header = (lines.shift() ?? "").split("\t");
   const col = (n: string) => header.indexOf(n);
   const byId = new Map(items.map((i) => [i.id, i] as const));
@@ -351,4 +419,61 @@ export function importDecisionsTsv(items: readonly SpellReviewItem[], tsv: strin
     }
   });
   return { applied, skipped, items: [...byId.values()] };
+}
+
+/** Attach the engine's predictions to an item ONCE. An item that already has predictions is returned unchanged: history is never rewritten. */
+export function withEnginePredictions(item: SpellReviewItem, forms: readonly string[], verdictOf: (form: string) => Verdict, engineVersion: string): SpellReviewItem {
+  if (item.enginePredictions?.length) return item;
+  const seen = new Set<string>();
+  const preds = forms.map((f) => f.trim().toLowerCase()).filter((f) => f && !seen.has(f) && seen.add(f)).map((form) => ({ form, verdict: verdictOf(form), engineVersion }));
+  return { ...item, enginePredictions: preds };
+}
+
+export type GoldStats = {
+  items: number;
+  byStatus: Record<ReviewStatus, number>;
+  nativeReviewed: number;
+  /** Items judged by ≥2 natives that were not flagged: the population where agreement is measurable. */
+  twoNativeItems: number;
+  /** NATIVE_REVIEWED / (NATIVE_REVIEWED + DISPUTED), or null when no item has two native judgments (NOT MEASURED). */
+  agreementRate: number | null;
+  disputed: number;
+  flagged: number;
+  adjudicated: number;
+  /** adjudicated / (adjudicated + still disputed), or null when there was never a dispute. */
+  resolutionRate: number | null;
+  reviewedForms: { valid: number; invalid: number };
+  pendingForms: number;
+};
+
+/** Honest gold-set accounting. A rate with an empty denominator is null — it is NOT MEASURED, never 0 and never 1. */
+export function goldStats(items: readonly SpellReviewItem[]): GoldStats {
+  const sum = summarize(items);
+  let adjudicated = 0;
+  let valid = 0;
+  let invalid = 0;
+  let pending = 0;
+  for (const it of items) {
+    const st = itemState(it);
+    if (st.resolution) adjudicated += 1;
+    for (const f of st.reviewedForms ?? []) (f.valid ? (valid += 1) : (invalid += 1));
+    pending += st.pendingForms?.length ?? 0;
+  }
+  const plainAgreed = sum.NATIVE_REVIEWED - adjudicated;
+  const denom = plainAgreed + sum.DISPUTED + adjudicated;
+  const { total, ...byStatus } = sum;
+  void total;
+  return {
+    items: items.length,
+    byStatus,
+    nativeReviewed: sum.NATIVE_REVIEWED,
+    twoNativeItems: denom,
+    agreementRate: denom ? plainAgreed / denom : null,
+    disputed: sum.DISPUTED,
+    flagged: sum.FLAGGED,
+    adjudicated,
+    resolutionRate: adjudicated + sum.DISPUTED ? adjudicated / (adjudicated + sum.DISPUTED) : null,
+    reviewedForms: { valid, invalid },
+    pendingForms: pending,
+  };
 }
