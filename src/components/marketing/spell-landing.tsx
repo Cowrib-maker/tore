@@ -2,6 +2,7 @@ import { ArrowRight, BookMarked, Laptop, SpellCheck, Wand2 } from "lucide-react"
 
 import { LandingFooter } from "@/components/marketing/landing-footer";
 import { LandingNav, type LandingAuthUser } from "@/components/marketing/landing-nav";
+import { SpellDownload } from "@/components/marketing/spell-download";
 import { SpellPurchase, type SpellPlanOption } from "@/components/marketing/spell-purchase";
 import { LandingReveal } from "@/components/marketing/landing-reveal";
 import { LandingEyebrow, LandingHeading, LandingLead, LandingSection } from "@/components/marketing/landing-section";
@@ -23,6 +24,7 @@ export function SpellLanding({
   authUser,
   plans,
   purchaseAvailable,
+  installerReady,
 }: {
   dict: Dictionary;
   locale: Locale;
@@ -30,6 +32,8 @@ export function SpellLanding({
   plans: SpellPlanOption[];
   /** Spell enabled and QPay configured on the server. */
   purchaseAvailable: boolean;
+  /** A real https installer URL is configured on the server (the URL itself never reaches this page). */
+  installerReady: boolean;
 }) {
   const t = dict.spell;
   const prices = plans.map((p) => p.priceMnt).filter((n): n is number => n !== null);
@@ -158,6 +162,7 @@ export function SpellLanding({
               </LandingReveal>
             ))}
           </ol>
+          <SpellDownload copy={t.download} installerReady={installerReady} />
         </LandingSection>
       </main>
       <LandingFooter dict={dict} authUser={authUser} />

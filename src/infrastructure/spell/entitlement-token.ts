@@ -13,6 +13,7 @@ import type {
   SpellTokenClaimsInput,
   SpellTokenIssuer,
 } from "@/domain/ports/spell-security";
+import { SPELL_RELEASE_TOKEN_TTL_SECONDS, SPELL_RELEASE_TOKEN_TYPE, type SpellRelease } from "@/domain/spell/update";
 import type { SigningKeyRing } from "./spell-config";
 
 export const SPELL_TOKEN_ISSUER = "tore-spell";
@@ -60,6 +61,24 @@ export class JoseSpellTokenIssuer implements SpellTokenIssuer {
         return { ...jwk, kid, alg: SPELL_TOKEN_ALG, use: "sig" };
       }),
     };
+  }
+
+  /**
+   * Signs the latest-release description for the desktop updater (typ `tore-spell-release+jwt`). Short-lived: a captured document cannot
+   * advertise an old release forever. The app verifies it with the public keys compiled into it.
+   */
+  async signRelease(release: SpellRelease, now: Date): Promise<string> {
+    const kid = this.ring.activeKid;
+    const key = this.privateKeys.get(kid);
+    if (!key) throw new Error("Spell signing key is not available");
+    const iat = Math.floor(now.getTime() / 1000);
+    return new SignJWT({ rel: release.version, url: release.url, sha256: release.sha256, size: release.size, min: release.minSupportedVersion })
+      .setProtectedHeader({ alg: SPELL_TOKEN_ALG, kid, typ: SPELL_RELEASE_TOKEN_TYPE })
+      .setIssuer(SPELL_TOKEN_ISSUER)
+      .setAudience(SPELL_TOKEN_AUDIENCE)
+      .setIssuedAt(iat)
+      .setExpirationTime(iat + SPELL_RELEASE_TOKEN_TTL_SECONDS)
+      .sign(key);
   }
 
   async issue(input: SpellTokenClaimsInput): Promise<IssuedSpellToken> {

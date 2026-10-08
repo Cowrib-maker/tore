@@ -13,9 +13,9 @@ const MSG = {
   OFFLINE_LIMIT: "Офлайн горимд ажиллах хугацаа дууссан. Интернет холболт шаардлагатай: холбогдоод «Эрх шалгах» дарна уу.",
   CLOCK_ROLLBACK: "Компьютерийн цаг буцсан байна. Интернет холболт шаардлагатай: холбогдож эрхээ шалгана уу.",
   TOKEN_INVALID: "Эрхийн мэдээлэл баталгаажсангүй. Интернет холболт шаардлагатай: эрхээ дахин шалгана уу.",
-  EXPIRED: "Лицензийн хугацаа дууссан. Автоматаар сунгагдахгүй; шинэ лиценз авч идэвхжүүлнэ үү.",
+  EXPIRED: "Таны TORE Spell-ийн эрх дууссан байна. Хувийн толь болон тохиргоо хэвээр хадгалагдсан; шинэ эрх идэвхжүүлмэгц ашиглаж болно.",
   ACTIVATION_NOT_ACTIVE: "Энэ лиценз өөр компьютерт шилжсэн эсвэл чөлөөлөгдсөн байна. Хэрэв энэ компьютер дээр дахин ашиглах бол шилжүүлэн идэвхжүүлнэ үү.",
-  LICENSE_EXPIRED: "Лицензийн хугацаа дууссан. Автоматаар сунгагдахгүй; шинэ лиценз авч идэвхжүүлнэ үү.",
+  LICENSE_EXPIRED: "Таны TORE Spell-ийн эрх дууссан байна. Хувийн толь болон тохиргоо хэвээр хадгалагдсан; шинэ эрх идэвхжүүлмэгц ашиглаж болно.",
   LICENSE_REVOKED: "Лиценз хүчингүй болсон байна.",
   INSTALLATION_REVOKED: "Энэ суулгалтын эрх хаагдсан байна.",
   DEACTIVATED: "Энэ компьютерээс лиценз чөлөөлөгдсөн.",
@@ -46,6 +46,8 @@ async function refresh() {
       note.textContent = `Эрхээ шинэчлэх хугацаа болсон. Интернет холболт шаардлагатай. Офлайн горимд ${state.offlineUntilLocal} хүртэл ажиллана.`;
     } else note.hidden = true;
     await loadDict();
+    void loadUpdate();
+    void loadFeedbackState();
     return;
   }
   $("ready-note").hidden = true;
@@ -57,6 +59,7 @@ async function refresh() {
   else { badge.textContent = "Идэвхжээгүй"; if (state.endedReason) msg = MSG[state.endedReason] || msg; }
   $("lock-msg").textContent = msg;
   $("validate-lock").hidden = !state || state.kind !== "VALIDATION_REQUIRED";
+  $("renew").hidden = !(state && state.kind === "EXPIRED") && !(state && state.endedReason && /EXPIRED/.test(state.endedReason));
 }
 
 const showErr = (r) => { $("err").textContent = r && r.message ? r.message : ""; };
@@ -197,11 +200,9 @@ function openPop(k) {
   foot.append(
     btn("Үл тоох", drop(() => api.ignoreOnce(issue))),
     btn("Тольд нэмэх", async () => { const r = await api.addWord(issue.token); if (!r.ok) { $("stats").textContent = r.message; return; } closePop(); runCheck(); loadDict(); }),
-    btn("Алдаа мэдээлэх", async () => {
-      const kind = bad ? (issue.suggestions.length ? "WRONG_SUGGESTION" : "VALID_WORD_FLAGGED") : "UNKNOWN_WORD";
-      const r = await api.feedbackAdd({ kind, word: issue.token, verdict: issue.verdict, suggestion: issue.suggestions[0] || null, reasonCode: issue.reasonCode || null, ...versions });
-      $("fb-msg").textContent = r.ok ? "Мэдээлэл хадгалагдлаа." : (r.message || "Хадгалж чадсангүй.");
-      updateFeedbackCount(); closePop();
+    btn("Алдаа мэдээлэх", () => {
+      closePop();
+      openReport({ type: bad ? (issue.suggestions.length ? "WRONG_SUGGESTION" : "WRONG_CORRECTION") : "MISSING_WORD", token: issue.token, engineSuggestion: issue.suggestions[0] || "", reasonCode: issue.reasonCode || null });
     }),
   );
   pop.append(foot);
@@ -259,22 +260,75 @@ async function loadDict() {
 
 $("dict-q").addEventListener("input", () => loadDict());
 
-async function updateFeedbackCount() {
-  const r = await api.feedbackCount();
-  $("fb-count").textContent = r.ok && r.value ? `(${r.value})` : "";
+// ── user feedback («Санал илгээх»): one word + short note, sent signed to the licence server; queued locally when offline ──
+let reportCtx = { reasonCode: null, engineSuggestion: "" };
+const rtype = () => (document.querySelector('input[name="rtype"]:checked') || {}).value || "";
+function syncReportFields() {
+  const t = rtype();
+  $("r-token-row").hidden = t === "GENERAL";
+  $("r-fix-row").hidden = !(t === "MISSING_ERROR" || t === "WRONG_SUGGESTION");
 }
-$("fb-missed").addEventListener("click", async () => {
-  const word = $("fb-word").value.trim();
-  const r = await api.feedbackAdd({ kind: "MISSED_MISSPELLING", word, verdict: null, suggestion: null, reasonCode: null, ...versions });
-  $("fb-msg").textContent = r.ok ? "Мэдээлэл хадгалагдлаа." : "Зөвхөн нэг үг оруулна уу (өгүүлбэр биш).";
-  if (r.ok) $("fb-word").value = "";
-  updateFeedbackCount();
+function openReport(pre) {
+  reportCtx = { reasonCode: (pre && pre.reasonCode) || null, engineSuggestion: (pre && pre.engineSuggestion) || "" };
+  const want = (pre && pre.type) || "MISSING_ERROR";
+  for (const r of document.querySelectorAll('input[name="rtype"]')) r.checked = r.value === want;
+  $("r-token").value = (pre && pre.token) || "";
+  $("r-fix").value = "";
+  $("r-note").value = "";
+  $("r-msg").textContent = "";
+  syncReportFields();
+  $("report-dlg").showModal();
+  ($("r-token-row").hidden ? $("r-note") : $("r-token")).focus();
+}
+for (const r of document.querySelectorAll('input[name="rtype"]')) r.addEventListener("change", syncReportFields);
+$("report-open").addEventListener("click", () => openReport(null));
+$("r-cancel").addEventListener("click", () => $("report-dlg").close());
+$("report-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const t = rtype();
+  if (!t) { $("r-msg").textContent = "Юу буруу байгааг сонгоно уу."; return; }
+  const payload = {
+    feedbackType: t,
+    token: t === "GENERAL" ? undefined : $("r-token").value.trim(),
+    engineSuggestion: reportCtx.engineSuggestion || null,
+    userSuggestion: $("r-fix-row").hidden ? null : ($("r-fix").value.trim() || null),
+    comment: $("r-note").value.trim() || null,
+    reasonCode: reportCtx.reasonCode,
+    engineVersion: versions.engineVersion || "unknown",
+    dataVersion: versions.dataPackVersion || "unknown",
+  };
+  $("r-send").disabled = true;
+  const r = await api.feedbackSubmit(payload);
+  $("r-send").disabled = false;
+  if (!r.ok) { $("r-msg").textContent = r.message || "Илгээж чадсангүй."; return; }
+  $("report-dlg").close();
+  $("stats").textContent = r.value.sent ? "Баярлалаа. Санал илгээгдлээ." : "Санал хадгалагдлаа; интернэттэй холбогдонгуут илгээгдэнэ.";
+  showContrib(r.value.stats, r.value.pending);
 });
-$("fb-export").addEventListener("click", async () => {
-  const r = await api.feedbackExport();
-  $("fb-msg").textContent = r.ok && r.value && r.value.saved ? "Файл хадгалагдлаа. Бидэнд илгээнэ үү." : "";
-});
-updateFeedbackCount();
+function showContrib(stats, pending) {
+  const el = $("contrib");
+  const parts = [];
+  if (stats && stats.accepted > 0) parts.push("Таны оруулсан санал TORE Spell-ийг сайжруулахад тусаллаа.", `Хүлээн авсан санал: ${stats.accepted}`);
+  else if (stats && stats.submitted > 0) parts.push(`Илгээсэн санал: ${stats.submitted} · Хянагдаж байна: ${stats.pending}`);
+  if (pending > 0) parts.push(`Илгээгдээгүй: ${pending}`);
+  el.textContent = parts.join(" ");
+  el.hidden = parts.length === 0;
+}
+async function loadFeedbackState() {
+  const r = await api.feedbackState();
+  if (r.ok) showContrib(r.value.stats, r.value.pending);
+}
+async function loadUpdate() {
+  const r = await api.updateState();
+  const n = $("update-note");
+  if (!r.ok || r.value.kind !== "UPDATE_AVAILABLE") { n.hidden = true; return; }
+  $("update-text").textContent = r.value.required ? `Шинэ хувилбар ${r.value.version} бэлэн. Энэ хувилбарыг шинэчлэхийг зөвлөж байна.` : `Шинэ хувилбар ${r.value.version} бэлэн.`;
+  n.hidden = false;
+}
+$("update-get").addEventListener("click", () => api.openPage("license"));
+$("renew").addEventListener("click", () => api.openPage("pricing"));
+$("my-license").addEventListener("click", () => api.openPage("license"));
+loadFeedbackState();
 
 refresh();
 setInterval(refresh, 60000);

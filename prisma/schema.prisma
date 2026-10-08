@@ -2025,3 +2025,48 @@ model SpellRequestNonce {
   @@index([expiresAt])
   @@map("spell_request_nonces")
 }
+
+enum SpellFeedbackType {
+  WRONG_CORRECTION
+  MISSING_ERROR
+  WRONG_SUGGESTION
+  MISSING_WORD
+  GENERAL
+}
+
+enum SpellFeedbackStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  NEEDS_NATIVE_REVIEW
+  DUPLICATE
+}
+
+/// A licensed user's report about a correction (a real-world SIGNAL, never linguistic authority). It is stored only; nothing here ever
+/// edits a lexicon, a gold set or a data tier. Status changes are made by admins only (see the review use case).
+model SpellFeedback {
+  id               String              @id @default(cuid())
+  /// Owner of the licence activation the report came from. Not a relation: feedback outlives the account lifecycle.
+  userId           String              @map("user_id")
+  feedbackType     SpellFeedbackType   @map("feedback_type")
+  /// One word (never a sentence); empty for GENERAL.
+  token            String              @db.VarChar(40)
+  engineSuggestion String?             @map("engine_suggestion") @db.VarChar(40)
+  userSuggestion   String?             @map("user_suggestion") @db.VarChar(40)
+  comment          String?             @db.VarChar(200)
+  reasonCode       String?             @map("reason_code") @db.VarChar(40)
+  engineVersion    String              @map("engine_version") @db.VarChar(40)
+  dataVersion      String              @map("data_version") @db.VarChar(200)
+  /// Identical reports share this key (see feedbackGroupKey).
+  groupKey         String              @map("group_key") @db.VarChar(64)
+  status           SpellFeedbackStatus @default(PENDING)
+  createdAt        DateTime            @default(now()) @map("created_at")
+  reviewedAt       DateTime?           @map("reviewed_at")
+  reviewedBy       String?             @map("reviewed_by")
+  reviewReason     String?             @map("review_reason") @db.VarChar(500)
+
+  @@index([groupKey])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
+  @@map("spell_feedback")
+}

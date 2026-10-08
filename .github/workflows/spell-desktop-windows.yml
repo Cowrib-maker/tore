@@ -4,8 +4,10 @@ name: spell-desktop-windows
 #
 # The installer is UNSIGNED (no code-signing certificate yet): Windows
 # SmartScreen will warn. Controlled-beta distribution only. When a
-# certificate exists, add CSC_LINK / CSC_KEY_PASSWORD secrets; electron-builder
-# signs automatically and nothing else here changes.
+# certificate exists, add the repository secrets CSC_LINK (base64 .pfx or a
+# secure URL) and CSC_KEY_PASSWORD: the build step below passes them to
+# electron-builder, which then signs the installer. Never commit a certificate.
+# The "Signature status" step reports the truth (NotSigned vs Valid) either way.
 #
 # What this job proves:  build · installer size/hash · silent install ·
 #   launch of the INSTALLED app (--selftest: engine, personal dictionary,
@@ -63,6 +65,16 @@ jobs:
       - name: Build + package (NSIS, x64, production config)
         run: npm run dist:win
         working-directory: desktop
+        env:
+          # Empty unless the secrets exist → electron-builder builds an UNSIGNED installer (the current state).
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+
+      - name: Signature status (reports NotSigned honestly)
+        shell: pwsh
+        run: |
+          $sig = Get-AuthenticodeSignature "desktop/release/TORE-Spell-Setup.exe"
+          "Authenticode status: $($sig.Status)" | Tee-Object -FilePath $env:GITHUB_STEP_SUMMARY -Append
 
       - name: Verify packaged app content (no secrets, production origin, pinned PUBLIC key)
         run: npm run verify:package

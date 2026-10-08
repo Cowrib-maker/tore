@@ -54,6 +54,7 @@ export default async function AdminSpellPage() {
     <>
       <DashboardPageHeading>TORE Spell лицензүүд</DashboardPageHeading>
       <PaymentCenterTabs active="/admin/spell" />
+      <p className="mb-3 text-sm"><a href="/admin/spell/feedback" className="font-medium underline">Хэрэглэгчийн санал →</a></p>
       {!enabled ? (
         <p className="text-sm text-muted-foreground">TORE_SPELL_V1 идэвхгүй тул лиценз харагдахгүй.</p>
       ) : (

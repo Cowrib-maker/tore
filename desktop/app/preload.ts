@@ -17,7 +17,8 @@ contextBridge.exposeInMainWorld("spell", {
   removeWord: (word: string) => call("dict:remove", word),
   words: () => call("dict:words"),
   searchWords: (query: string) => call("dict:search", query),
-  feedbackAdd: (entry: unknown) => call("feedback:add", entry),
-  feedbackCount: () => call("feedback:count"),
-  feedbackExport: () => call("feedback:export"),
+  feedbackSubmit: (input: unknown) => call("feedback:submit", input),
+  feedbackState: () => call("feedback:state"),
+  openPage: (page: "pricing" | "license") => call("app:openPage", page),
+  updateState: () => call("update:state"),
 });

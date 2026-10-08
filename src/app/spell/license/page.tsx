@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { getSessionUser } from "@/application/common/session";
 import { SpellCodeReveal } from "@/components/marketing/spell-license-card";
+import { SpellReleaseButton } from "@/components/marketing/spell-release-button";
 import { LandingFooter } from "@/components/marketing/landing-footer";
 import { LandingNav } from "@/components/marketing/landing-nav";
 import { listOwnerLicenses } from "@/application/use-cases/spell/owner-licenses";
@@ -49,6 +50,7 @@ export default async function SpellLicensePage() {
       await fulfillSpellPurchase(inv, runtime.deps).catch(() => undefined);
     }
     const licenses = await listOwnerLicenses(actor, runtime.deps);
+    const cooldownDays = runtime.deps.policy.transferCooldownDays;
     const installerReady = getSpellInstallerUrl() !== null;
     const hasUsable = licenses.some((l) => l.status === "ACTIVE");
 
@@ -89,9 +91,35 @@ export default async function SpellLicensePage() {
                   <p className="mb-1 text-sm text-slate-500">Лицензийн код</p>
                   <SpellCodeReveal licenseId={l.id} maskedCode={l.maskedCode} />
                 </div>
-                <p className="mt-4 text-sm text-slate-500">
-                  {l.activeActivation ? "Одоогоор нэг компьютер дээр идэвхтэй." : "Одоогоор ямар ч компьютер дээр идэвхжээгүй."}
-                </p>
+                <div className="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">
+                  <p className="font-semibold text-slate-800">Миний одоогийн компьютер</p>
+                  {l.activeActivation ? (
+                    <>
+                      <p className="mt-1">
+                        {l.activeActivation.platform === "MACOS" ? "macOS" : "Windows"} · идэвхжүүлсэн {formatDateTimeUlaanbaatar(new Date(l.activeActivation.activatedAt), locale)}
+                      </p>
+                      <p>Сүүлд шалгасан: {formatDateTimeUlaanbaatar(new Date(l.activeActivation.lastValidatedAt), locale)}</p>
+                      {l.status === "ACTIVE" ? (
+                        <>
+                          <p className="mt-2">
+                            {l.transferAvailableAt
+                              ? `Дараагийн шилжүүлэлт: ${formatDateTimeUlaanbaatar(new Date(l.transferAvailableAt), locale)}-ээс хойш.`
+                              : `Өөр компьютерт шилжүүлэх боломжтой. Эхний шилжүүлэлт үнэгүй; дараагийнх нь ${cooldownDays} хоногийн дараа.`}
+                          </p>
+                          <SpellReleaseButton licenseId={l.id} />
+                        </>
+                      ) : null}
+                    </>
+                  ) : (
+                    <p className="mt-1">Одоогоор ямар ч компьютер дээр идэвхжээгүй. Программ суулгаад кодоо оруулна уу.</p>
+                  )}
+                </div>
+                {l.status === "EXPIRED" ? (
+                  <p className="mt-4 text-sm text-slate-600">
+                    Таны TORE Spell-ийн эрх дууссан байна. Хувийн толь болон тохиргоо таны компьютерт хэвээр хадгалагдсан.{" "}
+                    <Link href="/spell#pricing" className="font-bold text-blue-600 hover:text-blue-700">Шинэ эрх авах →</Link>
+                  </p>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -104,7 +132,7 @@ export default async function SpellLicensePage() {
               Windows хувилбар татах
             </a>
           ) : hasUsable ? (
-            <p className="mt-2 text-slate-600">Beta installer удахгүй. Бэлэн болмогц энд татах холбоос гарна.</p>
+            <p className="mt-2 text-slate-600">Windows суулгац одоогоор бэлэн болоогүй байна. Бэлэн болмогц энд татах холбоос гарна.</p>
           ) : (
             <p className="mt-2 text-slate-600">Татахын тулд идэвхтэй лиценз шаардлагатай.</p>
           )}

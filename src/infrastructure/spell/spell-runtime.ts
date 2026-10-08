@@ -14,8 +14,10 @@ import {
   PrismaSpellAttemptRepository,
   PrismaSpellNonceRepository,
 } from "@/infrastructure/repositories/prisma-spell-guard-repository";
+import { PrismaSpellFeedbackRepository } from "@/infrastructure/repositories/prisma-spell-feedback-repository";
 import { PrismaSpellInstallationRepository } from "@/infrastructure/repositories/prisma-spell-installation-repository";
 import { PrismaSpellLicenseRepository } from "@/infrastructure/repositories/prisma-spell-license-repository";
+import type { SpellFeedbackRepository } from "@/domain/repositories/spell-feedback-repository";
 import type { SpellAdminDeps } from "@/application/use-cases/spell/deps";
 import { KeyRingSpellCodeVault } from "./code-vault";
 import { JoseSpellTokenIssuer } from "./entitlement-token";
@@ -23,6 +25,7 @@ import { parseSpellConfig, SpellConfigError } from "./spell-config";
 
 export type SpellRuntime = {
   deps: SpellAdminDeps;
+  feedbackRepository: SpellFeedbackRepository;
   tokenIssuer: JoseSpellTokenIssuer;
 };
 
@@ -69,6 +72,6 @@ export function getSpellRuntime(): SpellRuntime {
     auditLogRepository,
     randomBytes: (size) => randomBytes(size),
   };
-  cached = { deps, tokenIssuer };
+  cached = { deps, tokenIssuer, feedbackRepository: new PrismaSpellFeedbackRepository(prisma) };
   return cached;
 }

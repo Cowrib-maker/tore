@@ -45,6 +45,7 @@ export const spellMn: SpellCopy = {
       { title: "Компьютер дээр ажиллана", description: "Таны бичсэн текст компьютерээс гарахгүй." },
     ],
   },
+  download: { cta: "Windows-д татах", note: "Лиценз авсны дараа «Миний лиценз» хэсгээс татна.", soon: "Windows суулгац удахгүй.", platform: "Windows" },
   steps: {
     title: "Хэрхэн авах вэ",
     items: [
@@ -114,6 +115,7 @@ export const spellEn: SpellCopy = {
       { title: "Runs on your computer", description: "The text you write stays on your computer." },
     ],
   },
+  download: { cta: "Download for Windows", note: "After you get a licence, download it from «My licence».", soon: "The Windows installer is coming soon.", platform: "Windows" },
   steps: {
     title: "How to get it",
     items: [

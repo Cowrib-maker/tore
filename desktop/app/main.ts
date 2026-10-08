@@ -1,13 +1,14 @@
 import path from "node:path";
 
 import type { JSONWebKeySet } from "jose";
-import fs from "node:fs";
-import { app, BrowserWindow, dialog, ipcMain, safeStorage, session } from "electron";
+import { app, BrowserWindow, ipcMain, safeStorage, session, shell } from "electron";
 
 import { SpellClientError, SpellLicenseClient, type ClientRecord, type Transport } from "../core/license-client";
 import { formatUlaanbaatar, messageForCode } from "../core/messages";
 import { DesktopSpellSession, StaleIssueError, type DesktopIssue, type DictionaryDoc } from "../core/spell-session";
-import { FeedbackLog, type FeedbackDoc, type FeedbackEntry } from "../core/feedback";
+import { FeedbackOutbox, type OutboxDoc } from "../core/feedback-outbox";
+import { checkForUpdate, type UpdateStatus } from "../core/update";
+import { FeedbackValidationError, type FeedbackInput } from "../../src/domain/spell/feedback";
 import { FileStore, type SecretProtector } from "../core/store";
 import { runSelfTest } from "./selftest";
 import { createSpellEngineV1 } from "../../src/spell-engine/bundled";
@@ -40,6 +41,7 @@ const protector: SecretProtector = {
 
 function fail(e: unknown) {
   if (e instanceof SpellClientError) return { ok: false as const, code: e.code, message: e.messageMn, details: e.details };
+  if (e instanceof FeedbackValidationError) return { ok: false as const, code: "INVALID_FEEDBACK", message: "Оруулсан мэдээлэл буруу байна: зөвхөн нэг үг оруулна уу." };
   if (e instanceof StaleIssueError) return { ok: false as const, code: "STALE_ISSUE", message: "Текст өөрчлөгдсөн тул дахин шалгана уу." };
   console.error("[spell-desktop]", e instanceof Error ? `${e.name}: ${e.message}` : "unknown error");
   return { ok: false as const, code: "INTERNAL", message: "Алдаа гарлаа." };
@@ -71,7 +73,8 @@ async function start() {
   });
   const spell = new DesktopSpellSession(engine, new FileStore<DictionaryDoc>(path.join(dir, "dictionary.json")), dev.devLicense ? { isEntitled: async () => true } : client);
 
-  const feedback = new FeedbackLog(new FileStore<FeedbackDoc>(path.join(dir, "feedback.json")));
+  const outbox = new FeedbackOutbox(new FileStore<OutboxDoc>(path.join(dir, "feedback-outbox.json")), client);
+  let update: UpdateStatus = { kind: "UNAVAILABLE" };
 
   const view = async () => {
     if (dev.devLicense) return { ...DEV_LICENSE_STATE, licenseExpiresAtLocal: "DEV", offlineUntilLocal: "DEV" };
@@ -100,15 +103,22 @@ async function start() {
   ipcMain.handle("spell:ignoreAll", wrap((issue: DesktopIssue) => spell.ignoreAll(issue)));
   ipcMain.handle("dict:add", wrap((w: string) => spell.addToDictionary(w)));
   ipcMain.handle("dict:remove", wrap((w: string) => spell.removeFromDictionary(w)));
-  ipcMain.handle("feedback:add", wrap((entry: Omit<FeedbackEntry, "at">) => feedback.add(entry).kind));
-  ipcMain.handle("feedback:count", wrap(() => feedback.count()));
-  // Export is an explicit user action through a save dialog; nothing is ever uploaded.
-  ipcMain.handle("feedback:export", wrap(async () => {
-    const r = await dialog.showSaveDialog({ title: "Алдаа мэдээллийн файл хадгалах", defaultPath: "tore-spell-feedback.tsv", filters: [{ name: "TSV", extensions: ["tsv"] }] });
-    if (r.canceled || !r.filePath) return { saved: false };
-    fs.writeFileSync(r.filePath, feedback.exportTsv(), "utf8");
-    return { saved: true, count: feedback.count() };
+  // Reports go to a local outbox first, then to the licence server (signed by this installation). One word + short note; never document text.
+  ipcMain.handle("feedback:submit", wrap(async (input: FeedbackInput) => {
+    outbox.enqueue(input);
+    const r = await Promise.race([outbox.flush(), new Promise<null>((res) => setTimeout(() => res(null), 8000))]);
+    return { sent: r ? r.sent > 0 && r.pending === 0 : false, pending: outbox.pending(), stats: outbox.stats() };
   }));
+  ipcMain.handle("feedback:state", wrap(() => ({ pending: outbox.pending(), stats: outbox.stats() })));
+  // Only fixed pages of the configured TORE origin can be opened (no URL ever comes from the renderer).
+  const PAGES: Record<string, string> = { pricing: "/spell#pricing", license: "/spell/license" };
+  ipcMain.handle("app:openPage", wrap(async (page: string) => {
+    const p = PAGES[page];
+    if (!p || !API_BASE) return false;
+    await shell.openExternal(new URL(p, API_BASE).toString());
+    return true;
+  }));
+  ipcMain.handle("update:state", wrap(() => update));
   ipcMain.handle("dict:words", wrap(() => spell.dictionaryWords()));
   ipcMain.handle("dict:search", wrap((q: string) => spell.searchDictionary(String(q))));
 
@@ -127,8 +137,15 @@ async function start() {
   // Start-up validation, then at the server-provided cadence (12 h default; checked hourly).
   const tick = async () => {
     if ((await client.state()).kind !== "UNACTIVATED") await client.validate().catch(() => undefined);
+    if ((await client.state()).kind === "ACTIVE") await outbox.flush().catch(() => undefined);
     win.webContents.send("license:changed");
   };
+  // Manual-update notice: verified, never downloaded or run by the app (see src/domain/spell/update.ts).
+  const checkUpdate = async () => {
+    update = await checkForUpdate({ currentVersion: app.getVersion(), transport, pinnedJwks: __TORE_PINNED_JWKS__.keys.length > 0 ? __TORE_PINNED_JWKS__ : undefined });
+  };
+  void checkUpdate();
+  setInterval(() => void checkUpdate(), 24 * 60 * 60 * 1000);
   void tick();
   setInterval(() => void client.state().then((s) => (s.kind === "ACTIVE" && s.refreshDue) || s.kind === "VALIDATION_REQUIRED" ? tick() : undefined), 60 * 60 * 1000);
   app.on("window-all-closed", () => app.quit());

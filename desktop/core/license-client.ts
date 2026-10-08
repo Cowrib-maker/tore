@@ -9,6 +9,7 @@ import {
 
 import { createLocalJWKSet, jwtVerify, type JSONWebKeySet } from "jose";
 
+import type { ContributionStats, FeedbackInput } from "../../src/domain/spell/feedback";
 import { messageForCode, SPELL_TRANSFER_WARNING_MN } from "./messages";
 import type { DocumentStore, SecretProtector } from "./store";
 
@@ -304,6 +305,20 @@ export class SpellLicenseClient {
       }
     }
     return this.state();
+  }
+
+  /** Send one report for the ACTIVE activation of this computer (signed like every device request). */
+  async postFeedback(feedback: FeedbackInput): Promise<{ id: string; status: string; stats: ContributionStats }> {
+    const rec = this.record();
+    if (!rec.grant) throw new SpellClientError("NO_ACTIVATION", messageForCode("NO_ACTIVATION"));
+    return (await this.signedPost(rec, "/api/spell/v1/feedback", { activationId: rec.grant.activationId, feedback })) as { id: string; status: string; stats: ContributionStats };
+  }
+
+  /** This account's contribution counts (accepted reports are the only credit). */
+  async contributions(): Promise<ContributionStats> {
+    const rec = this.record();
+    if (!rec.grant) throw new SpellClientError("NO_ACTIVATION", messageForCode("NO_ACTIVATION"));
+    return (await this.signedPost(rec, "/api/spell/v1/contributions", { activationId: rec.grant.activationId })) as ContributionStats;
   }
 
   /** Release this computer's activation (idempotent server-side), then forget the grant. */

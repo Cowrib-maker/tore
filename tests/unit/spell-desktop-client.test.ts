@@ -383,21 +383,3 @@ describe("license error flows end to end (Mongolian messages)", () => {
     expect((await client.state()).kind).toBe("ACTIVE");
   });
 });
-
-describe("local feedback log («Алдаа мэдээлэх»)", () => {
-  it("stores one word + verdict + versions, never surrounding text; exports TSV; caps size", async () => {
-    const { FeedbackLog } = await import("../../desktop/core/feedback");
-    const log = new FeedbackLog(new MemoryStore());
-    const e = log.add({ kind: "WRONG_SUGGESTION", word: "нотлсон", verdict: "MISSPELLED", suggestion: "нотолсон", reasonCode: "STEM_VOWEL_MISSING", engineVersion: "1.0.0", dataPackVersion: "d1" });
-    expect(e.at).toMatch(/^\d{4}-/);
-    expect(() => log.add({ kind: "UNKNOWN_WORD", word: "Энэ бол миний бүтэн өгүүлбэр", verdict: "UNKNOWN", suggestion: null, reasonCode: null, engineVersion: "1", dataPackVersion: "d" })).toThrow("INVALID_FEEDBACK_WORD");
-    expect(() => log.add({ kind: "UNKNOWN_WORD", word: "ok", verdict: null, suggestion: "a b c", reasonCode: null, engineVersion: "1", dataPackVersion: "d" })).toThrow("INVALID_FEEDBACK_SUGGESTION");
-    expect(() => log.add({ kind: "BAD" as never, word: "ok", verdict: null, suggestion: null, reasonCode: null, engineVersion: "1", dataPackVersion: "d" })).toThrow("INVALID_FEEDBACK_KIND");
-    const tsv = log.exportTsv().trim().split("\n");
-    expect(tsv[0]).toContain("engineVersion\tdataPackVersion");
-    expect(tsv).toHaveLength(2);
-    expect(tsv[1]).toContain("нотлсон\tMISSPELLED\tнотолсон\tSTEM_VOWEL_MISSING");
-    for (let i = 0; i < 520; i += 1) log.add({ kind: "UNKNOWN_WORD", word: "үг", verdict: "UNKNOWN", suggestion: null, reasonCode: null, engineVersion: "1", dataPackVersion: "d" });
-    expect(log.count()).toBe(500);
-  });
-});

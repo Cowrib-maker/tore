@@ -457,6 +457,7 @@ export type SpellCopy = {
     mockSuggestionLabel: string;
   };
   features: { title: string; items: { title: string; description: string }[] };
+  download: { cta: string; note: string; soon: string; platform: string };
   steps: { title: string; items: { title: string; description: string }[] };
   pricing: {
     eyebrow: string;
