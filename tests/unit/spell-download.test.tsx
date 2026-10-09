@@ -57,7 +57,7 @@ describe("the download route stays owner-gated and config-driven", () => {
   const route = fs.readFileSync(path.join(ROOT, "src/app/api/spell/download/route.ts"), "utf8");
   it("requires an actor with an ACTIVE licence and redirects only to the configured URL", () => {
     expect(route).toMatch(/requireActor\(\)/);
-    expect(route).toMatch(/SpellLicenseStatus\.ACTIVE/);
+    expect(route).toMatch(/deriveLicenseState\(l, now\)\.status === SpellEffectiveLicenseStatus\.ACTIVE/); // effective (clock-derived) status, not the stored column
     expect(route).toMatch(/getSpellInstallerUrl\(\)/);
     expect(route).toMatch(/INSTALLER_NOT_AVAILABLE/);
     expect(route).not.toMatch(/https?:\/\//);
