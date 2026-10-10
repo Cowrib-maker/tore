@@ -25,6 +25,62 @@ describe("extractArticleMentions — false positives and multiples", () => {
   });
 });
 
+describe("extractArticleMentions — explicit citations are recognised", () => {
+  it.each([
+    ["12-р зүйл", [12]],
+    ["Хуулийн 12 -р зүйл", [12]],
+    ["17 дугаар зүйл", [17]],
+    ["40 дүгээр зүйл", [40]],
+    ["Иргэний хуулийн 17 дугаар зүйлийн 1 дэх хэсэг", [17]],
+    ["17-р зүйлийн 2 дахь заалт", [17]],
+    ["Хуулийн зүйлийн 21 заалт", [21]],
+    ["Зүйл 12. Зорилго", [12]],
+    ["Зүйл 12-т зааснаар", [12]],
+    ["(зүйл 7)", [7]],
+    ["Тайлбар: Зүйл 15\nДараагийн мөр", [15]],
+  ])("%s → %j", (text, expected) => {
+    expect(extractArticleMentions(text)).toEqual(expected);
+  });
+});
+
+describe("extractArticleMentions — plain numbers are not articles", () => {
+  it.each([
+    "Энэ зүйл 5 хоногийн дотор шийдэгдэнэ.",
+    "Нэг зүйл 3 удаа давтагдсан байна.",
+    "Таны асуусан 2 дахь зүйл нь гэрээ юм.",
+    "Дараах 3 зүйлийг анхаарна уу: 1) гэрээ 2) төлбөр 3) хугацаа.",
+    "Үнэ 25 зүйл бүтээгдэхүүн",
+    "Тухайн зүйлийн 5 хувийг төлнө.",
+    "Тухайн зүйлийн 30 хоногийн дотор.",
+    "Тухайн зүйлийн 10 өдрийн дотор.",
+    "Нийт 12 зүйл байна, 5 хоногийн дотор, 3 удаа.",
+  ])("%s → none", (text) => {
+    expect(extractArticleMentions(text)).toEqual([]);
+  });
+});
+
+describe("guardUngroundedCitations — warning only for an explicit, unverified article", () => {
+  it("never warns on quantities, even with no verified authority at all", () => {
+    const text = "Энэ зүйл 5 хоногийн дотор шийдэгдэнэ. Дараах 3 зүйлийг анхаарна уу. 2 дахь зүйл нь гэрээ юм.";
+    expect(guardUngroundedCitations(text, undefined)).toEqual({ content: text, ungrounded: [] });
+    expect(guardUngroundedCitations(text, [{ article: "17" }])).toEqual({ content: text, ungrounded: [] });
+  });
+  it("a verified article is not warned, in every recognised spelling", () => {
+    const verified = [{ article: "12" }, { locator: "art-17.1" }, { article: "40" }];
+    for (const text of ["12-р зүйл", "17 дугаар зүйлийн 1 дэх хэсэг", "40 дүгээр зүйл", "Зүйл 12-т зааснаар"]) {
+      expect(guardUngroundedCitations(text, verified)).toEqual({ content: text, ungrounded: [] });
+    }
+  });
+  it("warns about the unverified explicit article only, not the quantity next to it", () => {
+    const text = "Хуулийн 99-р зүйл 5 хоногийн дотор хамаарна, 12 дугаар зүйл мөн адил.";
+    const r = guardUngroundedCitations(text, [{ article: "12" }]);
+    expect(r.ungrounded).toEqual([99]);
+    expect(r.content).toContain("99-р зүйл");
+    expect(r.content).not.toContain("5-р зүйл");
+    expect(r.content).not.toContain("12-р зүйл нь");
+  });
+});
+
 describe("guardUngroundedCitations", () => {
   it("all cited articles verified (several) → no warning appended, text identical", () => {
     const text = "17-р зүйл болон 21-р зүйлийн 2 дахь хэсэг";
