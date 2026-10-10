@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { PreviewNetworkGuard } from "@/components/admin/preview/preview-network-guard";
+import { UserRole } from "@/domain/enums";
 import type { PreviewContentMode, PreviewContext, PreviewPageId } from "@/domain/admin-preview/scenarios";
 import { PREVIEW_PAGES } from "@/domain/admin-preview/scenarios";
 
@@ -30,6 +32,7 @@ export function PreviewFrame({
           Синтетик жишээ өгөгдөл. Товчлуур, маягт ажиллахгүй; төлбөр, имэйл, лиценз, байршуулалт хийгдэхгүй; жинхэнэ хэрэглэгчийн мэдээлэл өөрчлөгдөхгүй.
         </span>
       </div>
+      <PreviewNetworkGuard audience={context.role === UserRole.LAWYER ? "lawyer" : "citizen"} />
       <div inert aria-label="Урьдчилан харах агуулга">
         {children}
       </div>

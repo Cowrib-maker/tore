@@ -520,10 +520,27 @@ export function BillingCenter({
               <ShieldCheck className="size-4" />
               Багц идэвхжих хүртэл төлбөрийн баримт болон гүйлгээний мэдээллийг хадгална уу.
             </p>
-          ) : invoiceClosed ? null : invoice.status === "FAILED" ? (
-            <p className="mt-4 text-sm font-medium text-red-700">
-              Төлбөр баталгаажаагүй. Дахин оролдоно уу.
-            </p>
+          ) : invoiceClosed || invoice.status === "FAILED" ? (
+            <>
+              {invoice.status === "FAILED" ? (
+                <p className="mt-4 text-sm font-medium text-red-700">Төлбөр баталгаажаагүй. Дахин оролдоно уу.</p>
+              ) : null}
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="mt-4"
+                onClick={() => {
+                  stopPolling();
+                  setCheckoutError(null);
+                  setClaimError(null);
+                  // UI only: drop the closed invoice so the plan picker returns. A new invoice is created only by a new checkout request.
+                  setData((current) => (current ? { ...current, pendingInvoice: null } : current));
+                }}
+              >
+                Шинээр эхлэх
+              </Button>
+            </>
           ) : invoice.method !== "QPAY" ? (
             <>
               {claimError ? <p className="mt-3 text-sm text-red-700">{claimError}</p> : null}

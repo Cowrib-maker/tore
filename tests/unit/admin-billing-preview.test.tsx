@@ -150,3 +150,25 @@ describe("an injected transport can never render unlabelled", () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 });
+
+describe("a closed invoice never strands the customer", () => {
+  it.each([
+    ["payment-failed"],
+    ["invoice-expired"],
+    ["invoice-cancelled"],
+  ] as const)("%s offers a restart that returns to plan selection and can create a new simulated invoice", async (scenario) => {
+    sandbox("citizen", scenario);
+    fireEvent.click(await screen.findByText("Шинээр эхлэх"));
+    expect(await screen.findByText("Багц сонгох")).toBeTruthy();
+    fireEvent.click(screen.getByText("QR кодоор төлөх"));
+    expect(await screen.findByText("Төлбөр хүлээгдэж байна")).toBeTruthy();
+    expect(document.body.textContent).toMatch(/SIM-000[2-9]/);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it("an open invoice does not show the restart button", async () => {
+    sandbox("lawyer", "pending-payment");
+    await screen.findByText("Төлбөр хүлээгдэж байна");
+    expect(screen.queryByText("Шинээр эхлэх")).toBeNull();
+  });
+});

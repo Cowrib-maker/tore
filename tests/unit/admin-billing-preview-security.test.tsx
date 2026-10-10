@@ -1,11 +1,13 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ForbiddenError, UnauthorizedError } from "@/domain/errors/domain-error";
 
 const h = vi.hoisted(() => ({ requireAdminPage: vi.fn(), notFound: vi.fn() }));
 vi.mock("@/application/common/require-admin-page", () => ({ requireAdminPage: h.requireAdminPage }));
+vi.mock("@/components/admin/preview/preview-network-guard", () => ({ PreviewNetworkGuard: ({ audience }: { audience: string }) => <i data-network-guard={audience} /> }));
 vi.mock("next/navigation", () => ({
   notFound: () => {
     h.notFound();
@@ -21,6 +23,7 @@ vi.mock("next/navigation", () => ({
 
 import AdminCoveragePage from "@/app/admin/preview/coverage/page";
 import AdminCheckoutPreviewPage from "@/app/admin/preview/checkout/[role]/page";
+import { SiteContentList } from "@/components/admin/site-content/site-content-list";
 import { PRODUCT_COVERAGE } from "@/domain/admin-preview/product-coverage";
 import { ALL_SITE_CONTENT_DEFINITIONS } from "@/domain/site-content/registry";
 
@@ -126,5 +129,43 @@ describe("site content never exposes pricing or billing policy for editing", () 
   it("no editable key targets prices, plans, checkout or billing", () => {
     const keys = ALL_SITE_CONTENT_DEFINITIONS.map((e) => `${e.key} ${e.dictionaryPath}`.toLowerCase());
     for (const k of keys) expect(k).not.toMatch(/price|checkout|billing|subscription|payment|qpay/);
+  });
+});
+
+describe("URL parameters are never ignored silently", () => {
+  beforeEach(() => h.requireAdminPage.mockResolvedValue({ userId: "a" }));
+  const render = async (searchParams: Record<string, string>) =>
+    renderToStaticMarkup(await AdminCheckoutPreviewPage({ params: Promise.resolve({ role: "citizen" }), searchParams: Promise.resolve(searchParams) }));
+
+  it("tells the admin when state or locale was not understood", async () => {
+    const html = await render({ state: "bogus", locale: "xx" });
+    expect(html).toContain("Дэмжигдээгүй төлөв «bogus»");
+    expect(html).toContain("хэл «xx»");
+    expect(html).toContain('role="alert"');
+  });
+
+  it("shows no notice for valid parameters or none", async () => {
+    expect(await render({ state: "active", locale: "en" })).not.toContain("Дэмжигдээгүй");
+    expect(await render({})).not.toContain("Дэмжигдээгүй");
+  });
+});
+
+describe("content list rows wrap long text instead of widening the page", () => {
+  it("uses a wrapping clamp, not a nowrap truncate, for the text preview", () => {
+    const html = renderToStaticMarkup(
+      <SiteContentList rows={[{ key: "home.hero.tagline", page: "home", section: "hero", labelMn: "Үндсэн уриа", labelEn: "Main tagline", preview: "x".repeat(300), mn: "default", en: "default" }]} />,
+    );
+    expect(html).toContain("line-clamp-2");
+    expect(html).not.toContain("truncate");
+  });
+});
+
+describe("the checkout preview installs the network guard", () => {
+  it("renders PreviewNetworkGuard with the synthetic audience on both roles", async () => {
+    h.requireAdminPage.mockResolvedValue({ userId: "a" });
+    for (const role of ["citizen", "lawyer"]) {
+      const html = renderToStaticMarkup(await AdminCheckoutPreviewPage({ params: Promise.resolve({ role }), searchParams: Promise.resolve({}) }));
+      expect(html).toContain(`data-network-guard="${role}"`);
+    }
   });
 });

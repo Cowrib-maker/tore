@@ -69,8 +69,8 @@ export function SiteContentList({ rows }: { rows: SiteContentListRow[] }) {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto]">
-        <Input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Хайх: түлхүүр, нэр, текст…" aria-label="Агуулга хайх" />
+      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_auto_auto]">
+        <Input className="sm:col-span-2 xl:col-span-1" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Хайх: түлхүүр, нэр, текст…" aria-label="Агуулга хайх" />
         <select aria-label="Хуудас" className="rounded-md border bg-background px-2 text-sm" value={page} onChange={(e) => setPage(e.target.value as "all" | SiteContentPageId)}>
           <option value="all">Бүх хуудас</option>
           {pagesPresent.map((p) => (
@@ -102,7 +102,7 @@ export function SiteContentList({ rows }: { rows: SiteContentListRow[] }) {
                       <span className="font-medium">
                         {row.labelMn} <span className="font-normal text-muted-foreground">· {row.labelEn}</span>
                       </span>
-                      <span className="truncate text-sm text-muted-foreground">{row.preview}</span>
+                      <span className="line-clamp-2 break-words text-sm text-muted-foreground">{row.preview}</span>
                       <span className="flex flex-wrap items-center gap-2">
                         <code className="text-xs text-muted-foreground">{row.key}</code>
                         <StateBadge locale="mn" state={row.mn} />
