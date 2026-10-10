@@ -12,13 +12,29 @@
 export const INSUFFICIENT_EVIDENCE_MN =
   "Энэ дүгнэлтийг одоогийн баримт, эх сурвалжаар хангалттай тогтоох боломжгүй.";
 
-/** Ordinal article mentions: «12-р зүйл», «12 дугаар зүйл», «зүйлийн 12», «Зүйл 12». A bare «2 зүйл» is a count, not a citation. */
+/**
+ * Quantity words that may follow a number: «5 хоног», «3 удаа», «зүйлийн 5 хувь». A number followed by one of these is an amount, not an
+ * article. Suffixed forms are matched too («хоногийн», «хувийг», «өдрийн»), so a few stems that lose a vowel/soft sign before a suffix are listed twice («хувь/хуви», «өдөр/өдр»).
+ */
+const QUANTITY_AFTER_NUMBER = "(?:хувь|хуви|хоног|удаа|жил|сар|өдөр|өдр|минут|секунд|цаг|төгрөг|мянга|сая|тэрбум|%|₮)";
+
+/**
+ * Explicit article citations only:
+ *   «12-р зүйл», «17 дугаар/дүгээр зүйл» (also «17 дугаар зүйлийн 1 дэх хэсэг» → 17, the 1 is a paragraph),
+ *   «зүйлийн 21 заалт», and a heading-style «Зүйл 12.» / «Зүйл 12-т» (the number ends the phrase or takes a case suffix).
+ * Deliberately NOT citations: counts and amounts («3 зүйл», «зүйл 5 хоногийн дотор», «зүйлийн 5 хувь», «Нэг зүйл 3 удаа»), a bare list item
+ * («2 дахь зүйл нь…», «дараах 3 зүйлийг»). A real citation the patterns miss is only left unchecked; a quantity must never raise a warning.
+ */
 const ARTICLE_PATTERNS: readonly RegExp[] = [
   /(\d{1,3})\s*-\s*р\s+зүйл/giu,
-  /(\d{1,3})\s*(?:дугаар|дүгээр|дахь)\s+зүйл/giu,
+  /(\d{1,3})\s*(?:дугаар|дүгээр)\s+зүйл/giu,
   // «зүйлийн 12» names an article — but in «17 дугаар зүйлийн 1 дэх хэсэг» the 1 is a paragraph.
-  /(?<!\d\s*(?:-\s*р|дугаар|дүгээр|дахь)\s+)зүйлийн\s+(\d{1,3})(?![\d.]|\s*(?:дэх|дахь|-р))/giu,
-  /зүйл\s+(\d{1,3})(?![\d]|\s*-\s*р)/giu,
+  new RegExp(
+    "(?<!\\d\\s*(?:-\\s*р|дугаар|дүгээр)\\s+)зүйлийн\\s+(\\d{1,3})(?![\\d.]|\\s*(?:дэх|дахь|-р)|\\s*" + QUANTITY_AFTER_NUMBER + ")",
+    "giu",
+  ),
+  // «Зүйл 12.», «зүйл 12-т», «(зүйл 12)»: the number must end the phrase; «зүйл 5 хоногийн» continues with a word, so it is not matched.
+  /(?<!\p{L})зүйл\s+(\d{1,3})(?=\s*(?:$|[.,;:!?)\]»"'])|-\p{L})/gimu,
 ];
 
 export function extractArticleMentions(text: string): number[] {

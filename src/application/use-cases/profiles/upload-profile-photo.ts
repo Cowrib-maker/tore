@@ -37,14 +37,18 @@ export const PROFILE_PHOTO_SAVE_MESSAGE =
   "Зургийг бүртгэж чадсангүй. Одоогийн зураг хэвээр байна. Дахин оролдоно уу.";
 
 /**
- * Any LAWYER-role account (attorney, prosecutor, judge, other-lawyer) may
- * upload a profile photo — it is part of the shared professional
- * workspace, not a marketplace feature. Public visibility is decided later,
- * per request, by the position/isListed gate in getPublicLawyerProfile.
+ * Profile photo for a LAWYER-role account (attorney, prosecutor, judge, other-lawyer) — part of the shared professional workspace, not a
+ * marketplace feature. Public visibility is decided later, per request, by the position/isListed gate in getPublicLawyerProfile.
  *
- * Only ever touches the actor's own User row. The previous photo is deleted
- * strictly after the new one is persisted, so any failure leaves the existing
- * photo intact; a failure after the new blob was stored removes that blob.
+ * Whose photo is written (decided here, never by the route):
+ *  - LAWYER: always their own User row. Naming any other user in `targetUserId` is refused (ForbiddenError).
+ *  - ADMIN: only the LAWYER account named in `targetUserId`. A missing, deleted or non-LAWYER target gets the same NotFoundError (no account
+ *    probing). An ADMIN without `targetUserId` is refused (ForbiddenError): admins have no photo of their own here.
+ *  - every other role: refused (ForbiddenError).
+ * Audit: `actorUserId` is always the caller; for an admin acting on a lawyer, `entityId` is the lawyer and `metadata.onBehalfOfAdmin` is true.
+ *
+ * The previous photo is deleted strictly after the new one is persisted, so any failure leaves the existing photo intact; a failure after the
+ * new blob was stored removes that blob.
  */
 export async function uploadProfilePhotoUseCase(
   actor: ActorContext,
