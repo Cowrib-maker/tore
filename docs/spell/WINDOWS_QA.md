@@ -4,12 +4,12 @@ Legend: **CI** = performed automatically by `.github/workflows/spell-desktop-win
 
 | # | Check | Where | Status |
 |---|---|---|---|
-| 1 | `npm ci` (root + desktop), spell + desktop unit tests | CI | **NOT YET RUN** (workflow never executed; no push/dispatch permission in the authoring session) |
-| 2 | NSIS x64 installer builds (`dist:win`, production config) | CI | **NOT YET RUN** (could not be completed on Linux: NSIS needs Windows/wine) |
-| 3 | Installer exists and is ≥ 50 MB; SHA-256 recorded | CI | NOT YET RUN |
-| 4 | Silent install (`/S /D=…`) exit code 0, `TORE Spell.exe` present | CI | NOT YET RUN |
-| 5 | Installed app starts and passes `--selftest` (config + pinned key loads, crypto verify/tamper/foreign-key rejection, license client initialises, engine, personal dictionary persistence, DPAPI round-trip, Mongolian UI renders) | CI | NOT YET RUN. The same self-test **passed on Linux/Xvfb** against the Electron build (DPAPI check is informational there). |
-| 6 | Silent uninstall removes the executable | CI | NOT YET RUN |
+| 1 | `npm ci` (root + desktop), desktop typecheck, spell + desktop unit tests | CI | **PASSED in CI** — `spell-desktop-windows` run #8, commit `f7b74ac`, `windows-latest` (2026-10-09) |
+| 2 | NSIS x64 installer builds (`dist:win`, production config) | CI | **PASSED in CI** — `spell-desktop-windows` run #8, commit `f7b74ac`, `windows-latest` (2026-10-09). (It cannot be built on Linux: NSIS needs Windows/wine — verified failing in the authoring sandbox.) |
+| 3 | Installer exists and is ≥ 50 MB; SHA-256 recorded | CI | **PASSED in CI** — `spell-desktop-windows` run #8, commit `f7b74ac`, `windows-latest` (2026-10-09): `TORE-Spell-Setup.exe`, 111,335,763 bytes, SHA-256 `C648B7ED…C29A` (from the CI log; the file itself was not re-hashed outside CI) |
+| 4 | Silent install (`/S /D=…`) exit code 0, `TORE Spell.exe` present | CI | **PASSED in CI** — `spell-desktop-windows` run #8, commit `f7b74ac`, `windows-latest` (2026-10-09) |
+| 5 | Installed app starts and passes `--selftest` (config + pinned key loads, crypto verify/tamper/foreign-key rejection, license client initialises, engine, personal dictionary persistence, DPAPI round-trip, Mongolian UI renders) | CI | **PASSED in CI** — `spell-desktop-windows` run #8, commit `f7b74ac`, `windows-latest` (2026-10-09): crypto verify (valid / tamper rejected / foreign key rejected), licence client refuses without pinned keys, OS secret storage round-trip (DPAPI), engine runs, personal dictionary persists and removes, Mongolian UI loads with the «Идэвхжээгүй» badge. |
+| 6 | Silent uninstall removes the executable | CI | **PASSED in CI** — `spell-desktop-windows` run #8, commit `f7b74ac`, `windows-latest` (2026-10-09) |
 | 7 | SmartScreen dialog appears for the unsigned installer; "More info → Run anyway" works | MANUAL | NOT DONE |
 | 8 | Activation with a real beta license code against `https://www.tore.mn` (requires the production signing key to be installed server-side) | MANUAL | NOT DONE — blocked on server key |
 | 9 | Spell check of ordinary text; suggestion → «Солих»; «Үл тоох»; «Үргэлж үл тоох»; «Тольд нэмэх» / «Хасах» | MANUAL | Passed in Electron/Linux smoke test; Windows NOT DONE |
@@ -19,6 +19,8 @@ Legend: **CI** = performed automatically by `.github/workflows/spell-desktop-win
 | 13 | Transfer: activate on PC B → confirmation text → PC A locks after its next online validation | MANUAL | Unit/integration-tested against real server logic; two-PC run NOT DONE |
 | 14 | Upgrade install over an existing install keeps license + personal dictionary | MANUAL | NOT DONE (data lives in `%APPDATA%\TORE Spell`, uninstall keeps it by design) |
 | 15 | High-DPI / 125–150 % scaling, dark mode | MANUAL | NOT DONE |
+
+Rows 7–15 are the human acceptance test: follow `CONTROLLED-BETA.md` §4.
 
 ## Known behaviours to expect
 * Unsigned installer → SmartScreen warning (see release notes).

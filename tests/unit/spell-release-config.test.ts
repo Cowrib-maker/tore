@@ -17,7 +17,7 @@ function goodEnv() {
     DATABASE_URL: `postgresql://u:${SECRET_MARKERS[2]}@db.example.org:5432/tore`,
     TORE_SPELL_V1: "1", SPELL_PRICES_MNT: JSON.stringify({ SPELL_1M: 1, SPELL_3M: 2, SPELL_6M: 3, SPELL_12M: 4 }),
     QPAY_BASE_URL: "https://merchant.example.org", QPAY_CLIENT_ID: "id", QPAY_CLIENT_SECRET: SECRET_MARKERS[0]!, QPAY_INVOICE_CODE: "CODE", QPAY_CALLBACK_URL: "https://spell.example.org/api/billing/qpay/callback",
-    SPELL_WINDOWS_INSTALLER_URL: "https://downloads.example.org/TORE-Spell-Setup.exe", SPELL_WINDOWS_INSTALLER_SHA256: "a".repeat(64), SPELL_RELEASE_VERSION: "1.0.0",
+    SPELL_INSTALLER_STORAGE_KEY: "spell-installer/1.0.0/TORE-Spell-Setup.exe", FILE_STORAGE: "s3", SPELL_WINDOWS_INSTALLER_SHA256: "a".repeat(64), SPELL_RELEASE_VERSION: "1.0.0",
     CSC_LINK: "x", CSC_KEY_PASSWORD: "y",
   };
   return { env, pinned: { keys: [{ kid: "k1", x }] } };

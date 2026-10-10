@@ -58,7 +58,7 @@ describe("the download route stays owner-gated and config-driven", () => {
   it("requires an actor with an ACTIVE licence and redirects only to the configured URL", () => {
     expect(route).toMatch(/requireActor\(\)/);
     expect(route).toMatch(/deriveLicenseState\(l, now\)\.status === SpellEffectiveLicenseStatus\.ACTIVE/); // effective (clock-derived) status, not the stored column
-    expect(route).toMatch(/getSpellInstallerUrl\(\)/);
+    expect(route).toMatch(/getSpellInstallerSource\(process\.env, env\.FILE_STORAGE === "s3"\)/); // configuration only (private S3 key, else the configured https URL)
     expect(route).toMatch(/INSTALLER_NOT_AVAILABLE/);
     expect(route).not.toMatch(/https?:\/\//);
   });

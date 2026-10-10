@@ -2,6 +2,7 @@ import { createPrivateKey, createPublicKey } from "node:crypto";
 import { DEFAULT_QPAY_BASE_URL } from "@/lib/env-schema";
 import { parseSpellPrices } from "@/domain/spell/pricing";
 import { SpellPlanCode } from "@/domain/spell/enums";
+import { getSpellInstallerStorageKey, getSpellInstallerUrl } from "@/domain/spell/installer";
 import { getSpellRelease } from "@/domain/spell/update";
 import { parseSpellConfig } from "./spell-config";
 
@@ -75,7 +76,18 @@ export function checkSpellProductionConfig(env: Env, opts: { pinnedProductionKey
 
   // installer + release
   const rel = getSpellRelease(env);
-  add("INSTALLER_URL", rel ? "OK" : "MISSING", rel ? "https installer URL, SHA-256 and version are configured (the file itself must be fetched and hashed separately)" : "SPELL_WINDOWS_INSTALLER_URL / SPELL_WINDOWS_INSTALLER_SHA256 / SPELL_RELEASE_VERSION are not all set and valid: the download stays hidden and no update notice is published");
+  const privateKey = getSpellInstallerStorageKey(env);
+  const publicUrl = getSpellInstallerUrl(env);
+  add("INSTALLER_URL", rel ? "OK" : "MISSING", rel ? "installer location, SHA-256 and version are configured (the file itself must be fetched and hashed separately)" : "an installer location (SPELL_INSTALLER_STORAGE_KEY or SPELL_WINDOWS_INSTALLER_URL), SPELL_WINDOWS_INSTALLER_SHA256 and SPELL_RELEASE_VERSION are not all set and valid: the download stays hidden and no update notice is published");
+  const privateRequested = has(env, "SPELL_INSTALLER_STORAGE_KEY");
+  if (privateRequested) {
+    if (!privateKey) add("INSTALLER_DELIVERY", "INVALID", "SPELL_INSTALLER_STORAGE_KEY is set but is not a valid key under spell-installer/. The download is unavailable (it never falls back to the public URL)", true);
+    else if (env.FILE_STORAGE !== "s3") add("INSTALLER_DELIVERY", "INVALID", "SPELL_INSTALLER_STORAGE_KEY needs FILE_STORAGE=s3; on local storage the download is unavailable (it never falls back to the public URL)", true);
+    else add("INSTALLER_DELIVERY", "OK", "private delivery: licence-gated 60-second signed URL from S3 (upload the installer to that key with server-side encryption)");
+  } else if (publicUrl) {
+    const allowed = env.TORE_ALLOW_PUBLIC_SPELL_INSTALLER === "1";
+    add("INSTALLER_DELIVERY", allowed ? "WARN" : "INVALID", allowed ? "public installer URL accepted via TORE_ALLOW_PUBLIC_SPELL_INSTALLER=1: the licence check gates the page and route, but anyone who learns the URL can download the installer (the app stays locked without a licence). Prefer SPELL_INSTALLER_STORAGE_KEY" : "a public SPELL_WINDOWS_INSTALLER_URL is ignored in production unless TORE_ALLOW_PUBLIC_SPELL_INSTALLER=1 (the download stays hidden). Prefer SPELL_INSTALLER_STORAGE_KEY", !allowed);
+  }
 
   // signing + MVP escape hatches
   add("CODE_SIGNING", has(env, "CSC_LINK") && has(env, "CSC_KEY_PASSWORD") ? "OK" : "MISSING", has(env, "CSC_LINK") && has(env, "CSC_KEY_PASSWORD") ? "signing certificate secrets are present in this environment (the real result is the Authenticode status of the built installer)" : "REQUIRES PRODUCTION SIGNING CERTIFICATE: CSC_LINK / CSC_KEY_PASSWORD (CI secrets) not present; the installer is unsigned");

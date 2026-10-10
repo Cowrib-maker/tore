@@ -74,7 +74,8 @@ function serverEnv(spellOn: boolean): NodeJS.ProcessEnv {
     SPELL_CODE_ENC_KEYS: `e1:${k()}`, SPELL_CODE_ENC_ACTIVE_KEY_ID: "e1",
     SPELL_SIGNING_KEYS: `k1:${(privateKey.export({ format: "der", type: "pkcs8" }) as Buffer).toString("base64")}`, SPELL_SIGNING_ACTIVE_KID: "k1",
     SPELL_PRICES_MNT: JSON.stringify(PRICES),
-    SPELL_WINDOWS_INSTALLER_URL: INSTALLER, SPELL_RELEASE_VERSION: "1.0.1", SPELL_WINDOWS_INSTALLER_SHA256: "a".repeat(64),
+    // The harness has no S3, so it exercises the PUBLIC-URL mode and must opt in explicitly, as a production operator would have to.
+    SPELL_WINDOWS_INSTALLER_URL: INSTALLER, TORE_ALLOW_PUBLIC_SPELL_INSTALLER: "1", SPELL_RELEASE_VERSION: "1.0.1", SPELL_WINDOWS_INSTALLER_SHA256: "a".repeat(64),
     QPAY_BASE_URL: `http://127.0.0.1:${SIM_PORT}`, QPAY_CLIENT_ID: QPAY.clientId, QPAY_CLIENT_SECRET: QPAY.clientSecret, QPAY_INVOICE_CODE: QPAY.invoiceCode,
     QPAY_CALLBACK_URL: `${BASE}/api/billing/qpay/callback`,
   };

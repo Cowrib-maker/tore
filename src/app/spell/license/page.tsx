@@ -12,7 +12,9 @@ import { fulfillSpellPurchase } from "@/application/use-cases/spell/purchase";
 import { InvoiceStatus, type UserRole } from "@/domain/enums";
 import { getHomepageAccountHref } from "@/domain/services/homepage-routing";
 import { isSpellV1Enabled } from "@/lib/feature-flags";
-import { getSpellInstallerUrl } from "@/domain/spell/installer";
+import { getSpellInstallerSource } from "@/domain/spell/installer";
+import { getSpellRelease } from "@/domain/spell/update";
+import { env } from "@/lib/env";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 import { invoiceRepository } from "@/infrastructure/repositories/prisma-invoice-repository";
@@ -51,7 +53,8 @@ export default async function SpellLicensePage() {
     }
     const licenses = await listOwnerLicenses(actor, runtime.deps);
     const cooldownDays = runtime.deps.policy.transferCooldownDays;
-    const installerReady = getSpellInstallerUrl() !== null;
+    const installerReady = getSpellInstallerSource(process.env, env.FILE_STORAGE === "s3") !== null;
+    const release = getSpellRelease();
     const hasUsable = licenses.some((l) => l.status === "ACTIVE");
 
     body = (
@@ -136,9 +139,28 @@ export default async function SpellLicensePage() {
           ) : (
             <p className="mt-2 text-slate-600">Татахын тулд идэвхтэй лиценз шаардлагатай.</p>
           )}
+          {hasUsable && installerReady && release ? (
+            <dl className="mt-4 space-y-1 text-xs text-slate-600">
+              <div className="flex gap-2"><dt className="font-semibold">Хувилбар:</dt><dd>{release.version}</dd></div>
+              {release.size ? <div className="flex gap-2"><dt className="font-semibold">Хэмжээ:</dt><dd>{(release.size / 1024 / 1024).toFixed(1)} MB</dd></div> : null}
+              <div className="flex flex-wrap gap-2"><dt className="font-semibold">SHA-256:</dt><dd className="break-all font-mono">{release.sha256}</dd></div>
+              <p className="pt-1 text-slate-500">Татсан файлаа шалгахдаа PowerShell дээр <span className="font-mono">Get-FileHash .\TORE-Spell-Setup.exe -Algorithm SHA256</span> гэж ажиллуулаад дээрх утгатай тулгана.</p>
+            </dl>
+          ) : null}
           <p className="mt-3 text-xs text-slate-500">
-            Суулгацад дижитал гарын үсэг одоогоор байхгүй тул Windows SmartScreen анхааруулга харуулж болно. Суулгасны дараа программд лицензийн кодоо оруулж идэвхжүүлнэ.
+            Windows 10 эсвэл түүнээс дээш, 64-бит. Суулгацад дижитал гарын үсэг одоогоор байхгүй тул Windows SmartScreen анхааруулга харуулж болно. Суулгасны дараа программд лицензийн кодоо оруулж идэвхжүүлнэ; идэвхжүүлэхэд интернэт хэрэгтэй.
           </p>
+          {hasUsable ? (
+            <div className="mt-4 rounded-xl bg-slate-50 p-4 text-xs leading-5 text-slate-600">
+              <p className="font-semibold text-slate-800">Төлбөр төлөгдсөн ч татаж эсвэл идэвхжүүлж чадахгүй байна уу?</p>
+              <ul className="mt-1 list-disc space-y-0.5 pl-4">
+                <li>Татах товч ажиллахгүй бол хуудсаа шинэчлээд дахин оролдоно уу. Холбоос хэдхэн секундын хугацаатай тул дахин дарахад шинэ холбоос үүснэ.</li>
+                <li>Лицензийн код харагдахгүй бол «Кодыг харуулах» товчийг дарна уу; код зөвхөн энэ хуудсан дээр, зөвхөн танд харагдана.</li>
+                <li>Лиценз өөр компьютерт идэвхжсэн гэсэн мэдэгдэл гарвал дээрх лицензийн хэсгийн «Шилжүүлэх (чөлөөлөх)» товчоор хуучин компьютерийг чөлөөлж, шинэ компьютер дээрээ кодоо оруулна.</li>
+                <li>Шийдэгдэхгүй бол support@tore.mn хаягт имэйл бичиж, нэхэмжлэлийн дугаараа дурдана уу.</li>
+              </ul>
+            </div>
+          ) : null}
         </div>
       </>
     );

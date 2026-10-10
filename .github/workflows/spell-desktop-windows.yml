@@ -40,6 +40,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Release identity (version, commit; a spell-v* tag must match the app version)
+        shell: pwsh
+        run: |
+          $v = (Get-Content desktop/package.json -Raw | ConvertFrom-Json).version
+          $sha = "${{ github.sha }}".Substring(0, 7)
+          if ($env:GITHUB_REF -like "refs/tags/spell-v*") {
+            $tag = $env:GITHUB_REF.Substring("refs/tags/spell-v".Length)
+            if ($tag -ne $v) { throw "tag spell-v$tag does not match desktop/package.json version $v" }
+          }
+          "SPELL_VERSION=$v" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+          "SHORT_SHA=$sha" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+          "version $v @ $sha" | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -96,6 +109,9 @@ jobs:
           Write-Host "sha256: $h"
           $sig = Get-AuthenticodeSignature $f.FullName
           Write-Host "authenticode: $($sig.Status) (NotSigned is expected for the beta)"
+          # The artifact name states what was actually measured, never what was hoped for.
+          $state = if ($sig.Status -eq "Valid") { "signed" } else { "unsigned" }
+          "SIGN_STATE=$state" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
 
       - name: Silent install
         shell: pwsh
@@ -138,15 +154,43 @@ jobs:
         if: always()
         shell: pwsh
         run: |
-          $lines = @("## TORE Spell Windows build", "", "- installer: ``$env:INSTALLER_NAME``", "- size: $env:INSTALLER_BYTES bytes", "- sha256: ``$env:INSTALLER_SHA256``", "- signed: no (beta)")
+          $lines = @("## TORE Spell Windows build", "", "- installer: ``$env:INSTALLER_NAME``", "- size: $env:INSTALLER_BYTES bytes", "- sha256: ``$env:INSTALLER_SHA256``", "- version: $env:SPELL_VERSION", "- commit: $env:SHORT_SHA", "- signature: $env:SIGN_STATE")
           if (Test-Path desktop/release/selftest-windows.json) { $lines += "- selftest: ``" + ((Get-Content desktop/release/selftest-windows.json | ConvertFrom-Json).ok) + "``" }
           $lines | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
 
       - uses: actions/upload-artifact@v4
         with:
-          name: tore-spell-beta-windows-unsigned
+          # Versioned and commit-stamped; the signature word comes from the measured Authenticode status above.
+          name: tore-spell-${{ env.SPELL_VERSION }}-${{ env.SHORT_SHA }}-windows-${{ env.SIGN_STATE }}
           path: |
             desktop/release/TORE-Spell-Setup*.exe
             desktop/release/SHA256SUMS.txt
             desktop/release/selftest-windows.json
           if-no-files-found: error
+          # Explicit (not left to the repository default). Artifacts expire; a spell-v* tag also produces a DRAFT release below.
+          retention-days: 90
+
+  # Only for spell-v* tags. Creates a DRAFT, PRE-RELEASE (not public, not announced) holding the exact installer + SHA256SUMS.txt so the
+  # file outlives artifact expiry. It never publishes: a human reviews and decides. Needs no secrets beyond the built-in token.
+  release-draft:
+    if: startsWith(github.ref, 'refs/tags/spell-v')
+    needs: windows
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: tore-spell-*-windows-*
+          path: dist
+      - name: Create draft pre-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          ls -R dist
+          gh release create "$GITHUB_REF_NAME" --draft --prerelease \
+            --title "TORE Spell ${GITHUB_REF_NAME#spell-v} (draft)" \
+            --notes "Draft. Verify the SHA-256 in SHA256SUMS.txt and the Authenticode state (see the workflow summary) before using. Not a customer download." \
+            dist/*/TORE-Spell-Setup*.exe dist/*/SHA256SUMS.txt

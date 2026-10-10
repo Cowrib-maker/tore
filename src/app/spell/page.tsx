@@ -4,7 +4,8 @@ import { getSessionUser } from "@/application/common/session";
 import { SpellLanding } from "@/components/marketing/spell-landing";
 import type { UserRole } from "@/domain/enums";
 import { isQpayConfigured } from "@/infrastructure/billing/create-qpay-gateway";
-import { getSpellInstallerUrl } from "@/domain/spell/installer";
+import { getSpellInstallerSource } from "@/domain/spell/installer";
+import { env } from "@/lib/env";
 import { getSpellPriceList } from "@/domain/spell/pricing";
 import { isSpellV1Enabled } from "@/lib/feature-flags";
 import { getHomepageAccountHref } from "@/domain/services/homepage-routing";
@@ -46,5 +47,5 @@ export default async function SpellPage() {
   const plans = getSpellPriceList().map((p, i) => ({ code: p.code, label: labels[i] ?? `${p.durationMonths}`, priceMnt: p.priceMnt }));
   const purchaseAvailable = isSpellV1Enabled() && isQpayConfigured();
 
-  return <SpellLanding dict={dict} locale={locale} authUser={authUser} plans={plans} purchaseAvailable={purchaseAvailable} installerReady={getSpellInstallerUrl() !== null} />;
+  return <SpellLanding dict={dict} locale={locale} authUser={authUser} plans={plans} purchaseAvailable={purchaseAvailable} installerReady={getSpellInstallerSource(process.env, env.FILE_STORAGE === "s3") !== null} />;
 }

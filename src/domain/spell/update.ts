@@ -9,6 +9,8 @@
  * dictionary, device identity) lives in the OS user-data directory and is never touched by an installer upgrade (appId and
  * deleteAppDataOnUninstall=false are tested).
  */
+import { getSpellInstallerStorageKey } from "@/domain/spell/installer";
+
 export const SPELL_RELEASE_TOKEN_TYPE = "tore-spell-release+jwt";
 export const SPELL_RELEASE_TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60;
 
@@ -60,7 +62,12 @@ export function compareVersions(a: string, b: string): -1 | 0 | 1 | null {
 /** The configured latest release, or null when ANY required part is missing or malformed (never a guessed URL or hash). */
 export function getSpellRelease(env: Record<string, string | undefined> = process.env): SpellRelease | null {
   const version = env[SPELL_RELEASE_ENV.version]?.trim();
-  const url = env[SPELL_RELEASE_ENV.installerUrl]?.trim();
+  let url = env[SPELL_RELEASE_ENV.installerUrl]?.trim();
+  // Private delivery: the installer has no public URL, so the signed notice points at the licence page where the owner downloads it.
+  if (!url && getSpellInstallerStorageKey(env)) {
+    const origin = (env.NEXT_PUBLIC_APP_URL ?? env.AUTH_URL)?.trim().replace(/\/+$/, "");
+    if (origin) url = `${origin}/spell/license`;
+  }
   const sha256 = env[SPELL_RELEASE_ENV.sha256]?.trim().toLowerCase();
   if (!version || !parseVersion(version) || !url || !sha256 || !/^[a-f0-9]{64}$/.test(sha256)) return null;
   try {

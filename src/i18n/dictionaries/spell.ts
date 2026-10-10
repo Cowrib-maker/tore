@@ -45,7 +45,9 @@ export const spellMn: SpellCopy = {
       { title: "Компьютер дээр ажиллана", description: "Таны бичсэн текст компьютерээс гарахгүй." },
     ],
   },
-  download: { cta: "Windows-д татах", note: "Лиценз авсны дараа «Миний лиценз» хэсгээс татна.", soon: "Windows суулгац удахгүй.", platform: "Windows" },
+  download: { cta: "Windows-д татах", note: "Лиценз авсны дараа «Миний лиценз» хэсгээс татна.", soon: "Windows суулгац удахгүй.", platform: "Windows",
+    requirements: "Windows 10 эсвэл түүнээс дээш, 64-бит. Идэвхжүүлэхэд интернэт хэрэгтэй; идэвхжсэний дараа 24 цаг хүртэл интернэтгүй ажиллана.",
+    unsigned: "Beta суулгацад дижитал гарын үсэг одоогоор байхгүй тул Windows SmartScreen анхааруулга харуулж болно." },
   steps: {
     title: "Хэрхэн авах вэ",
     items: [
@@ -115,7 +117,9 @@ export const spellEn: SpellCopy = {
       { title: "Runs on your computer", description: "The text you write stays on your computer." },
     ],
   },
-  download: { cta: "Download for Windows", note: "After you get a licence, download it from «My licence».", soon: "The Windows installer is coming soon.", platform: "Windows" },
+  download: { cta: "Download for Windows", note: "After you get a licence, download it from «My licence».", soon: "The Windows installer is coming soon.", platform: "Windows",
+    requirements: "Windows 10 or newer, 64-bit. Activation needs an internet connection; after that it works offline for up to 24 hours.",
+    unsigned: "The beta installer is not digitally signed yet, so Windows SmartScreen may show a warning." },
   steps: {
     title: "How to get it",
     items: [

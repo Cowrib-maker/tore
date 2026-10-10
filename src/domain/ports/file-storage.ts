@@ -15,6 +15,7 @@ export const FILE_PURPOSES = [
   "homepage-image",
   "legal-ai-document",
   "matter-document",
+  "spell-installer",
 ] as const;
 
 export type FilePurpose = (typeof FILE_PURPOSES)[number];

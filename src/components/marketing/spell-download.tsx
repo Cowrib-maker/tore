@@ -14,6 +14,8 @@ export function SpellDownload({ copy, installerReady }: { copy: SpellCopy["downl
       <div>
         <p className="text-sm font-semibold text-slate-900">{copy.platform}</p>
         <p className="text-sm text-slate-500">{installerReady ? copy.note : copy.soon}</p>
+        <p className="mt-1 text-xs text-slate-500">{copy.requirements}</p>
+        <p className="mt-1 text-xs text-slate-500">{copy.unsigned}</p>
       </div>
       {installerReady ? (
         <Link href="/spell/license" className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#1B63FF] px-6 text-[15px] font-bold text-white transition hover:bg-blue-700">
