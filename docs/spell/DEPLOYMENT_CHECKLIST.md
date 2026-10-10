@@ -11,6 +11,14 @@ State observed on **2026-10-06** via read-only Vercel inspection (project `tore`
 | Build script | `prisma generate && next build` | The build does **not** run migrations |
 | QPay variables | none set | Paid consultations are refused honestly (no fake payments) |
 
+## Deploy-order safety (enforced in code)
+The build does not run migrations, so this code can be deployed before the Spell migrations are applied. A plain Prisma read selects every mapped column, which would make **every invoice query of the existing products fail** (`The column invoices.spell_plan_code does not exist`). This was reproduced on a local database that had only `main`'s 35 migrations.
+
+`src/infrastructure/database/spell-schema-gate.ts` therefore makes the Prisma client leave `invoices.spell_plan_code` out of every query, and `PrismaInvoiceRepository.create` stops writing it for ordinary invoices, **while `TORE_SPELL_V1` is not `1`**. Consequences:
+- Merging/deploying this code before the migrations is safe for the existing products as long as `TORE_SPELL_V1` stays unset (verified locally: reads and creates of ordinary invoices work against the pre-migration schema).
+- **Never set `TORE_SPELL_V1=1` before all three Spell migrations are applied.** With the flag on, the column is read and written; on an unmigrated database every invoice query fails (also verified locally).
+- **Do not switch `TORE_SPELL_V1` off again after Spell invoices exist and can still be paid.** With the flag off the Spell plan code is hidden, so a late QPay callback for a Spell invoice would be handled like a plan-less invoice and be marked `FAILED` instead of licensing the customer. To pause sales, remove the QPay variables (or the price entries) instead of the flag.
+
 ## Required, in this order (all need production access — not done)
 1. **Ship the code.** Commit + push the branch, open a PR, merge to `main` (needs your go-ahead; nothing was staged/committed).
 2. **Apply the migration** `prisma/migrations/20261005120000_spell_licensing_foundation` to the production database. It is *purely additive* (new enums/tables/indexes; no existing table altered). Use the guarded CLI (`prisma.config.ts` refuses non-local URLs by design after the Sprint-14 incident — run it deliberately, from a trusted shell, with the production URL; back up first).
