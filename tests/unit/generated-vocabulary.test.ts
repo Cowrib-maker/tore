@@ -1,4 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
 import {
   clearGeneratedVocabularyForTests,
@@ -45,9 +48,6 @@ describe("loadGeneratedVocabularyFile", () => {
     // A file that parses as JSON but doesn't match the schema (e.g.
     // missing entries, wrong schemaVersion) must be refused, not
     // silently half-loaded.
-    const fs = require("node:fs") as typeof import("node:fs");
-    const os = require("node:os") as typeof import("node:os");
-    const path = require("node:path") as typeof import("node:path");
     const tmpFile = path.join(os.tmpdir(), `bad-vocab-${Date.now()}.json`);
     fs.writeFileSync(tmpFile, JSON.stringify({ schemaVersion: 2, entries: "not an array" }));
     try {

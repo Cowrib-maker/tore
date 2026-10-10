@@ -57,11 +57,11 @@ type Props = {
 };
 
 export function LawyerWorkspaceHome({ view }: Props) {
-  const { cases, recentConversations, activity, summary, schedule } = view;
+  const { cases, recentConversations, activity, summary, schedule, generatedAtMs } = view;
   // Computed once, server-side, and passed down as a plain prop — never
   // recomputed client-side — so every relative-time row in the case table
   // renders from the same stable reference and can never hydration-mismatch.
-  const now = Date.now();
+  const now = generatedAtMs;
 
   return (
     <div

@@ -8,6 +8,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
 import Link from "next/link";
 import {
@@ -1225,8 +1226,12 @@ function MessageBubble({ message }: { message: Message }) {
  * mounted so this never disagrees with the server-rendered markup. */
 function useLogoTone(): "on-light" | "on-dark" {
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  // false while server-rendering / hydrating, true on the client afterwards.
+  const mounted = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  );
   return mounted && resolvedTheme === "dark" ? "on-dark" : "on-light";
 }
 
