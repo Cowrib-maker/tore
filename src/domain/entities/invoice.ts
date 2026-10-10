@@ -1,5 +1,6 @@
 import { InvoiceStatus } from "@/domain/enums";
 import type { PaymentTransactionStatus, SubscriptionPlanCode } from "@/domain/enums";
+import type { SpellPlanCode } from "@/domain/spell/enums";
 
 export type InvoiceDeeplink = {
   name: string;
@@ -14,6 +15,8 @@ export type Invoice = {
   subscriptionId: string | null;
   bookingId: string | null;
   planCode: SubscriptionPlanCode | null;
+  /** TORE Spell licence purchase; null/undefined for every other invoice. */
+  spellPlanCode?: SpellPlanCode | null;
   amountMnt: number;
   currency: string;
   provider: string;
@@ -61,6 +64,7 @@ export type CreateInvoiceInput = {
   subscriptionId?: string | null;
   bookingId?: string | null;
   planCode?: SubscriptionPlanCode | null;
+  spellPlanCode?: SpellPlanCode | null;
   amountMnt: number;
   currency: string;
   provider: string;

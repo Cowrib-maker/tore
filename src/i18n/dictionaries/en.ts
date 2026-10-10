@@ -1,4 +1,5 @@
 import type { Dictionary } from "@/i18n/types";
+import { spellEn } from "@/i18n/dictionaries/spell";
 import { marketplaceEn } from "@/i18n/dictionaries/marketplace/en";
 
 /**
@@ -215,6 +216,7 @@ export const en: Dictionary = {
     footerRights: "All rights reserved.",
     footerBuilt: "Mongolia and international clients · MN / EN / ZH / KO",
   },
+  spell: spellEn,
   publicHome: {
     brandLine: "LEGAL INTELLIGENCE FOR A STRONGER MONGOLIA",
     tagline: "Understand the law, build the solution.",

@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "typecheck:desktop": "npm --prefix desktop run typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:spell-db": "vitest run --config vitest.db.config.ts",
@@ -47,7 +48,8 @@
     "evaluate:gold-set-metrics": "tsx scripts/compute-gold-set-metrics.ts",
     "benchmark:generated-vocabulary-activation": "tsx scripts/benchmark-generated-vocabulary-activation.ts",
     "compare:gold-set-off-on": "tsx scripts/compare-gold-set-off-on.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "e2e:spell": "bash scripts/e2e/run-spell-e2e.sh"
   },
   "prisma": { "seed": "tsx prisma/seed.ts" },
   "dependencies": {
@@ -64,6 +66,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
     "ioredis": "^6.0.0",
+    "jose": "^6.2.8",
     "lucide-react": "^1.28.0",
     "mammoth": "^1.12.2",
     "negotiator": "^1.0.0",
@@ -100,6 +103,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
+    "hunspell-asm": "^4.0.2",
     "jsdom": "^30.0.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.11",

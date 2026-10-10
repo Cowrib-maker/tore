@@ -1,4 +1,5 @@
 import type { Dictionary } from "@/i18n/types";
+import { spellEn } from "@/i18n/dictionaries/spell";
 import { marketplaceZh } from "@/i18n/dictionaries/marketplace/zh";
 
 /**
@@ -162,6 +163,7 @@ export const zh: Dictionary = {
     footerRights: "保留所有权利。",
     footerBuilt: "蒙古与国际客户 · MN / EN / ZH / KO",
   },
+  spell: spellEn,
   publicHome: {
     brandLine: "LEGAL INTELLIGENCE FOR A STRONGER MONGOLIA",
     tagline: "理解法律，构建解决方案。",

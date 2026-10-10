@@ -1,0 +1,1596 @@
+{
+ "schema": "tore-spell-gold/1",
+ "datasetVersion": "spell-gold-v3.0",
+ "set": "O_COMMON_TYPOS",
+ "provenanceDir": "model",
+ "note": "MODEL_ADJUDICATED candidates: authored and judged by the AI assistant. NOT native-reviewed; NOT gold.",
+ "items": [
+  {
+   "id": "O_COMMON_TYPOS:001:надэд",
+   "token": "надэд",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "надад",
+   "currentReason": "HARMONY_VIOLATION_NEIGHBOR",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "надад",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "надад",
+     "note": "wrong harmony",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:002:чамд",
+   "token": "чамд",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "control: valid dative",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:003:хууль",
+   "token": "хууль",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "control",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:004:хуулийг",
+   "token": "хуулийг",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "control",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:005:хуулиг",
+   "token": "хуулиг",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "хуулийг",
+   "priority": 90,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "хуулийг",
+     "note": "и for ий",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:006:гэртээ",
+   "token": "гэртээ",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "control",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:007:гэрийнхээ",
+   "token": "гэрийнхээ",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "control",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:008:ажилласан",
+   "token": "ажилласан",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "control",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:009:ажиллсан",
+   "token": "ажиллсан",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "ажилласан",
+   "currentReason": "STEM_VOWEL_MISSING",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "ажилласан",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "ажилласан",
+     "note": "dropped stem vowel",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:010:шалгсан",
+   "token": "шалгсан",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "шалгасан",
+   "currentReason": "STEM_VOWEL_MISSING",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "шалгасан",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "шалгасан",
+     "note": "dropped stem vowel",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:011:тоглсон",
+   "token": "тоглсон",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "тоглосон",
+   "currentReason": "STEM_VOWEL_MISSING",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "тоглосон",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "тоглосон",
+     "note": "dropped stem vowel",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:012:ойлгсон",
+   "token": "ойлгсон",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "ойлгосон",
+   "currentReason": "STEM_VOWEL_MISSING",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "ойлгосон",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "ойлгосон",
+     "note": "dropped stem vowel",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:013:сонгсон",
+   "token": "сонгсон",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "сонгосон",
+   "currentReason": "STEM_VOWEL_MISSING",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "сонгосон",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "сонгосон",
+     "note": "dropped stem vowel",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:014:дүгнсэн",
+   "token": "дүгнсэн",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "дүгнэсэн",
+   "currentReason": "STEM_VOWEL_MISSING",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "дүгнэсэн",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "дүгнэсэн",
+     "note": "dropped stem vowel",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:015:нотлсон",
+   "token": "нотлсон",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "нотолсон",
+   "currentReason": "STEM_VOWEL_MISSING",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "нотолсон",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "нотолсон",
+     "note": "dropped stem vowel",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:016:хамтрсан",
+   "token": "хамтрсан",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "хамтарсан",
+   "currentReason": "STEM_VOWEL_MISSING",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "хамтарсан",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "хамтарсан",
+     "note": "dropped stem vowel",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:017:амрсан",
+   "token": "амрсан",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "амарсан",
+   "currentReason": "STEM_VOWEL_MISSING",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "амарсан",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "амарсан",
+     "note": "dropped stem vowel",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:018:шүүмжилсан",
+   "token": "шүүмжилсан",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "шүүмжилсэн",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "шүүмжилсэн",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "шүүмжилсэн",
+     "note": "wrong harmony",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:019:оруулсэн",
+   "token": "оруулсэн",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "оруулсан",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "оруулсан",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "оруулсан",
+     "note": "wrong harmony",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:020:сайжирсэн",
+   "token": "сайжирсэн",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "сайжирсан",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "сайжирсан",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "сайжирсан",
+     "note": "wrong harmony",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:021:мэдэгдсан",
+   "token": "мэдэгдсан",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "мэдэгдсэн",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "мэдэгдсэн",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "мэдэгдсэн",
+     "note": "wrong harmony",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:022:найдвартэй",
+   "token": "найдвартэй",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "найдвартай",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "найдвартай",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "найдвартай",
+     "note": "wrong harmony (comitative)",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:023:тавагтэй",
+   "token": "тавагтэй",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "тавагтай",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "тавагтай",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "тавагтай",
+     "note": "wrong harmony (comitative)",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:024:шаардлагатэй",
+   "token": "шаардлагатэй",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "шаардлагатай",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "шаардлагатай",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "шаардлагатай",
+     "note": "wrong harmony (comitative)",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:025:хөгжилтай",
+   "token": "хөгжилтай",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "хөгжилтэй",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "хөгжилтэй",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "хөгжилтэй",
+     "note": "wrong harmony (comitative)",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:026:төвөгтай",
+   "token": "төвөгтай",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "төвөгтэй",
+   "currentReason": "HARMONY_VIOLATION_NEIGHBOR",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "төвөгтэй",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "төвөгтэй",
+     "note": "wrong harmony (comitative)",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:027:энергитай",
+   "token": "энергитай",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "энергитэй",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "энергитэй",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "энергитэй",
+     "note": "wrong harmony (comitative)",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:028:төслууд",
+   "token": "төслууд",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "төслүүд",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "төслүүд",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "төслүүд",
+     "note": "wrong harmony (plural)",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:029:шинууд",
+   "token": "шинууд",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "шинүүд",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "шинүүд",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "шинүүд",
+     "note": "wrong harmony (plural)",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:030:тээврын",
+   "token": "тээврын",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "тээврийн",
+   "currentReason": "YI_FEMININE_STEM",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "тээврийн",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "тээврийн",
+     "note": "ы for ий (feminine stem)",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:031:өвчны",
+   "token": "өвчны",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "өвчний",
+   "currentReason": "YI_FEMININE_STEM",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "өвчний",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "өвчний",
+     "note": "ы for ий",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:032:шилжилтын",
+   "token": "шилжилтын",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "шилжилтийн",
+   "currentReason": "YI_FEMININE_STEM",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "шилжилтийн",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "шилжилтийн",
+     "note": "ы for ий",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:033:техникыг",
+   "token": "техникыг",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "техникийг",
+   "currentReason": "YI_FEMININE_STEM",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "техникийг",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "техникийг",
+     "note": "ыг for ийг (к-final)",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:034:сургуулыг",
+   "token": "сургуулыг",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "сургуулийг",
+   "currentReason": "YI_FEMININE_STEM",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "сургуулийг",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "сургуулийг",
+     "note": "ыг for ийг",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:035:үзэгчдын",
+   "token": "үзэгчдын",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "үзэгчдийн",
+   "currentReason": "YI_FEMININE_STEM",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "үзэгчдийн",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "үзэгчдийн",
+     "note": "plural stem + ы",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:036:жүжигчдын",
+   "token": "жүжигчдын",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "жүжигчдийн",
+   "currentReason": "YI_FEMININE_STEM",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "жүжигчдийн",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "жүжигчдийн",
+     "note": "plural stem + ы",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:037:цомогг",
+   "token": "цомогг",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "цомог",
+   "currentReason": "DOUBLED_FINAL_LETTER",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "цомог",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "цомог",
+     "note": "doubled final",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:038:алхх",
+   "token": "алхх",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "алх",
+   "currentReason": "DOUBLED_FINAL_LETTER",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "алх",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "алх",
+     "note": "doubled final",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:039:ярьжж",
+   "token": "ярьжж",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "ярьж",
+   "currentReason": "DOUBLED_FINAL_LETTER",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "ярьж",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "ярьж",
+     "note": "doubled final",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:040:хувийгг",
+   "token": "хувийгг",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "хувийг",
+   "currentReason": "DOUBLED_FINAL_LETTER",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "хувийг",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "хувийг",
+     "note": "doubled final",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:041:тоннн",
+   "token": "тоннн",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "тонн",
+   "currentReason": "DOUBLED_FINAL_LETTER",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "тонн",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "тонн",
+     "note": "tripled final",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:042:үгүйй",
+   "token": "үгүйй",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "үгүй",
+   "currentReason": "DOUBLED_FINAL_LETTER",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "үгүй",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "үгүй",
+     "note": "doubled final й",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:043:хоер",
+   "token": "хоер",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "хоёр",
+   "currentReason": "HARMONY_VIOLATION_NEIGHBOR",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "хоёр",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "хоёр",
+     "note": "ё→е",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:044:соел",
+   "token": "соел",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "соёл",
+   "currentReason": "HARMONY_VIOLATION_NEIGHBOR",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "соёл",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "соёл",
+     "note": "ё→е",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:045:томъео",
+   "token": "томъео",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "томъёо",
+   "currentReason": "HARMONY_VIOLATION_NEIGHBOR",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "томъёо",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "томъёо",
+     "note": "ё→е",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:046:уйлдвэр",
+   "token": "уйлдвэр",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "үйлдвэр",
+   "currentReason": "HARMONY_VIOLATION_NEIGHBOR",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "үйлдвэр",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "үйлдвэр",
+     "note": "у for ү",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:047:хүрдан",
+   "token": "хүрдан",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "хурдан",
+   "currentReason": "HARMONY_VIOLATION_NEIGHBOR",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "хурдан",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "хурдан",
+     "note": "ү for у",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:048:технилоги",
+   "token": "технилоги",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "технологи",
+   "currentReason": "HARMONY_VIOLATION_NEIGHBOR",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "технологи",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "технологи",
+     "note": "vowel confusion",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:049:сонгдог",
+   "token": "сонгдог",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "сонгодог",
+   "currentReason": "STEM_VOWEL_MISSING",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "сонгодог",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "сонгодог",
+     "note": "dropped vowel",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:050:хянадаг",
+   "token": "хянадаг",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "control",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:051:хяндаг",
+   "token": "хяндаг",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "хянадаг",
+   "currentReason": "STEM_VOWEL_MISSING",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "хянадаг",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "хянадаг",
+     "note": "dropped stem vowel",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:052:тайлбарллаа",
+   "token": "тайлбарллаа",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "тайлбарлалаа",
+   "currentReason": "STEM_VOWEL_MISSING",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "тайлбарлалаа",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "тайлбарлалаа",
+     "note": "consonant cluster / dropped vowel",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:053:танилцуулнэ",
+   "token": "танилцуулнэ",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "танилцуулна",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "танилцуулна",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "танилцуулна",
+     "note": "wrong harmony (future)",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:054:хэдэнтаа",
+   "token": "хэдэнтаа",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "хэдэнтээ",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "хэдэнтээ",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "хэдэнтээ",
+     "note": "wrong harmony",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:055:хүргэё",
+   "token": "хүргэё",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "хүргэе",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 90,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "ё/е hortative variant — native judgment needed",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:056:чихраа",
+   "token": "чихраа",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "чихрээ",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "чихрээ",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "чихрээ",
+     "note": "wrong harmony (reflexive)",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:057:ирнээ",
+   "token": "ирнээ",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "MISSPELLED",
+   "currentSuggestion": "ирнаа",
+   "currentReason": "HARMONY_SUFFIX",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "ирнэ",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "ирнэ",
+     "note": "unclear: native judgment needed",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:058:хамт",
+   "token": "хамт",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "control",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:059:хамтт",
+   "token": "хамтт",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 40,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "double т is loan-prone: engine abstains by design",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "O_COMMON_TYPOS:060:холл",
+   "token": "холл",
+   "sentenceOrigin": "NONE",
+   "category": "MISSPELLED",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 40,
+   "source": "authoring/targeted.ts O_COMMON_TYPOS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "loanword hall: must not be accused",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  }
+ ]
+}

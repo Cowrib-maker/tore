@@ -1,8 +1,10 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
+import { spellColumnsOmit } from "@/infrastructure/database/spell-schema-gate";
 import { env } from "@/lib/env";
-import { PrismaClient } from "@/generated/prisma/client";
+import { isSpellV1Enabled } from "@/lib/feature-flags";
+import { PrismaClient, type Prisma } from "@/generated/prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -20,9 +22,13 @@ function createPrismaClient() {
   globalForPrisma.pool = pool;
 
   const adapter = new PrismaPg(pool);
+  // Widened on purpose: the cached client below is typed with the default (optional) omit option.
+  const omit = spellColumnsOmit(isSpellV1Enabled()) as Prisma.PrismaClientOptions["omit"];
 
   return new PrismaClient({
     adapter,
+    // Spell columns stay out of every query until Spell is enabled (see spell-schema-gate.ts).
+    omit,
     log:
       env.NODE_ENV === "development"
         ? ["query", "error", "warn"]

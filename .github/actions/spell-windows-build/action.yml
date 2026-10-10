@@ -1,0 +1,171 @@
+name: spell-windows-build
+description: "TORE Spell: build, verify, install, self-test, uninstall and upload the Windows installer (used by spell-desktop-windows.yml)"
+
+# Composite action holding the build steps ONCE. The two jobs in spell-desktop-windows.yml differ only in how they call it:
+#   unsigned job: no `environment`, no secrets, no inputs  -> CSC_* are empty -> UNSIGNED test build.
+#   signed job:   `environment: spell-release-signing`, secrets passed as csc-* inputs, sign: "true" -> "Release gate" must see Authenticode Valid.
+# The certificate values never appear here except as inputs handed over by the signed job. Never echo them.
+
+inputs:
+  sign:
+    description: "'true' = release build that must be signed; anything else = unsigned test build"
+    required: false
+    default: "false"
+  csc-link:
+    description: "Certificate (base64 .pfx or secure URL). Only the signed job passes it."
+    required: false
+    default: ""
+  csc-key-password:
+    description: "Certificate password. Only the signed job passes it."
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Release identity (version, commit; a spell-v* tag must match the app version)
+      shell: pwsh
+      run: |
+        $v = (Get-Content desktop/package.json -Raw | ConvertFrom-Json).version
+        $sha = "${{ github.sha }}".Substring(0, 7)
+        if ($env:GITHUB_REF -like "refs/tags/spell-v*") {
+          $tag = $env:GITHUB_REF.Substring("refs/tags/spell-v".Length)
+          if ($tag -ne $v) { throw "tag spell-v$tag does not match desktop/package.json version $v" }
+        }
+        "SPELL_VERSION=$v" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+        "SHORT_SHA=$sha" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+        "version $v @ $sha" | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+        cache: npm
+        cache-dependency-path: |
+          package-lock.json
+          desktop/package-lock.json
+
+    - name: Install root dependencies
+      shell: pwsh
+      run: npm ci
+
+    - name: Install desktop dependencies
+      shell: pwsh
+      run: npm ci
+      working-directory: desktop
+
+    - name: Desktop typecheck (Electron code, desktop toolchain)
+      shell: pwsh
+      run: npm run typecheck
+      working-directory: desktop
+
+    - name: Desktop + Spell tests
+      shell: pwsh
+      run: npx vitest run tests/unit/spell-desktop-client.test.ts tests/unit/spell-beta-release-gate.test.ts tests/unit/spell-engine-v1.test.ts tests/unit/spell-engine-v1-benchmark-gate.test.ts tests/unit/spell-morphology-hardening.test.ts tests/unit/spell-purchase.test.ts
+
+    - name: Build + package (NSIS, x64, production config)
+      shell: pwsh
+      run: npm run dist:win
+      working-directory: desktop
+      env:
+        # Handed over only by the signed job (inside the protected environment). The unsigned job passes nothing -> '' -> UNSIGNED installer.
+        CSC_LINK: ${{ inputs.csc-link }}
+        CSC_KEY_PASSWORD: ${{ inputs.csc-key-password }}
+
+    - name: Signature status (reports NotSigned honestly)
+      shell: pwsh
+      run: |
+        $sig = Get-AuthenticodeSignature "desktop/release/TORE-Spell-Setup.exe"
+        "Authenticode status: $($sig.Status)" | Tee-Object -FilePath $env:GITHUB_STEP_SUMMARY -Append
+
+    - name: Release gate (a signed build must be Valid; nothing is installed, uploaded or released otherwise)
+      if: inputs.sign == 'true'
+      shell: pwsh
+      run: |
+        $sig = Get-AuthenticodeSignature "desktop/release/TORE-Spell-Setup.exe"
+        if ($sig.Status -ne "Valid") {
+          "RELEASE GATE FAILED: a signed build was requested but the Authenticode status is $($sig.Status). No artifact will be uploaded." | Tee-Object -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          throw "signed build requested but Authenticode status is $($sig.Status)"
+        }
+        "Release gate: Authenticode status Valid" | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+
+    - name: Verify packaged app content (no secrets, production origin, pinned PUBLIC key)
+      shell: pwsh
+      run: npm run verify:package
+      working-directory: desktop
+
+    - name: Verify installer artifact
+      shell: pwsh
+      run: |
+        $f = Get-ChildItem desktop/release -Filter "TORE-Spell-Setup*.exe" | Select-Object -First 1
+        if (-not $f) { throw "installer not found" }
+        $mb = [math]::Round($f.Length / 1MB, 1)
+        Write-Host "installer: $($f.Name) $mb MB"
+        if ($f.Length -lt 50MB) { throw "installer implausibly small ($mb MB)" }
+        "INSTALLER_NAME=$($f.Name)" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+        "INSTALLER_BYTES=$($f.Length)" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+        $h = (Get-FileHash $f.FullName -Algorithm SHA256).Hash
+        "INSTALLER_SHA256=$h" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+        "$h  $($f.Name)" | Out-File -Encoding ascii desktop/release/SHA256SUMS.txt
+        Write-Host "sha256: $h"
+        $sig = Get-AuthenticodeSignature $f.FullName
+        Write-Host "authenticode: $($sig.Status) (NotSigned is expected for the beta)"
+        # The artifact name states what was actually measured, never what was hoped for.
+        $state = if ($sig.Status -eq "Valid") { "signed" } else { "unsigned" }
+        "SIGN_STATE=$state" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+
+    - name: Silent install
+      shell: pwsh
+      run: |
+        $f = Get-ChildItem desktop/release -Filter "TORE-Spell-Setup*.exe" | Select-Object -First 1
+        $dir = Join-Path $env:RUNNER_TEMP "tore-spell-install"
+        $p = Start-Process -FilePath $f.FullName -ArgumentList "/S", "/D=$dir" -Wait -PassThru
+        if ($p.ExitCode -ne 0) { throw "installer exit code $($p.ExitCode)" }
+        $exe = Get-ChildItem $dir -Filter "TORE Spell*.exe" -Recurse | Where-Object { $_.Name -notlike "Uninstall*" } | Select-Object -First 1
+        if (-not $exe) { throw "installed executable not found in $dir" }
+        "INSTALL_DIR=$dir" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+        "INSTALLED_EXE=$($exe.FullName)" | Out-File -Append -Encoding ascii $env:GITHUB_ENV
+
+    - name: Launch installed app (--selftest)
+      shell: pwsh
+      run: |
+        $out = Join-Path $env:RUNNER_TEMP "selftest.json"
+        $ud = Join-Path $env:RUNNER_TEMP "ud"
+        $p = Start-Process -FilePath $env:INSTALLED_EXE -ArgumentList "--selftest=$out", "--user-data-dir=$ud" -Wait -PassThru
+        if (Test-Path $out) { Get-Content $out | Write-Host; Copy-Item $out desktop/release/selftest-windows.json }
+        if ($p.ExitCode -ne 0) { throw "selftest exit code $($p.ExitCode)" }
+        $r = Get-Content $out | ConvertFrom-Json
+        if (-not $r.ok) { throw "selftest reported failure" }
+        $dpapi = $r.checks | Where-Object { $_.name -eq "os-secret-storage" }
+        if (-not $dpapi.ok) { throw "DPAPI secret storage unavailable on Windows" }
+
+    - name: Silent uninstall
+      shell: pwsh
+      run: |
+        $u = Get-ChildItem $env:INSTALL_DIR -Filter "Uninstall*.exe" -Recurse | Select-Object -First 1
+        if (-not $u) { throw "uninstaller not found" }
+        $p = Start-Process -FilePath $u.FullName -ArgumentList "/S" -Wait -PassThru
+        if ($p.ExitCode -ne 0) { throw "uninstaller exit code $($p.ExitCode)" }
+        # NSIS silent uninstall re-launches itself from %TEMP% and returns early: poll.
+        $deadline = (Get-Date).AddSeconds(90)
+        while ((Test-Path $env:INSTALLED_EXE) -and ((Get-Date) -lt $deadline)) { Start-Sleep -Seconds 2 }
+        if (Test-Path $env:INSTALLED_EXE) { throw "app executable still present after uninstall" }
+
+    - name: Summary (installer, size, SHA-256, self-test)
+      if: always()
+      shell: pwsh
+      run: |
+        $lines = @("## TORE Spell Windows build", "", "- installer: ``$env:INSTALLER_NAME``", "- size: $env:INSTALLER_BYTES bytes", "- sha256: ``$env:INSTALLER_SHA256``", "- version: $env:SPELL_VERSION", "- commit: $env:SHORT_SHA", "- signature: $env:SIGN_STATE", "- release-ready: $(if ($env:SIGN_STATE -eq 'signed') { 'candidate (signed; still needs the human QA)' } else { 'NO - unsigned TEST build' })")
+        if (Test-Path desktop/release/selftest-windows.json) { $lines += "- selftest: ``" + ((Get-Content desktop/release/selftest-windows.json | ConvertFrom-Json).ok) + "``" }
+        $lines | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+
+    - uses: actions/upload-artifact@v4
+      with:
+        # Versioned and commit-stamped; the signature word comes from the measured Authenticode status above.
+        name: tore-spell-${{ env.SPELL_VERSION }}-${{ env.SHORT_SHA }}-windows-${{ env.SIGN_STATE }}
+        path: |
+          desktop/release/TORE-Spell-Setup*.exe
+          desktop/release/SHA256SUMS.txt
+          desktop/release/selftest-windows.json
+        if-no-files-found: error
+        # Explicit (not left to the repository default). Artifacts expire; a spell-v* tag also produces a DRAFT release below.
+        retention-days: 90

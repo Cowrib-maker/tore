@@ -15,3 +15,6 @@ if (kind !== "local") {
 }
 process.env.DATABASE_URL = url;
 process.env.AUTH_SECRET ??= "test-auth-secret-minimum-32-characters";
+// The Spell DB tests need the Spell columns (the Prisma client omits `invoices.spell_plan_code` until Spell is enabled; see
+// src/infrastructure/database/spell-schema-gate.ts). The test database is fully migrated.
+process.env.TORE_SPELL_V1 ??= "1";

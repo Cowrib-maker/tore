@@ -12,6 +12,8 @@ import {
   type OrthographyCheckResult,
   type OrthographySuggestion,
 } from "@/domain/mongolian-orthography";
+import { isSpellLanguageEngineV1Enabled } from "@/lib/feature-flags";
+import { checkWithLanguageEngineV1 } from "@/application/use-cases/orthography/language-engine-v1-adapter";
 import { initializeGeneratedVocabularyIfEnabled } from "@/domain/mongolian-orthography/generated-vocabulary-activation";
 
 // Runs once when this server-only module is first loaded (Next.js loads
@@ -71,6 +73,14 @@ export async function checkOrthographyForPaidUser(
   const trimmed = input.text.trim();
   if (!trimmed) return { suggestions: [], suggestionCount: 0, orthographyCount: 0, latinCount: 0, spellingCount: 0, wordCount: 0, characterCount: 0, premium: true };
   if (trimmed.length > MAX_CHARS) throw new ValidationError(`Текст хэт урт байна (дээд тал ${MAX_CHARS} тэмдэгт).`);
+
+  // Opt-in Language Engine V1 (TORE_SPELL_LANGUAGE_ENGINE_V1, default OFF).
+  if (isSpellLanguageEngineV1Enabled()) {
+    return {
+      ...checkWithLanguageEngineV1(trimmed, { includeLatinToCyrillic: input.includeLatinToCyrillic }),
+      premium: true,
+    };
+  }
 
   // Self-contained Mongolian vowel-harmony/suffix-rule engine + curated
   // dictionary — no external hunspell dictionary dependency required.

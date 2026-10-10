@@ -1,0 +1,49 @@
+{
+  "schema": "tore-spell-errormodel/1",
+  "version": "2026.10.1",
+  "provenance": {
+    "source": "TORE-authored estimate from Mongolian typing/spelling patterns",
+    "license": "TORE proprietary (original work)",
+    "redistributable": true,
+    "dataClass": "A_TORE_OWNED",
+    "sourceIds": ["tore-core-seed"],
+    "reviewStatus": "PENDING_NATIVE_REVIEW",
+    "notes": "Costs are ESTIMATES, not fitted to a real error corpus (none is lawfully available). They only order candidates and set ambiguity; they never make a word valid. Calibrate with the human-reviewed error gold when it exists."
+  },
+  "costs": {
+    "DELETE": 1.0,
+    "DELETE_DOUBLED": 0.6,
+    "DELETE_VOWEL": 0.9,
+    "INSERT": 1.0,
+    "INSERT_VOWEL_IN_CLUSTER": 0.6,
+    "INSERT_DUPLICATE_VOWEL": 0.6,
+    "INSERT_DUPLICATE_CONSONANT": 0.7,
+    "TRANSPOSE": 0.8,
+    "SUBSTITUTE_VOWEL": 0.7,
+    "SUBSTITUTE_CONSONANT": 0.8,
+    "SUBSTITUTE_OTHER": 1.0
+  },
+  "substitutions": {
+    "оө": 0.35, "уү": 0.35, "аэ": 0.5, "ыи": 0.5, "ий": 0.5, "ео": 0.6, "эе": 0.4, "яа": 0.5, "юу": 0.5, "ёо": 0.5,
+    "дт": 0.5, "гх": 0.6, "бп": 0.6, "зс": 0.6, "шс": 0.7, "чц": 0.6, "гк": 0.6, "бв": 0.7, "жз": 0.7, "шч": 0.7
+  },
+  "kinds": [
+    { "kind": "DELETE", "status": "IMPLEMENTED", "where": "plausible-edits + cost" },
+    { "kind": "INSERT", "status": "IMPLEMENTED", "where": "plausible-edits + cost" },
+    { "kind": "DOUBLE", "status": "IMPLEMENTED", "where": "doubledFinalRepairs + cost" },
+    { "kind": "TRANSPOSE", "status": "IMPLEMENTED", "where": "plausible-edits + cost" },
+    { "kind": "VOWEL_SWAP", "status": "IMPLEMENTED", "where": "substitutions" },
+    { "kind": "VOWEL_DROP", "status": "IMPLEMENTED", "where": "INSERT_VOWEL_IN_CLUSTER" },
+    { "kind": "VOWEL_INSERT", "status": "IMPLEMENTED", "where": "DELETE_VOWEL / DELETE_DOUBLED" },
+    { "kind": "CONSONANT_SWAP", "status": "IMPLEMENTED", "where": "substitutions" },
+    { "kind": "PHONETIC_CONFUSION", "status": "PARTIAL", "where": "substitutions (д/т г/х б/п з/с)" },
+    { "kind": "VISUAL_CONFUSION", "status": "IMPLEMENTED", "where": "lookalikeRepair (Latin↔Cyrillic)" },
+    { "kind": "KEYBOARD_NEIGHBOR", "status": "NOT_IMPLEMENTED", "where": "needs the physical Mongolian layout table; not guessed" },
+    { "kind": "SUFFIX_ERROR", "status": "IMPLEMENTED", "where": "morphology violations" },
+    { "kind": "HARMONY_ERROR", "status": "IMPLEMENTED", "where": "morphology violations (harmony break only)" },
+    { "kind": "STEM_ERROR", "status": "IMPLEMENTED", "where": "STEM_VOWEL_MISSING (flagged verbs)" },
+    { "kind": "WORD_BOUNDARY", "status": "IMPLEMENTED", "where": "diagnostics/boundary" },
+    { "kind": "GLUED_WORD", "status": "IMPLEMENTED", "where": "diagnostics/boundary" },
+    { "kind": "SPLIT_WORD", "status": "PARTIAL", "where": "diagnostics/boundary (known suffix splits)" }
+  ]
+}

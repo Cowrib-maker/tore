@@ -34,6 +34,7 @@ export function LandingHero({
   stats,
   statsLabels,
   productHrefs,
+  spell,
 }: {
   home: Dictionary["publicHome"];
   checkoutEnabled: boolean;
@@ -41,6 +42,8 @@ export function LandingHero({
   stats?: HomepageStats;
   statsLabels?: { lawyers: string; practiceAreas: string; organizations: string };
   productHrefs: Record<ProductKey, string>;
+  /** Separate-product card for TORE Spell (rendered beside the role products). */
+  spell?: Dictionary["spell"]["home"];
 }) {
   const [taglineLead, taglineAccent] = splitLastWord(home.tagline);
   const statEntries = [
@@ -175,7 +178,7 @@ export function LandingHero({
           </div>
         </div>
 
-        <LandingProducts home={home} hrefs={productHrefs} />
+        <LandingProducts home={home} hrefs={productHrefs} spell={spell} />
       </div>
     </section>
   );

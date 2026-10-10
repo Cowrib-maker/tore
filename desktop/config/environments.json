@@ -1,0 +1,5 @@
+{
+  "development": { "apiBase": "http://localhost:3000", "pinnedKeys": null, "label": "DEV" },
+  "staging": { "apiBase": null, "pinnedKeys": "pinned-keys.staging.json", "label": "STAGING" },
+  "production": { "apiBase": "https://www.tore.mn", "pinnedKeys": "pinned-keys.production.json", "label": "BETA" }
+}

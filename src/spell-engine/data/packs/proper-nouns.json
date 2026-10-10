@@ -1,0 +1,117 @@
+{
+ "schema": "tore-spell-pack/1",
+ "id": "tore-names-seed",
+ "version": "2026.10.3",
+ "layer": "PROPER_NOUN",
+ "language": "mn-Cyrl",
+ "coverage": "SEED",
+ "provenance": {
+  "source": "proper-nouns.tsv",
+  "license": "TORE proprietary (original work)",
+  "redistributable": true,
+  "dataClass": "A_TORE_OWNED",
+  "tier": "PROVISIONAL",
+  "sourceIds": [
+   "tore-names-abbr"
+  ],
+  "reviewStatus": "PENDING_NATIVE_REVIEW",
+  "notes": "Names / places."
+ },
+ "entries": [
+  {
+   "w": "Архангай",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Бат",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Болд",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Дархан",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Дорж",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Дорнод",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Завхан",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Монгол",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Нарантуяа",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Оюун",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Сараа",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Сүхбаатар",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Тогтох",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Тэмүүжин",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Улаанбаатар",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Хаан",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Хөвсгөл",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Чингис",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "Эрдэнэт",
+   "pos": "N",
+   "conf": "HIGH"
+  }
+ ]
+}

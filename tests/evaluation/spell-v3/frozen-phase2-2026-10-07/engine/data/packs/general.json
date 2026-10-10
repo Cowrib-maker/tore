@@ -1,0 +1,2944 @@
+{
+ "schema": "tore-spell-pack/1",
+ "id": "tore-general-seed",
+ "version": "2026.10.1",
+ "layer": "GENERAL",
+ "language": "mn-Cyrl",
+ "coverage": "SEED",
+ "provenance": {
+  "source": "TORE CORE_DICTIONARY_WORDS + general-extra.tsv",
+  "license": "TORE proprietary (original work)",
+  "redistributable": true,
+  "dataClass": "A_TORE_OWNED",
+  "sourceIds": [
+   "tore-core-seed",
+   "tore-audit-overrides"
+  ],
+  "reviewStatus": "PENDING_NATIVE_REVIEW",
+  "notes": "Curated starter vocabulary. SEED: absence proves nothing."
+ },
+ "entries": [
+  {
+   "w": "аа",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "аав",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "аажим",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "авах",
+   "pos": "V",
+   "flags": [
+    "cvb:ч"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "авсан",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "авч",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "адил",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "ажил",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ажиллах",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "ажилтан",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "аймаг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "алхах",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "амрах",
+   "pos": "V",
+   "flags": [
+    "hv:а"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "англи",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "анх",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "арав",
+   "pos": "NUM",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "ард",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "асуудал",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "асуулт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "асуух",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ах",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ач",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "аюултай",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ба",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "бага",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "багц",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "багш",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "бай",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "байгаа",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "байж",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "байна",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "байр",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "байршуулах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "байсан",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "байх",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "байхад",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "байшин",
+   "pos": "N",
+   "flags": [
+    "hidden-g"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "банк",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "барилга",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "баримт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "бас",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "баталгаа",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "баян",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "баярлалаа",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "баяртай",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "би",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "бид",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "биднийг",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "бидэнд",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "бичиг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "бичих",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "бичсэн",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "бодлого",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "бодож",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "бодол",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "бодох",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "бол",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "болно",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "болон",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "болсон",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "босох",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "бохир",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "бөөн",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "буруу",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "буулгах",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "буцаж",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "буцах",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "бүгд",
+   "pos": "PRON",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "бүү",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "бүх",
+   "pos": "PRON",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "бэ",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "вэ",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "вэб",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "газар",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "гал",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "гарах",
+   "pos": "V",
+   "flags": [
+    "cvb:ч"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "гарцаагүй",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "гишүүн",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "график",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "гудамж",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "гуйх",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "гурав",
+   "pos": "NUM",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "гуч",
+   "pos": "NUM",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "гүйх",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "гэвч",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "гэвэл",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "гэмт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "гэр",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "гэрт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "гэртэй",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "гэртээ",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "гэрч",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "гэрээ",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "гэрээс",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "гэрээсээ",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "гэхдээ",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "даатгал",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "дал",
+   "pos": "NUM",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "данс",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "дараа",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "дарга",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "долоо",
+   "pos": "NUM",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "дөрөв",
+   "pos": "NUM",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "дөч",
+   "pos": "NUM",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "дундаж",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "дуу",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "дуудах",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "дуусах",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "дүгнэлт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "дүрэм",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "дүү",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "дэвтэр",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ер",
+   "pos": "NUM",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "ес",
+   "pos": "NUM",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "жар",
+   "pos": "NUM",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "жижиг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "жил",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "жишээ",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "за",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "заалт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "залуу",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "зам",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "зарах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "зардал",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "заримдаа",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "засаг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "засаж",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "засах",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "зассан",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "захиалга",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "захирал",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "захиргаа",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "захиргааны",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "зогсох",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "зочид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "зочин",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "зөв",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "зөрчил",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "зураг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "зургаа",
+   "pos": "NUM",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "зуу",
+   "pos": "NUM",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "зүй",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "зүйл",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "зүйн",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "зээ",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "зээл",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "иймээс",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "илгээх",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ингээд",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "интернет",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "иргэд",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "иргэн",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "иргэний",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "ирсэн",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "ирэх",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "ирээд",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "их",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ихэнх",
+   "pos": "PRON",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "иш",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "кино",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "компани",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "компьютер",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "магадгүй",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "манай",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "маргаан",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "маргааш",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "маш",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "менежер",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "миний",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "минут",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "минь",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "монгол",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "мөн",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "мөнгө",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "муу",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "мэдрэх",
+   "pos": "V",
+   "flags": [
+    "hv:э"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "мэдсэн",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "мэдүүлэг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "мэдэх",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "мэдээ",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "мэдээлэл",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "мэнд",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "мянга",
+   "pos": "NUM",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "надад",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "найз",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "найм",
+   "pos": "NUM",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "нам",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "намайг",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "нар",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ная",
+   "pos": "NUM",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "нийт",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "ногоон",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ном",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "нотлох",
+   "pos": "V",
+   "flags": [
+    "hv:о"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "нөхөр",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "нутаг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "нь",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "нэвтрэх",
+   "pos": "V",
+   "flags": [
+    "cvb:ч"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "нэг",
+   "pos": "NUM",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "нэмэх",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "нэхэмжлэл",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "нэхэмжлэх",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "нээх",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "од",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "одоо",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "ойлгох",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "олох",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "олсон",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "орлого",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "орой",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "оройхон",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "орон",
+   "pos": "N",
+   "flags": [
+    "hidden-g"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "орос",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "охин",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "оюутан",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "өвгөн",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "өвөө",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "өвчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "өвчин",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "өвчтэй",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "өглөө",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "өгөх",
+   "pos": "V",
+   "flags": [
+    "cvb:ч"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "өгүүлбэр",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "өдөр",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "өмгөөлөгч",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "өмгөөлөгчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "өмнө",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "өмч",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "өндөр",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "өнөөдөр",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "өө",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "өргөдөл",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "өчигдөр",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "програм",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "программ",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "сайн",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "сайт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "салхи",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "санал",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "сандал",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "сар",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "сахал",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "сая",
+   "pos": "NUM",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "саяхан",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "систем",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "соёл",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "солилцож",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "солилцох",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "солилцсон",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "сонгох",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "сонин",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "сонирхох",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "сонсох",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "спорт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "сум",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "сурагч",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "сурагчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "сурах",
+   "pos": "V",
+   "flags": [
+    "cvb:ч"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "сургалт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "сургалтын",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "сургах",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "сургууль",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "сурсан",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "суух",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "сүм",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "та",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "тав",
+   "pos": "NUM",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "тавь",
+   "pos": "NUM",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "тайлан",
+   "pos": "N",
+   "flags": [
+    "hidden-g"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "тайлбар",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "талбай",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "танайг",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "танд",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "танил",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "танилцаж",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "танилцах",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "танилцсан",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "татах",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "татвар",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "технологи",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "тиймээс",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "тоглоом",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "тоглох",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "тогтоол",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "том",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "торгууль",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "тохируулах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "төвөгтэй",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "төгрөг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "төлбөр",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "төлбөртэй",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "төлөвлөгөө",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "төлөө",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "төлөх",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "төр",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "төсөл",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "туслах",
+   "pos": "V",
+   "flags": [
+    "hv:а"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "түмэн",
+   "pos": "N",
+   "flags": [
+    "hidden-g"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "түүнд",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "түүнийг",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "түүх",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "тэгээд",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "тэд",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "тэдгээр",
+   "pos": "PRON",
+   "conf": "HIGH"
+  },
+  {
+   "w": "тэднийг",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "тэдэнд",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "тэр",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "тэрбум",
+   "pos": "NUM",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "удаа",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "удаан",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "улаан",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "улс",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "унтах",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "унших",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ус",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "утас",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "утга",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "уу",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "уулзалт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "уулзах",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "уучлаарай",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "ухаан",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "учир",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "үг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "үгс",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "үзэг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "үзэх",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "үйлдвэр",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "үйлдэл",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "үйлчилгээ",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "үнэ",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "үнэгүй",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "үргэлж",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "үргэлжлэх",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "үү",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "үүнээс",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "файл",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хаалга",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хаалт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хаана",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хаах",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хавсралт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хадгалалт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хадгалах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хайх",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "халуун",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хамтрах",
+   "pos": "V",
+   "flags": [
+    "hv:а"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хараат",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "харах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "харин",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хариу",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хариулах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хариулт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хариуцлага",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "харсан",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "харьцах",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хасах",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хийж",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хийсэн",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хийх",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хоёр",
+   "pos": "NUM",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хоол",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хориг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хорь",
+   "pos": "NUM",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хот",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хохирогч",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хохирогчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хөгжим",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хөдөө",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хөрөнгө",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хөрш",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хуваах",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хувцас",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "худалдаа",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "худалдагч",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "худалдагчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "худалдах",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хурал",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хурдан",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хуулах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хуулийн",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хууль",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хуучид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хуучин",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хүйтэн",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хүлээх",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хүмүүс",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хүн",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хүнд",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хүний",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хүнтэй",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хүргэх",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хүрэх",
+   "pos": "V",
+   "flags": [
+    "cvb:ч"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хүснэгт",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хүсэх",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хүү",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хүүхэд",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хэдий",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хэдийгээр",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хэзээд",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хэл",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хэлсэн",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хэлэх",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хэн",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хэргийн",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хэрхэн",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хэрэг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хэрэглэгч",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хэрэглэгчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "хэрэгсэл",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хэцүү",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "хятад",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "цаг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "цагаан",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "цалин",
+   "pos": "N",
+   "flags": [
+    "hidden-g"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "цахим",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "цонх",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "цөөн",
+   "pos": "PRON",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "цэвэр",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "цэнхэр",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ч",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "чамайг",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "чамд",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "чи",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "чинь",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "шалгаж",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "шалгах",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "шар",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "шиг",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "шийдвэр",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "шинжилгээ",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "шинжлэх",
+   "pos": "V",
+   "flags": [
+    "hv:и"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "шинэ",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "шинэчлэл",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ширхэг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ширээ",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "шөнө",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "шүүгч",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "шүүгчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "шүүх",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "шүүх",
+   "pos": "V",
+   "conf": "HIGH"
+  },
+  {
+   "w": "эгч",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "эд",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "эм",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "эмч",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "эмээ",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "энэ",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "эрдэм",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "эрт",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "эрүүгийн",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "эрүүл",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "эрх",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "эрхтэй",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "эсвэл",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "эсэх",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "эх",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "эхлэх",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "эхнэр",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "эцэг",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ээж",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "юм",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "юу",
+   "pos": "PRON",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "яав",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "яавч",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "яагаад",
+   "pos": "PART",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "яам",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "явах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "явсан",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "HIGH"
+  },
+  {
+   "w": "ядуу",
+   "pos": "ADJ",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ял",
+   "pos": "N",
+   "conf": "HIGH"
+  },
+  {
+   "w": "ярих",
+   "pos": "V",
+   "flags": [
+    "soft-i"
+   ],
+   "conf": "HIGH"
+  }
+ ]
+}

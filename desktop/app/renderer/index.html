@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:;">
+<title>TORE Spell</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>TORE Spell <span class="beta">Бета</span></h1>
+  <span id="lic-badge" class="badge">…</span>
+  <span id="net-badge" class="badge" hidden></span>
+</header>
+
+
+<section id="lock" hidden>
+  <h2>Лицензийн кодоо оруулна уу</h2>
+  <p id="lock-msg"></p>
+  <form id="act-form">
+    <label for="code" class="sr-only">Лицензийн код</label>
+    <input id="code" autocomplete="off" spellcheck="false" placeholder="TORE-XXXX-XXXX-XXXX-XXXX">
+    <button type="submit">Идэвхжүүлэх</button>
+  </form>
+  <div id="transfer" class="notice" hidden>
+    <h3>Компьютер шилжүүлэх</h3>
+    <p id="transfer-warning"></p>
+    <button id="transfer-yes">Шилжүүлэх</button> <button id="transfer-no" class="ghost">Болих</button>
+  </div>
+  <button id="validate-lock" class="ghost" hidden>Эрх шалгах</button>
+  <button id="renew" hidden type="button">Шинэ эрх авах</button>
+  <button id="my-license" class="ghost" type="button">Миний лиценз (вэб)</button>
+  <p id="err" role="alert"></p>
+</section>
+
+<main id="app" hidden>
+  <div class="bar">
+    <span id="stats" aria-live="polite">Текстээ бичнэ үү</span>
+    <span class="grow"></span>
+    <details class="menu">
+      <summary>Тохиргоо</summary>
+      <div class="menu-body">
+        <label class="inline"><input type="checkbox" id="unknown"> Мэдэхгүй үгсийг тэмдэглэх</label>
+        <label class="inline"><input type="checkbox" id="advisory"> Зай, том үсгийн зөвлөмж</label>
+        <button id="validate" class="ghost sm">Эрх шалгах</button>
+        <button id="deactivate" class="ghost sm">Энэ компьютерээс чөлөөлөх</button>
+      </div>
+    </details>
+  </div>
+  <div id="ready-note" class="notice ok" role="status" hidden>TORE Spell бэлэн боллоо.</div>
+  <div id="offline-note" class="notice" hidden></div>
+  <div id="update-note" class="notice" hidden><span id="update-text"></span> <button id="update-get" class="sm" type="button">Татах</button></div>
+  <div class="cols">
+    <div class="editor">
+      <div id="backdrop" aria-hidden="true"></div>
+      <textarea id="text" spellcheck="false" placeholder="Текстээ энд бичнэ үү эсвэл буулгана уу…"></textarea>
+      <div id="pop" class="pop" role="dialog" aria-label="Засвар" hidden></div>
+    </div>
+    <aside>
+      <h3>Алдаа <span id="count"></span></h3>
+      <ul id="issues"></ul>
+      <h3>Миний толь</h3>
+      <input id="dict-q" type="search" placeholder="Толиос хайх…" maxlength="40" aria-label="Миний толиос хайх">
+      <ul id="dict"></ul>
+      <h3>Санал илгээх</h3>
+      <p class="note">Алдаа илрээгүй, засвар буруу, шинэ үг байвал нэг үгээр мэдэгдээрэй. Текст биш, зөвхөн нэг үг илгээгдэнэ.</p>
+      <button id="report-open" class="sm ghost" type="button">Санал илгээх</button>
+      <p id="contrib" class="note" hidden></p>
+    </aside>
+  </div>
+  <p class="note">Таны текст компьютерээс гадагш гарахгүй.</p>
+</main>
+<dialog id="report-dlg">
+  <form id="report-form" method="dialog">
+    <h3>Юу буруу байна?</h3>
+    <label class="opt"><input type="radio" name="rtype" value="WRONG_CORRECTION"> Энэ үг буруу гэж танигдсан</label>
+    <label class="opt"><input type="radio" name="rtype" value="WRONG_SUGGESTION"> Санал болгосон засвар буруу</label>
+    <label class="opt"><input type="radio" name="rtype" value="MISSING_ERROR"> Алдаа илрээгүй</label>
+    <label class="opt"><input type="radio" name="rtype" value="MISSING_WORD"> Шинэ үг санал болгох</label>
+    <label class="opt"><input type="radio" name="rtype" value="GENERAL"> Бусад</label>
+    <div id="r-token-row" class="frow"><label for="r-token">Үг</label><input id="r-token" type="text" maxlength="40" autocomplete="off"></div>
+    <div id="r-fix-row" class="frow" hidden><label for="r-fix">Зөв хувилбар</label><input id="r-fix" type="text" maxlength="40" autocomplete="off"></div>
+    <div class="frow"><label for="r-note">Тайлбар</label><textarea id="r-note" maxlength="200" rows="2"></textarea></div>
+    <p id="r-msg" class="note" role="alert"></p>
+    <div class="frow"><button id="r-send" type="submit">Илгээх</button> <button id="r-cancel" class="ghost" type="button">Болих</button></div>
+  </form>
+</dialog>
+<script src="renderer.js"></script>
+</body>
+</html>

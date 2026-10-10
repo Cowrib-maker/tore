@@ -1,0 +1,9 @@
+{
+  "schema": "tore-spell-baseline-synthetic/1",
+  "date": "2026-10-08",
+  "note": "AUTO-generated mutations of real words (ground truth = the original word, by construction; NOT native-reviewed). Command: npx tsx scripts/spell-data/synthetic-eval.ts --n 12000 --seed <seed>. Shipping configuration, engine 1.0.0-alpha.2. Re-measured in Phase 4; the engine and data are unchanged since.",
+  "runs": [
+    { "seed": 20261006, "n": 12000, "confident": 684, "confidentRight": 681, "detectedPct": 8.1, "top1PctOfAll": 7.8, "top3PctOfAll": 8.1, "mrr": 0.079 },
+    { "seed": 777, "n": 12000, "confident": 643, "confidentRight": 639, "detectedPct": 7.7, "top1PctOfAll": 7.3, "top3PctOfAll": 7.7, "mrr": 0.075 }
+  ]
+}

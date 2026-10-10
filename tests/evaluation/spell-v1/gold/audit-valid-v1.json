@@ -1,0 +1,15 @@
+{
+  "schema": "tore-spell-audit-valid/1",
+  "dataset": "REAL_TEXT_AUDIT_VALID_V1",
+  "datasetClass": "REGRESSION",
+  "provenance": "Found by scripts/spell-data/corpus-eval.ts on real news text (local research corpus, class D). Each word occurred in running text, was wrongly flagged MISSPELLED by the shipping engine, and is a valid Mongolian word per assistant review and a second-opinion dictionary. NOT native-reviewed.",
+  "reviewStatus": "PENDING_NATIVE_REVIEW",
+  "date": "2026-10-06",
+  "mustNotBeMisspelled": [
+    {"word": "нарын", "reason": "«нар» (collective plural / sun) inflects; the ы-feminine rule mistook it for нарийн"},
+    {"word": "авчээ", "reason": "converb «авч» was filed as a noun, so «-ээ» was read as a wrong-harmony reflexive"},
+    {"word": "явуулжээ", "reason": "same: converb «явуулж» filed as a noun"},
+    {"word": "сахлаа", "reason": "«сахал» + reflexive «-аа» (hidden vowel); mistaken for a verb with a missing stem vowel"},
+    {"word": "хараат", "reason": "valid adjective (хараат бус = independent); mistaken for д/т confusion"}
+  ]
+}

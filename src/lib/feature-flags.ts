@@ -82,3 +82,26 @@ export const GENERATED_LEGAL_VOCABULARY_V1_FLAG = "TORE_GENERATED_LEGAL_VOCABULA
 export function isGeneratedLegalVocabularyEnabled(): boolean {
   return allowFlag(GENERATED_LEGAL_VOCABULARY_V1_FLAG);
 }
+
+/**
+ * TORE Spell licensing (desktop product backend). Must be exactly "1" to
+ * enable. Default: OFF — every /api/spell route answers 404 until enabled.
+ * Independent of every other flag and of subscription billing.
+ */
+export const SPELL_V1_FLAG = "TORE_SPELL_V1";
+
+export function isSpellV1Enabled(): boolean {
+  return allowFlag(SPELL_V1_FLAG);
+}
+
+/**
+ * TORE Spell Language Engine V1 (src/spell-engine): morphology-aware,
+ * precision-first VALID / MISSPELLED / UNKNOWN engine. Must be exactly "1"
+ * to enable. Default: OFF — /api/orthography/check keeps using the legacy
+ * orthography engine until this is explicitly turned on. Server-only.
+ */
+export const SPELL_LANGUAGE_ENGINE_V1_FLAG = "TORE_SPELL_LANGUAGE_ENGINE_V1";
+
+export function isSpellLanguageEngineV1Enabled(): boolean {
+  return allowFlag(SPELL_LANGUAGE_ENGINE_V1_FLAG);
+}

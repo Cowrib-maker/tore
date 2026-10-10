@@ -1,0 +1,12 @@
+{
+  "schema": "tore-spell-verb-gold/2",
+  "dataset": "VERB_GOLD_NATIVE_REVIEWED_V1",
+  "datasetClass": "NATIVE_REVIEWED",
+  "version": "2026.10.2",
+  "requires": "Records here are valid ONLY if a named human native linguist reviewed them. Each lemma record must carry reviewer and reviewedOn.",
+  "note": "EMPTY. As of M1.1 no human native-linguist review has taken place. Do not move AI-authored records here without a real review: tests reject it.",
+  "defaults": {"source": "HUMAN_REVIEWED", "authorKind": "HUMAN_NATIVE_LINGUIST", "provenance": "Reviewed record by record; see reviewer / reviewedOn.", "reviewStatus": "NATIVE_REVIEWED", "reviewerNote": null, "confidence": "HIGH"},
+  "expectedKinds": {"VALID": "must be VALID", "INVALID": "must not be VALID", "VALID_UNSUPPORTED": "must be UNKNOWN", "DERIVATION": "must be UNKNOWN", "AMBIGUOUS": "must not be MISSPELLED"},
+  "entryFormat": ["surface","expected","tags","suffixChain","reason","confidence (null = default)"],
+  "lemmas": []
+}
