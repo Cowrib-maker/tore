@@ -66,11 +66,41 @@ describe("the download route stays owner-gated and config-driven", () => {
 
 describe("Windows release workflow: signing is wired but never faked", () => {
   const wf = fs.readFileSync(path.join(ROOT, ".github/workflows/spell-desktop-windows.yml"), "utf8");
-  it("passes signing secrets by reference only and reports the real signature status", () => {
-    expect(wf).toMatch(/CSC_LINK: \$\{\{ secrets\.CSC_LINK \}\}/);
-    expect(wf).toMatch(/CSC_KEY_PASSWORD: \$\{\{ secrets\.CSC_KEY_PASSWORD \}\}/);
-    expect(wf).toMatch(/Get-AuthenticodeSignature/);
-    expect(wf).not.toMatch(/-----BEGIN/);
+  const action = fs.readFileSync(path.join(ROOT, ".github/actions/spell-windows-build/action.yml"), "utf8");
+  // YAML keys only: comments may mention the names without referencing them.
+  const code = (t: string) => t.split("\n").filter((l) => !l.trim().startsWith("#")).join("\n");
+  const jobBlock = (name: string) => {
+    const t = code(wf);
+    const i = t.search(new RegExp(`^ {2}${name}:\\s*$`, "m"));
+    const rest = t.slice(i + 1);
+    const next = rest.search(/^ {2}[a-z-]+:\s*$/m);
+    return next === -1 ? rest : rest.slice(0, next);
+  };
+  it("signing secrets reach only the signed job, which runs in the protected environment, and are passed by reference", () => {
+    const signed = jobBlock("build-signed");
+    expect(signed).toMatch(/^ {4}environment: spell-release-signing$/m);
+    expect(signed).toMatch(/csc-link: \$\{\{ secrets\.CSC_LINK \}\}/);
+    expect(signed).toMatch(/csc-key-password: \$\{\{ secrets\.CSC_KEY_PASSWORD \}\}/);
+    // nothing else in the caller reads the certificate secrets, and the unsigned (PR) job has no environment or secret at all
+    expect(code(wf).match(/secrets\.CSC_/g)).toHaveLength(2);
+    const unsigned = jobBlock("build-unsigned");
+    expect(unsigned).not.toMatch(/environment|secrets|csc-/);
+  });
+  it("the composite action maps the inputs to CSC_LINK / CSC_KEY_PASSWORD in the build step only, never reading secrets itself", () => {
+    const ca = code(action);
+    expect(ca).toMatch(/CSC_LINK: \$\{\{ inputs\.csc-link \}\}/);
+    expect(ca).toMatch(/CSC_KEY_PASSWORD: \$\{\{ inputs\.csc-key-password \}\}/);
+    expect(ca.match(/CSC_/g)).toHaveLength(2);
+    expect(ca).not.toMatch(/secrets\./);
+    const build = ca.slice(ca.indexOf("- name: Build + package"), ca.indexOf("- name: Signature status"));
+    expect(build).toMatch(/CSC_LINK/);
+    expect(build).toMatch(/CSC_KEY_PASSWORD/);
+  });
+  it("reports the real signature status and fails closed unless it is Valid; no certificate material is committed", () => {
+    expect(action).toMatch(/Get-AuthenticodeSignature/);
+    expect(action).toMatch(/- name: Release gate[\s\S]*?if: inputs\.sign == 'true'[\s\S]*?-ne "Valid"[\s\S]*?throw/);
+    expect(action).toMatch(/Status -eq "Valid"\) \{ "signed" \} else \{ "unsigned" \}/);
+    expect(wf + action).not.toMatch(/-----BEGIN/);
     const tracked = execSync("git ls-files", { cwd: ROOT, encoding: "utf8" }).split("\n");
     expect(tracked.filter((f) => /\.(pfx|p12|pem|key)$/i.test(f) && !/node_modules/.test(f))).toEqual([]);
   });
