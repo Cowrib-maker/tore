@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import Link from "next/link";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -49,8 +49,8 @@ export function LegalAiAccessGateCard({
   const audience = gate.audience ?? "citizen";
   const loginHref = loginHrefForLegalAi(gate.question);
   const registerHref = registerClientHrefForLegalAi(gate.question);
-  const onPaidRef = useRef(onPaid);
-  onPaidRef.current = onPaid;
+  // Calls the latest onPaid from the polling effect without re-subscribing it.
+  const notifyPaid = useEffectEvent(() => onPaid?.());
   const paidRef = useRef(false);
   const [waiting, setWaiting] = useState(gate.kind === "billing");
   const [checkout, setCheckout] = useState<LegalAiCheckoutView | null>(
@@ -63,17 +63,27 @@ export function LegalAiAccessGateCard({
   const [claimError, setClaimError] = useState<string | undefined>(undefined);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
+  // Follow a changed gate.checkout / gate.checkoutError by adjusting state while rendering (not in an effect).
+  const [seenGate, setSeenGate] = useState({ checkout: gate.checkout, error: gate.checkoutError });
+  if (seenGate.checkout !== gate.checkout || seenGate.error !== gate.checkoutError) {
+    setSeenGate({ checkout: gate.checkout, error: gate.checkoutError });
     setCheckout(gate.checkout ?? null);
     setCheckoutError(gate.checkoutError);
-  }, [gate.checkout, gate.checkoutError]);
+  }
+
+  // «Waiting for payment» restarts whenever the thing being waited for changes (same inputs the polling effect depends on).
+  const waitKey = `${gate.kind}|${checkout?.invoiceId ?? ""}|${checkout?.audience ?? ""}`;
+  const [seenWaitKey, setSeenWaitKey] = useState(waitKey);
+  if (seenWaitKey !== waitKey) {
+    setSeenWaitKey(waitKey);
+    if (gate.kind === "billing") setWaiting(true);
+  }
 
   useEffect(() => {
     if (gate.kind !== "billing") {
       return;
     }
     paidRef.current = false;
-    setWaiting(true);
 
     function finishPaid() {
       if (paidRef.current) {
@@ -81,7 +91,7 @@ export function LegalAiAccessGateCard({
       }
       paidRef.current = true;
       setWaiting(false);
-      onPaidRef.current?.();
+      notifyPaid();
     }
 
     const invoiceId = checkout?.invoiceId;
@@ -414,7 +424,7 @@ export function LegalAiAccessGateCard({
                 variant="outline"
                 onClick={() => {
                   paidRef.current = false;
-                  onPaidRef.current?.();
+                  onPaid?.();
                 }}
               >
                 Төлсөн — үргэлжлүүлэх

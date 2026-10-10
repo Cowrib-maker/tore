@@ -24,7 +24,6 @@ export function ConsultationPaymentCard({
 
   useEffect(() => {
     paidRef.current = false;
-    setWaiting(true);
     const timer = window.setInterval(() => {
       void fetch(`/api/citizen/billing/invoices/${invoiceId}`, {
         credentials: "include",
