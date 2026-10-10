@@ -14,6 +14,7 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { PageHeader } from "@/components/ui/page-header";
 import { ConsultationModality, type UserRole } from "@/domain/enums";
 import { getHomepageAccountHref } from "@/domain/services/homepage-routing";
+import { loadRequestDictionary } from "@/application/use-cases/site-content/load-public-dictionary";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 import {
@@ -66,7 +67,7 @@ export default async function LawyersDirectoryPage({
     typeof params.languageId === "string" ? params.languageId : undefined;
   const city = typeof params.city === "string" ? params.city : undefined;
 
-  const dict = await getDictionary();
+  const dict = await loadRequestDictionary();
   const locale = await getLocale();
   const m = dict.marketplace;
   const d = m.directory;

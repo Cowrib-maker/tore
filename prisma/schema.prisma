@@ -919,6 +919,46 @@ model HomepageContent {
   @@map("homepage_contents")
 }
 
+/// Admin-editable public text (allowlisted keys only — see src/domain/site-content/registry.ts).
+/// One row per (key, locale). `version` is the optimistic-concurrency counter: every write must present the version it read.
+model SiteContentEntry {
+  key               String
+  locale            String
+  /// Unpublished working copy. NULL when there are no pending changes.
+  draftValue        String?  @map("draft_value") @db.Text
+  /// What the public site renders. NULL = use the code-owned default.
+  publishedValue    String?  @map("published_value") @db.Text
+  publishedRevision Int?     @map("published_revision")
+  /// Highest revision number issued for this (key, locale).
+  revisionCounter   Int      @default(0) @map("revision_counter")
+  version           Int      @default(1)
+  updatedByUserId   String?  @map("updated_by_user_id")
+  updatedByLabel    String?  @map("updated_by_label")
+  updatedAt         DateTime @default(now()) @map("updated_at")
+  publishedByUserId String?  @map("published_by_user_id")
+  publishedByLabel  String?  @map("published_by_label")
+  publishedAt       DateTime? @map("published_at")
+
+  @@id([key, locale])
+  @@map("site_content_entries")
+}
+
+/// Immutable snapshot written on every publish. Actor identity is stored as a snapshot (no FK) so history survives account removal.
+model SiteContentRevision {
+  id              String   @id @default(cuid())
+  key             String
+  locale          String
+  revision        Int
+  value           String   @db.Text
+  createdByUserId String?  @map("created_by_user_id")
+  createdByLabel  String?  @map("created_by_label")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@unique([key, locale, revision])
+  @@index([key, locale, createdAt(sort: Desc)])
+  @@map("site_content_revisions")
+}
+
 // ─── TORE Legal AI ────────────────────────────────────────────────────────────
 
 enum AIProvider {

@@ -11,11 +11,11 @@ import { formatDateTimeUtc } from "@/lib/format-labels";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 
-type Role = "citizen" | "lawyer";
-type CheckoutMethod = "QR" | "BANK_TRANSFER" | "QPAY";
-type CitizenPlanCode = "CITIZEN_BASIC" | "CITIZEN_PLUS";
+export type Role = "citizen" | "lawyer";
+export type CheckoutMethod = "QR" | "BANK_TRANSFER" | "QPAY";
+export type CitizenPlanCode = "CITIZEN_BASIC" | "CITIZEN_PLUS";
 
-type PendingInvoice = {
+export type PendingInvoice = {
   invoiceId: string;
   planCode: string | null;
   amountMnt: number;
@@ -43,7 +43,7 @@ type HistoryRow = {
   createdAt: string;
 };
 
-type CitizenPayload = {
+export type CitizenPayload = {
   audience: string;
   planName: string | null;
   statusLabel: string;
@@ -55,7 +55,7 @@ type CitizenPayload = {
   history: HistoryRow[];
 };
 
-type LawyerPayload = {
+export type LawyerPayload = {
   planName: string;
   priceMnt: number;
   billingRequired: boolean;
@@ -79,23 +79,114 @@ function statusLabelMn(status: string): string {
   return PLAN_NAME_MN[status] ?? status;
 }
 
+function SimulatedBadge() {
+  return (
+    <p
+      role="note"
+      className="inline-flex rounded-md border border-amber-500 bg-amber-100 px-2 py-1 text-xs font-bold tracking-wide text-amber-950"
+    >
+      TEST / SIMULATED — бодит төлбөр биш
+    </p>
+  );
+}
+
 function methodLabelMn(method: CheckoutMethod): string {
   if (method === "QR") return "QR кодоор";
   if (method === "BANK_TRANSFER") return "Дансаар";
   return "QPay";
 }
 
-/** Pure fetch + parse (no React state), so it can be called from an effect without setting state synchronously. */
-async function fetchBillingPayload(endpoint: string): Promise<CitizenPayload | LawyerPayload> {
-  const response = await fetch(endpoint, { credentials: "same-origin" });
-  if (!response.ok) {
-    throw new Error("load_failed");
-  }
-  return (await response.json()) as CitizenPayload | LawyerPayload;
+export type CheckoutResult = {
+  ok: boolean;
+  view: {
+    error?: string;
+    invoiceId?: string;
+    planCode?: string;
+    amountMnt?: number;
+    status?: string;
+    reference?: string | null;
+    paymentCode?: string | null;
+    bankName?: string | null;
+    bankAccountNumber?: string | null;
+    bankAccountName?: string | null;
+    qrAssetUrl?: string | null;
+    qrImage?: string | null;
+    shortUrl?: string | null;
+  };
+};
+
+export type InvoiceStatusPayload = {
+  paid?: boolean;
+  subscriptionStatus?: string;
+  invoiceStatus?: string;
+  invoice?: { status?: string };
+};
+
+/**
+ * Everything BillingCenter needs from the outside world. The default is the real, authenticated HTTP API; the admin
+ * preview injects an in-memory transport instead, so the SAME component renders without ever touching QPay, invoices
+ * or entitlements. The component never decides which one it gets from request data.
+ */
+export type BillingTransport = {
+  load(): Promise<CitizenPayload | LawyerPayload>;
+  checkout(input: { planCode: CitizenPlanCode | null; method: CheckoutMethod }): Promise<CheckoutResult>;
+  invoiceStatus(invoiceId: string): Promise<InvoiceStatusPayload | null>;
+  claim(invoiceId: string): Promise<{ ok: boolean; error?: string }>;
+};
+
+function createHttpBillingTransport(role: Role): BillingTransport {
+  const base = role === "citizen" ? "/api/citizen/billing" : "/api/lawyer/billing";
+  return {
+    async load() {
+      const response = await fetch(base, { credentials: "same-origin" });
+      if (!response.ok) throw new Error("load_failed");
+      return (await response.json()) as CitizenPayload | LawyerPayload;
+    },
+    async checkout({ planCode, method }) {
+      const response = await fetch(`${base}/checkout`, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(
+          role === "citizen"
+            ? { planCode, method: method === "QPAY" ? undefined : method }
+            : { method: method === "QPAY" ? undefined : method },
+        ),
+      });
+      return { ok: response.ok, view: (await response.json()) as CheckoutResult["view"] };
+    },
+    async invoiceStatus(invoiceId) {
+      const response = await fetch(`${base}/invoices/${invoiceId}`, { credentials: "same-origin" });
+      if (!response.ok) return null;
+      return (await response.json()) as InvoiceStatusPayload;
+    },
+    async claim(invoiceId) {
+      const response = await fetch(`${base}/invoices/${invoiceId}/claim`, { method: "POST", credentials: "same-origin" });
+      const result = (await response.json().catch(() => ({}))) as { error?: string };
+      return { ok: response.ok, error: result.error };
+    },
+  };
 }
 
-export function BillingCenter({ role, backHref, locale }: { role: Role; backHref: string; locale: Locale }) {
-  const endpoint = role === "citizen" ? "/api/citizen/billing" : "/api/lawyer/billing";
+export function BillingCenter({
+  role,
+  backHref,
+  locale,
+  transport: injectedTransport,
+  simulated = false,
+}: {
+  role: Role;
+  backHref: string;
+  locale: Locale;
+  /** Admin preview only: replaces the real HTTP API. Omitted (the default) = the real billing API. */
+  transport?: BillingTransport;
+  /** Marks every payment screen TEST / SIMULATED. Set together with `transport` by the admin preview. */
+  simulated?: boolean;
+}) {
+  const [httpTransport] = useState(() => createHttpBillingTransport(role));
+  const transport = injectedTransport ?? httpTransport;
+  // An injected transport is by definition not the real billing API, so it can never render without the TEST / SIMULATED label.
+  const isSimulated = simulated || injectedTransport !== undefined;
   const [data, setData] = useState<CitizenPayload | LawyerPayload | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<CitizenPlanCode>("CITIZEN_BASIC");
@@ -107,10 +198,10 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
   const pollRef = useRef<number | null>(null);
 
   const load = useCallback(async () => {
-    const payload = await fetchBillingPayload(endpoint);
+    const payload = await transport.load();
     setData(payload);
     return payload;
-  }, [endpoint]);
+  }, [transport]);
 
   const stopPolling = useCallback(() => {
     if (pollRef.current) {
@@ -122,20 +213,11 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
   const pollInvoice = useCallback(
     (invoiceId: string) => {
       stopPolling();
-      const statusPath =
-        role === "lawyer"
-          ? `/api/lawyer/billing/invoices/${invoiceId}`
-          : `/api/citizen/billing/invoices/${invoiceId}`;
       pollRef.current = window.setInterval(() => {
-        void fetch(statusPath, { credentials: "same-origin" })
-          .then(async (response) => {
-            if (!response.ok) return;
-            const payload = (await response.json()) as {
-              paid?: boolean;
-              subscriptionStatus?: string;
-              invoiceStatus?: string;
-              invoice?: { status?: string };
-            };
+        void transport
+          .invoiceStatus(invoiceId)
+          .then(async (payload) => {
+            if (!payload) return;
             const paid = payload.paid === true || payload.subscriptionStatus === "ACTIVE";
             if (paid) {
               stopPolling();
@@ -154,13 +236,14 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
           .catch(() => undefined);
       }, 3000);
     },
-    [load, role, stopPolling],
+    [load, stopPolling, transport],
   );
 
   useEffect(() => {
     let cancelled = false;
     // Fetch first, then update state from the resolved promise (never synchronously in the effect body).
-    fetchBillingPayload(endpoint)
+    transport
+      .load()
       .then((payload) => {
         if (cancelled) return;
         setData(payload);
@@ -182,35 +265,8 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
     setCheckoutPending(true);
     setCheckoutError(null);
     try {
-      const response = await fetch(
-        role === "citizen" ? "/api/citizen/billing/checkout" : "/api/lawyer/billing/checkout",
-        {
-          method: "POST",
-          credentials: "same-origin",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(
-            role === "citizen"
-              ? { planCode, method: method === "QPAY" ? undefined : method }
-              : { method: method === "QPAY" ? undefined : method },
-          ),
-        },
-      );
-      const view = (await response.json()) as {
-        error?: string;
-        invoiceId?: string;
-        planCode?: string;
-        amountMnt?: number;
-        status?: string;
-        reference?: string | null;
-        paymentCode?: string | null;
-        bankName?: string | null;
-        bankAccountNumber?: string | null;
-        bankAccountName?: string | null;
-        qrAssetUrl?: string | null;
-        qrImage?: string | null;
-        shortUrl?: string | null;
-      };
-      if (!response.ok || !view.invoiceId) {
+      const { ok, view } = await transport.checkout({ planCode, method });
+      if (!ok || !view.invoiceId) {
         setCheckoutError(view.error ?? "Төлбөрийн нэхэмжлэл үүсгэж чадсангүй.");
         return;
       }
@@ -241,14 +297,9 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
   async function handleClaim(invoiceId: string) {
     setClaiming(true);
     setClaimError(null);
-    const path =
-      role === "lawyer"
-        ? `/api/lawyer/billing/invoices/${invoiceId}/claim`
-        : `/api/citizen/billing/invoices/${invoiceId}/claim`;
     try {
-      const response = await fetch(path, { method: "POST", credentials: "same-origin" });
-      const result = (await response.json().catch(() => ({}))) as { error?: string };
-      if (!response.ok) {
+      const result = await transport.claim(invoiceId);
+      if (!result.ok) {
         setClaimError(result.error ?? "Хүсэлт биелэгдсэнгүй.");
       } else {
         setData((current) =>
@@ -291,8 +342,11 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
     ? citizenData!.availablePlans
     : [{ code: SOLO_PLAN.code, name: SOLO_PLAN.name, priceMnt: SOLO_PLAN.priceMnt, quotas: SOLO_PLAN.quotas }];
 
+  const invoiceClosed = invoice?.status === "EXPIRED" || invoice?.status === "CANCELLED";
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-billing-simulated={isSimulated ? "true" : undefined}>
+      {isSimulated ? <SimulatedBadge /> : null}
       {/* MY CURRENT PLAN */}
       <section className="rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -396,9 +450,17 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
             </p>
           </div>
 
+          {isSimulated ? <SimulatedBadge /> : null}
           <p className="mt-3 text-2xl font-semibold text-[#0B1F3A]">
             {invoice.amountMnt.toLocaleString("mn-MN")}₮
           </p>
+          {invoiceClosed ? (
+            <p className="mt-2 text-sm font-medium text-red-700">
+              {invoice.status === "EXPIRED"
+                ? "Нэхэмжлэлийн хугацаа дууссан. Шинэ нэхэмжлэл үүсгэнэ үү."
+                : "Нэхэмжлэл цуцлагдсан. Шинэ нэхэмжлэл үүсгэнэ үү."}
+            </p>
+          ) : null}
 
           {invoice.method === "QR" ? (
             invoice.qrAssetUrl ? (
@@ -458,10 +520,27 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
               <ShieldCheck className="size-4" />
               Багц идэвхжих хүртэл төлбөрийн баримт болон гүйлгээний мэдээллийг хадгална уу.
             </p>
-          ) : invoice.status === "FAILED" ? (
-            <p className="mt-4 text-sm font-medium text-red-700">
-              Төлбөр баталгаажаагүй. Дахин оролдоно уу.
-            </p>
+          ) : invoiceClosed || invoice.status === "FAILED" ? (
+            <>
+              {invoice.status === "FAILED" ? (
+                <p className="mt-4 text-sm font-medium text-red-700">Төлбөр баталгаажаагүй. Дахин оролдоно уу.</p>
+              ) : null}
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="mt-4"
+                onClick={() => {
+                  stopPolling();
+                  setCheckoutError(null);
+                  setClaimError(null);
+                  // UI only: drop the closed invoice so the plan picker returns. A new invoice is created only by a new checkout request.
+                  setData((current) => (current ? { ...current, pendingInvoice: null } : current));
+                }}
+              >
+                Шинээр эхлэх
+              </Button>
+            </>
           ) : invoice.method !== "QPAY" ? (
             <>
               {claimError ? <p className="mt-3 text-sm text-red-700">{claimError}</p> : null}

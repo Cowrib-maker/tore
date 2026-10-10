@@ -25,6 +25,8 @@ const ADMIN_NAV_ICONS: Record<string, WorkspaceIconKey> = {
   "/admin/taxonomy": "tags",
   "/admin/settings": "settings",
   "/admin/homepage": "globe",
+  "/admin/content": "globe",
+  "/admin/preview": "layout-dashboard",
   "/admin/audit": "scroll-text",
   "/admin/payments": "credit-card",
   "/admin/dev": "wrench",
@@ -42,7 +44,12 @@ export default async function AdminLayout({
   }
 
   const i18n = await getShellI18n("admin");
-  const items: WorkspaceNavItem[] = (i18n.nav ?? []).map((item) => ({
+  const isMn = i18n.locale === "mn";
+  const controlCenterItems = [
+    { href: "/admin/content", label: isMn ? "Сайтын агуулга" : "Site content" },
+    { href: "/admin/preview", label: isMn ? "Дүрээр урьдчилан харах" : "Role preview" },
+  ];
+  const items: WorkspaceNavItem[] = [...(i18n.nav ?? []), ...controlCenterItems].map((item) => ({
     href: item.href,
     label: item.label,
     icon: ADMIN_NAV_ICONS[item.href],

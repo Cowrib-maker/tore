@@ -1,27 +1,10 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
-import { getClientIp } from "@/application/common/client-ip";
 import { requireActor } from "@/application/common/require-actor";
-import {
-  getAdminHomepageContentUseCase,
-  saveHomepageContentUseCase,
-} from "@/application/use-cases/admin/manage-homepage-content";
-import { homepageContentSchema } from "@/application/validators/homepage-content.schema";
+import { getAdminHomepageContentUseCase } from "@/application/use-cases/admin/manage-homepage-content";
 import type { HomepageLandingContent } from "@/domain/entities/homepage-content";
 import { UserRole } from "@/domain/enums";
-import {
-  auditLogRepository,
-  homepageContentRepository,
-} from "@/infrastructure/repositories";
-import { homepageTranslator } from "@/infrastructure/ai/openai-homepage-translator";
-
-const deps = {
-  homepageContentRepository,
-  auditLogRepository,
-  homepageTranslator,
-};
+import { homepageContentRepository } from "@/infrastructure/repositories";
 
 export async function getAdminHomepageContentAction(): Promise<
   | { status: "unauthorized" }
@@ -33,7 +16,7 @@ export async function getAdminHomepageContentAction(): Promise<
 > {
   try {
     const actor = await requireActor(UserRole.ADMIN);
-    const snapshot = await getAdminHomepageContentUseCase(actor, deps);
+    const snapshot = await getAdminHomepageContentUseCase(actor, { homepageContentRepository });
     return {
       status: "ok",
       content: snapshot.content,
@@ -46,50 +29,20 @@ export async function getAdminHomepageContentAction(): Promise<
 }
 
 export type AdminSaveHomepageContentResult =
-  | {
-      success: true;
-      translated: string[];
-      translationError?: string;
-      updatedAt: string;
-    }
+  | { success: true; translated: string[]; translationError?: string; updatedAt: string }
   | { success: false; error: string };
 
+/**
+ * RETIRED. The old homepage editor saved overrides the live site never read. Saving through it would silently do nothing for visitors,
+ * so the write path is closed; use /admin/content. Previously saved rows are untouched (see legacy-homepage-import.ts).
+ */
 export async function adminSaveHomepageContentAction(
   content: HomepageLandingContent,
 ): Promise<AdminSaveHomepageContentResult> {
-  try {
-    const actor = await requireActor(UserRole.ADMIN);
-
-    const parsed = homepageContentSchema.safeParse(content);
-    if (!parsed.success) {
-      return {
-        success: false,
-        error: "Зарим талбар буруу бөглөгдсөн байна. Дахин шалгана уу.",
-      };
-    }
-
-    const ipAddress = await getClientIp();
-    const result = await saveHomepageContentUseCase(
-      actor,
-      parsed.data,
-      deps,
-      ipAddress,
-    );
-
-    revalidatePath("/admin/homepage");
-    revalidatePath("/");
-
-    return {
-      success: true,
-      translated: result.translated,
-      translationError: result.translationError,
-      updatedAt: new Date().toISOString(),
-    };
-  } catch (error) {
-    console.error("adminSaveHomepageContentAction failed:", error);
-    return {
-      success: false,
-      error: "Хадгалах явцад алдаа гарлаа. Дахин оролдоно уу.",
-    };
-  }
+  void content;
+  await requireActor(UserRole.ADMIN).catch(() => null);
+  return {
+    success: false,
+    error: "Энэ засварлагч хаагдсан. Нүүр хуудасны текстийг «Вэб сайтын агуулга» (/admin/content) хэсгээс засна уу.",
+  };
 }

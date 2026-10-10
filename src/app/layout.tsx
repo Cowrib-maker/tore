@@ -9,9 +9,9 @@ import { FloatingLegalAiWidget } from "@/components/legal-ai/floating-legal-ai-w
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { getDictionary } from "@/i18n/get-dictionary";
+import { loadRequestDictionary } from "@/application/use-cases/site-content/load-public-dictionary";
 import { getHtmlLang, getLocale } from "@/i18n/get-locale";
-import { localeMeta } from "@/i18n/config";
+import { buildRootMetadata } from "@/lib/root-metadata";
 import { getAppUrl } from "@/lib/app-url";
 import { env } from "@/lib/env";
 
@@ -32,7 +32,7 @@ const geistMono = Geist_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
+  const [dict, locale] = await Promise.all([loadRequestDictionary(), getLocale()]);
   // Canonical origin for metadataBase/og:url/social images -- routed through
   // getAppUrl() (not the raw env var) so this stays the one place that
   // enforces "never a localhost/http URL in production" (see app-url.ts).
@@ -43,31 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const base = getAppUrl().replace(/\/$/, "");
   const appName = env.NEXT_PUBLIC_APP_NAME || "TORE";
 
-  return {
-    metadataBase: new URL(base),
-    title: {
-      default: dict.meta.title,
-      template: `%s | ${appName}`,
-    },
-    description: dict.meta.description,
-    applicationName: appName,
-    openGraph: {
-      type: "website",
-      locale: localeMeta[locale].htmlLang.replace("-", "_"),
-      url: base,
-      siteName: appName,
-      title: dict.meta.title,
-      description: dict.meta.description,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: dict.meta.title,
-      description: dict.meta.description,
-    },
-    icons: {
-      icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-    },
-  };
+  return buildRootMetadata({ dict, locale, base, appName });
 }
 
 export default async function RootLayout({
