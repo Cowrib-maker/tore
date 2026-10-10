@@ -121,4 +121,26 @@ export function formatDateTimeUtc(date: Date, locale?: Locale): string {
   }).format(date);
 }
 
+/**
+ * User-visible instants are shown in Asia/Ulaanbaatar (UTC+8, no DST since
+ * 2017). Stored instants stay UTC; only the display changes.
+ */
+export const DISPLAY_TIME_ZONE = "Asia/Ulaanbaatar";
+
+export function formatDateTimeUlaanbaatar(date: Date, locale?: Locale): string {
+  const tag =
+    locale === "mn"
+      ? "mn-MN"
+      : locale === "zh"
+        ? "zh-CN"
+        : locale === "ko"
+          ? "ko-KR"
+          : "en-GB";
+  return new Intl.DateTimeFormat(tag, {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: DISPLAY_TIME_ZONE,
+  }).format(date);
+}
+
 export type { StatusLabels, Weekdays };

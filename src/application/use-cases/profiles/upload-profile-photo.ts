@@ -37,22 +37,45 @@ export const PROFILE_PHOTO_SAVE_MESSAGE =
   "Зургийг бүртгэж чадсангүй. Одоогийн зураг хэвээр байна. Дахин оролдоно уу.";
 
 /**
- * Any LAWYER-role account (attorney, prosecutor, judge, other-lawyer) may
- * upload a profile photo — it is part of the shared professional
- * workspace, not a marketplace feature. Public visibility is decided later,
- * per request, by the position/isListed gate in getPublicLawyerProfile.
+ * Profile photo for a LAWYER-role account (attorney, prosecutor, judge, other-lawyer) — part of the shared professional workspace, not a
+ * marketplace feature. Public visibility is decided later, per request, by the position/isListed gate in getPublicLawyerProfile.
  *
- * Only ever touches the actor's own User row. The previous photo is deleted
- * strictly after the new one is persisted, so any failure leaves the existing
- * photo intact; a failure after the new blob was stored removes that blob.
+ * Whose photo is written (decided here, never by the route):
+ *  - LAWYER: always their own User row. Naming any other user in `targetUserId` is refused (ForbiddenError).
+ *  - ADMIN: only the LAWYER account named in `targetUserId`. A missing, deleted or non-LAWYER target gets the same NotFoundError (no account
+ *    probing). An ADMIN without `targetUserId` is refused (ForbiddenError): admins have no photo of their own here.
+ *  - every other role: refused (ForbiddenError).
+ * Audit: `actorUserId` is always the caller; for an admin acting on a lawyer, `entityId` is the lawyer and `metadata.onBehalfOfAdmin` is true.
+ *
+ * The previous photo is deleted strictly after the new one is persisted, so any failure leaves the existing photo intact; a failure after the
+ * new blob was stored removes that blob.
  */
 export async function uploadProfilePhotoUseCase(
   actor: ActorContext,
   file: UploadProfilePhotoFile,
   deps: UploadProfilePhotoDeps,
   ipAddress?: string,
+  /** Admin only: the lawyer whose photo is being managed. */
+  targetUserId?: string,
 ): Promise<User> {
-  if (actor.role !== UserRole.LAWYER) {
+  // Who owns the photo being written:
+  //  - LAWYER: always themselves; naming another user is refused outright.
+  //  - ADMIN: only an explicitly named LAWYER account (all administrative rights).
+  //  - everyone else: refused.
+  let ownerId: string;
+  if (actor.role === UserRole.LAWYER) {
+    if (targetUserId !== undefined && targetUserId !== actor.userId) {
+      throw new ForbiddenError();
+    }
+    ownerId = actor.userId;
+  } else if (actor.role === UserRole.ADMIN && targetUserId) {
+    const target = await deps.userRepository.findById(targetUserId);
+    if (!target || target.role !== UserRole.LAWYER) {
+      // Same answer for "missing" and "not a lawyer": no account probing.
+      throw new NotFoundError("User", targetUserId);
+    }
+    ownerId = target.id;
+  } else {
     throw new ForbiddenError();
   }
 
@@ -68,16 +91,16 @@ export async function uploadProfilePhotoUseCase(
     );
   }
 
-  const previous = await deps.userRepository.findById(actor.userId);
+  const previous = await deps.userRepository.findById(ownerId);
   if (!previous) {
-    throw new NotFoundError("User", actor.userId);
+    throw new NotFoundError("User", ownerId);
   }
 
   let stored;
   try {
     stored = await deps.fileStorage.upload({
       purpose: "profile-photo",
-      ownerId: actor.userId,
+      ownerId,
       fileName: file.fileName,
       contentType: PHOTO_MIME_BY_FORMAT[detected],
       body: file.body,
@@ -89,7 +112,7 @@ export async function uploadProfilePhotoUseCase(
 
   let updated: User;
   try {
-    updated = await deps.userRepository.updateProfile(actor.userId, {
+    updated = await deps.userRepository.updateProfile(ownerId, {
       image: stored.key,
     });
   } catch (error) {
@@ -120,7 +143,7 @@ export async function uploadProfilePhotoUseCase(
     action: AuditAction.UPDATE,
     entityType: "User",
     entityId: updated.id,
-    metadata: { field: "profilePhoto" },
+    metadata: { field: "profilePhoto", ...(ownerId !== actor.userId ? { onBehalfOfAdmin: true } : {}) },
     ipAddress,
   });
 

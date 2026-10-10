@@ -12,7 +12,7 @@ import type { Notification } from "@/domain/entities/trust";
 import type { Locale } from "@/i18n/config";
 import type { MarketplaceDictionary } from "@/i18n/marketplace-types";
 import {
-  formatDateTimeUtc,
+  formatDateTimeUlaanbaatar,
   formatNotificationType,
 } from "@/lib/format-labels";
 import { localizeNotification } from "@/lib/localize-notification";
@@ -89,7 +89,7 @@ export function NotificationList({
                   {localized.body}
                 </p>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  {formatDateTimeUtc(note.createdAt, locale)} {copy.utc}
+                  {formatDateTimeUlaanbaatar(note.createdAt, locale)} {copy.utc}
                   {" · "}
                   {formatNotificationType(note.type, locale)}
                 </p>
