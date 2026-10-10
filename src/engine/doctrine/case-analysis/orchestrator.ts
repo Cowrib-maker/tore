@@ -366,7 +366,7 @@ export class CaseAnalysisOrchestrator {
     });
 
     // 9. Counterarguments (party / assistive — never authoritative)
-    let counterarguments: CaseCounterargument[] = [
+    const counterarguments: CaseCounterargument[] = [
       ...(request.counterarguments ?? []),
     ].map((c) => ({ ...c, authoritative: false as const }));
 

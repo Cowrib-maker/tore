@@ -4,8 +4,8 @@ import {
   startTransition,
   useActionState,
   useEffect,
+  useEffectEvent,
   useMemo,
-  useRef,
   useState,
 } from "react";
 
@@ -35,10 +35,15 @@ export function ResendVerificationForm({
   hideEmailField?: boolean;
   onSent?: () => void;
 }) {
-  const onSentRef = useRef(onSent);
-  onSentRef.current = onSent;
+  // Always calls the latest `onSent` without making the effect below depend on it.
+  const notifySent = useEffectEvent(() => onSent?.());
   const knownEmail = defaultEmail?.trim() ?? "";
   const [typedEmail, setTypedEmail] = useState(knownEmail);
+  const [seenKnownEmail, setSeenKnownEmail] = useState(knownEmail);
+  if (knownEmail !== seenKnownEmail) {
+    setSeenKnownEmail(knownEmail);
+    if (knownEmail) setTypedEmail(knownEmail);
+  }
   const boundAction = useMemo(
     () => resendVerificationEmailAction.bind(null, knownEmail || null),
     [knownEmail],
@@ -46,14 +51,8 @@ export function ResendVerificationForm({
   const [state, dispatch, pending] = useActionState(boundAction, initialState);
 
   useEffect(() => {
-    if (knownEmail) {
-      setTypedEmail(knownEmail);
-    }
-  }, [knownEmail]);
-
-  useEffect(() => {
     if (state.success && state.code === AUTH_ACTION_CODE.RESEND_SENT) {
-      onSentRef.current?.();
+      notifySent();
     }
   }, [state]);
 

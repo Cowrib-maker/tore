@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 
 import { EmailVerificationOtpForm } from "@/components/auth/email-verification-otp-form";
@@ -43,12 +43,15 @@ export function EmailVerificationPanel({
     }
   }, []);
 
-  useEffect(() => {
+  // Follow a changed `model.email` prop by adjusting state while rendering (React's documented alternative to an effect).
+  const [seenModelEmail, setSeenModelEmail] = useState(model.email);
+  if (model.email !== seenModelEmail) {
+    setSeenModelEmail(model.email);
     const next = normalizeVerificationEmail(model.email);
     if (next) {
       setIdentityEmail(next);
     }
-  }, [model.email]);
+  }
 
   const continueHref =
     model.status === "success"

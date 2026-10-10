@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { type FormEvent, useEffect, useEffectEvent, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MessageCircle, Send, X } from "lucide-react";
@@ -22,16 +22,18 @@ export function FloatingLegalAiWidget() {
   const [message, setMessage] = useState("");
   const { messages, conversationId, loading, error, accessGate, sendMessage } =
     useLegalAiChatSession();
-  const sendMessageRef = useRef(sendMessage);
-  sendMessageRef.current = sendMessage;
+  // Always the latest sendMessage, without re-subscribing the window listener below.
+  const openWithMessage = useEffectEvent((pending?: string) => {
+    setOpen(true);
+    if (pending) {
+      void sendMessage(pending);
+    }
+  });
 
   useEffect(() => {
     function handleOpenRequest(event: Event) {
-      setOpen(true);
       const detail = (event as CustomEvent<OpenLegalAiWidgetDetail>).detail;
-      if (detail?.message) {
-        void sendMessageRef.current(detail.message);
-      }
+      openWithMessage(detail?.message);
     }
     window.addEventListener(OPEN_LEGAL_AI_WIDGET_EVENT, handleOpenRequest);
     return () =>

@@ -85,6 +85,15 @@ function methodLabelMn(method: CheckoutMethod): string {
   return "QPay";
 }
 
+/** Pure fetch + parse (no React state), so it can be called from an effect without setting state synchronously. */
+async function fetchBillingPayload(endpoint: string): Promise<CitizenPayload | LawyerPayload> {
+  const response = await fetch(endpoint, { credentials: "same-origin" });
+  if (!response.ok) {
+    throw new Error("load_failed");
+  }
+  return (await response.json()) as CitizenPayload | LawyerPayload;
+}
+
 export function BillingCenter({ role, backHref, locale }: { role: Role; backHref: string; locale: Locale }) {
   const endpoint = role === "citizen" ? "/api/citizen/billing" : "/api/lawyer/billing";
   const [data, setData] = useState<CitizenPayload | LawyerPayload | null>(null);
@@ -98,11 +107,7 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
   const pollRef = useRef<number | null>(null);
 
   const load = useCallback(async () => {
-    const response = await fetch(endpoint, { credentials: "same-origin" });
-    if (!response.ok) {
-      throw new Error("load_failed");
-    }
-    const payload = (await response.json()) as CitizenPayload | LawyerPayload;
+    const payload = await fetchBillingPayload(endpoint);
     setData(payload);
     return payload;
   }, [endpoint]);
@@ -153,14 +158,23 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
   );
 
   useEffect(() => {
-    void load()
+    let cancelled = false;
+    // Fetch first, then update state from the resolved promise (never synchronously in the effect body).
+    fetchBillingPayload(endpoint)
       .then((payload) => {
+        if (cancelled) return;
+        setData(payload);
         if (payload.pendingInvoice) {
           pollInvoice(payload.pendingInvoice.invoiceId);
         }
       })
-      .catch(() => setLoadError("Ачаалж чадсангүй. Дахин ачаална уу."));
-    return () => stopPolling();
+      .catch(() => {
+        if (!cancelled) setLoadError("Ачаалж чадсангүй. Дахин ачаална уу.");
+      });
+    return () => {
+      cancelled = true;
+      stopPolling();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
