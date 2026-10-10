@@ -3,6 +3,7 @@ import Link from "next/link";
 import { requireAdminPage } from "@/application/common/require-admin-page";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BILLING_PREVIEW_SCENARIOS, BILLING_PREVIEW_SCENARIO_IDS } from "@/domain/admin-preview/billing-simulation";
 import {
   PREVIEW_CONTEXT_IDS,
   PREVIEW_CONTEXTS,
@@ -52,6 +53,27 @@ export default async function AdminPreviewIndexPage() {
               </ul>
             </section>
           ))}
+          <section aria-labelledby="checkout" className="space-y-2">
+            <h2 id="checkout" className="font-semibold">Төлбөрийн (checkout) симуляци · TEST / SIMULATED</h2>
+            <p className="text-sm text-muted-foreground">
+              Жинхэнэ Billing Center-ийг санах ойн симуляциар ажиллуулна. Бодит QPay, нэхэмжлэл, багц, эрх хөндөгдөхгүй.{" "}
+              <Link href="/admin/preview/coverage" className="underline">Бүтээгдэхүүн бүрийн хэрэгжилтийн байдал</Link>
+            </p>
+            {(["citizen", "lawyer"] as const).map((role) => (
+              <div key={role} className="rounded-lg border p-3">
+                <p className="font-medium">{role === "citizen" ? "Иргэн (Citizen)" : "Хуульч (Lawyer)"}</p>
+                <ul className="mt-1 flex flex-wrap gap-2 text-sm">
+                  {BILLING_PREVIEW_SCENARIO_IDS.map((id) => (
+                    <li key={id}>
+                      <Link href={`/admin/preview/checkout/${role}?state=${id}`} className="underline" target="_blank">
+                        {BILLING_PREVIEW_SCENARIOS[id].label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </section>
           <section aria-labelledby="unsupported" className="space-y-2">
             <h2 id="unsupported" className="font-semibold">Дэмжигдээгүй дүрүүд</h2>
             <ul className="space-y-1 text-sm">
