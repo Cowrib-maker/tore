@@ -1,0 +1,44 @@
+--- a/src/app/spell/page.tsx
++++ b/src/app/spell/page.tsx
+@@ -9,11 +9,12 @@
+ import { getSpellPriceList } from "@/domain/spell/pricing";
+ import { isSpellV1Enabled } from "@/lib/feature-flags";
+ import { getHomepageAccountHref } from "@/domain/services/homepage-routing";
++import { loadPublicDictionary, loadRequestDictionary } from "@/application/use-cases/site-content/load-public-dictionary";
+ import { getDictionary } from "@/i18n/get-dictionary";
+ import { getLocale } from "@/i18n/get-locale";
+ 
+ export async function generateMetadata(): Promise<Metadata> {
+-  const dict = await getDictionary(await getLocale());
++  const dict = await loadRequestDictionary();
+   return {
+     title: { absolute: dict.spell.meta.title },
+     description: dict.spell.meta.description,
+@@ -34,7 +35,7 @@
+  */
+ export default async function SpellPage() {
+   const locale = await getLocale();
+-  const [dict, session] = await Promise.all([getDictionary(locale), getSessionUser()]);
++  const [dict, session] = await Promise.all([getDictionary(locale).then((base) => loadPublicDictionary(base, locale)), getSessionUser()]);
+   const authUser = session?.user
+     ? {
+         displayName: session.user.name?.trim() || session.user.email || dict.common.brand,
+--- a/src/app/spell/license/page.tsx
++++ b/src/app/spell/license/page.tsx
+@@ -15,6 +15,7 @@
+ import { getSpellInstallerSource } from "@/domain/spell/installer";
+ import { getSpellRelease } from "@/domain/spell/update";
+ import { env } from "@/lib/env";
++import { loadPublicDictionary } from "@/application/use-cases/site-content/load-public-dictionary";
+ import { getDictionary } from "@/i18n/get-dictionary";
+ import { getLocale } from "@/i18n/get-locale";
+ import { invoiceRepository } from "@/infrastructure/repositories/prisma-invoice-repository";
+@@ -32,7 +33,7 @@
+   const session = await getSessionUser();
+   if (!session?.user?.id) redirect(`/login?callbackUrl=${encodeURIComponent("/spell/license")}`);
+   const locale = await getLocale();
+-  const dict = await getDictionary(locale);
++  const dict = await loadPublicDictionary(await getDictionary(locale), locale);
+   const role = session.user.role as UserRole | undefined;
+   const authUser = {
+     displayName: session.user.name?.trim() || session.user.email || dict.common.brand,

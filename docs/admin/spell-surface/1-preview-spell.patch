@@ -1,0 +1,53 @@
+--- a/src/domain/admin-preview/scenarios.ts
++++ b/src/domain/admin-preview/scenarios.ts
+@@ -24,7 +24,7 @@
+ ] as const;
+ export type PreviewContextId = (typeof PREVIEW_CONTEXT_IDS)[number];
+ 
+-export const PREVIEW_PAGE_IDS = ["home", "student", "legal-ai-gate"] as const;
++export const PREVIEW_PAGE_IDS = ["home", "student", "spell", "legal-ai-gate"] as const;
+ export type PreviewPageId = (typeof PREVIEW_PAGE_IDS)[number];
+ 
+ export type PreviewContext = {
+@@ -111,6 +111,10 @@
+     title: { mn: "Оюутны хуудас", en: "Student hub" },
+     description: "Жинхэнэ StudentHubView: нийтийн цэс, хөл хэсэг болон оюутны танилцуулга. Нэвтэрсэн төлөв нь зөвхөн цэсийн товчлуурыг өөрчилнө.",
+   },
++  spell: {
++    title: { mn: "TORE Spell бүтээгдэхүүний хуудас", en: "TORE Spell product page" },
++    description: "Жинхэнэ SpellLanding: үнэ, худалдан авалт, суулгацын төлөв синтетик (худалдан авалт нээгдээгүй, татах холбоосгүй) тул үнэ харагдахгүй.",
++  },
+   "legal-ai-gate": {
+     title: { mn: "Хууль зүйн AI — хандалтын хаалт", en: "Legal AI access gate" },
+     description: "Жинхэнэ LegalAiAccessGateCard: нэвтрэх эсвэл төлбөртэй багц шаардах үед хэрэглэгчид харагдах карт.",
+--- a/src/app/admin/preview/[page]/page.tsx
++++ b/src/app/admin/preview/[page]/page.tsx
+@@ -5,6 +5,7 @@
+ import { PreviewFrame } from "@/components/admin/preview/preview-frame";
+ import { LegalAiAccessGateCard } from "@/components/legal-ai/legal-ai-access-gate";
+ import { LandingPage } from "@/components/marketing/landing-page";
++import { SpellLanding } from "@/components/marketing/spell-landing";
+ import { StudentHubView } from "@/components/student/student-hub-view";
+ import { getGatePreview, getHomePreviewProps, resolvePreview } from "@/domain/admin-preview/scenarios";
+ import { applySiteContentOverrides } from "@/domain/site-content/registry";
+@@ -46,6 +47,9 @@
+         <LandingPage dict={dict} locale={resolved.locale} {...getHomePreviewProps(resolved.context, dict.common.brand)} />
+       ) : resolved.page === "student" ? (
+         <StudentHubView dict={dict} locale={resolved.locale} authUser={getHomePreviewProps(resolved.context, dict.common.brand).authUser} />
++      ) : resolved.page === "spell" ? (
++        // Synthetic state: no plans (so no price is shown), purchasing closed, installer not available. Nothing here reads licences, prices or storage.
++        <SpellLanding dict={dict} locale={resolved.locale} authUser={getHomePreviewProps(resolved.context, dict.common.brand).authUser} plans={[]} purchaseAvailable={false} installerReady={false} />
+       ) : gate ? (
+         <div className="mx-auto max-w-xl p-6">
+           <LegalAiAccessGateCard gate={gate} />
+--- a/src/app/admin/preview/page.tsx
++++ b/src/app/admin/preview/page.tsx
+@@ -40,7 +40,7 @@
+                       {PREVIEW_CONTEXTS[id].label.mn}
+                     </Link>
+                     <p className="text-xs text-muted-foreground">{PREVIEW_CONTEXTS[id].description}</p>
+-                    {page === "home" || page === "student" ? (
++                    {page === "home" || page === "student" || page === "spell" ? (
+                       <p className="mt-1 text-xs">
+                         <Link href={`/admin/preview/${page}?context=${id}&locale=mn&content=draft`} className="underline" target="_blank">Ноорогтой нь</Link>
+                         {" · "}
