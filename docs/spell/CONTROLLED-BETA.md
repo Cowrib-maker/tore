@@ -9,7 +9,7 @@ Status words used here: **Verified** = observed in a real run; **Simulated** = e
 |---|---|---|
 | Windows installer builds, installs, launches, uninstalls | **Verified (CI, headless)** | `spell-desktop-windows` run #8, commit `f7b74ac`, `windows-latest`: typecheck, tests, NSIS build, content check, silent install, `--selftest`, silent uninstall all passed |
 | Installer identity | Verified in the CI log only | `TORE-Spell-Setup.exe`, 111,335,763 bytes, SHA-256 `C648B7ED3ED4EC26BD59893412BB936EC21C492D0B05996437776A77B3C8C29A`, app version `1.0.0-rc.1` (`desktop/package.json`) |
-| Code signing | **Not signed** | CI reports the measured Authenticode status; no `CSC_LINK` / `CSC_KEY_PASSWORD` secrets exist. The artifact name now says `unsigned` or `signed` from that measurement |
+| Code signing | **Not signed** | CI reports the measured Authenticode status; no `CSC_LINK` / `CSC_KEY_PASSWORD` secrets exist. Pull-request builds are always unsigned test builds and never receive signing secrets; only a `spell-v*` tag (push, or `sign=true` dispatch started from the tag) inside the protected `spell-release-signing` Environment can sign, and it fails unless the signature is `Valid`. The artifact name now says `unsigned` or `signed` from that measurement |
 | File bytes re-checked outside CI | **Not verified** | The authoring sandbox could not reach the artifact store, so the hash above has not been recomputed from the downloaded file |
 | Purchase → licence → activation logic | **Verified against a simulator** | `npm run e2e:spell`: 29 steps over real HTTP + a real PostgreSQL, with a QPay **sandbox simulator (not QPay)** |
 | Real QPay payment | **Not verified** | no merchant credentials exist |
