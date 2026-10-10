@@ -22,6 +22,7 @@ import { Surface } from "@/components/ui/surface";
 import { ConsultationModality, UserRole } from "@/domain/enums";
 import { DomainError } from "@/domain/errors/domain-error";
 import { getHomepageAccountHref } from "@/domain/services/homepage-routing";
+import { loadRequestDictionary } from "@/application/use-cases/site-content/load-public-dictionary";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 import {
@@ -104,7 +105,7 @@ export default async function PublicLawyerProfilePage({
 
   const [session, dict, locale, reviews] = await Promise.all([
     getSessionUser(),
-    getDictionary(),
+    loadRequestDictionary(),
     getLocale(),
     reviewRepository.findVisibleByLawyerProfileId(view.profile.id),
   ]);

@@ -7,6 +7,7 @@ import {
   getHomepageAccountHref,
   getHomepageProductHref,
 } from "@/domain/services/homepage-routing";
+import { loadPublicDictionary } from "@/application/use-cases/site-content/load-public-dictionary";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 
@@ -14,7 +15,7 @@ export default async function HomePage() {
   const locale = await getLocale();
 
   const [dict, session, intelligence, stats] = await Promise.all([
-    getDictionary(locale),
+    getDictionary(locale).then((base) => loadPublicDictionary(base, locale)),
     getSessionUser(),
     loadLegalIntelligence(),
     getHomepageStats(),
