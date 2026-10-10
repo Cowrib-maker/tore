@@ -15,7 +15,7 @@ import {
 import { AuditAction, UserRole } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
-import { formatAuditAction, formatDateTimeUtc } from "@/lib/format-labels";
+import { formatAuditAction, formatDateTimeUlaanbaatar } from "@/lib/format-labels";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -212,7 +212,7 @@ export default async function AdminAuditPage({
                 {items.map((entry) => (
                   <TableRow key={entry.id}>
                     <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
-                      {formatDateTimeUtc(entry.createdAt, i18n.locale)}
+                      {formatDateTimeUlaanbaatar(entry.createdAt, i18n.locale)}
                     </TableCell>
                     <TableCell className="text-sm">
                       {entry.actorEmail ?? entry.actorName ?? aa.systemActor}

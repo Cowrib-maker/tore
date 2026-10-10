@@ -60,7 +60,7 @@ describe("uploadProfilePhotoUseCase", () => {
   });
 
   it.each([UserRole.CLIENT, UserRole.ADMIN])(
-    "refuses a %s actor before touching storage or the user row",
+    "refuses a %s actor with no target lawyer, before touching storage or the user row",
     async (role) => {
       const { deps, upload, updateProfile } = setup();
       await expect(
@@ -70,6 +70,42 @@ describe("uploadProfilePhotoUseCase", () => {
       expect(updateProfile).not.toHaveBeenCalled();
     },
   );
+
+  it("lawyer A cannot change lawyer B's photo (explicit target is forbidden)", async () => {
+    const { deps, upload, updateProfile } = setup();
+    await expect(
+      uploadProfilePhotoUseCase(lawyer, file(PNG), deps, undefined, "u-other-lawyer"),
+    ).rejects.toBeInstanceOf(ForbiddenError);
+    expect(upload).not.toHaveBeenCalled();
+    expect(updateProfile).not.toHaveBeenCalled();
+  });
+
+  it("a lawyer naming themselves explicitly is fine", async () => {
+    const { deps, updateProfile } = setup();
+    await uploadProfilePhotoUseCase(lawyer, file(PNG), deps, undefined, "u-lawyer");
+    expect(updateProfile).toHaveBeenCalledWith("u-lawyer", expect.anything());
+  });
+
+  it("an ADMIN may manage a LAWYER account's photo; the owner is the lawyer, the audit actor is the admin", async () => {
+    const { deps, upload, updateProfile } = setup();
+    (deps as { userRepository: { findById: ReturnType<typeof vi.fn> } }).userRepository.findById = vi.fn(async (id: string) => ({ id, role: UserRole.LAWYER, image: null })) as never;
+    await uploadProfilePhotoUseCase({ userId: "admin-1", role: UserRole.ADMIN }, file(PNG), deps, "1.2.3.4", "u-lawyer");
+    expect(upload.mock.calls[0]![0].ownerId).toBe("u-lawyer");
+    expect(updateProfile.mock.calls[0]![0]).toBe("u-lawyer");
+    const audit = (deps as { auditLogRepository: { create: ReturnType<typeof vi.fn> } }).auditLogRepository.create.mock.calls[0]![0];
+    expect(audit).toMatchObject({ actorUserId: "admin-1", entityId: "u-lawyer", metadata: { onBehalfOfAdmin: true } });
+  });
+
+  it("an ADMIN cannot use this to write a non-lawyer or missing account (indistinguishable NotFound)", async () => {
+    for (const found of [{ id: "c1", role: UserRole.CLIENT, image: null }, null]) {
+      const { deps, upload } = setup();
+      (deps as { userRepository: { findById: ReturnType<typeof vi.fn> } }).userRepository.findById = vi.fn(async () => found) as never;
+      await expect(
+        uploadProfilePhotoUseCase({ userId: "admin-1", role: UserRole.ADMIN }, file(PNG), deps, undefined, "c1"),
+      ).rejects.toMatchObject({ name: expect.stringMatching(/NotFound/i) });
+      expect(upload).not.toHaveBeenCalled();
+    }
+  });
 
   it("only ever writes the acting user's own row and storage owner", async () => {
     const { deps, upload, updateProfile } = setup();

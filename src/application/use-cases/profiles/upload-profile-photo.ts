@@ -51,8 +51,27 @@ export async function uploadProfilePhotoUseCase(
   file: UploadProfilePhotoFile,
   deps: UploadProfilePhotoDeps,
   ipAddress?: string,
+  /** Admin only: the lawyer whose photo is being managed. */
+  targetUserId?: string,
 ): Promise<User> {
-  if (actor.role !== UserRole.LAWYER) {
+  // Who owns the photo being written:
+  //  - LAWYER: always themselves; naming another user is refused outright.
+  //  - ADMIN: only an explicitly named LAWYER account (all administrative rights).
+  //  - everyone else: refused.
+  let ownerId: string;
+  if (actor.role === UserRole.LAWYER) {
+    if (targetUserId !== undefined && targetUserId !== actor.userId) {
+      throw new ForbiddenError();
+    }
+    ownerId = actor.userId;
+  } else if (actor.role === UserRole.ADMIN && targetUserId) {
+    const target = await deps.userRepository.findById(targetUserId);
+    if (!target || target.role !== UserRole.LAWYER) {
+      // Same answer for "missing" and "not a lawyer": no account probing.
+      throw new NotFoundError("User", targetUserId);
+    }
+    ownerId = target.id;
+  } else {
     throw new ForbiddenError();
   }
 
@@ -68,16 +87,16 @@ export async function uploadProfilePhotoUseCase(
     );
   }
 
-  const previous = await deps.userRepository.findById(actor.userId);
+  const previous = await deps.userRepository.findById(ownerId);
   if (!previous) {
-    throw new NotFoundError("User", actor.userId);
+    throw new NotFoundError("User", ownerId);
   }
 
   let stored;
   try {
     stored = await deps.fileStorage.upload({
       purpose: "profile-photo",
-      ownerId: actor.userId,
+      ownerId,
       fileName: file.fileName,
       contentType: PHOTO_MIME_BY_FORMAT[detected],
       body: file.body,
@@ -89,7 +108,7 @@ export async function uploadProfilePhotoUseCase(
 
   let updated: User;
   try {
-    updated = await deps.userRepository.updateProfile(actor.userId, {
+    updated = await deps.userRepository.updateProfile(ownerId, {
       image: stored.key,
     });
   } catch (error) {
@@ -120,7 +139,7 @@ export async function uploadProfilePhotoUseCase(
     action: AuditAction.UPDATE,
     entityType: "User",
     entityId: updated.id,
-    metadata: { field: "profilePhoto" },
+    metadata: { field: "profilePhoto", ...(ownerId !== actor.userId ? { onBehalfOfAdmin: true } : {}) },
     ipAddress,
   });
 

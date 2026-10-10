@@ -36,7 +36,7 @@ import {
   lawyerCredentialRepository,
   reviewRepository,
 } from "@/infrastructure/repositories";
-import { formatDateTimeUtc, formatModality } from "@/lib/format-labels";
+import { formatDateTimeUlaanbaatar, formatModality } from "@/lib/format-labels";
 import {
   localizedOfferingTitle,
   localizedTaxonomyName,
@@ -379,7 +379,7 @@ export default async function PublicLawyerProfilePage({
                       key={slot.startAt.toISOString()}
                       className="rounded-md border px-3 py-2 text-sm"
                     >
-                      {formatDateTimeUtc(slot.startAt, locale)} {m.common.utc}
+                      {formatDateTimeUlaanbaatar(slot.startAt, locale)} {m.common.utc}
                     </div>
                   ))
                 )}
