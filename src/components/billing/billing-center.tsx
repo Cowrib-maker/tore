@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Check, Clock, ShieldCheck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SOLO_PLAN } from "@/domain/constants/subscription-plans";
+import { isInvoicePaymentConfirmed } from "@/domain/services/invoice-payment-confirmation";
 import { formatDateTimeUlaanbaatar } from "@/lib/format-labels";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
@@ -94,7 +96,23 @@ async function fetchBillingPayload(endpoint: string): Promise<CitizenPayload | L
   return (await response.json()) as CitizenPayload | LawyerPayload;
 }
 
-export function BillingCenter({ role, backHref, locale }: { role: Role; backHref: string; locale: Locale }) {
+/**
+ * `returnTo` must already be validated server-side (safeReturnPath). After a payment that the
+ * SERVER reports as paid, the user is sent back there; a client redirect alone never marks anything paid.
+ */
+export function BillingCenter({
+  role,
+  backHref,
+  locale,
+  returnTo = null,
+}: {
+  role: Role;
+  backHref: string;
+  locale: Locale;
+  returnTo?: string | null;
+}) {
+  const router = useRouter();
+  const [paidThisVisit, setPaidThisVisit] = useState(false);
   const endpoint = role === "citizen" ? "/api/citizen/billing" : "/api/lawyer/billing";
   const [data, setData] = useState<CitizenPayload | LawyerPayload | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -136,10 +154,13 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
               invoiceStatus?: string;
               invoice?: { status?: string };
             };
-            const paid = payload.paid === true || payload.subscriptionStatus === "ACTIVE";
+            // Shared rule (invoice-payment-confirmation.ts): only the server's `paid` verdict on THIS invoice counts.
+            // `subscriptionStatus` is account-level and can read ACTIVE while this invoice is still pending.
+            const paid = isInvoicePaymentConfirmed(payload);
             if (paid) {
               stopPolling();
               await load();
+              setPaidThisVisit(true);
               return;
             }
             const status = payload.invoiceStatus ?? payload.invoice?.status;
@@ -177,6 +198,15 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!paidThisVisit || !returnTo) return;
+    const timer = window.setTimeout(() => {
+      router.replace(returnTo);
+      router.refresh();
+    }, 1500);
+    return () => window.clearTimeout(timer);
+  }, [paidThisVisit, returnTo, router]);
 
   async function startCheckout(planCode: CitizenPlanCode | null, method: CheckoutMethod) {
     setCheckoutPending(true);
@@ -291,8 +321,34 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
     ? citizenData!.availablePlans
     : [{ code: SOLO_PLAN.code, name: SOLO_PLAN.name, priceMnt: SOLO_PLAN.priceMnt, quotas: SOLO_PLAN.quotas }];
 
+  const lastSettled = data.history[0];
+  const retryNote =
+    !invoice && !hasActivePlan && lastSettled && ["FAILED", "CANCELLED", "EXPIRED"].includes(lastSettled.status)
+      ? lastSettled.status === "EXPIRED"
+        ? "Өмнөх нэхэмжлэлийн хугацаа дууссан. Доороос дахин төлбөрийн арга сонгоно уу."
+        : lastSettled.status === "CANCELLED"
+          ? "Өмнөх төлбөр цуцлагдсан. Бүртгэл дахин хийх шаардлагагүй, доороос дахин оролдоно уу."
+          : "Өмнөх төлбөр баталгаажаагүй. Бүртгэл дахин хийх шаардлагагүй, доороос дахин оролдоно уу."
+      : null;
+
   return (
     <div className="space-y-6">
+      {paidThisVisit ? (
+        <p role="status" className="rounded-xl border border-green-600/30 bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
+          Төлбөр баталгаажлаа. Таны багц идэвхжлээ.
+          {returnTo ? " Өмнөх хуудас руу буцаж байна…" : ""}
+        </p>
+      ) : null}
+      {returnTo && (hasActivePlan || paidThisVisit) ? (
+        <Link href={returnTo} className="inline-flex text-sm font-semibold text-[#0B5CFF] underline underline-offset-4">
+          Үргэлжлүүлэх →
+        </Link>
+      ) : null}
+      {retryNote ? (
+        <p role="status" className="rounded-xl border border-amber-500/30 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {retryNote}
+        </p>
+      ) : null}
       {/* MY CURRENT PLAN */}
       <section className="rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -480,7 +536,7 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
       ) : null}
 
       {/* PAYMENT HISTORY */}
-      <section className="rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 sm:p-6">
+      <section id="history" className="scroll-mt-20 rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 sm:p-6">
         <p className="text-[11px] font-semibold tracking-[0.14em] text-[#0B5CFF] uppercase">
           Төлбөрийн түүх
         </p>

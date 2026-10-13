@@ -17,6 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { AccountSharingRiskState } from "@/domain/enums";
+import { isInvoicePaymentConfirmed } from "@/domain/services/invoice-payment-confirmation";
 import type { MarketplaceDictionary } from "@/i18n/marketplace-types";
 import { formatDateTimeUlaanbaatar } from "@/lib/format-labels";
 import type { Locale } from "@/i18n/config";
@@ -141,9 +142,8 @@ export function BillingAndSessionsPanel({
             : new Date(session.firstSeenAt).toISOString(),
       })),
     });
-    if (payload.subscriptionStatus === "ACTIVE" && !payload.billingRequired) {
-      setPaymentState("success");
-    }
+    // No "payment confirmed" state here: an account that is simply active has not paid anything this
+    // visit. Success is set only when the server confirms an invoice (see pollInvoice).
   }, []);
 
   const load = useCallback(async () => {
@@ -173,7 +173,7 @@ export function BillingAndSessionsPanel({
               invoiceStatus?: string;
               subscriptionStatus?: string;
             };
-            if (payload.paid || payload.subscriptionStatus === "ACTIVE") {
+            if (isInvoicePaymentConfirmed(payload)) {
               setPaymentState("success");
               stopPolling();
               await load();

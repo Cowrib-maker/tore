@@ -84,6 +84,8 @@ export interface WorkspaceShellProps {
   header?: ReactNode;
   /** Optional right rail, shown only at wide (xl+) breakpoints. */
   rightRail?: ReactNode;
+  /** Optional compact block above the identity card in the sidebar (also shown in the mobile drawer), e.g. plan status. */
+  sidebarExtra?: ReactNode;
 }
 
 const SIDEBAR_STYLE = {
@@ -127,6 +129,7 @@ export function WorkspaceShell({
   profileHref,
   header,
   rightRail,
+  sidebarExtra,
 }: WorkspaceShellProps) {
   const initial = initialOf(user.name, user.email);
   const identity = (
@@ -185,6 +188,8 @@ export function WorkspaceShell({
               {tagline}
             </p>
           ) : null}
+
+          {sidebarExtra}
 
           {profileHref ? (
             <Link
