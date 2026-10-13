@@ -1,3 +1,5 @@
+import { isInvoicePaymentConfirmed } from "@/domain/services/invoice-payment-confirmation";
+
 export type LegalAiCheckoutAudience = "citizen" | "lawyer";
 export type LegalAiCheckoutMethod = "QPAY" | "BANK_TRANSFER" | "QR";
 
@@ -27,11 +29,15 @@ export function qrImageSrc(qrImage: string | null): string | null {
     : `data:image/png;base64,${qrImage}`;
 }
 
+/**
+ * @deprecated Use isInvoicePaymentConfirmed. Kept as a thin alias so there is one payment rule:
+ * only the server's `paid` verdict counts; `subscriptionStatus` alone never does.
+ */
 export function isLawyerInvoicePaid(payload: {
   paid?: boolean;
   subscriptionStatus?: string;
 }): boolean {
-  return payload.paid === true || payload.subscriptionStatus === "ACTIVE";
+  return isInvoicePaymentConfirmed(payload);
 }
 
 export function isEntitlementReadyToContinue(snapshot: {

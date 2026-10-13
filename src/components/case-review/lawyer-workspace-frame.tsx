@@ -7,6 +7,7 @@ import {
   Bell,
   BookOpen,
   CalendarClock,
+  CreditCard,
   Database,
   FileText,
   FolderOpen,
@@ -15,6 +16,7 @@ import {
   LogOut,
   Menu,
   Plus,
+  Receipt,
   Scale,
   Search,
   Settings,
@@ -33,6 +35,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { LawyerPlanStatusCard } from "@/components/billing/lawyer-plan-status-card";
+import type { LawyerVerificationState } from "@/domain/services/lawyer-onboarding";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 
@@ -85,6 +89,8 @@ function buildNavGroups(profileHref: string): NavGroup[] {
       items: [
         { href: "/lawyer/bookings", label: "Захиалга", icon: CalendarClock },
         { href: "/lawyer/offerings", label: "Зөвлөгөө", icon: Scale },
+        { href: "/lawyer/billing", label: "Миний багц", icon: CreditCard, exact: true },
+        { href: "/lawyer/billing#history", label: "Төлбөрийн түүх", icon: Receipt },
         { href: "/lawyer/notifications", label: "Мэдэгдэл", icon: Bell },
         { href: profileHref, label: "Тохиргоо", icon: Settings },
       ],
@@ -95,7 +101,7 @@ function buildNavGroups(profileHref: string): NavGroup[] {
 function isActive(pathname: string, item: NavItem): boolean {
   if (item.disabled) return false;
   if (item.exact) return pathname === item.href;
-  if (item.label === "Баримт бичиг") return false;
+  if (item.label === "Баримт бичиг" || item.href.includes("#")) return false;
   return pathname === item.href || pathname.startsWith(`${item.href}/`);
 }
 
@@ -112,6 +118,11 @@ type FrameProps = {
    * Rendered verbatim (never recomputed client-side) so it can never
    * hydration-mismatch. */
   todayLabel?: string;
+  /**
+   * Sidebar plan card. `undefined` hides the card; `null` shows it without a
+   * licence line (accounts with no licence flow, e.g. non-attorney positions).
+   */
+  licenseState?: LawyerVerificationState | null;
 };
 
 export function LawyerWorkspaceFrame({
@@ -124,6 +135,7 @@ export function LawyerWorkspaceFrame({
   variant = "page",
   unreadNotificationsCount = 0,
   todayLabel,
+  licenseState,
 }: FrameProps) {
   const [open, setOpen] = useState(false);
   const displayName = user.name?.trim() || user.email || "Хуульч";
@@ -144,6 +156,7 @@ export function LawyerWorkspaceFrame({
             locale={locale}
             languageLabel={languageLabel}
             signOutLabel={signOutLabel}
+            licenseState={licenseState}
           />
         </aside>
 
@@ -185,6 +198,7 @@ export function LawyerWorkspaceFrame({
                 locale={locale}
                 languageLabel={languageLabel}
                 signOutLabel={signOutLabel}
+                licenseState={licenseState}
                 onNavigate={() => setOpen(false)}
               />
             </SheetContent>
@@ -292,6 +306,7 @@ export function LawyerWorkspaceFrame({
             </Link>
 
             <DesktopNav navGroups={navGroups} />
+            {licenseState !== undefined ? <LawyerPlanStatusCard licenseState={licenseState} tone="light" showHistoryLink={false} /> : null}
           </div>
 
           <div className="border-t border-[#0B1F3A]/8 p-2.5">
@@ -340,6 +355,7 @@ export function LawyerWorkspaceFrame({
               locale={locale}
               languageLabel={languageLabel}
               signOutLabel={signOutLabel}
+              licenseState={licenseState}
               onNavigate={() => setOpen(false)}
             />
           </SheetContent>
@@ -427,6 +443,7 @@ function WorkspaceSidebar({
   locale,
   languageLabel,
   signOutLabel,
+  licenseState,
   onNavigate,
 }: {
   navGroups: NavGroup[];
@@ -435,6 +452,7 @@ function WorkspaceSidebar({
   locale: Locale;
   languageLabel: string;
   signOutLabel: string;
+  licenseState?: LawyerVerificationState | null;
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
@@ -476,6 +494,7 @@ function WorkspaceSidebar({
       </nav>
 
       <div className="mt-auto space-y-3 pt-6">
+        {licenseState !== undefined ? <LawyerPlanStatusCard licenseState={licenseState} tone="dark" showHistoryLink={false} onNavigate={onNavigate} /> : null}
         <div className="flex items-center gap-2 px-1">
           <LanguageSwitcher
             locale={locale}

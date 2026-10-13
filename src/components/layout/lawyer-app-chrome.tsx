@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
+import { LawyerPlanStatusCard } from "@/components/billing/lawyer-plan-status-card";
 import { LawyerWorkspaceFrame } from "@/components/case-review/lawyer-workspace-frame";
 import type { DashboardNavItem } from "@/components/layout/dashboard-shell";
 import {
@@ -9,6 +10,7 @@ import {
   type WorkspaceNavItem,
 } from "@/components/workspace/workspace-shell";
 import type { WorkspaceIconKey } from "@/components/workspace/workspace-icons";
+import type { LawyerVerificationState } from "@/domain/services/lawyer-onboarding";
 import type { Locale } from "@/i18n/config";
 
 type Props = {
@@ -27,6 +29,8 @@ type Props = {
   notificationsLabel?: string;
   /** Server-computed "YYYY.MM.DD Weekday" label — see lawyer/layout.tsx. */
   todayLabel?: string;
+  /** Plan card in the sidebar: `undefined` hides it, `null` shows it without a licence line. */
+  licenseState?: LawyerVerificationState | null;
 };
 
 /**
@@ -46,6 +50,7 @@ const LAWYER_NAV_ICONS: Record<string, WorkspaceIconKey> = {
   "/lawyer/offerings": "briefcase",
   "/lawyer/bookings": "calendar-clock",
   "/billing": "credit-card",
+  "/lawyer/billing": "credit-card",
   "/lawyer/notifications": "bell",
   "/legal-ai": "sparkles",
   "/organizations": "building-2",
@@ -64,6 +69,7 @@ export function LawyerAppChrome({
   notificationsHref,
   unreadNotificationsCount,
   todayLabel,
+  licenseState,
 }: Props) {
   const pathname = usePathname();
 
@@ -77,6 +83,7 @@ export function LawyerAppChrome({
         signOutLabel={signOutLabel}
         unreadNotificationsCount={unreadNotificationsCount}
         todayLabel={todayLabel}
+        licenseState={licenseState}
       >
         {children}
       </LawyerWorkspaceFrame>
@@ -102,6 +109,7 @@ export function LawyerAppChrome({
       brand={brand}
       navAriaLabel={navAriaLabel}
       profileHref={profileHref}
+      sidebarExtra={licenseState !== undefined ? <LawyerPlanStatusCard licenseState={licenseState} tone="dark" /> : undefined}
     >
       {children}
     </WorkspaceShell>

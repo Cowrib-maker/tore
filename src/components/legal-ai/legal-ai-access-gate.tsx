@@ -11,9 +11,9 @@ import type {
 } from "@/components/legal-ai/legal-ai-checkout";
 import {
   isEntitlementReadyToContinue,
-  isLawyerInvoicePaid,
   qrImageSrc,
 } from "@/components/legal-ai/legal-ai-checkout";
+import { isInvoicePaymentConfirmed } from "@/domain/services/invoice-payment-confirmation";
 import { requestCitizenCheckout } from "@/components/legal-ai/request-citizen-checkout";
 import { requestLawyerCheckout } from "@/components/legal-ai/request-lawyer-checkout";
 import { requestClaimManualPayment } from "@/components/legal-ai/request-claim-manual-payment";
@@ -21,6 +21,7 @@ import {
   CITIZEN_BASIC_PLAN,
   CITIZEN_PLUS_PLAN,
 } from "@/domain/constants/subscription-plans";
+import { lawyerBillingHref } from "@/domain/services/safe-return-path";
 import {
   loginHrefForLegalAi,
   registerClientHrefForLegalAi,
@@ -62,7 +63,6 @@ export function LegalAiAccessGateCard({
   const [claiming, setClaiming] = useState(false);
   const [claimError, setClaimError] = useState<string | undefined>(undefined);
   const [copied, setCopied] = useState(false);
-
   // Follow a changed gate.checkout / gate.checkoutError by adjusting state while rendering (not in an effect).
   const [seenGate, setSeenGate] = useState({ checkout: gate.checkout, error: gate.checkoutError });
   if (seenGate.checkout !== gate.checkout || seenGate.error !== gate.checkoutError) {
@@ -129,7 +129,7 @@ export function LegalAiAccessGateCard({
             if (payload.invoice?.status) {
               setCheckout((prev) => (prev ? { ...prev, status: payload.invoice!.status } : prev));
             }
-            if (isLawyerInvoicePaid(payload)) {
+            if (isInvoicePaymentConfirmed(payload)) {
               finishPaid();
             }
           })
@@ -432,10 +432,15 @@ export function LegalAiAccessGateCard({
             ) : null}
             {audience === "lawyer" ? (
               <Link
-                href="/lawyer/profile"
+                href={lawyerBillingHref("/legal-ai")}
+                onClick={(event) => {
+                  // Come back to this exact chat (conversation id included), read at click time.
+                  event.preventDefault();
+                  window.location.assign(lawyerBillingHref(`${window.location.pathname}${window.location.search}`));
+                }}
                 className={cn(buttonVariants({ size: "sm", variant: "ghost" }))}
               >
-                Багц ба төхөөрөмж
+                Багц ба төлбөрийн түүх
               </Link>
             ) : null}
           </div>

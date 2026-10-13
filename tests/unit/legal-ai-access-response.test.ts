@@ -60,7 +60,9 @@ describe("homepage and /legal-ai shared access interpretation", () => {
 describe("in-place paywall helpers", () => {
   it("treats a paid lawyer invoice as ready to continue", () => {
     expect(isLawyerInvoicePaid({ paid: true })).toBe(true);
-    expect(isLawyerInvoicePaid({ subscriptionStatus: "ACTIVE" })).toBe(true);
+    // An account-level ACTIVE subscription is NOT proof that this invoice was paid.
+    expect(isLawyerInvoicePaid({ subscriptionStatus: "ACTIVE" })).toBe(false);
+    expect(isLawyerInvoicePaid({ paid: false, subscriptionStatus: "ACTIVE" })).toBe(false);
     expect(isLawyerInvoicePaid({ paid: false, subscriptionStatus: "PENDING" })).toBe(
       false,
     );
