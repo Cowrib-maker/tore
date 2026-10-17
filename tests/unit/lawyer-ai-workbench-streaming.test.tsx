@@ -185,6 +185,29 @@ describe("LawyerAiWorkbench — SSE streaming (regression for Critical Bug #2)",
     expect(screen.queryByText(/Хагас хариулт/)).toBeNull();
   });
 
+  it("treats a stream that closes after some text but WITHOUT a done/error frame as a failed turn (no truncated answer shown as final)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = typeof input === "string" ? input : input.toString();
+        if (url.includes("/api/ai/chat")) {
+          return sseResponse([{ event: "delta", data: { text: "Таслагдсан хариулт" } }]);
+        }
+        return new Response(null, { status: 404 });
+      }),
+    );
+
+    renderWorkbench();
+    await act(async () => {
+      typeAndSubmit("Асуулт");
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).not.toBeNull();
+    });
+    expect(screen.queryByText(/Таслагдсан хариулт/)).toBeNull();
+  });
+
   it("removes the partial assistant bubble on user-initiated abort, with no error shown", async () => {
     const encoder = new TextEncoder();
     let errorReader: ((reason: unknown) => void) | null = null;
@@ -232,6 +255,66 @@ describe("LawyerAiWorkbench — SSE streaming (regression for Critical Bug #2)",
       expect(screen.queryByText(/Хагас/)).toBeNull();
     });
     expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("treats a Stop followed by a CLEAN stream close (no done frame) as a quiet cancellation: partial bubble removed, no error shown", async () => {
+    // Unlike the abort test above (where the read rejects with AbortError), here the connection ends normally after the user
+    // pressed Stop — the loop exits without a terminal frame. That must still be the silent cancel path, not the retry error.
+    const encoder = new TextEncoder();
+    let closeStream: (() => void) | null = null;
+    let sawAbortSignal = false;
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(
+          encoder.encode(`event: delta\ndata: ${JSON.stringify({ text: "Хагас" })}\n\n`),
+        );
+        closeStream = () => controller.close();
+      },
+    });
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = typeof input === "string" ? input : input.toString();
+        if (url.includes("/api/ai/chat")) {
+          init?.signal?.addEventListener("abort", () => {
+            sawAbortSignal = true; // the stream is deliberately NOT errored: it will be closed cleanly below
+          });
+          return new Response(stream, {
+            status: 200,
+            headers: { "Content-Type": "text/event-stream; charset=utf-8" },
+          });
+        }
+        return new Response(null, { status: 404 });
+      }),
+    );
+
+    renderWorkbench();
+    await act(async () => {
+      typeAndSubmit("Асуулт");
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Хагас")).not.toBeNull();
+    });
+
+    const stopButton = await screen.findByRole("button", { name: "Зогсоох" });
+    await act(async () => {
+      fireEvent.click(stopButton);
+    });
+    expect(sawAbortSignal).toBe(true);
+    await act(async () => {
+      closeStream?.();
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Хагас/)).toBeNull();
+    });
+    expect(screen.queryByRole("alert")).toBeNull();
+    // The turn is over: the Stop button is gone and the composer is usable again.
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: "Зогсоох" })).toBeNull();
+    });
   });
 
   it("still handles the pre-LLM JSON failure contract (401) via the non-streaming branch", async () => {
