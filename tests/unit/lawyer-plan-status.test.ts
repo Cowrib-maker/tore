@@ -211,7 +211,16 @@ describe("GET /api/lawyer/billing/status", () => {
   });
 
   it("returns the plan status and never creates, updates or reads device sessions or cookies", async () => {
-    const res = await GET();
+    // The route reads the real clock, and the fixture subscription is ACTIVE only until 2026-11-01T00:00Z. Pin the clock (Date only —
+    // promises/timers stay real) to `now`, inside that period, for the one call that reads it; the assertions below do not use the clock.
+    let res: Awaited<ReturnType<typeof GET>>;
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(now);
+    try {
+      res = await GET();
+    } finally {
+      vi.useRealTimers(); // always restored, even if the call above throws
+    }
     expect(res.status).toBe(200);
     expect(await res.json()).toMatchObject({ subscriptionStatus: "ACTIVE", billingRequired: false });
     for (const [name, spy] of Object.entries(sessionSpies)) {
@@ -226,9 +235,17 @@ describe("GET /api/lawyer/billing/status", () => {
 
   it("exposes no usage counters, session list or invoice payment details", async () => {
     invoiceList.mockResolvedValue([invoice()]);
-    const body = await (await GET()).json();
-    expect(Object.keys(body).sort()).toEqual(["billingRequired", "expiresAt", "pendingInvoice", "planName", "subscriptionStatus"]);
-    expect(body.pendingInvoice).toEqual({ status: "PENDING" });
+    // The route reads the real clock, and a PENDING invoice only counts as open while its expiresAt is in the future. The fixture
+    // invoice expires at 2026-10-15T01:00Z, so pin the clock (Date only — promises/timers stay real) to `now`, which is before that.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(now);
+    try {
+      const body = await (await GET()).json();
+      expect(Object.keys(body).sort()).toEqual(["billingRequired", "expiresAt", "pendingInvoice", "planName", "subscriptionStatus"]);
+      expect(body.pendingInvoice).toEqual({ status: "PENDING" });
+    } finally {
+      vi.useRealTimers(); // always restored, even if an assertion above fails
+    }
   });
 
   it.each([
