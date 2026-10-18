@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { readJsonBody } from "@/application/common/read-json-body";
 import { requireActor } from "@/application/common/require-actor";
 import {
   linkCaseFactEvidenceForLawyer,
@@ -11,7 +12,7 @@ import { UserRole } from "@/domain/enums";
 export async function POST(request: Request) {
   try {
     const actor = await requireActor(UserRole.LAWYER);
-    const body = (await request.json()) as {
+    const body = (await readJsonBody(request)) as {
       caseId?: string;
       expectedVersion?: number;
       factId?: string;
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const actor = await requireActor(UserRole.LAWYER);
-    const body = (await request.json()) as {
+    const body = (await readJsonBody(request)) as {
       caseId?: string;
       expectedVersion?: number;
       factId?: string;

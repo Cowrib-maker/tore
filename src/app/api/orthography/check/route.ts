@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { readJsonBody } from "@/application/common/read-json-body";
 import { lookupAuthSession } from "@/application/common/session";
 import { checkOrthographyForPaidUser } from "@/application/use-cases/orthography/check-orthography";
 import { UserRole } from "@/domain/enums";
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
       return rateLimitHttpResponse(rate.retryAfterSeconds);
     }
 
-    const body = (await request.json()) as OrthographyCheckBody;
+    const body = (await readJsonBody(request)) as OrthographyCheckBody;
     const text = typeof body.text === "string" ? body.text : "";
     const includeLatinToCyrillic = Boolean(body.includeLatinToCyrillic);
 

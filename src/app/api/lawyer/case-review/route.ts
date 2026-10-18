@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { readJsonBody } from "@/application/common/read-json-body";
 import { requireActor } from "@/application/common/require-actor";
 import {
   createCaseFileForLawyer,
@@ -30,7 +31,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const actor = await requireActor(UserRole.LAWYER);
-    const body = (await request.json()) as {
+    const body = (await readJsonBody(request)) as {
       title?: string;
       description?: string | null;
       legalDomain?: string;
