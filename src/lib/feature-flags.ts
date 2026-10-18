@@ -105,3 +105,13 @@ export const SPELL_LANGUAGE_ENGINE_V1_FLAG = "TORE_SPELL_LANGUAGE_ENGINE_V1";
 export function isSpellLanguageEngineV1Enabled(): boolean {
   return allowFlag(SPELL_LANGUAGE_ENGINE_V1_FLAG);
 }
+
+/**
+ * Legal Research Agent (read-only, retrieval + citation verification, no model call) — HTTP route /api/ai/research-agent.
+ * Must be exactly "1" to enable. Default: OFF (missing / any other value).
+ */
+export const LEGAL_RESEARCH_AGENT_V1_FLAG = "TORE_LEGAL_RESEARCH_AGENT_V1";
+
+export function isLegalResearchAgentV1Enabled(): boolean {
+  return allowFlag(LEGAL_RESEARCH_AGENT_V1_FLAG);
+}
