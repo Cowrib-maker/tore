@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { getMyOrganizationsForSession } from "@/application/actions/organization.actions";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
@@ -17,6 +18,7 @@ import {
 } from "@/domain/enums";
 import { getDictionary } from "@/i18n/get-dictionary";
 import type { Dictionary } from "@/i18n/types";
+import { isFoundationOrgsV1Enabled } from "@/lib/feature-flags";
 import { cn } from "@/lib/utils";
 
 function typeLabel(type: OrganizationType, copy: Dictionary["organizations"]) {
@@ -41,6 +43,9 @@ function statusLabel(
 }
 
 export default async function OrganizationsPage() {
+  // Feature flag off: the layout redirects, but the page is not guaranteed to be gated by that redirect (production logged an
+  // uncaught ForbiddenError from /organizations.rsc). Never reach the flag-guarded use cases; answer 404 instead of a 500.
+  if (!isFoundationOrgsV1Enabled()) notFound();
   const [dict, items] = await Promise.all([
     getDictionary(),
     getMyOrganizationsForSession(),
