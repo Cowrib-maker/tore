@@ -290,6 +290,7 @@ model User {
   guestSessions                   GuestSession[]                   @relation("GuestSessionClaimedBy")
   unpaidCitizenLegalQuestionUsage UnpaidCitizenLegalQuestionUsage?
   spellLicenses                   SpellLicense[]
+  studentExamAttempts             StudentExamAttempt[]
 
   @@index([role, status])
   @@index([email])
@@ -2069,4 +2070,140 @@ model SpellFeedback {
   @@index([userId, createdAt(sort: Desc)])
   @@index([status, createdAt(sort: Desc)])
   @@map("spell_feedback")
+}
+
+// ─── TORE Student: lawyer-selection examination preparation ──────────────────
+
+enum StudentExamArea {
+  CRIMINAL
+  CIVIL
+  ADMINISTRATIVE
+  CONSTITUTIONAL
+}
+
+enum StudentExamReviewStatus {
+  IMPORTED
+  NEEDS_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum StudentExamAttemptMode {
+  STUDY
+  EXAM
+}
+
+enum StudentExamAttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  EXPIRED
+}
+
+/// One source problem. Holds ONLY what a student may see while working: the answer key lives in StudentExamProblemKey.
+model StudentExamProblem {
+  id               String                  @id @default(cuid())
+  /// Stable identity of the problem inside its source file (file + area + ordinal + occurrence). Re-imports upsert on this.
+  sourceKey        String                  @unique @map("source_key") @db.VarChar(64)
+  area             StudentExamArea
+  ordinal          Int
+  ordinalLabel     String                  @map("ordinal_label") @db.VarChar(80)
+  statement        String                  @db.Text
+  /// Question paragraphs, verbatim, in source order (JSON array of strings).
+  questions        Json
+  topic            String?                 @db.VarChar(120)
+  difficulty       Int?
+  sourceFile       String                  @map("source_file") @db.VarChar(200)
+  sourceLocator    Json                    @map("source_locator")
+  statementHash    String                  @map("statement_hash") @db.VarChar(64)
+  contentHash      String                  @map("content_hash") @db.VarChar(64)
+  reviewStatus     StudentExamReviewStatus @default(IMPORTED) @map("review_status")
+  reviewFlags      String[]                @map("review_flags")
+  reviewNote       String?                 @map("review_note") @db.Text
+  reviewedByUserId String?                 @map("reviewed_by_user_id")
+  reviewedAt       DateTime?               @map("reviewed_at")
+  importedAt       DateTime                @default(now()) @map("imported_at")
+  updatedAt        DateTime                @updatedAt @map("updated_at")
+
+  key   StudentExamProblemKey?
+  items StudentExamAttemptItem[]
+
+  @@index([area, reviewStatus])
+  @@index([statementHash])
+  @@map("student_exam_problems")
+}
+
+/// Model answer, outline, citations and rubric. Never selected by any query that feeds a question payload.
+model StudentExamProblemKey {
+  problemId       String   @id @map("problem_id")
+  modelAnswer     String?  @map("model_answer") @db.Text
+  answerOutline   Json     @map("answer_outline")
+  legalProvisions Json     @map("legal_provisions")
+  courtCitations  Json     @map("court_citations")
+  rubric          Json
+  provenance      String   @db.VarChar(40)
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  problem StudentExamProblem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@map("student_exam_problem_keys")
+}
+
+model StudentExamAttempt {
+  id             String                   @id @default(cuid())
+  userId         String                   @map("user_id")
+  mode           StudentExamAttemptMode
+  status         StudentExamAttemptStatus @default(IN_PROGRESS)
+  config         Json?
+  studyProblemId String?                  @map("study_problem_id")
+  startedAt      DateTime                 @default(now()) @map("started_at")
+  deadlineAt     DateTime?                @map("deadline_at")
+  submittedAt    DateTime?                @map("submitted_at")
+  finalizedAt    DateTime?                @map("finalized_at")
+  scoreTotal     Decimal?                 @map("score_total") @db.Decimal(6, 2)
+  scoreMax       Int?                     @map("score_max")
+
+  user  User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items StudentExamAttemptItem[]
+
+  @@index([userId, status])
+  @@index([userId, startedAt(sort: Desc)])
+  @@map("student_exam_attempts")
+}
+
+model StudentExamAttemptItem {
+  attemptId       String    @map("attempt_id")
+  problemId       String    @map("problem_id")
+  position        Int
+  answerText      String    @default("") @map("answer_text") @db.Text
+  methodChecks    Int[]     @map("method_checks")
+  answerUpdatedAt DateTime? @map("answer_updated_at")
+  selfRatings     Json?     @map("self_ratings")
+  scoreAwarded    Decimal?  @map("score_awarded") @db.Decimal(6, 2)
+  scoreMax        Int?      @map("score_max")
+  autoIndicators  Json?     @map("auto_indicators")
+
+  attempt StudentExamAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  problem StudentExamProblem @relation(fields: [problemId], references: [id], onDelete: Restrict)
+
+  @@id([attemptId, problemId])
+  @@index([problemId])
+  @@map("student_exam_attempt_items")
+}
+
+/// Index of Supreme Court decision extracts used as practice reference material (no full text is stored).
+model StudentCourtDecision {
+  id         String          @id @default(cuid())
+  sourceKey  String          @unique @map("source_key") @db.VarChar(64)
+  area       StudentExamArea
+  chapter    Int?
+  courtDate  String?         @map("court_date") @db.VarChar(80)
+  caseNumber String?         @map("case_number") @db.VarChar(80)
+  topic      String          @db.Text
+  pageFrom   Int?            @map("page_from")
+  pageTo     Int?            @map("page_to")
+  sourceFile String          @map("source_file") @db.VarChar(200)
+  importedAt DateTime        @default(now()) @map("imported_at")
+
+  @@index([area, chapter])
+  @@map("student_court_decisions")
 }
