@@ -8,6 +8,7 @@ import {
   MessagesSquare,
   NotebookPen,
   PenSquare,
+  Scale,
   Wallet,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -29,7 +30,7 @@ import { cn } from "@/lib/utils";
  * Тэмдэглэл/Хадгалсан have no backend yet and stay inert.
  */
 export function studentSidebarItems(
-  active: "home" | "library",
+  active: "home" | "library" | "lawyer-exam",
 ): WorkspaceSideNavItem[] {
   return [
     { key: "home", icon: Home, label: "Нүүр", href: "/student", active: active === "home" },
@@ -43,6 +44,13 @@ export function studentSidebarItems(
     },
     { key: "case-study", icon: BriefcaseBusiness, label: "Кейс судалгаа", comingSoonLabel: "Тун удахгүй" },
     { key: "tests", icon: PenSquare, label: "Шалгалтын тест", href: "/student#modules" },
+    {
+      key: "lawyer-exam",
+      icon: Scale,
+      label: "Хуульчийн шалгалт",
+      href: "/student/lawyer-exam",
+      active: active === "lawyer-exam",
+    },
     { key: "materials", icon: FolderOpen, label: "Хичээлийн материал", href: "/student#modules" },
     { key: "notes", icon: NotebookPen, label: "Тэмдэглэл", comingSoonLabel: "Тун удахгүй" },
     { key: "saved", icon: Bookmark, label: "Хадгалсан", comingSoonLabel: "Тун удахгүй" },
