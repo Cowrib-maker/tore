@@ -35,7 +35,6 @@ export default async function LawyerExamHubPage() {
         {copy.title}
       </h1>
       <p className="mt-3 max-w-2xl text-[15px] leading-7 text-[#5C6570]">{copy.intro}</p>
-      <p className="mt-3 max-w-2xl rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] leading-6 text-amber-900">{copy.notOfficial}</p>
 
       {!session?.user?.id ? (
         <div className="mt-8 rounded-2xl border border-[#0B1F3A]/10 bg-white p-5">

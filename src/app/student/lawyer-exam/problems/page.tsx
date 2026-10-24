@@ -50,7 +50,6 @@ export default async function LawyerExamProblemsPage({
       <h1 className="font-[family-name:var(--font-landing-display)] text-[1.85rem] tracking-[-0.03em] text-[#0B1F3A] sm:text-[2.2rem]">
         {copy.browse.title}
       </h1>
-      <p className="mt-3 max-w-2xl rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] leading-6 text-amber-900">{copy.notOfficial}</p>
 
       <nav aria-label={copy.browse.title} className="mt-5 flex flex-wrap gap-2">
         <Link href={href({ topic })} className={chip(!area)}>

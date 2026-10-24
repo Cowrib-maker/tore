@@ -9,8 +9,6 @@ const mn = {
   title: "Хуульчийн сонгон шалгаруулалтын бэлтгэл",
   intro:
     "Өмнөх шалгалтуудын эрх зүйн бодлогыг бодож, бодлого бодох аргачлалыг эзэмшиж, хугацаатай шалгалт өгч, ахицаа хянаарай.",
-  notOfficial:
-    "Бодлого, жишиг хариулт нь оруулсан эх сурвалж материалаас авсан хэрэг бөгөөд албан ёсны шалгалтын түлхүүр биш. Хууль зүйн хяналт хийгдээгүй, хуучирсан хууль дурдсан байж болно — хүчин төгөлдөр хуулиар заавал тулган шалгана уу.",
   signInRequired: "Хариултаа хадгалж, ахицаа хянахын тулд нэвтэрнэ үү.",
   signIn: "Нэвтрэх",
   areas: {
@@ -227,8 +225,6 @@ const en: LawyerExamCopy = {
   navLabel: "Lawyer exam prep",
   title: "Lawyer selection examination preparation",
   intro: "Solve past legal problems, learn the problem-solving method, take timed exams and track your progress.",
-  notOfficial:
-    "Problems and model answers come from the source materials that were imported; they are not an official examination key. They may not have been legally reviewed and may cite outdated law — always check against the law in force.",
   signInRequired: "Sign in to save your answers and track your progress.",
   signIn: "Sign in",
   areas: { CRIMINAL: "Criminal law", CIVIL: "Civil law", ADMINISTRATIVE: "Administrative law", CONSTITUTIONAL: "Constitutional law" },
@@ -427,8 +423,6 @@ const ko: LawyerExamCopy = {
   navLabel: "변호사 시험 대비",
   title: "변호사 선발시험 대비",
   intro: "기출 법률 문제를 풀고 문제 풀이 방법을 익히며, 시간제 시험으로 진도를 확인하세요.",
-  notOfficial:
-    "문제와 모범답안은 가져온 자료에서 온 것이며 공식 시험 정답이 아닙니다. 법적 검토가 되지 않았거나 폐지된 법을 인용할 수 있으니 현행법으로 반드시 확인하세요.",
   signInRequired: "답안을 저장하고 진도를 확인하려면 로그인하세요.",
   signIn: "로그인",
   areas: { CRIMINAL: "형사법", CIVIL: "민사법", ADMINISTRATIVE: "행정법", CONSTITUTIONAL: "헌법" },
@@ -624,8 +618,6 @@ const zh: LawyerExamCopy = {
   navLabel: "律师选拔考试备考",
   title: "律师选拔考试备考",
   intro: "练习历年法律案例题，掌握解题方法，参加限时模拟考试并跟踪进步。",
-  notOfficial:
-    "题目与参考答案来自已导入的资料，并非官方考试标准答案。可能未经法律审核，也可能引用已过时的法律——请务必以现行有效法律为准。",
   signInRequired: "登录后可保存答案并跟踪进度。",
   signIn: "登录",
   areas: { CRIMINAL: "刑法", CIVIL: "民法", ADMINISTRATIVE: "行政法", CONSTITUTIONAL: "宪法" },

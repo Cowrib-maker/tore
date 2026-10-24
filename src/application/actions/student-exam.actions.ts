@@ -47,7 +47,8 @@ async function guarded<T>(
       if (!rate.ok) return { ok: false, error: "rate_limited" };
     }
     return await run(userId);
-  } catch {
+  } catch (error) {
+    console.error(`[student-exam:${scope}] action failed`, error instanceof Error ? error.message : String(error));
     return { ok: false, error: "failed" };
   }
 }
