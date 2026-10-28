@@ -203,11 +203,19 @@ export function parseShuukhJudgmentHtml(
   const caseId = caseIdFromShuukhUrl(officialUrl) ?? "";
   // Drop head/meta so site chrome is not mistaken for the court name.
   const bodyHtml = html.replace(/<head[\s\S]*?<\/head>/i, " ");
+  // The real "Шийдвэрийн мэдээлэл" panel is a <th>Label</th><td>Value</td>
+  // table (confirmed against a live shuukh.mn detail page), not the plain
+  // <p> tags the older patterns below assume — scope the table lookup to
+  // the FIRST <table> on the page so a later "Холбоотой шийдвэрүүд"
+  // (related decisions) list can never be mistaken for this one.
+  const infoTableHtml = firstTableHtml(bodyHtml);
   const caseNumber =
+    tableRowValue(infoTableHtml, "Дугаар") ??
     firstMatch(bodyHtml, /Дугаар\s*<\/[^>]+>\s*([^<]+)/i)?.trim() ??
     firstMatch(bodyHtml, /Дугаар\s+([0-9A-Za-zА-Яа-яЁёҮүӨө/]+)/)?.trim() ??
     null;
   const courtName =
+    tableRowValue(infoTableHtml, "Шүүх") ??
     firstMatch(
       bodyHtml,
       /Шийдвэрийн\s+мэдээлэл[\s\S]{0,400}?<p[^>]*>\s*([^<]*шүүх[^<]*)/i,
@@ -222,6 +230,7 @@ export function parseShuukhJudgmentHtml(
       .trim() ??
     null;
   const decidedOn =
+    tableRowValue(infoTableHtml, "Огноо") ??
     firstMatch(
       bodyHtml,
       /(\d{4}\s*оны\s*\d{1,2}\s*сарын\s*\d{1,2}\s*өдөр)/,
@@ -263,6 +272,26 @@ function extractJudgmentBody(html: string): string {
 function firstMatch(text: string, re: RegExp): string | null {
   const match = text.match(re);
   return match?.[1] ?? null;
+}
+
+/** First <table>...</table> block, or the whole input if there is none. */
+function firstTableHtml(html: string): string {
+  const match = html.match(/<table[^>]*>[\s\S]*?<\/table>/i);
+  return match?.[0] ?? html;
+}
+
+/**
+ * Value of a <th>Label</th>\s*<td>Value</td> row inside an info table.
+ * Returns null (never invents a value) when the label isn't present.
+ */
+function tableRowValue(tableHtml: string, label: string): string | null {
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(
+    `<th[^>]*>\\s*${escaped}\\s*</th>\\s*<td[^>]*>\\s*([^<]+?)\\s*</td>`,
+    "i",
+  );
+  const value = tableHtml.match(re)?.[1]?.trim();
+  return value ? value : null;
 }
 
 function stripTags(value: string): string {

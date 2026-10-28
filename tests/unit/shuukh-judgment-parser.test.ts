@@ -37,6 +37,37 @@ const JUDGMENT_HTML = `
 </html>
 `;
 
+// Structurally matches the actual shuukh.mn "Шийдвэрийн мэдээлэл" panel
+// (confirmed against a live detail page) — a <th>Label</th><td>Value</td>
+// table, not the plain <p> tags JUDGMENT_HTML (above) assumes.
+const JUDGMENT_HTML_TABLE_LAYOUT = `
+<html>
+  <body>
+    <div class="col-md-4 full-search">
+      <h6>Шийдвэрийн мэдээлэл</h6>
+      <table class="table table-bordered">
+        <tbody>
+          <tr><th>Шүүх</th><td>Дархан-Уул аймгийн Иргэний хэргийн давж заалдах шатны шүүх </td></tr>
+          <tr><th>Шүүгч</th><td>Мянган Оюунцэцэг </td></tr>
+          <tr><th>Хэргийн индекс</th><td>307/2025/00401/и </td></tr>
+          <tr><th>Дугаар</th><td>209/МА2026/00036 </td></tr>
+          <tr><th>Огноо</th><td>2026-07-06 </td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h6>Холбоотой шийдвэрүүд</h6>
+    <table class="table table-bordered">
+      <tbody>
+        <tr><th>Шүүх</th><td>Энэ бол өөр, холбоотой шийдвэрийн мэдээлэл — үл тооцно</td></tr>
+        <tr><th>Дугаар</th><td>999/ХХ2026/99999</td></tr>
+      </tbody>
+    </table>
+    <p>Дархан-Уул аймгийн Иргэний хэргийн давж заалдах шатны шүүхийн Магадлал</p>
+    <p>Гэр бүлийн тухай хуулийн 14 дүгээр зүйлийн 14.1-т зааснаар гэрлэлтийг цуцалсугай.</p>
+  </body>
+</html>
+`;
+
 describe("shuukh.mn list and judgment parsers", () => {
   it("extracts official single_case ids without inventing numbers", () => {
     const items = parseShuukhListHtml(LIST_HTML);
@@ -81,5 +112,30 @@ describe("shuukh.mn list and judgment parsers", () => {
     expect(document.articles).toHaveLength(1);
     expect(document.articles[0]?.articleNumber).toBe("310/ШШ2026/00576");
     expect(document.validFrom).toBe("2026-07-30");
+  });
+
+  it("extracts court name, case number, and date from the real table-based info panel", async () => {
+    const parsed = parseShuukhJudgmentHtml(
+      JUDGMENT_HTML_TABLE_LAYOUT,
+      "https://shuukh.mn/single_case/37257?id=2&court_cat=1&bb=1",
+    );
+    expect(parsed.courtName).toBe(
+      "Дархан-Уул аймгийн Иргэний хэргийн давж заалдах шатны шүүх",
+    );
+    expect(parsed.caseNumber).toBe("209/МА2026/00036");
+    expect(parsed.decidedOn).toBe("2026-07-06");
+    expect(parsed.title).toBe(
+      "Дархан-Уул аймгийн Иргэний хэргийн давж заалдах шатны шүүх — 209/МА2026/00036",
+    );
+
+    const parser = new ShuukhJudgmentParser();
+    const document = await parser.parse({
+      sourceId: "shuukh",
+      sourceUrl: "https://shuukh.mn/single_case/37257?id=2&court_cat=1&bb=1",
+      kind: KnowledgeDocumentKind.HTML,
+      bytes: new TextEncoder().encode(JUDGMENT_HTML_TABLE_LAYOUT),
+      fetchedAt: new Date("2026-01-01T00:00:00.000Z"),
+    });
+    expect(document.validFrom).toBe("2026-07-06");
   });
 });
