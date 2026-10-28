@@ -49,3 +49,15 @@ next-env.d.ts
 .data/
 
 tmp/
+
+# desktop app build output
+/desktop/node_modules
+/desktop/dist
+/desktop/release
+
+# secrets (never commit)
+/.secrets/
+
+# TORE Spell: local-only research data (never commit, never bundle)
+/.spell-research/
+/dist/spell-pack/

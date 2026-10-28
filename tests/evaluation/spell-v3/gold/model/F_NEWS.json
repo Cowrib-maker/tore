@@ -1,0 +1,1785 @@
+{
+ "schema": "tore-spell-gold/1",
+ "datasetVersion": "spell-gold-v3.0",
+ "set": "F_NEWS",
+ "provenanceDir": "model",
+ "note": "MODEL_ADJUDICATED candidates: authored and judged by the AI assistant. NOT native-reviewed; NOT gold.",
+ "items": [
+  {
+   "id": "F_NEWS:01:өнөөдөр",
+   "token": "Өнөөдөр",
+   "sentence": "Өнөөдөр нийслэлд цас орж, зарим замын хөдөлгөөн хэсэгчлэн саатлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:01:нийслэлд",
+   "token": "нийслэлд",
+   "sentence": "Өнөөдөр нийслэлд цас орж, зарим замын хөдөлгөөн хэсэгчлэн саатлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:01:цас",
+   "token": "цас",
+   "sentence": "Өнөөдөр нийслэлд цас орж, зарим замын хөдөлгөөн хэсэгчлэн саатлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:01:орж",
+   "token": "орж",
+   "sentence": "Өнөөдөр нийслэлд цас орж, зарим замын хөдөлгөөн хэсэгчлэн саатлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:01:зарим",
+   "token": "зарим",
+   "sentence": "Өнөөдөр нийслэлд цас орж, зарим замын хөдөлгөөн хэсэгчлэн саатлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:01:замын",
+   "token": "замын",
+   "sentence": "Өнөөдөр нийслэлд цас орж, зарим замын хөдөлгөөн хэсэгчлэн саатлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:01:хөдөлгөөн",
+   "token": "хөдөлгөөн",
+   "sentence": "Өнөөдөр нийслэлд цас орж, зарим замын хөдөлгөөн хэсэгчлэн саатлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:01:хэсэгчлэн",
+   "token": "хэсэгчлэн",
+   "sentence": "Өнөөдөр нийслэлд цас орж, зарим замын хөдөлгөөн хэсэгчлэн саатлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts F_NEWS s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:01:саатлаа",
+   "token": "саатлаа",
+   "sentence": "Өнөөдөр нийслэлд цас орж, зарим замын хөдөлгөөн хэсэгчлэн саатлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:02:улсын",
+   "token": "Улсын",
+   "sentence": "Улсын шигшээ баг олон улсын тэмцээнд амжилттай оролцож, хоёрдугаар байр эзэллээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:02:шигшээ",
+   "token": "шигшээ",
+   "sentence": "Улсын шигшээ баг олон улсын тэмцээнд амжилттай оролцож, хоёрдугаар байр эзэллээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts F_NEWS s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:02:баг",
+   "token": "баг",
+   "sentence": "Улсын шигшээ баг олон улсын тэмцээнд амжилттай оролцож, хоёрдугаар байр эзэллээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:02:олон",
+   "token": "олон",
+   "sentence": "Улсын шигшээ баг олон улсын тэмцээнд амжилттай оролцож, хоёрдугаар байр эзэллээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:02:улсын",
+   "token": "улсын",
+   "sentence": "Улсын шигшээ баг олон улсын тэмцээнд амжилттай оролцож, хоёрдугаар байр эзэллээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:02:тэмцээнд",
+   "token": "тэмцээнд",
+   "sentence": "Улсын шигшээ баг олон улсын тэмцээнд амжилттай оролцож, хоёрдугаар байр эзэллээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:02:амжилттай",
+   "token": "амжилттай",
+   "sentence": "Улсын шигшээ баг олон улсын тэмцээнд амжилттай оролцож, хоёрдугаар байр эзэллээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:02:оролцож",
+   "token": "оролцож",
+   "sentence": "Улсын шигшээ баг олон улсын тэмцээнд амжилттай оролцож, хоёрдугаар байр эзэллээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:02:хоёрдугаар",
+   "token": "хоёрдугаар",
+   "sentence": "Улсын шигшээ баг олон улсын тэмцээнд амжилттай оролцож, хоёрдугаар байр эзэллээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:02:байр",
+   "token": "байр",
+   "sentence": "Улсын шигшээ баг олон улсын тэмцээнд амжилттай оролцож, хоёрдугаар байр эзэллээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:02:эзэллээ",
+   "token": "эзэллээ",
+   "sentence": "Улсын шигшээ баг олон улсын тэмцээнд амжилттай оролцож, хоёрдугаар байр эзэллээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:03:эрүүл",
+   "token": "Эрүүл",
+   "sentence": "Эрүүл мэндийн яам томуугийн вирусээс сэргийлэх зөвлөмж гаргав.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:03:мэндийн",
+   "token": "мэндийн",
+   "sentence": "Эрүүл мэндийн яам томуугийн вирусээс сэргийлэх зөвлөмж гаргав.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:03:яам",
+   "token": "яам",
+   "sentence": "Эрүүл мэндийн яам томуугийн вирусээс сэргийлэх зөвлөмж гаргав.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:03:томуугийн",
+   "token": "томуугийн",
+   "sentence": "Эрүүл мэндийн яам томуугийн вирусээс сэргийлэх зөвлөмж гаргав.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts F_NEWS s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:03:вирусээс",
+   "token": "вирусээс",
+   "sentence": "Эрүүл мэндийн яам томуугийн вирусээс сэргийлэх зөвлөмж гаргав.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:03:сэргийлэх",
+   "token": "сэргийлэх",
+   "sentence": "Эрүүл мэндийн яам томуугийн вирусээс сэргийлэх зөвлөмж гаргав.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:03:зөвлөмж",
+   "token": "зөвлөмж",
+   "sentence": "Эрүүл мэндийн яам томуугийн вирусээс сэргийлэх зөвлөмж гаргав.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:03:гаргав",
+   "token": "гаргав",
+   "sentence": "Эрүүл мэндийн яам томуугийн вирусээс сэргийлэх зөвлөмж гаргав.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:04:шинэ",
+   "token": "Шинэ",
+   "sentence": "Шинэ эмнэлгийн барилгын ажил энэ намар дуусах төлөвтэй байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:04:эмнэлгийн",
+   "token": "эмнэлгийн",
+   "sentence": "Шинэ эмнэлгийн барилгын ажил энэ намар дуусах төлөвтэй байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:04:барилгын",
+   "token": "барилгын",
+   "sentence": "Шинэ эмнэлгийн барилгын ажил энэ намар дуусах төлөвтэй байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:04:ажил",
+   "token": "ажил",
+   "sentence": "Шинэ эмнэлгийн барилгын ажил энэ намар дуусах төлөвтэй байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:04:энэ",
+   "token": "энэ",
+   "sentence": "Шинэ эмнэлгийн барилгын ажил энэ намар дуусах төлөвтэй байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:04:намар",
+   "token": "намар",
+   "sentence": "Шинэ эмнэлгийн барилгын ажил энэ намар дуусах төлөвтэй байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:04:дуусах",
+   "token": "дуусах",
+   "sentence": "Шинэ эмнэлгийн барилгын ажил энэ намар дуусах төлөвтэй байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:04:төлөвтэй",
+   "token": "төлөвтэй",
+   "sentence": "Шинэ эмнэлгийн барилгын ажил энэ намар дуусах төлөвтэй байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:04:байна",
+   "token": "байна",
+   "sentence": "Шинэ эмнэлгийн барилгын ажил энэ намар дуусах төлөвтэй байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:05:төв",
+   "token": "Төв",
+   "sentence": "Төв аймгийн малчид хүйтэн өвөлд бэлтгэн тэжээл нөөцөлж байгаагаа ярьсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:05:аймгийн",
+   "token": "аймгийн",
+   "sentence": "Төв аймгийн малчид хүйтэн өвөлд бэлтгэн тэжээл нөөцөлж байгаагаа ярьсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:05:малчид",
+   "token": "малчид",
+   "sentence": "Төв аймгийн малчид хүйтэн өвөлд бэлтгэн тэжээл нөөцөлж байгаагаа ярьсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:05:хүйтэн",
+   "token": "хүйтэн",
+   "sentence": "Төв аймгийн малчид хүйтэн өвөлд бэлтгэн тэжээл нөөцөлж байгаагаа ярьсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:05:өвөлд",
+   "token": "өвөлд",
+   "sentence": "Төв аймгийн малчид хүйтэн өвөлд бэлтгэн тэжээл нөөцөлж байгаагаа ярьсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:05:бэлтгэн",
+   "token": "бэлтгэн",
+   "sentence": "Төв аймгийн малчид хүйтэн өвөлд бэлтгэн тэжээл нөөцөлж байгаагаа ярьсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:05:тэжээл",
+   "token": "тэжээл",
+   "sentence": "Төв аймгийн малчид хүйтэн өвөлд бэлтгэн тэжээл нөөцөлж байгаагаа ярьсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:05:нөөцөлж",
+   "token": "нөөцөлж",
+   "sentence": "Төв аймгийн малчид хүйтэн өвөлд бэлтгэн тэжээл нөөцөлж байгаагаа ярьсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:05:байгаагаа",
+   "token": "байгаагаа",
+   "sentence": "Төв аймгийн малчид хүйтэн өвөлд бэлтгэн тэжээл нөөцөлж байгаагаа ярьсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:05:ярьсан",
+   "token": "ярьсан",
+   "sentence": "Төв аймгийн малчид хүйтэн өвөлд бэлтгэн тэжээл нөөцөлж байгаагаа ярьсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:06:хотын",
+   "token": "Хотын",
+   "sentence": "Хотын захиргаа гэрлэн дохионы системийг шинэчлэхээр шийдлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:06:захиргаа",
+   "token": "захиргаа",
+   "sentence": "Хотын захиргаа гэрлэн дохионы системийг шинэчлэхээр шийдлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:06:гэрлэн",
+   "token": "гэрлэн",
+   "sentence": "Хотын захиргаа гэрлэн дохионы системийг шинэчлэхээр шийдлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:06:дохионы",
+   "token": "дохионы",
+   "sentence": "Хотын захиргаа гэрлэн дохионы системийг шинэчлэхээр шийдлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:06:системийг",
+   "token": "системийг",
+   "sentence": "Хотын захиргаа гэрлэн дохионы системийг шинэчлэхээр шийдлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:06:шинэчлэхээр",
+   "token": "шинэчлэхээр",
+   "sentence": "Хотын захиргаа гэрлэн дохионы системийг шинэчлэхээр шийдлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:06:шийдлээ",
+   "token": "шийдлээ",
+   "sentence": "Хотын захиргаа гэрлэн дохионы системийг шинэчлэхээр шийдлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:07:уран",
+   "token": "Уран",
+   "sentence": "Уран бүтээлчид Төв театрт болсон тоглолтоор үзэгчдийн халуун дэмжлэгийг хүлээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:07:бүтээлчид",
+   "token": "бүтээлчид",
+   "sentence": "Уран бүтээлчид Төв театрт болсон тоглолтоор үзэгчдийн халуун дэмжлэгийг хүлээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:07:төв",
+   "token": "Төв",
+   "sentence": "Уран бүтээлчид Төв театрт болсон тоглолтоор үзэгчдийн халуун дэмжлэгийг хүлээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:07:театрт",
+   "token": "театрт",
+   "sentence": "Уран бүтээлчид Төв театрт болсон тоглолтоор үзэгчдийн халуун дэмжлэгийг хүлээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:07:болсон",
+   "token": "болсон",
+   "sentence": "Уран бүтээлчид Төв театрт болсон тоглолтоор үзэгчдийн халуун дэмжлэгийг хүлээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:07:тоглолтоор",
+   "token": "тоглолтоор",
+   "sentence": "Уран бүтээлчид Төв театрт болсон тоглолтоор үзэгчдийн халуун дэмжлэгийг хүлээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:07:үзэгчдийн",
+   "token": "үзэгчдийн",
+   "sentence": "Уран бүтээлчид Төв театрт болсон тоглолтоор үзэгчдийн халуун дэмжлэгийг хүлээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:07:халуун",
+   "token": "халуун",
+   "sentence": "Уран бүтээлчид Төв театрт болсон тоглолтоор үзэгчдийн халуун дэмжлэгийг хүлээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:07:дэмжлэгийг",
+   "token": "дэмжлэгийг",
+   "sentence": "Уран бүтээлчид Төв театрт болсон тоглолтоор үзэгчдийн халуун дэмжлэгийг хүлээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:07:хүлээв",
+   "token": "хүлээв",
+   "sentence": "Уран бүтээлчид Төв театрт болсон тоглолтоор үзэгчдийн халуун дэмжлэгийг хүлээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:08:мэргэжилтнүүдийн",
+   "token": "Мэргэжилтнүүдийн",
+   "sentence": "Мэргэжилтнүүдийн үзэж байгаагаар эдийн засгийн өсөлт дараа жил тогтворжих боломжтой.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:08:үзэж",
+   "token": "үзэж",
+   "sentence": "Мэргэжилтнүүдийн үзэж байгаагаар эдийн засгийн өсөлт дараа жил тогтворжих боломжтой.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:08:байгаагаар",
+   "token": "байгаагаар",
+   "sentence": "Мэргэжилтнүүдийн үзэж байгаагаар эдийн засгийн өсөлт дараа жил тогтворжих боломжтой.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:08:эдийн",
+   "token": "эдийн",
+   "sentence": "Мэргэжилтнүүдийн үзэж байгаагаар эдийн засгийн өсөлт дараа жил тогтворжих боломжтой.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:08:засгийн",
+   "token": "засгийн",
+   "sentence": "Мэргэжилтнүүдийн үзэж байгаагаар эдийн засгийн өсөлт дараа жил тогтворжих боломжтой.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:08:өсөлт",
+   "token": "өсөлт",
+   "sentence": "Мэргэжилтнүүдийн үзэж байгаагаар эдийн засгийн өсөлт дараа жил тогтворжих боломжтой.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:08:дараа",
+   "token": "дараа",
+   "sentence": "Мэргэжилтнүүдийн үзэж байгаагаар эдийн засгийн өсөлт дараа жил тогтворжих боломжтой.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:08:жил",
+   "token": "жил",
+   "sentence": "Мэргэжилтнүүдийн үзэж байгаагаар эдийн засгийн өсөлт дараа жил тогтворжих боломжтой.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:08:тогтворжих",
+   "token": "тогтворжих",
+   "sentence": "Мэргэжилтнүүдийн үзэж байгаагаар эдийн засгийн өсөлт дараа жил тогтворжих боломжтой.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "F_NEWS:08:боломжтой",
+   "token": "боломжтой",
+   "sentence": "Мэргэжилтнүүдийн үзэж байгаагаар эдийн засгийн өсөлт дараа жил тогтворжих боломжтой.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts F_NEWS s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+{
+ "schema": "tore-spell-typos/1",
+ "version": "2026.10.3",
+ "provenance": {
+  "source": "typo-pairs.tsv",
+  "license": "TORE proprietary (original work)",
+  "redistributable": true,
+  "dataClass": "A_TORE_OWNED",
+  "sourceIds": [
+   "tore-core-seed"
+  ],
+  "reviewStatus": "PENDING_NATIVE_REVIEW"
+ },
+ "pairs": [
+  {
+   "wrong": "хунэтаи",
+   "right": "хүнтэй"
+  },
+  {
+   "wrong": "хүнэтаи",
+   "right": "хүнтэй"
+  },
+  {
+   "wrong": "хунэтэй",
+   "right": "хүнтэй"
+  },
+  {
+   "wrong": "өчигдр",
+   "right": "өчигдөр"
+  },
+  {
+   "wrong": "өчигдөөр",
+   "right": "өчигдөр"
+  },
+  {
+   "wrong": "очидөр",
+   "right": "өчигдөр"
+  },
+  {
+   "wrong": "хувцаа",
+   "right": "хувцас"
+  },
+  {
+   "wrong": "хувцаса",
+   "right": "хувцас"
+  },
+  {
+   "wrong": "явч",
+   "right": "яавч"
+  },
+  {
+   "wrong": "явач",
+   "right": "яавч"
+  }
+ ]
+}

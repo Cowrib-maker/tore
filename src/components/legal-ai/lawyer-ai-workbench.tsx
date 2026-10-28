@@ -133,6 +133,8 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
   const submittingRef = useRef(false);
   const { items: uploads, uploading, addFiles, retry: retryUpload, cancel: cancelUpload, settle: settleUploads, hasUnready } = useDocumentUploadQueue(performUpload);
   const [accessGate, setAccessGate] = useState<LegalAiAccessGate | null>(null);
+  // Bumped after a verified payment so the entitlement banner re-reads the server state.
+  const [entitlementKey, setEntitlementKey] = useState(0);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
@@ -169,6 +171,16 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
     const next = `/legal-ai?${params.toString()}`;
     if (`${window.location.pathname}${window.location.search}` !== next) window.history.replaceState(null, "", next);
   }, [conversationId, caseFileId]);
+
+  /** Payment was confirmed by the server: refresh the entitlement and, if a question was waiting, send it. */
+  function handleGatePaid(question: string) {
+    setEntitlementKey((key) => key + 1);
+    if (question.trim()) {
+      void sendMessage(question, { resume: true });
+    } else {
+      setAccessGate(null);
+    }
+  }
 
   /** One upload, run by the shared serial queue (see useDocumentUploadQueue). */
   async function performUpload(file: File, signal: AbortSignal): Promise<UploadOutcome> {
@@ -271,11 +283,13 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
         throw new Error("empty stream body");
       }
 
+      let sawFinalFrame = false;
       for await (const frame of parseSseStream(response.body)) {
         if (frame.event === "delta") {
           const { text: delta } = frame.data as { text: string };
           if (delta) appendStreamingDelta(delta);
         } else if (frame.event === "done") {
+          sawFinalFrame = true;
           const payload = frame.data as { conversationId?: string; message?: { id?: string; content?: string; citations?: unknown } };
           conversationIdRef.current = payload.conversationId;
           setConversationId(payload.conversationId);
@@ -288,6 +302,13 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
           removeStreamingPlaceholder();
           throw new Error("stream error");
         }
+      }
+      if (!sawFinalFrame) {
+        // The body ended without a done/error frame (connection closed mid-answer): not a completed turn, so the catch below
+        // removes the partial bubble and shows the retry message instead of leaving a truncated, citation-less answer as final.
+        // (A stream cut because the user pressed Stop is the quiet abort path, not an error.)
+        if (abortRef.current?.signal.aborted) throw new DOMException("Aborted", "AbortError");
+        throw new Error("stream ended without a final frame");
       }
     } catch (err) {
       removeStreamingPlaceholder();
@@ -362,13 +383,13 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
               {messages.map((item, index) => <MessageBubble key={`${item.role}-${index}`} message={item} appear={item.role === "ASSISTANT"} />)}
               {loading ? <div className="flex items-start gap-3"><AiMark /><div className="rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-white px-4 py-3 text-sm text-[#66717D]"><span className="inline-flex items-center gap-2"><LoaderCircle className="size-3.5 animate-spin text-[#0B5CFF]" />{thinkingStageLabel}</span></div></div> : null}
               {error ? <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-              {accessGate ? <LegalAiAccessGateCard gate={accessGate} onPaid={() => void sendMessage(accessGate.question, { resume: true })} /> : null}
+              {accessGate && conversationMode ? <LegalAiAccessGateCard gate={accessGate} onPaid={() => handleGatePaid(accessGate.question)} /> : null}
             </div>
           </div>
 
           <div className="shrink-0 pb-4 pt-2 sm:pb-6">
             <form onSubmit={handleSubmit} className="mx-auto w-full max-w-[1040px] px-4 sm:px-6" data-testid="lawyer-ai-composer">
-              {!conversationMode ? <div className="mb-4"><LegalAiEntitlementBanner /></div> : null}
+              {!conversationMode ? <div className="mb-4 space-y-3"><LegalAiEntitlementBanner refreshKey={entitlementKey} onActivate={() => setAccessGate({ kind: "billing", question: "", message: "TORE Lawyer багц идэвхгүй байна. Төлбөрийн аргаа сонгоно уу.", audience: "lawyer" })} />{accessGate ? <LegalAiAccessGateCard gate={accessGate} onPaid={() => handleGatePaid(accessGate.question)} /> : null}</div> : null}
               <div className={cn("rounded-2xl border border-[#0B1F3A]/10 bg-white p-2 shadow-[0_16px_40px_-28px_rgba(11,31,58,0.45)] focus-within:border-[#0B5CFF]/40", dragOver && "border-[#0B5CFF]/40 bg-[#E8F0FE]")} onDragOver={(event) => { event.preventDefault(); if (!loading) setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={handleComposerDrop}>
                 {attachedDocuments.length || uploads.length ? <ul className="mb-2 flex max-h-24 flex-wrap gap-2 overflow-y-auto px-0.5 pt-0.5">{[...uploads].sort((x, y) => Number(y.status === "error") - Number(x.status === "error")).map((item) => item.status === "error" ? <li key={item.id} role="alert" className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-red-50 py-1 pr-1.5 pl-2.5 text-xs text-red-700 ring-1 ring-red-200"><Paperclip className="size-3.5 shrink-0" /><span className="truncate">{item.file.name}</span><span className="min-w-0 break-words">{item.errorMessage}</span><button type="button" aria-label={`${item.file.name} дахин оролдох`} className="shrink-0 rounded-full px-1.5 py-0.5 font-medium hover:bg-red-100" onClick={() => retryUpload(item.id)}>Дахин</button><button type="button" aria-label={`${item.file.name} хасах`} className="inline-flex size-5 shrink-0 items-center justify-center rounded-full hover:bg-red-100" onClick={() => cancelUpload(item.id)}><X className="size-3" /></button></li> : <li key={item.id} className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#F8FAFC] py-1 pr-1.5 pl-2.5 text-xs text-[#3F4852] ring-1 ring-[#0B1F3A]/10"><LoaderCircle className="size-3.5 shrink-0 animate-spin text-[#0B5CFF]" /><span className="truncate">{item.file.name}</span><span className="shrink-0 text-[10px] text-[#66717D]">Файл хавсаргаж байна...</span><button type="button" aria-label={`${item.file.name} цуцлах`} className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[#66717D] hover:bg-[#0B1F3A]/8" onClick={() => cancelUpload(item.id)}><X className="size-3" /></button></li>)}{attachedDocuments.map((document) => { const hint = legalAiExtractStatusHint(document.extractStatus); return <li key={document.id} className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#F8FAFC] py-1 pr-1.5 pl-2.5 text-xs text-[#3F4852] ring-1 ring-[#0B1F3A]/10"><Paperclip className="size-3.5" /><span className="truncate">{document.fileName}</span>{hint ? <span className="shrink-0 text-[10px] text-amber-700">{hint}</span> : null}<button type="button" aria-label={`${document.fileName} хасах`} className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[#66717D] hover:bg-[#0B1F3A]/8 hover:text-[#0B1F3A]" onClick={() => removeAttachedDocument(document.id)}><X className="size-3" /></button></li>; })}</ul> : null}
                 <SpellcheckTextarea

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { requirePageSession } from "@/application/common/session";
 import { BrandLink } from "@/components/layout/brand-link";
@@ -6,12 +7,20 @@ import { BRAND_LOGO_LANDING } from "@/components/brand/tokens";
 import { BillingCenter } from "@/components/billing/billing-center";
 import { UserRole } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
+import { lawyerBillingHref } from "@/domain/services/safe-return-path";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 
-export default async function BillingPage() {
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+export default async function BillingPage({ searchParams }: { searchParams: SearchParams }) {
   const session = await requirePageSession();
   const role = session.user.role as UserRole;
+  if (role === UserRole.LAWYER) {
+    // Lawyers manage their plan inside the workspace (sidebar, status, return path), not on a separate page.
+    const params = await searchParams;
+    redirect(lawyerBillingHref(typeof params.returnTo === "string" ? params.returnTo : undefined));
+  }
   const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
   const backHref = getDashboardPath(role);
 
@@ -42,8 +51,6 @@ export default async function BillingPage() {
         <div className="mt-8">
           {role === UserRole.CLIENT ? (
             <BillingCenter role="citizen" backHref={backHref} locale={locale} />
-          ) : role === UserRole.LAWYER ? (
-            <BillingCenter role="lawyer" backHref={backHref} locale={locale} />
           ) : (
             <div className="rounded-2xl border border-[#0B1F3A]/10 bg-white p-6">
               <p className="text-sm text-[#5C6570]">

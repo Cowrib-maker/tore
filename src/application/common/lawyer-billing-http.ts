@@ -1,3 +1,4 @@
+import type { Invoice } from "@/domain/entities/invoice";
 import type { BillingUnitOfWork } from "@/domain/ports/billing-unit-of-work";
 import type { QpayGateway } from "@/domain/ports/qpay-gateway";
 import type { InvoiceRepository } from "@/domain/repositories/invoice-repository";
@@ -22,6 +23,7 @@ import { bookingRepository } from "@/infrastructure/repositories/prisma-booking-
 import { lawyerProfileRepository } from "@/infrastructure/repositories/prisma-lawyer-profile-repository";
 import { notificationRepository } from "@/infrastructure/repositories/prisma-notification-repository";
 import { auditLogRepository } from "@/infrastructure/repositories/prisma-audit-log-repository";
+import { fulfillSpellPurchaseFromRuntime } from "@/infrastructure/spell/spell-purchase";
 import type { CreateManualCheckoutDeps } from "@/application/use-cases/billing/create-manual-checkout";
 import type { ClaimManualPaymentDeps } from "@/application/use-cases/billing/claim-manual-payment";
 
@@ -36,6 +38,7 @@ export type LawyerBillingDeps = {
   lawyerProfileRepository: LawyerProfileRepository;
   notificationRepository: NotificationRepository;
   auditLogRepository: AuditLogRepository;
+  spellFulfillment: (invoice: Invoice) => Promise<unknown>;
 };
 
 /**
@@ -71,6 +74,7 @@ export function lawyerBillingDeps(): LawyerBillingDeps {
     lawyerProfileRepository,
     notificationRepository,
     auditLogRepository,
+    spellFulfillment: fulfillSpellPurchaseFromRuntime,
   };
 }
 
@@ -105,5 +109,6 @@ export function invoiceStatusDeps(): LawyerBillingDeps {
     lawyerProfileRepository,
     notificationRepository,
     auditLogRepository,
+    spellFulfillment: fulfillSpellPurchaseFromRuntime,
   };
 }

@@ -7,7 +7,7 @@ export const marketplaceZh: MarketplaceDictionary = {
     submitting: "提交中…",
     removing: "移除中…",
     updating: "更新中…",
-    utc: "UTC",
+    utc: "(乌兰巴托时间，UTC+8)",
     yes: "是",
     no: "否",
     complete: "已完成",
@@ -408,7 +408,7 @@ export const marketplaceZh: MarketplaceDictionary = {
     intro: "每周时段用于生成可预约时段。例外可用于屏蔽日期或开放单次时段。",
     weeklyTitle: "每周日程",
     weeklyHelp:
-      "时间格式为 HH:mm。时段生成以 UTC 为参考时钟；请在专业档案中设置时区以便正确显示。",
+      "请以 UTC 输入 HH:mm 时间。乌兰巴托时间为 UTC+8（例如 01:00 UTC = 乌兰巴托 09:00）。客户看到的是乌兰巴托时间。",
     exceptionsTitle: "例外",
     exceptionsHelp: "假期、休假，或每周规则之外的额外开放时段。",
   },

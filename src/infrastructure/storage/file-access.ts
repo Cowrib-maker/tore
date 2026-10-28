@@ -17,6 +17,7 @@ const SENSITIVE_PURPOSES = new Set<FilePurpose>([
   "message-attachment",
   "legal-ai-document",
   "matter-document",
+  "spell-installer",
 ]);
 
 export function isSensitiveFilePurpose(purpose: string): boolean {

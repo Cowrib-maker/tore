@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { readJsonBody } from "@/application/common/read-json-body";
 import { LegalAiError } from "@/application/ai/legal-ai.errors";
 import { getLegalAiService } from "@/application/ai/create-legal-ai-service";
 import { guardLawyerAiHttp } from "@/application/common/guard-lawyer-ai-http";
@@ -112,7 +113,7 @@ export async function POST(request: Request) {
       return rateLimitHttpResponse(rate.retryAfterSeconds);
     }
 
-    const body = (await request.json()) as ChatRequest;
+    const body = (await readJsonBody(request)) as ChatRequest;
     const requestedCaseFileId =
       typeof body.caseFileId === "string" ? body.caseFileId.trim() : "";
     // Citizens/guests never attach a case. Lawyers must own the CaseFile.

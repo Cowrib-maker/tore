@@ -14,7 +14,7 @@ import type { Locale } from "@/i18n/config";
 import type { MarketplaceDictionary } from "@/i18n/marketplace-types";
 import {
   formatCredentialStatus,
-  formatDateTimeUtc,
+  formatDateTimeUlaanbaatar,
   formatVerificationStatus,
 } from "@/lib/format-labels";
 
@@ -91,7 +91,7 @@ export function LawyerVerificationSection({
           <p>
             {copy.approvedOn}{" "}
             {profile.verifiedAt
-              ? `${formatDateTimeUtc(profile.verifiedAt, locale)} UTC`
+              ? `${formatDateTimeUlaanbaatar(profile.verifiedAt, locale)} (UTC+8)`
               : "—"}
           </p>
           <p>

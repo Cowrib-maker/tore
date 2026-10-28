@@ -20,6 +20,7 @@ import { detectForeignLegalScope } from "@/engine/relevance";
 import type { AsyncGraphRepository, ConflictFinding } from "@/engine/graph";
 import { formatAuthorityConflictBlock } from "@/application/ai/legal-ai-authority-conflict-block";
 import { formatTemporalValidityBlock } from "@/application/ai/legal-ai-temporal-validity-block";
+import { guardUngroundedCitations } from "@/application/ai/ungrounded-citation-guard";
 import {
   MISSING_LEGAL_SOURCE_MESSAGE,
   resolveLegalAuthorities,
@@ -583,7 +584,10 @@ export class LegalAiService {
       await this.dependencies.store.createAssistantMessage({
         conversationId: conversation.id,
         content:
+          guardUngroundedCitations(
           completion.content.trim() || "Хариу боловсруулах явцад алдаа гарлаа.",
+          verifiedAuthorities,
+        ).content,
         provider: completion.provider,
         model: completion.model,
         inputTokens: completion.inputTokens,
@@ -893,7 +897,10 @@ export class LegalAiService {
 
     const assistantMessage = await this.dependencies.store.createAssistantMessage({
       conversationId: conversation.id,
-      content: completion.content.trim() || "Хариу боловсруулах явцад алдаа гарлаа.",
+      content: guardUngroundedCitations(
+          completion.content.trim() || "Хариу боловсруулах явцад алдаа гарлаа.",
+          verifiedAuthorities,
+        ).content,
       provider: completion.provider,
       model: completion.model,
       inputTokens: completion.inputTokens,
@@ -997,7 +1004,10 @@ export class LegalAiService {
     });
 
     let content =
-      completion.content.trim() || "Хариу боловсруулах явцад алдаа гарлаа.";
+      guardUngroundedCitations(
+          completion.content.trim() || "Хариу боловсруулах явцад алдаа гарлаа.",
+          undefined,
+        ).content;
     if (
       lastAssistant?.content &&
       content.trim() === lastAssistant.content.trim()

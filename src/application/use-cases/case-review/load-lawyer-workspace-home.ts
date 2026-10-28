@@ -93,6 +93,8 @@ export type LawyerWorkspaceHomeView = {
   activity: LawyerWorkspaceActivityItem[];
   summary: LawyerWorkspaceSummary;
   schedule: LawyerWorkspaceSchedule;
+  /** Server clock (epoch ms) when this view was built. Relative times render from this, never from the client's clock, so SSR and hydration agree. */
+  generatedAtMs: number;
 };
 
 export type LawyerWorkspaceScheduleDeps = {
@@ -284,5 +286,5 @@ export async function loadLawyerWorkspaceHome(
     documentCount: cases.reduce((total, item) => total + item.documentCount, 0),
   };
 
-  return { cases, recentConversations, activity, summary, schedule };
+  return { cases, recentConversations, activity, summary, schedule, generatedAtMs: Date.now() };
 }

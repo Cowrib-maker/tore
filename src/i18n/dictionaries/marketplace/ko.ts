@@ -7,7 +7,7 @@ export const marketplaceKo: MarketplaceDictionary = {
     submitting: "제출 중…",
     removing: "삭제 중…",
     updating: "업데이트 중…",
-    utc: "UTC",
+    utc: "(울란바토르 시간, UTC+8)",
     yes: "예",
     no: "아니오",
     complete: "완료",
@@ -416,7 +416,7 @@ export const marketplaceKo: MarketplaceDictionary = {
       "주간 시간이 예약 가능 시간을 생성합니다. 예외는 날짜를 차단하거나 단회 창을 엽니다.",
     weeklyTitle: "주간 일정",
     weeklyHelp:
-      "시간은 HH:mm 형식으로 입력하십시오. 슬롯 생성은 UTC 기준 시계를 사용합니다. 표시를 위해 전문 프로필에서 시간대를 설정하십시오.",
+      "시간은 UTC 기준 HH:mm 형식으로 입력하십시오. 울란바토르 시간은 UTC+8입니다(예: 01:00 UTC = 울란바토르 09:00). 고객에게는 울란바토르 시간으로 표시됩니다.",
     exceptionsTitle: "예외",
     exceptionsHelp: "휴일, 휴가 또는 주간 규칙 외의 추가 가능 시간.",
   },

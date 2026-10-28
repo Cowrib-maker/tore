@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatTodayLabelMn } from "@/lib/format-labels";
+import { formatDateTimeUlaanbaatar, formatTodayLabelMn } from "@/lib/format-labels";
 
 /**
  * formatTodayLabelMn must derive both the date and the weekday from the
@@ -52,5 +52,17 @@ describe("formatTodayLabelMn", () => {
     expect(formatTodayLabelMn(instant, "Not/AZone")).toBe(
       "2026.01.15 Пүрэв",
     );
+  });
+});
+
+describe("formatDateTimeUlaanbaatar", () => {
+  it("renders an instant in Asia/Ulaanbaatar (UTC+8), crossing the date line correctly", () => {
+    const out = formatDateTimeUlaanbaatar(new Date("2026-10-05T16:30:00.000Z"), "en");
+    expect(out).toContain("6 Oct 2026");
+    expect(out).toContain("00:30");
+  });
+  it("is independent of the process time zone", () => {
+    const d = new Date("2026-01-01T01:00:00.000Z");
+    expect(formatDateTimeUlaanbaatar(d, "en")).toContain("09:00");
   });
 });

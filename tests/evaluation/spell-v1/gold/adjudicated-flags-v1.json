@@ -1,0 +1,19 @@
+{
+  "schema": "tore-spell-adjudication/1",
+  "dataset": "RESEARCH_MODE_FLAG_ADJUDICATION_V1",
+  "datasetClass": "BENCHMARK_RESULT",
+  "date": "2026-10-06",
+  "reviewer": "AI assistant (NOT a native-speaker linguist)",
+  "reviewStatus": "PENDING_NATIVE_REVIEW",
+  "method": "scripts/spell-data/corpus-eval.ts --limit 1500 --research flagged 367 types in 349k+ word tokens of real news (local research corpus, class D). A seeded random sample of 100 flagged types was judged by reading the type and its top suggestion; the word list itself is not redistributed here beyond these 100 short strings.",
+  "result": {
+    "sampled": 100,
+    "realErrorTop1Correct": 90,
+    "realErrorWrongTop1": 2,
+    "validWordFlagged": 1,
+    "couldNotJudge": 7
+  },
+  "wrongTop1": [{"word": "лгэр", "suggested": "гэр", "likely": "үлгэр"}, {"word": "рхангай", "suggested": "хангай", "likely": "Архангай"}],
+  "validWordFlagged": [{"word": "матраж", "suggested": "мартаж", "note": "valid loanword absent from the second-opinion dictionary"}],
+  "couldNotJudge": ["лхийн", "втэй", "хаалтан", "ином", "идсэр", "рчин", "руулс"]
+}

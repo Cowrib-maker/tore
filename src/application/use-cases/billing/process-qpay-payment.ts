@@ -33,6 +33,13 @@ export type ProcessQpayPaymentDeps = {
   lawyerProfileRepository?: LawyerProfileRepository;
   notificationRepository?: NotificationRepository;
   auditLogRepository?: AuditLogRepository;
+  /**
+   * TORE Spell: mints the licence for a PAID Spell invoice (idempotent). Kept
+   * out of the payment transaction on purpose: payment recording must never
+   * fail because licensing is unavailable; a failed fulfilment is retried by
+   * the next callback / status poll / account-page visit.
+   */
+  spellFulfillment?: (invoice: Invoice) => Promise<unknown>;
 };
 
 export type ProcessQpayPaymentResult = {
@@ -58,6 +65,9 @@ export async function processQpayInvoicePayment(
 
   if (invoice.bookingId) {
     return processBookingQpayPayment(invoice, deps, now);
+  }
+  if (invoice.spellPlanCode) {
+    return processSpellQpayPayment(invoice, deps, now);
   }
 
   const planCode = invoice.planCode;
@@ -278,3 +288,82 @@ async function processBookingQpayPayment(
   };
 }
 
+/**
+ * TORE Spell licence purchase. The amount that must have been paid is the
+ * server-set invoice amount (never client input); payment is verified
+ * server-to-server with QPay; the licence is issued only afterwards and only
+ * once per invoice.
+ */
+async function processSpellQpayPayment(
+  invoice: Invoice,
+  deps: ProcessQpayPaymentDeps,
+  now: Date,
+): Promise<ProcessQpayPaymentResult> {
+  if (!invoice.providerInvoiceId || !invoice.spellPlanCode || invoice.amountMnt <= 0) {
+    await deps.invoiceRepository.updateStatus(invoice.id, InvoiceStatus.FAILED).catch(() => undefined);
+    throw new PaymentVerificationError("Plan is not priced for payment", "UNPRICED_PLAN");
+  }
+
+  const fulfil = async (paid: Invoice) => {
+    if (!deps.spellFulfillment) return;
+    try {
+      await deps.spellFulfillment(paid);
+    } catch (error) {
+      // Payment is recorded; licence issuance is retried on the next poll/callback/visit.
+      console.error("[spell] licence fulfilment deferred:", error instanceof Error ? error.name : "unknown");
+    }
+  };
+
+  // Already settled (repeated callback / poll): never re-verify, never double-issue.
+  if (invoice.status === InvoiceStatus.PAID) {
+    await fulfil(invoice);
+    return { alreadyProcessed: true, invoice, subscription: null };
+  }
+
+  const checked = await deps.qpayGateway.checkPayment(invoice.providerInvoiceId);
+  let verified;
+  try {
+    verified = verifyQpayCatalogPayment({
+      expectedProviderInvoiceId: invoice.providerInvoiceId,
+      expectedAmountMnt: invoice.amountMnt,
+      checked,
+    });
+  } catch (error) {
+    if (error instanceof PaymentVerificationError && (error.code === "WRONG_AMOUNT" || error.code === "UNPRICED_PLAN")) {
+      await deps.invoiceRepository.updateStatus(invoice.id, InvoiceStatus.FAILED).catch(() => undefined);
+    }
+    throw error;
+  }
+
+  const result = await deps.billingUnitOfWork.runInTransaction(async (repos) => {
+    const current = await repos.invoiceRepository.findById(invoice.id);
+    if (!current) throw new PaymentVerificationError("Invoice was not found", "WRONG_INVOICE");
+    const existingPayment = await repos.paymentTransactionRepository.findByInvoiceId(current.id);
+    if (current.status === InvoiceStatus.PAID && existingPayment?.status === PaymentTransactionStatus.PAID) {
+      return { alreadyProcessed: true, invoice: current };
+    }
+    try {
+      await repos.paymentTransactionRepository.create({
+        invoiceId: current.id,
+        provider: BILLING_PROVIDER_QPAY,
+        providerPaymentId: verified.paymentId,
+        amountMnt: verified.amountMnt,
+        currency: verified.currency,
+        status: PaymentTransactionStatus.PAID,
+        paidAt: now,
+        metadata: verified.safeMetadata,
+      });
+    } catch (error) {
+      if (error instanceof DuplicatePaymentError) {
+        const paid = await repos.invoiceRepository.findById(current.id);
+        return { alreadyProcessed: true, invoice: paid ?? current };
+      }
+      throw error;
+    }
+    const paidInvoice = await repos.invoiceRepository.updateStatus(current.id, InvoiceStatus.PAID);
+    return { alreadyProcessed: false, invoice: paidInvoice };
+  });
+
+  await fulfil(result.invoice);
+  return { alreadyProcessed: result.alreadyProcessed, invoice: result.invoice, subscription: null };
+}

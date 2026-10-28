@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { getActiveContextSwitcherModel } from "@/application/common/active-context-switcher-model";
 import { requireActor } from "@/application/common/require-actor";
@@ -10,25 +10,16 @@ import { getDashboardPath, getProfilePath } from "@/domain/services/rbac";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 import { isFoundationOrgsV1Enabled } from "@/lib/feature-flags";
-import { SessionReplacedError } from "@/domain/errors/domain-error";
-import { sessionReplacedLoginPath } from "@/domain/services/active-session";
 
 export default async function OrganizationsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  if (!isFoundationOrgsV1Enabled()) {
-    try {
-      const actor = await requireActor();
-      redirect(getDashboardPath(actor.role));
-    } catch (error) {
-      if (error instanceof SessionReplacedError) {
-        redirect(sessionReplacedLoginPath());
-      }
-      redirect("/login");
-    }
-  }
+  // Feature flag off: the feature does not exist, for everyone (same policy as the pages, nothing links here while disabled).
+  // The previous branch redirected inside a try/catch whose catch swallowed redirect()'s control-flow exception, so signed-in
+  // users were sent to /login. notFound() is called outside any try/catch and before any actor lookup.
+  if (!isFoundationOrgsV1Enabled()) notFound();
 
   await requirePageSession();
 

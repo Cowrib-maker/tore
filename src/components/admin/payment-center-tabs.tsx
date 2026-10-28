@@ -4,6 +4,7 @@ const SECTIONS = [
   { href: "/admin/payments/transactions", label: "Гүйлгээ" },
   { href: "/admin/payments/subscriptions", label: "Захиалга" },
   { href: "/admin/payments/entitlements", label: "Эрхийн багц" },
+  { href: "/admin/spell", label: "TORE Spell" },
   { href: "/admin/payments/trace", label: "Хэрэглэгчийн трайс" },
   { href: "/admin/payments/diagnostics", label: "QPay diagnostics" },
 ] as const;

@@ -19,7 +19,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { UserRole } from "@/domain/enums";
 import { getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
-import { formatAuditAction, formatDateTimeUtc } from "@/lib/format-labels";
+import { formatAuditAction, formatDateTimeUlaanbaatar } from "@/lib/format-labels";
 import { cn } from "@/lib/utils";
 
 function formatMnt(amount: number): string {
@@ -140,7 +140,7 @@ export default async function AdminDashboardPage() {
                       </span>
                     </span>
                     <span className="shrink-0 text-[11px] text-muted-foreground">
-                      {formatDateTimeUtc(entry.createdAt, i18n.locale)}
+                      {formatDateTimeUlaanbaatar(entry.createdAt, i18n.locale)}
                     </span>
                   </li>
                 ))}

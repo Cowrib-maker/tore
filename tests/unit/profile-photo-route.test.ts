@@ -72,7 +72,25 @@ describe("POST /api/profile/photo", () => {
     expect(res.status).toBe(200);
     expect(uploadMock.mock.calls[0]![0]).toEqual({ userId: "u1", role: "LAWYER" });
     expect(JSON.stringify(uploadMock.mock.calls[0]![1])).not.toContain("victim");
-    expect(requireActor).toHaveBeenCalledWith("LAWYER");
+    expect(requireActor).toHaveBeenCalledWith(["LAWYER", "ADMIN"]);
+  });
+
+  it("forwards an explicit targetUserId to the use case, which alone decides who may use it", async () => {
+    const form = new FormData();
+    form.append("photo", new File([PNG], "a.png", { type: "image/png" }));
+    form.append("targetUserId", "lawyer-b");
+    await POST(new Request("http://localhost/api/profile/photo", { method: "POST", body: form }));
+    expect(uploadMock.mock.calls[0]![4]).toBe("lawyer-b");
+    expect(uploadMock.mock.calls[0]![0]).toEqual({ userId: "u1", role: "LAWYER" });
+  });
+
+  it("a use-case Forbidden (lawyer A → lawyer B) surfaces as 403", async () => {
+    uploadMock.mockRejectedValue(new ForbiddenError());
+    const form = new FormData();
+    form.append("photo", new File([PNG], "a.png", { type: "image/png" }));
+    form.append("targetUserId", "lawyer-b");
+    const res = await POST(new Request("http://localhost/api/profile/photo", { method: "POST", body: form }));
+    expect(res.status).toBe(403);
   });
 
   it("returns the owner's photo URL on success", async () => {

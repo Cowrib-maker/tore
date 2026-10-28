@@ -1,0 +1,1569 @@
+{
+ "schema": "tore-spell-gold/1",
+ "datasetVersion": "spell-gold-v3.0",
+ "set": "H_EDUCATION",
+ "provenanceDir": "model",
+ "note": "MODEL_ADJUDICATED candidates: authored and judged by the AI assistant. NOT native-reviewed; NOT gold.",
+ "items": [
+  {
+   "id": "H_EDUCATION:01:багш",
+   "token": "Багш",
+   "sentence": "Багш сурагчдад шинэ хичээлийн агуулгыг энгийн жишээгээр тайлбарлаж өгсөн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:01:сурагчдад",
+   "token": "сурагчдад",
+   "sentence": "Багш сурагчдад шинэ хичээлийн агуулгыг энгийн жишээгээр тайлбарлаж өгсөн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:01:шинэ",
+   "token": "шинэ",
+   "sentence": "Багш сурагчдад шинэ хичээлийн агуулгыг энгийн жишээгээр тайлбарлаж өгсөн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:01:хичээлийн",
+   "token": "хичээлийн",
+   "sentence": "Багш сурагчдад шинэ хичээлийн агуулгыг энгийн жишээгээр тайлбарлаж өгсөн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:01:агуулгыг",
+   "token": "агуулгыг",
+   "sentence": "Багш сурагчдад шинэ хичээлийн агуулгыг энгийн жишээгээр тайлбарлаж өгсөн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:01:энгийн",
+   "token": "энгийн",
+   "sentence": "Багш сурагчдад шинэ хичээлийн агуулгыг энгийн жишээгээр тайлбарлаж өгсөн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:01:жишээгээр",
+   "token": "жишээгээр",
+   "sentence": "Багш сурагчдад шинэ хичээлийн агуулгыг энгийн жишээгээр тайлбарлаж өгсөн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:01:тайлбарлаж",
+   "token": "тайлбарлаж",
+   "sentence": "Багш сурагчдад шинэ хичээлийн агуулгыг энгийн жишээгээр тайлбарлаж өгсөн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:01:өгсөн",
+   "token": "өгсөн",
+   "sentence": "Багш сурагчдад шинэ хичээлийн агуулгыг энгийн жишээгээр тайлбарлаж өгсөн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:02:хичээлийн",
+   "token": "Хичээлийн",
+   "sentence": "Хичээлийн шинэ жилийн нээлт есдүгээр сарын нэгэнд болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:02:шинэ",
+   "token": "шинэ",
+   "sentence": "Хичээлийн шинэ жилийн нээлт есдүгээр сарын нэгэнд болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:02:жилийн",
+   "token": "жилийн",
+   "sentence": "Хичээлийн шинэ жилийн нээлт есдүгээр сарын нэгэнд болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:02:нээлт",
+   "token": "нээлт",
+   "sentence": "Хичээлийн шинэ жилийн нээлт есдүгээр сарын нэгэнд болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:02:есдүгээр",
+   "token": "есдүгээр",
+   "sentence": "Хичээлийн шинэ жилийн нээлт есдүгээр сарын нэгэнд болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:02:сарын",
+   "token": "сарын",
+   "sentence": "Хичээлийн шинэ жилийн нээлт есдүгээр сарын нэгэнд болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:02:нэгэнд",
+   "token": "нэгэнд",
+   "sentence": "Хичээлийн шинэ жилийн нээлт есдүгээр сарын нэгэнд болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:02:болно",
+   "token": "болно",
+   "sentence": "Хичээлийн шинэ жилийн нээлт есдүгээр сарын нэгэнд болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:03:оюутнууд",
+   "token": "Оюутнууд",
+   "sentence": "Оюутнууд улирлын шалгалтандаа сайн бэлтгэж, номын санд өдөржин суув.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:03:улирлын",
+   "token": "улирлын",
+   "sentence": "Оюутнууд улирлын шалгалтандаа сайн бэлтгэж, номын санд өдөржин суув.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:03:шалгалтандаа",
+   "token": "шалгалтандаа",
+   "sentence": "Оюутнууд улирлын шалгалтандаа сайн бэлтгэж, номын санд өдөржин суув.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:03:сайн",
+   "token": "сайн",
+   "sentence": "Оюутнууд улирлын шалгалтандаа сайн бэлтгэж, номын санд өдөржин суув.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:03:бэлтгэж",
+   "token": "бэлтгэж",
+   "sentence": "Оюутнууд улирлын шалгалтандаа сайн бэлтгэж, номын санд өдөржин суув.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:03:номын",
+   "token": "номын",
+   "sentence": "Оюутнууд улирлын шалгалтандаа сайн бэлтгэж, номын санд өдөржин суув.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:03:санд",
+   "token": "санд",
+   "sentence": "Оюутнууд улирлын шалгалтандаа сайн бэлтгэж, номын санд өдөржин суув.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:03:өдөржин",
+   "token": "өдөржин",
+   "sentence": "Оюутнууд улирлын шалгалтандаа сайн бэлтгэж, номын санд өдөржин суув.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts H_EDUCATION s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:03:суув",
+   "token": "суув",
+   "sentence": "Оюутнууд улирлын шалгалтандаа сайн бэлтгэж, номын санд өдөржин суув.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:04:сургуулийн",
+   "token": "Сургуулийн",
+   "sentence": "Сургуулийн захирал эцэг эхчүүдтэй уулзаж, сурлагын дүнг танилцууллаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:04:захирал",
+   "token": "захирал",
+   "sentence": "Сургуулийн захирал эцэг эхчүүдтэй уулзаж, сурлагын дүнг танилцууллаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:04:эцэг",
+   "token": "эцэг",
+   "sentence": "Сургуулийн захирал эцэг эхчүүдтэй уулзаж, сурлагын дүнг танилцууллаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:04:эхчүүдтэй",
+   "token": "эхчүүдтэй",
+   "sentence": "Сургуулийн захирал эцэг эхчүүдтэй уулзаж, сурлагын дүнг танилцууллаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts H_EDUCATION s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:04:уулзаж",
+   "token": "уулзаж",
+   "sentence": "Сургуулийн захирал эцэг эхчүүдтэй уулзаж, сурлагын дүнг танилцууллаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:04:сурлагын",
+   "token": "сурлагын",
+   "sentence": "Сургуулийн захирал эцэг эхчүүдтэй уулзаж, сурлагын дүнг танилцууллаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts H_EDUCATION s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:04:дүнг",
+   "token": "дүнг",
+   "sentence": "Сургуулийн захирал эцэг эхчүүдтэй уулзаж, сурлагын дүнг танилцууллаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:04:танилцууллаа",
+   "token": "танилцууллаа",
+   "sentence": "Сургуулийн захирал эцэг эхчүүдтэй уулзаж, сурлагын дүнг танилцууллаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:05:хүүхдүүд",
+   "token": "Хүүхдүүд",
+   "sentence": "Хүүхдүүд спортын уралдаанд оролцож, багаараа тэргүүн байр эзэлсэн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:05:спортын",
+   "token": "спортын",
+   "sentence": "Хүүхдүүд спортын уралдаанд оролцож, багаараа тэргүүн байр эзэлсэн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:05:уралдаанд",
+   "token": "уралдаанд",
+   "sentence": "Хүүхдүүд спортын уралдаанд оролцож, багаараа тэргүүн байр эзэлсэн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:05:оролцож",
+   "token": "оролцож",
+   "sentence": "Хүүхдүүд спортын уралдаанд оролцож, багаараа тэргүүн байр эзэлсэн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:05:багаараа",
+   "token": "багаараа",
+   "sentence": "Хүүхдүүд спортын уралдаанд оролцож, багаараа тэргүүн байр эзэлсэн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:05:тэргүүн",
+   "token": "тэргүүн",
+   "sentence": "Хүүхдүүд спортын уралдаанд оролцож, багаараа тэргүүн байр эзэлсэн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:05:байр",
+   "token": "байр",
+   "sentence": "Хүүхдүүд спортын уралдаанд оролцож, багаараа тэргүүн байр эзэлсэн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:05:эзэлсэн",
+   "token": "эзэлсэн",
+   "sentence": "Хүүхдүүд спортын уралдаанд оролцож, багаараа тэргүүн байр эзэлсэн.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:06:дугуйлангийн",
+   "token": "Дугуйлангийн",
+   "sentence": "Дугуйлангийн багш сурагчдын авьяасыг нээж хөгжүүлэхэд анхаардаг.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:06:багш",
+   "token": "багш",
+   "sentence": "Дугуйлангийн багш сурагчдын авьяасыг нээж хөгжүүлэхэд анхаардаг.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:06:сурагчдын",
+   "token": "сурагчдын",
+   "sentence": "Дугуйлангийн багш сурагчдын авьяасыг нээж хөгжүүлэхэд анхаардаг.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:06:авьяасыг",
+   "token": "авьяасыг",
+   "sentence": "Дугуйлангийн багш сурагчдын авьяасыг нээж хөгжүүлэхэд анхаардаг.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:06:нээж",
+   "token": "нээж",
+   "sentence": "Дугуйлангийн багш сурагчдын авьяасыг нээж хөгжүүлэхэд анхаардаг.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:06:хөгжүүлэхэд",
+   "token": "хөгжүүлэхэд",
+   "sentence": "Дугуйлангийн багш сурагчдын авьяасыг нээж хөгжүүлэхэд анхаардаг.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:06:анхаардаг",
+   "token": "анхаардаг",
+   "sentence": "Дугуйлангийн багш сурагчдын авьяасыг нээж хөгжүүлэхэд анхаардаг.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:07:дүнгийн",
+   "token": "Дүнгийн",
+   "sentence": "Дүнгийн мэдээллийг оюутан цахим системээс харж болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:07:мэдээллийг",
+   "token": "мэдээллийг",
+   "sentence": "Дүнгийн мэдээллийг оюутан цахим системээс харж болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:07:оюутан",
+   "token": "оюутан",
+   "sentence": "Дүнгийн мэдээллийг оюутан цахим системээс харж болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:07:цахим",
+   "token": "цахим",
+   "sentence": "Дүнгийн мэдээллийг оюутан цахим системээс харж болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:07:системээс",
+   "token": "системээс",
+   "sentence": "Дүнгийн мэдээллийг оюутан цахим системээс харж болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:07:харж",
+   "token": "харж",
+   "sentence": "Дүнгийн мэдээллийг оюутан цахим системээс харж болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:07:болно",
+   "token": "болно",
+   "sentence": "Дүнгийн мэдээллийг оюутан цахим системээс харж болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:08:бакалаврын",
+   "token": "Бакалаврын",
+   "sentence": "Бакалаврын дипломын ажлаа хамгаалсны дараа тэд төгсөлтийн баярт оролцов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:08:дипломын",
+   "token": "дипломын",
+   "sentence": "Бакалаврын дипломын ажлаа хамгаалсны дараа тэд төгсөлтийн баярт оролцов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:08:ажлаа",
+   "token": "ажлаа",
+   "sentence": "Бакалаврын дипломын ажлаа хамгаалсны дараа тэд төгсөлтийн баярт оролцов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:08:хамгаалсны",
+   "token": "хамгаалсны",
+   "sentence": "Бакалаврын дипломын ажлаа хамгаалсны дараа тэд төгсөлтийн баярт оролцов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:08:дараа",
+   "token": "дараа",
+   "sentence": "Бакалаврын дипломын ажлаа хамгаалсны дараа тэд төгсөлтийн баярт оролцов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:08:тэд",
+   "token": "тэд",
+   "sentence": "Бакалаврын дипломын ажлаа хамгаалсны дараа тэд төгсөлтийн баярт оролцов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:08:төгсөлтийн",
+   "token": "төгсөлтийн",
+   "sentence": "Бакалаврын дипломын ажлаа хамгаалсны дараа тэд төгсөлтийн баярт оролцов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:08:баярт",
+   "token": "баярт",
+   "sentence": "Бакалаврын дипломын ажлаа хамгаалсны дараа тэд төгсөлтийн баярт оролцов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "H_EDUCATION:08:оролцов",
+   "token": "оролцов",
+   "sentence": "Бакалаврын дипломын ажлаа хамгаалсны дараа тэд төгсөлтийн баярт оролцов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts H_EDUCATION s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  }
+ ]
+}

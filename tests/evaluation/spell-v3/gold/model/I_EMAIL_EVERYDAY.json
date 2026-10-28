@@ -1,0 +1,1353 @@
+{
+ "schema": "tore-spell-gold/1",
+ "datasetVersion": "spell-gold-v3.0",
+ "set": "I_EMAIL_EVERYDAY",
+ "provenanceDir": "model",
+ "note": "MODEL_ADJUDICATED candidates: authored and judged by the AI assistant. NOT native-reviewed; NOT gold.",
+ "items": [
+  {
+   "id": "I_EMAIL_EVERYDAY:01:сайн",
+   "token": "Сайн",
+   "sentence": "Сайн байна уу, таны илгээсэн материалыг хүлээн авлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:01:байна",
+   "token": "байна",
+   "sentence": "Сайн байна уу, таны илгээсэн материалыг хүлээн авлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:01:уу",
+   "token": "уу",
+   "sentence": "Сайн байна уу, таны илгээсэн материалыг хүлээн авлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:01:таны",
+   "token": "таны",
+   "sentence": "Сайн байна уу, таны илгээсэн материалыг хүлээн авлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:01:илгээсэн",
+   "token": "илгээсэн",
+   "sentence": "Сайн байна уу, таны илгээсэн материалыг хүлээн авлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:01:материалыг",
+   "token": "материалыг",
+   "sentence": "Сайн байна уу, таны илгээсэн материалыг хүлээн авлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:01:хүлээн",
+   "token": "хүлээн",
+   "sentence": "Сайн байна уу, таны илгээсэн материалыг хүлээн авлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:01:авлаа",
+   "token": "авлаа",
+   "sentence": "Сайн байна уу, таны илгээсэн материалыг хүлээн авлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:02:маргааш",
+   "token": "Маргааш",
+   "sentence": "Маргааш өглөө арван цагт уулзалт болохыг сануулъя.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:02:өглөө",
+   "token": "өглөө",
+   "sentence": "Маргааш өглөө арван цагт уулзалт болохыг сануулъя.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:02:арван",
+   "token": "арван",
+   "sentence": "Маргааш өглөө арван цагт уулзалт болохыг сануулъя.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:02:цагт",
+   "token": "цагт",
+   "sentence": "Маргааш өглөө арван цагт уулзалт болохыг сануулъя.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:02:уулзалт",
+   "token": "уулзалт",
+   "sentence": "Маргааш өглөө арван цагт уулзалт болохыг сануулъя.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:02:болохыг",
+   "token": "болохыг",
+   "sentence": "Маргааш өглөө арван цагт уулзалт болохыг сануулъя.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:02:сануулъя",
+   "token": "сануулъя",
+   "sentence": "Маргааш өглөө арван цагт уулзалт болохыг сануулъя.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:03:хавсаргасан",
+   "token": "Хавсаргасан",
+   "sentence": "Хавсаргасан баримтыг шалгаад санал бодлоо хэлнэ үү.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:03:баримтыг",
+   "token": "баримтыг",
+   "sentence": "Хавсаргасан баримтыг шалгаад санал бодлоо хэлнэ үү.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:03:шалгаад",
+   "token": "шалгаад",
+   "sentence": "Хавсаргасан баримтыг шалгаад санал бодлоо хэлнэ үү.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:03:санал",
+   "token": "санал",
+   "sentence": "Хавсаргасан баримтыг шалгаад санал бодлоо хэлнэ үү.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:03:бодлоо",
+   "token": "бодлоо",
+   "sentence": "Хавсаргасан баримтыг шалгаад санал бодлоо хэлнэ үү.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:03:хэлнэ",
+   "token": "хэлнэ",
+   "sentence": "Хавсаргасан баримтыг шалгаад санал бодлоо хэлнэ үү.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:03:үү",
+   "token": "үү",
+   "sentence": "Хавсаргасан баримтыг шалгаад санал бодлоо хэлнэ үү.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:04:уучлаарай",
+   "token": "Уучлаарай",
+   "sentence": "Уучлаарай, би өнөөдөр хоцорч ирсэндээ харамсаж байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:04:би",
+   "token": "би",
+   "sentence": "Уучлаарай, би өнөөдөр хоцорч ирсэндээ харамсаж байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:04:өнөөдөр",
+   "token": "өнөөдөр",
+   "sentence": "Уучлаарай, би өнөөдөр хоцорч ирсэндээ харамсаж байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:04:хоцорч",
+   "token": "хоцорч",
+   "sentence": "Уучлаарай, би өнөөдөр хоцорч ирсэндээ харамсаж байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:04:ирсэндээ",
+   "token": "ирсэндээ",
+   "sentence": "Уучлаарай, би өнөөдөр хоцорч ирсэндээ харамсаж байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:04:харамсаж",
+   "token": "харамсаж",
+   "sentence": "Уучлаарай, би өнөөдөр хоцорч ирсэндээ харамсаж байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:04:байна",
+   "token": "байна",
+   "sentence": "Уучлаарай, би өнөөдөр хоцорч ирсэндээ харамсаж байна.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:05:таны",
+   "token": "Таны",
+   "sentence": "Таны хүсэлтийг хүлээн авч, боломжит хугацаанд хариу өгөх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:05:хүсэлтийг",
+   "token": "хүсэлтийг",
+   "sentence": "Таны хүсэлтийг хүлээн авч, боломжит хугацаанд хариу өгөх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:05:хүлээн",
+   "token": "хүлээн",
+   "sentence": "Таны хүсэлтийг хүлээн авч, боломжит хугацаанд хариу өгөх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:05:авч",
+   "token": "авч",
+   "sentence": "Таны хүсэлтийг хүлээн авч, боломжит хугацаанд хариу өгөх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:05:боломжит",
+   "token": "боломжит",
+   "sentence": "Таны хүсэлтийг хүлээн авч, боломжит хугацаанд хариу өгөх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:05:хугацаанд",
+   "token": "хугацаанд",
+   "sentence": "Таны хүсэлтийг хүлээн авч, боломжит хугацаанд хариу өгөх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:05:хариу",
+   "token": "хариу",
+   "sentence": "Таны хүсэлтийг хүлээн авч, боломжит хугацаанд хариу өгөх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:05:өгөх",
+   "token": "өгөх",
+   "sentence": "Таны хүсэлтийг хүлээн авч, боломжит хугацаанд хариу өгөх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:05:болно",
+   "token": "болно",
+   "sentence": "Таны хүсэлтийг хүлээн авч, боломжит хугацаанд хариу өгөх болно.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:06:баярлалаа",
+   "token": "Баярлалаа",
+   "sentence": "Баярлалаа, танд амжилт хүсье!",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:06:танд",
+   "token": "танд",
+   "sentence": "Баярлалаа, танд амжилт хүсье!",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:06:амжилт",
+   "token": "амжилт",
+   "sentence": "Баярлалаа, танд амжилт хүсье!",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:06:хүсье",
+   "token": "хүсье",
+   "sentence": "Баярлалаа, танд амжилт хүсье!",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:07:захиалгаа",
+   "token": "Захиалгаа",
+   "sentence": "Захиалгаа баталгаажуулахын тулд доорх холбоосоор орно уу.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:07:баталгаажуулахын",
+   "token": "баталгаажуулахын",
+   "sentence": "Захиалгаа баталгаажуулахын тулд доорх холбоосоор орно уу.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:07:тулд",
+   "token": "тулд",
+   "sentence": "Захиалгаа баталгаажуулахын тулд доорх холбоосоор орно уу.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:07:доорх",
+   "token": "доорх",
+   "sentence": "Захиалгаа баталгаажуулахын тулд доорх холбоосоор орно уу.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:07:холбоосоор",
+   "token": "холбоосоор",
+   "sentence": "Захиалгаа баталгаажуулахын тулд доорх холбоосоор орно уу.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:07:орно",
+   "token": "орно",
+   "sentence": "Захиалгаа баталгаажуулахын тулд доорх холбоосоор орно уу.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:07:уу",
+   "token": "уу",
+   "sentence": "Захиалгаа баталгаажуулахын тулд доорх холбоосоор орно уу.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:08:долоо",
+   "token": "Долоо",
+   "sentence": "Долоо хоногийн сүүлээр хамтдаа кино үзэх үү?",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:08:хоногийн",
+   "token": "хоногийн",
+   "sentence": "Долоо хоногийн сүүлээр хамтдаа кино үзэх үү?",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:08:сүүлээр",
+   "token": "сүүлээр",
+   "sentence": "Долоо хоногийн сүүлээр хамтдаа кино үзэх үү?",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:08:хамтдаа",
+   "token": "хамтдаа",
+   "sentence": "Долоо хоногийн сүүлээр хамтдаа кино үзэх үү?",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:08:кино",
+   "token": "кино",
+   "sentence": "Долоо хоногийн сүүлээр хамтдаа кино үзэх үү?",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:08:үзэх",
+   "token": "үзэх",
+   "sentence": "Долоо хоногийн сүүлээр хамтдаа кино үзэх үү?",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "I_EMAIL_EVERYDAY:08:үү",
+   "token": "үү",
+   "sentence": "Долоо хоногийн сүүлээр хамтдаа кино үзэх үү?",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts I_EMAIL_EVERYDAY s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  }
+ ]
+}

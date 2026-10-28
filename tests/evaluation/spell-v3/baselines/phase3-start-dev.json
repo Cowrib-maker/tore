@@ -1,0 +1,259 @@
+{
+  "schema": "tore-spell-benchmark/3",
+  "date": "2026-10-07T15:07:25.029Z",
+  "slice": "dev",
+  "documents": 9701,
+  "words": 3128378,
+  "types": 110573,
+  "engines": [
+    "PHASE_2_FROZEN",
+    "PHASE_3_CURRENT",
+    "RELEASE_CLAIM(TRUSTED+REVIEWED)"
+  ],
+  "result": {
+    "PHASE_2_FROZEN": {
+      "CULTURE(news)": {
+        "words": 285123,
+        "valid": 246286,
+        "unknown": 38821,
+        "misspelled": 16,
+        "fpCandidates": 0
+      },
+      "BUSINESS(news)": {
+        "words": 905090,
+        "valid": 827826,
+        "unknown": 77202,
+        "misspelled": 62,
+        "fpCandidates": 10
+      },
+      "HEALTH(news)": {
+        "words": 80793,
+        "valid": 71460,
+        "unknown": 9328,
+        "misspelled": 5,
+        "fpCandidates": 0
+      },
+      "LEGAL(news)": {
+        "words": 96660,
+        "valid": 86709,
+        "unknown": 9941,
+        "misspelled": 10,
+        "fpCandidates": 0
+      },
+      "GOVERNMENT(news)": {
+        "words": 1138088,
+        "valid": 1042309,
+        "unknown": 95740,
+        "misspelled": 39,
+        "fpCandidates": 0
+      },
+      "SPORT(news)": {
+        "words": 468557,
+        "valid": 374676,
+        "unknown": 93860,
+        "misspelled": 21,
+        "fpCandidates": 3
+      },
+      "TECH(news)": {
+        "words": 153354,
+        "valid": 133379,
+        "unknown": 19961,
+        "misspelled": 14,
+        "fpCandidates": 0
+      },
+      "EDUCATION(news)": {
+        "words": 713,
+        "valid": 655,
+        "unknown": 58,
+        "misspelled": 0,
+        "fpCandidates": 0
+      },
+      "ALL": {
+        "words": 3128378,
+        "valid": 2783300,
+        "unknown": 344911,
+        "misspelled": 167,
+        "fpCandidates": 13
+      }
+    },
+    "PHASE_3_CURRENT": {
+      "CULTURE(news)": {
+        "words": 285123,
+        "valid": 246286,
+        "unknown": 38821,
+        "misspelled": 16,
+        "fpCandidates": 0
+      },
+      "BUSINESS(news)": {
+        "words": 905090,
+        "valid": 827826,
+        "unknown": 77202,
+        "misspelled": 62,
+        "fpCandidates": 10
+      },
+      "HEALTH(news)": {
+        "words": 80793,
+        "valid": 71460,
+        "unknown": 9328,
+        "misspelled": 5,
+        "fpCandidates": 0
+      },
+      "LEGAL(news)": {
+        "words": 96660,
+        "valid": 86709,
+        "unknown": 9941,
+        "misspelled": 10,
+        "fpCandidates": 0
+      },
+      "GOVERNMENT(news)": {
+        "words": 1138088,
+        "valid": 1042309,
+        "unknown": 95740,
+        "misspelled": 39,
+        "fpCandidates": 0
+      },
+      "SPORT(news)": {
+        "words": 468557,
+        "valid": 374676,
+        "unknown": 93860,
+        "misspelled": 21,
+        "fpCandidates": 3
+      },
+      "TECH(news)": {
+        "words": 153354,
+        "valid": 133379,
+        "unknown": 19961,
+        "misspelled": 14,
+        "fpCandidates": 0
+      },
+      "EDUCATION(news)": {
+        "words": 713,
+        "valid": 655,
+        "unknown": 58,
+        "misspelled": 0,
+        "fpCandidates": 0
+      },
+      "ALL": {
+        "words": 3128378,
+        "valid": 2783300,
+        "unknown": 344911,
+        "misspelled": 167,
+        "fpCandidates": 13
+      }
+    },
+    "RELEASE_CLAIM(TRUSTED+REVIEWED)": {
+      "CULTURE(news)": {
+        "words": 285123,
+        "valid": 86535,
+        "unknown": 198588,
+        "misspelled": 0,
+        "fpCandidates": 0
+      },
+      "BUSINESS(news)": {
+        "words": 905090,
+        "valid": 293665,
+        "unknown": 611404,
+        "misspelled": 21,
+        "fpCandidates": 0
+      },
+      "HEALTH(news)": {
+        "words": 80793,
+        "valid": 27207,
+        "unknown": 53584,
+        "misspelled": 2,
+        "fpCandidates": 0
+      },
+      "LEGAL(news)": {
+        "words": 96660,
+        "valid": 39587,
+        "unknown": 57066,
+        "misspelled": 7,
+        "fpCandidates": 0
+      },
+      "GOVERNMENT(news)": {
+        "words": 1138088,
+        "valid": 414258,
+        "unknown": 723819,
+        "misspelled": 11,
+        "fpCandidates": 0
+      },
+      "SPORT(news)": {
+        "words": 468557,
+        "valid": 130121,
+        "unknown": 338432,
+        "misspelled": 4,
+        "fpCandidates": 0
+      },
+      "TECH(news)": {
+        "words": 153354,
+        "valid": 46985,
+        "unknown": 106364,
+        "misspelled": 5,
+        "fpCandidates": 0
+      },
+      "EDUCATION(news)": {
+        "words": 713,
+        "valid": 322,
+        "unknown": 391,
+        "misspelled": 0,
+        "fpCandidates": 0
+      },
+      "ALL": {
+        "words": 3128378,
+        "valid": 1038680,
+        "unknown": 2089648,
+        "misspelled": 50,
+        "fpCandidates": 0
+      }
+    }
+  },
+  "unknownTaxonomy": {
+    "MISSING_LEMMA": {
+      "tokens": 118029,
+      "types": 23310
+    },
+    "PROPER_NAME": {
+      "tokens": 67058,
+      "types": 12648
+    },
+    "MISSING_INFLECTION": {
+      "tokens": 42901,
+      "types": 4970
+    },
+    "TRUE_UNKNOWN": {
+      "tokens": 45210,
+      "types": 20790
+    },
+    "COMPOUND": {
+      "tokens": 36356,
+      "types": 6056
+    },
+    "LOANWORD": {
+      "tokens": 6881,
+      "types": 776
+    },
+    "DERIVATIONAL_FORM": {
+      "tokens": 21071,
+      "types": 2456
+    },
+    "TECHNICAL_TERM": {
+      "tokens": 397,
+      "types": 176
+    },
+    "TOKENIZER_FAILURE": {
+      "tokens": 7111,
+      "types": 117
+    }
+  },
+  "unknownTokens": 345014,
+  "perf": {
+    "wordP50Ms": 0.013732000006712042,
+    "wordP95Ms": 0.08542399998987094,
+    "wordP99Ms": 0.13612900000589434,
+    "doc20kMedianMs": 43.69292899999709,
+    "doc20kMaxMs": 48.93461099998967,
+    "engineHeapDeltaMb": 9.213531494140625,
+    "coldStartMs": 33.102859999999055
+  },
+  "note": "aggregates only; no corpus text"
+}

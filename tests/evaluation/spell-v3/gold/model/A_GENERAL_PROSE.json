@@ -1,0 +1,2337 @@
+{
+ "schema": "tore-spell-gold/1",
+ "datasetVersion": "spell-gold-v3.0",
+ "set": "A_GENERAL_PROSE",
+ "provenanceDir": "model",
+ "note": "MODEL_ADJUDICATED candidates: authored and judged by the AI assistant. NOT native-reviewed; NOT gold.",
+ "items": [
+  {
+   "id": "A_GENERAL_PROSE:01:өглөө",
+   "token": "Өглөө",
+   "sentence": "Өглөө эрт босоод би гэрийнхээ ойролцоох цэцэрлэгт хүрээлэнгээр алхлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:01:эрт",
+   "token": "эрт",
+   "sentence": "Өглөө эрт босоод би гэрийнхээ ойролцоох цэцэрлэгт хүрээлэнгээр алхлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:01:босоод",
+   "token": "босоод",
+   "sentence": "Өглөө эрт босоод би гэрийнхээ ойролцоох цэцэрлэгт хүрээлэнгээр алхлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:01:би",
+   "token": "би",
+   "sentence": "Өглөө эрт босоод би гэрийнхээ ойролцоох цэцэрлэгт хүрээлэнгээр алхлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:01:гэрийнхээ",
+   "token": "гэрийнхээ",
+   "sentence": "Өглөө эрт босоод би гэрийнхээ ойролцоох цэцэрлэгт хүрээлэнгээр алхлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:01:ойролцоох",
+   "token": "ойролцоох",
+   "sentence": "Өглөө эрт босоод би гэрийнхээ ойролцоох цэцэрлэгт хүрээлэнгээр алхлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:01:цэцэрлэгт",
+   "token": "цэцэрлэгт",
+   "sentence": "Өглөө эрт босоод би гэрийнхээ ойролцоох цэцэрлэгт хүрээлэнгээр алхлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:01:хүрээлэнгээр",
+   "token": "хүрээлэнгээр",
+   "sentence": "Өглөө эрт босоод би гэрийнхээ ойролцоох цэцэрлэгт хүрээлэнгээр алхлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:01:алхлаа",
+   "token": "алхлаа",
+   "sentence": "Өглөө эрт босоод би гэрийнхээ ойролцоох цэцэрлэгт хүрээлэнгээр алхлаа.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s1",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:02:намрын",
+   "token": "Намрын",
+   "sentence": "Намрын салхи навчсыг хөдөлгөж, замын хажуугаар хүүхдүүд дугуй унан өнгөрч байв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:02:салхи",
+   "token": "салхи",
+   "sentence": "Намрын салхи навчсыг хөдөлгөж, замын хажуугаар хүүхдүүд дугуй унан өнгөрч байв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:02:навчсыг",
+   "token": "навчсыг",
+   "sentence": "Намрын салхи навчсыг хөдөлгөж, замын хажуугаар хүүхдүүд дугуй унан өнгөрч байв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:02:хөдөлгөж",
+   "token": "хөдөлгөж",
+   "sentence": "Намрын салхи навчсыг хөдөлгөж, замын хажуугаар хүүхдүүд дугуй унан өнгөрч байв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:02:замын",
+   "token": "замын",
+   "sentence": "Намрын салхи навчсыг хөдөлгөж, замын хажуугаар хүүхдүүд дугуй унан өнгөрч байв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:02:хажуугаар",
+   "token": "хажуугаар",
+   "sentence": "Намрын салхи навчсыг хөдөлгөж, замын хажуугаар хүүхдүүд дугуй унан өнгөрч байв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:02:хүүхдүүд",
+   "token": "хүүхдүүд",
+   "sentence": "Намрын салхи навчсыг хөдөлгөж, замын хажуугаар хүүхдүүд дугуй унан өнгөрч байв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:02:дугуй",
+   "token": "дугуй",
+   "sentence": "Намрын салхи навчсыг хөдөлгөж, замын хажуугаар хүүхдүүд дугуй унан өнгөрч байв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:02:унан",
+   "token": "унан",
+   "sentence": "Намрын салхи навчсыг хөдөлгөж, замын хажуугаар хүүхдүүд дугуй унан өнгөрч байв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:02:өнгөрч",
+   "token": "өнгөрч",
+   "sentence": "Намрын салхи навчсыг хөдөлгөж, замын хажуугаар хүүхдүүд дугуй унан өнгөрч байв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:02:байв",
+   "token": "байв",
+   "sentence": "Намрын салхи навчсыг хөдөлгөж, замын хажуугаар хүүхдүүд дугуй унан өнгөрч байв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s2",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:03:өвөө",
+   "token": "Өвөө",
+   "sentence": "Өвөө минь өвлийн урт шөнө бидэнд эртний үлгэр ярьж өгдөг байсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:03:минь",
+   "token": "минь",
+   "sentence": "Өвөө минь өвлийн урт шөнө бидэнд эртний үлгэр ярьж өгдөг байсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:03:өвлийн",
+   "token": "өвлийн",
+   "sentence": "Өвөө минь өвлийн урт шөнө бидэнд эртний үлгэр ярьж өгдөг байсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:03:урт",
+   "token": "урт",
+   "sentence": "Өвөө минь өвлийн урт шөнө бидэнд эртний үлгэр ярьж өгдөг байсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:03:шөнө",
+   "token": "шөнө",
+   "sentence": "Өвөө минь өвлийн урт шөнө бидэнд эртний үлгэр ярьж өгдөг байсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:03:бидэнд",
+   "token": "бидэнд",
+   "sentence": "Өвөө минь өвлийн урт шөнө бидэнд эртний үлгэр ярьж өгдөг байсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:03:эртний",
+   "token": "эртний",
+   "sentence": "Өвөө минь өвлийн урт шөнө бидэнд эртний үлгэр ярьж өгдөг байсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:03:үлгэр",
+   "token": "үлгэр",
+   "sentence": "Өвөө минь өвлийн урт шөнө бидэнд эртний үлгэр ярьж өгдөг байсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:03:ярьж",
+   "token": "ярьж",
+   "sentence": "Өвөө минь өвлийн урт шөнө бидэнд эртний үлгэр ярьж өгдөг байсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:03:өгдөг",
+   "token": "өгдөг",
+   "sentence": "Өвөө минь өвлийн урт шөнө бидэнд эртний үлгэр ярьж өгдөг байсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:03:байсан",
+   "token": "байсан",
+   "sentence": "Өвөө минь өвлийн урт шөнө бидэнд эртний үлгэр ярьж өгдөг байсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s3",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:04:манай",
+   "token": "Манай",
+   "sentence": "Манай хотод шинэ номын сан нээгдэж, олон хүн ном унших дуртай болсон.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:04:хотод",
+   "token": "хотод",
+   "sentence": "Манай хотод шинэ номын сан нээгдэж, олон хүн ном унших дуртай болсон.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:04:шинэ",
+   "token": "шинэ",
+   "sentence": "Манай хотод шинэ номын сан нээгдэж, олон хүн ном унших дуртай болсон.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:04:номын",
+   "token": "номын",
+   "sentence": "Манай хотод шинэ номын сан нээгдэж, олон хүн ном унших дуртай болсон.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:04:сан",
+   "token": "сан",
+   "sentence": "Манай хотод шинэ номын сан нээгдэж, олон хүн ном унших дуртай болсон.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:04:нээгдэж",
+   "token": "нээгдэж",
+   "sentence": "Манай хотод шинэ номын сан нээгдэж, олон хүн ном унших дуртай болсон.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:04:олон",
+   "token": "олон",
+   "sentence": "Манай хотод шинэ номын сан нээгдэж, олон хүн ном унших дуртай болсон.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:04:хүн",
+   "token": "хүн",
+   "sentence": "Манай хотод шинэ номын сан нээгдэж, олон хүн ном унших дуртай болсон.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:04:ном",
+   "token": "ном",
+   "sentence": "Манай хотод шинэ номын сан нээгдэж, олон хүн ном унших дуртай болсон.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:04:унших",
+   "token": "унших",
+   "sentence": "Манай хотод шинэ номын сан нээгдэж, олон хүн ном унших дуртай болсон.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:04:дуртай",
+   "token": "дуртай",
+   "sentence": "Манай хотод шинэ номын сан нээгдэж, олон хүн ном унших дуртай болсон.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:04:болсон",
+   "token": "болсон",
+   "sentence": "Манай хотод шинэ номын сан нээгдэж, олон хүн ном унших дуртай болсон.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s4",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:05:тэр",
+   "token": "Тэр",
+   "sentence": "Тэр зуны амралтаараа ээжтэйгээ хамт хөдөө очиж, мал маллахад тусалсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:05:зуны",
+   "token": "зуны",
+   "sentence": "Тэр зуны амралтаараа ээжтэйгээ хамт хөдөө очиж, мал маллахад тусалсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:05:амралтаараа",
+   "token": "амралтаараа",
+   "sentence": "Тэр зуны амралтаараа ээжтэйгээ хамт хөдөө очиж, мал маллахад тусалсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:05:ээжтэйгээ",
+   "token": "ээжтэйгээ",
+   "sentence": "Тэр зуны амралтаараа ээжтэйгээ хамт хөдөө очиж, мал маллахад тусалсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:05:хамт",
+   "token": "хамт",
+   "sentence": "Тэр зуны амралтаараа ээжтэйгээ хамт хөдөө очиж, мал маллахад тусалсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:05:хөдөө",
+   "token": "хөдөө",
+   "sentence": "Тэр зуны амралтаараа ээжтэйгээ хамт хөдөө очиж, мал маллахад тусалсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:05:очиж",
+   "token": "очиж",
+   "sentence": "Тэр зуны амралтаараа ээжтэйгээ хамт хөдөө очиж, мал маллахад тусалсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:05:мал",
+   "token": "мал",
+   "sentence": "Тэр зуны амралтаараа ээжтэйгээ хамт хөдөө очиж, мал маллахад тусалсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:05:маллахад",
+   "token": "маллахад",
+   "sentence": "Тэр зуны амралтаараа ээжтэйгээ хамт хөдөө очиж, мал маллахад тусалсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:05:тусалсан",
+   "token": "тусалсан",
+   "sentence": "Тэр зуны амралтаараа ээжтэйгээ хамт хөдөө очиж, мал маллахад тусалсан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s5",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:06:гэр",
+   "token": "Гэр",
+   "sentence": "Гэр бүлийнхэн нэг ширээний ард цугларч, хамт оройн хоол идлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:06:бүлийнхэн",
+   "token": "бүлийнхэн",
+   "sentence": "Гэр бүлийнхэн нэг ширээний ард цугларч, хамт оройн хоол идлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:06:нэг",
+   "token": "нэг",
+   "sentence": "Гэр бүлийнхэн нэг ширээний ард цугларч, хамт оройн хоол идлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:06:ширээний",
+   "token": "ширээний",
+   "sentence": "Гэр бүлийнхэн нэг ширээний ард цугларч, хамт оройн хоол идлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:06:ард",
+   "token": "ард",
+   "sentence": "Гэр бүлийнхэн нэг ширээний ард цугларч, хамт оройн хоол идлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:06:цугларч",
+   "token": "цугларч",
+   "sentence": "Гэр бүлийнхэн нэг ширээний ард цугларч, хамт оройн хоол идлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:06:хамт",
+   "token": "хамт",
+   "sentence": "Гэр бүлийнхэн нэг ширээний ард цугларч, хамт оройн хоол идлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:06:оройн",
+   "token": "оройн",
+   "sentence": "Гэр бүлийнхэн нэг ширээний ард цугларч, хамт оройн хоол идлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:06:хоол",
+   "token": "хоол",
+   "sentence": "Гэр бүлийнхэн нэг ширээний ард цугларч, хамт оройн хоол идлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:06:идлээ",
+   "token": "идлээ",
+   "sentence": "Гэр бүлийнхэн нэг ширээний ард цугларч, хамт оройн хоол идлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s6",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:07:борооны",
+   "token": "Борооны",
+   "sentence": "Борооны дараа тэнгэрт солонго гарч, бүгд баярлан ширтэцгээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:07:дараа",
+   "token": "дараа",
+   "sentence": "Борооны дараа тэнгэрт солонго гарч, бүгд баярлан ширтэцгээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:07:тэнгэрт",
+   "token": "тэнгэрт",
+   "sentence": "Борооны дараа тэнгэрт солонго гарч, бүгд баярлан ширтэцгээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:07:солонго",
+   "token": "солонго",
+   "sentence": "Борооны дараа тэнгэрт солонго гарч, бүгд баярлан ширтэцгээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:07:гарч",
+   "token": "гарч",
+   "sentence": "Борооны дараа тэнгэрт солонго гарч, бүгд баярлан ширтэцгээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:07:бүгд",
+   "token": "бүгд",
+   "sentence": "Борооны дараа тэнгэрт солонго гарч, бүгд баярлан ширтэцгээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:07:баярлан",
+   "token": "баярлан",
+   "sentence": "Борооны дараа тэнгэрт солонго гарч, бүгд баярлан ширтэцгээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:07:ширтэцгээв",
+   "token": "ширтэцгээв",
+   "sentence": "Борооны дараа тэнгэрт солонго гарч, бүгд баярлан ширтэцгээв.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s7",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:08:найз",
+   "token": "Найз",
+   "sentence": "Найз маань надад гэнэт утасдаж, маргааш уулзахыг санал болгов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:08:маань",
+   "token": "маань",
+   "sentence": "Найз маань надад гэнэт утасдаж, маргааш уулзахыг санал болгов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:08:надад",
+   "token": "надад",
+   "sentence": "Найз маань надад гэнэт утасдаж, маргааш уулзахыг санал болгов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:08:гэнэт",
+   "token": "гэнэт",
+   "sentence": "Найз маань надад гэнэт утасдаж, маргааш уулзахыг санал болгов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:08:утасдаж",
+   "token": "утасдаж",
+   "sentence": "Найз маань надад гэнэт утасдаж, маргааш уулзахыг санал болгов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:08:маргааш",
+   "token": "маргааш",
+   "sentence": "Найз маань надад гэнэт утасдаж, маргааш уулзахыг санал болгов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:08:уулзахыг",
+   "token": "уулзахыг",
+   "sentence": "Найз маань надад гэнэт утасдаж, маргааш уулзахыг санал болгов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:08:санал",
+   "token": "санал",
+   "sentence": "Найз маань надад гэнэт утасдаж, маргааш уулзахыг санал болгов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:08:болгов",
+   "token": "болгов",
+   "sentence": "Найз маань надад гэнэт утасдаж, маргааш уулзахыг санал болгов.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s8",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:09:тэд",
+   "token": "Тэд",
+   "sentence": "Тэд хуучин дурсамжаа ярьж, удаан инээлдэж суусан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s9",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:09:хуучин",
+   "token": "хуучин",
+   "sentence": "Тэд хуучин дурсамжаа ярьж, удаан инээлдэж суусан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s9",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:09:дурсамжаа",
+   "token": "дурсамжаа",
+   "sentence": "Тэд хуучин дурсамжаа ярьж, удаан инээлдэж суусан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s9",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:09:ярьж",
+   "token": "ярьж",
+   "sentence": "Тэд хуучин дурсамжаа ярьж, удаан инээлдэж суусан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s9",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:09:удаан",
+   "token": "удаан",
+   "sentence": "Тэд хуучин дурсамжаа ярьж, удаан инээлдэж суусан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s9",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:09:инээлдэж",
+   "token": "инээлдэж",
+   "sentence": "Тэд хуучин дурсамжаа ярьж, удаан инээлдэж суусан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s9",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:09:суусан",
+   "token": "суусан",
+   "sentence": "Тэд хуучин дурсамжаа ярьж, удаан инээлдэж суусан.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s9",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:10:энэ",
+   "token": "Энэ",
+   "sentence": "Энэ жил хаврын цас оройтож хайлсан тул бэлчээр удаан ногооров.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:10:жил",
+   "token": "жил",
+   "sentence": "Энэ жил хаврын цас оройтож хайлсан тул бэлчээр удаан ногооров.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:10:хаврын",
+   "token": "хаврын",
+   "sentence": "Энэ жил хаврын цас оройтож хайлсан тул бэлчээр удаан ногооров.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:10:цас",
+   "token": "цас",
+   "sentence": "Энэ жил хаврын цас оройтож хайлсан тул бэлчээр удаан ногооров.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:10:оройтож",
+   "token": "оройтож",
+   "sentence": "Энэ жил хаврын цас оройтож хайлсан тул бэлчээр удаан ногооров.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:10:хайлсан",
+   "token": "хайлсан",
+   "sentence": "Энэ жил хаврын цас оройтож хайлсан тул бэлчээр удаан ногооров.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:10:тул",
+   "token": "тул",
+   "sentence": "Энэ жил хаврын цас оройтож хайлсан тул бэлчээр удаан ногооров.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:10:бэлчээр",
+   "token": "бэлчээр",
+   "sentence": "Энэ жил хаврын цас оройтож хайлсан тул бэлчээр удаан ногооров.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:10:удаан",
+   "token": "удаан",
+   "sentence": "Энэ жил хаврын цас оройтож хайлсан тул бэлчээр удаан ногооров.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "VALID",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 1,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "A_GENERAL_PROSE:10:ногооров",
+   "token": "ногооров",
+   "sentence": "Энэ жил хаврын цас оройтож хайлсан тул бэлчээр удаан ногооров.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "UNKNOWN",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 50,
+   "source": "authoring/passages.ts A_GENERAL_PROSE s10",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "assistant-authored passage; intended to be correctly spelled",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  }
+ ]
+}

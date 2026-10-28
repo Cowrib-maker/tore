@@ -1,0 +1,717 @@
+{
+ "schema": "tore-spell-pack/1",
+ "id": "tore-vocab-academic",
+ "version": "2026.10.1",
+ "layer": "ACADEMIC",
+ "language": "mn-Cyrl",
+ "coverage": "SEED",
+ "provenance": {
+  "source": "sources/vocab/academic-core.tsv",
+  "license": "TORE proprietary (original work)",
+  "redistributable": true,
+  "dataClass": "A_TORE_OWNED",
+  "sourceIds": [
+   "tore-authored-vocab-2026-10"
+  ],
+  "reviewStatus": "PENDING_NATIVE_REVIEW",
+  "notes": "AI-drafted ACADEMIC vocabulary (academic-core.tsv); every entry is PENDING_NATIVE_REVIEW. SEED: absence proves nothing."
+ },
+ "entries": [
+  {
+   "w": "авиа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ажил",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ангилал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "антропологи",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "арга",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "арга",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "аргачлал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "археологи",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "биологи",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бичих",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бичихийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бүтэц",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бүтээл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "геологи",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "график",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "диаграмм",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "дипломын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "диссертаци",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "дундаж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "дүгнэлт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "дүн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "дүн",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "дүнгийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "дүрэм",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "загвар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "засаг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зохиолын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зөв",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зураг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зүй",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зүйн",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "иш",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ишлэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "категори",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "лаборатори",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "лабораторийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "логик",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "магадлал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "магадлалын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "математик",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "маяг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "мэдээлэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "найруулга",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нийгэм",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ном",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нотолгоо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нэгдсэн",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ойлголт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "онол",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "онолын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "онолын",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "өгүүлбэр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "өгүүлэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "практик",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "практик",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "сан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "систем",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "социологи",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "статистик",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "статистик",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "статистикийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "судалгаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "судалгааны",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "судлаач",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "судлаачид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "судлал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "сурвалж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "сэтгэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "таамаг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "таамаглал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тархалт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "татах",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тезис",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тогтолцоо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тогтолцооны",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тодорхойлолт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "томьёо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тоног",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тоон",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тооцоо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тооцоолол",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тохиолдол",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "төхөөрөмж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "туршилт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "түүвэр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "түүвэрлэлт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "түүх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тэгшитгэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "удиртгал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "уран",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "утга",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ухаан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ухааны",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ухагдахуун",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үгийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үндсэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үндэслэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үндэслэлтэй",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "физик",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "философи",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хавсралт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хазайлт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хамаарал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хамаарлын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "харьцуулсан",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хими",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хувьсагч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хувьсагчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хураангуй",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хууль",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хүснэгт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэв",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэлний",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэлэлцүүлэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэм",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэмжилт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэмжүүр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэмжээ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэрэгжилт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэрэглээ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэсэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хянан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "чанарын",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "шинж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "шинжилгээ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "шинжилгээний",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "шинжилгээний",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "шинжлэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "шинжлэх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "шинжлэх",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "эдийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "эксперимент",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "эрдэм",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "эрдэм",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "эх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  }
+ ]
+}

@@ -148,7 +148,12 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
     localRef.current?.scrollTo({ top: localRef.current.scrollHeight, behavior: "smooth" });
   }
 
-  useEffect(() => setActiveKey(null), [value]);
+  // Any edit closes the open suggestion menu (adjusting state while rendering, not in an effect).
+  const [seenValue, setSeenValue] = useState(value);
+  if (value !== seenValue) {
+    setSeenValue(value);
+    setActiveKey(null);
+  }
 
   const closeMenu = useCallback(() => setActiveKey(null), []);
 
@@ -222,7 +227,10 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
     const index = activeIndex;
     return {
       getBoundingClientRect: () => spanRefs.current.get(index)?.getBoundingClientRect() ?? new DOMRect(),
-      contextElement: localRef.current ?? undefined,
+      // A getter, so the ref is read when floating-ui asks for it, not while rendering.
+      get contextElement() {
+        return localRef.current ?? undefined;
+      },
     };
   }, [activeIndex]);
 

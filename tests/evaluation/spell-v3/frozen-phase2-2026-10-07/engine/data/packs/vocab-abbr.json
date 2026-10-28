@@ -1,0 +1,541 @@
+{
+ "schema": "tore-spell-pack/1",
+ "id": "tore-vocab-abbr",
+ "version": "2026.10.1",
+ "layer": "ABBREVIATION",
+ "language": "mn-Cyrl",
+ "coverage": "SEED",
+ "provenance": {
+  "source": "sources/vocab/abbr-core.tsv",
+  "license": "TORE proprietary (original work)",
+  "redistributable": true,
+  "dataClass": "A_TORE_OWNED",
+  "sourceIds": [
+   "tore-authored-vocab-2026-10"
+  ],
+  "reviewStatus": "PENDING_NATIVE_REVIEW",
+  "notes": "AI-drafted ABBREVIATION vocabulary (abbr-core.tsv); every entry is PENDING_NATIVE_REVIEW. SEED: absence proves nothing."
+ },
+ "entries": [
+  {
+   "w": "АРХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "АШУҮИС",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ББСБ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "БГД",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "БЗД",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "БНАСАУ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "БНД",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "БНСУ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "БӨ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "га",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "гр",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ГТ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ДГ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ДД",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ДШШ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ДЭМБ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ЕАБХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ЕПГ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ЗГХЭГ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ЗДТГ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ЗХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ИХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "кг",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "км",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "л",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "м",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "МИАТ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "мин",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "мл",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "мм",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "МУИС",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "МҮОХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "МҮХАҮТ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "МҮЭ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "НАТО",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "НД",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "НДШ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ОНӨҮГ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ОУ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ОУВС",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ӨБ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "СБД",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "сек",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "см",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "СӨХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "СХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "СХД",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тн",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ТӨ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ТӨҮГ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ТӨҮК",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "УБ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "УБХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ҮЦХ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ХААИС",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ХБНГУ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ХГ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ХӨСҮТ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ХС",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ХУД",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ХУИС",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ХХОАТ",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ЧД",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ШУТИС",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ЭМД",
+   "pos": "X",
+   "flags": [
+    "no-infl"
+   ],
+   "conf": "MEDIUM"
+  }
+ ]
+}

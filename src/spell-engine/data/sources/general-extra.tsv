@@ -1,0 +1,248 @@
+# TORE-authored seed vocabulary (word<TAB>pos<TAB>flags). Original work by the
+# TORE team; no third-party data. pos: N V ADJ NUM PRON PART X
+хот	N
+хөдөө	N
+байшин	N	hidden-g
+сүм	N
+гудамж	N
+талбай	N
+цонх	N
+хаалга	N
+ширээ	N
+сандал	N
+ном	N
+дэвтэр	N
+үзэг	N
+компани	N
+банк	N
+орон	N
+нутаг	N
+төр	N
+засаг	N
+ард	N
+түмэн	N
+эрдэм	N
+шинжлэх	V
+ухаан	N
+соёл	N
+түүх	N
+хэл	N
+монгол	N
+англи	N
+орос	N
+хятад	N
+найз	N
+ээж	N
+аав	N
+ах	N
+эгч	N
+дүү	N
+хүү	N
+охин	N
+эхнэр	N
+нөхөр	N
+өвөө	N
+эмээ	N
+багш	N
+эмч	N
+ажилтан	N
+захирал	N
+дарга	N
+менежер	N
+хурал	N
+уулзалт	N
+төсөл	N
+төлөвлөгөө	N
+тайлан	N
+гэрээсэй	X	form
+сургалтын	X	form
+цалин	N
+татвар	N
+зээл	N
+даатгал	N
+хөрөнгө	N
+эд	N
+өмч	N
+газар	N
+барилга	N
+орлого	N
+зардал	N
+хэрэглэгч	N
+худалдаа	N
+үйлдвэр	N
+эрүүл	ADJ
+мэнд	N
+өвчин	N
+эм	N
+зураг	N
+дуу	N
+хөгжим	N
+кино	N
+спорт	N
+тоглоом	N
+сонин	N
+мэдээ	N
+цахим	ADJ
+компьютер	N
+утас	N
+хэрэгсэл	N
+програм	N
+хайх	V
+сонгох	V
+нэмэх	V
+хасах	V
+хадгалах	V
+нээх	V
+хаах	V
+илгээх	V
+хүлээх	V
+дуудах	V
+асуух	V
+хариулах	V
+сонсох	V
+ойлгох	V
+мэдрэх	V
+хүсэх	V
+гуйх	V
+өгөх	V
+сурах	V
+сургах	V
+тоглох	V
+ажиллах	V
+амрах	V
+унтах	V
+босох	V
+суух	V
+зогсох	V
+алхах	V
+гүйх	V
+үзэх	V
+сонирхох	V
+туслах	V
+хамтрах	V
+төлөх	V
+худалдах	V
+зарах	V
+
+# Beta coverage batch (TORE-authored basic vocabulary: function words, numerals, common verbs/nouns).
+# Added only where the engine did not already accept the word. Non-verb content words are `form`-only
+# (exact surface form VALID, no paradigm) because their stem alternations are not yet native-reviewed.
+# Pending native review.
+аа	PART	no-infl
+аажим	PART	no-infl
+адил	PART	no-infl
+ач	N	form
+аюултай	ADJ	form
+ба	PART	no-infl
+байршуулах	V
+бас	PART	no-infl
+баталгаа	N	form
+баян	ADJ	form
+баярлалаа	PART	no-infl
+баяртай	PART	no-infl
+бодол	N	form
+бохир	ADJ	form
+буулгах	V
+бүгд	PRON	form
+бүх	PRON	form
+бөөн	N	form
+вэб	N	form
+гал	N	form
+гарах	V
+гарцаагүй	PART	no-infl
+гишүүн	N	form
+график	N	form
+гуч	NUM	form
+гэвч	PART	no-infl
+гэвэл	PART	no-infl
+дал	NUM	form
+данс	N	form
+дундаж	N	form
+дуусах	V
+дүрэм	N	form
+дөч	NUM	form
+ер	NUM	form
+жар	NUM	form
+за	PART	no-infl
+залуу	ADJ	form
+заримдаа	PART	no-infl
+захиалга	N	form
+зочин	N	form
+зуу	NUM	form
+зээ	N	form
+иймээс	PART	no-infl
+ингээд	PART	no-infl
+ихэнх	PRON	form
+иш	N	form
+магадгүй	PART	no-infl
+маш	PART	no-infl
+мянга	NUM	form
+нам	ADJ	form
+нар	PART	no-infl
+ная	NUM	form
+нийт	PART	no-infl
+ногоон	ADJ	form
+нэвтрэх	V
+нэхэмжлэх	N	form
+од	N	form
+оройхон	PART	no-infl
+программ	N	form
+сайт	N	form
+салхи	N	form
+сая	NUM	form
+саяхан	PART	no-infl
+сурагч	N	form
+тавь	NUM	form
+татах	V
+тиймээс	PART	no-infl
+тохируулах	V
+тэдгээр	PRON	form
+тэрбум	NUM	form
+төвөгтэй	ADJ	form
+төгрөг	N	form
+төлөө	PART	no-infl
+удаан	ADJ	form
+улаан	ADJ	form
+ус	N	form
+уулзах	V
+уучлаарай	PART	no-infl
+хадгалалт	N	form
+халуун	ADJ	form
+харьцах	V
+хориг	N	form
+хорь	NUM	form
+хуваах	V
+худалдагч	N	form
+хурдан	ADJ	form
+хуулах	V
+хэдий	PART	no-infl
+хэдийгээр	PART	no-infl
+хэзээд	PART	no-infl
+хэцүү	ADJ	form
+хүйтэн	ADJ	form
+хүргэх	V
+хүрэх	V
+хүснэгт	N	form
+хөрш	N	form
+цагаан	ADJ	form
+цэвэр	ADJ	form
+цэнхэр	ADJ	form
+цөөн	PRON	form
+шар	ADJ	form
+шиг	PART	no-infl
+шинэчлэл	N	form
+эрт	PART	no-infl
+эх	N	form
+эхлэх	V
+эцэг	N	form
+яам	N	form
+ядуу	ADJ	form
+ярих	V	soft-i
+үргэлж	PART	no-infl
+үргэлжлэх	V
+үүнээс	PART	no-infl
+өвгөн	N	form
+өвчтэй	ADJ	form
+өндөр	ADJ	form
+өргөдөл	N	form
+өө	PART	no-infl

@@ -1,0 +1,465 @@
+{
+ "schema": "tore-spell-gold/1",
+ "datasetVersion": "spell-gold-v3.0",
+ "set": "N_INFLECTION",
+ "provenanceDir": "model",
+ "note": "MODEL_ADJUDICATED candidates: authored and judged by the AI assistant. NOT native-reviewed; NOT gold.",
+ "items": [
+  {
+   "id": "N_INFLECTION:001:байгаагийн",
+   "token": "байгаагийн",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "long-vowel genitive",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:002:хүүгийн",
+   "token": "хүүгийн",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "long-vowel genitive",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:003:хотынх",
+   "token": "хотынх",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "genitive nominalizer",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:004:багийнхан",
+   "token": "багийнхан",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "genitive nominalizer + collective",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:005:ашиглан",
+   "token": "ашиглан",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "-н converb",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:006:оруулан",
+   "token": "оруулан",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "-н converb",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:007:байдаггүй",
+   "token": "байдаггүй",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "habitual + гүй",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:008:байдгийг",
+   "token": "байдгийг",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "habitual elision + acc",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:009:болсныг",
+   "token": "болсныг",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "participle elision + acc",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:010:зохиолчдын",
+   "token": "зохиолчдын",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "agent plural stem",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:011:үзэсгэлэнгийн",
+   "token": "үзэсгэлэнгийн",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "hidden-г",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:012:төгрөгөөр",
+   "token": "төгрөгөөр",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "instrumental",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:013:байдагийг",
+   "token": "байдагийг",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 40,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "un-elided participle: not a standard form",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:014:хаалгагийн",
+   "token": "хаалгагийн",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 40,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "short vowel stem never takes гийн",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:015:хотийнх",
+   "token": "хотийнх",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 40,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "wrong harmony inside nominalized stem",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:016:усны",
+   "token": "усны",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "ус→усны",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:017:гишүүний",
+   "token": "гишүүний",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "гишүүн→гишүүний",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:018:эцгийн",
+   "token": "эцгийн",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "эцэг→эцгийн",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "N_INFLECTION:019:эхийн",
+   "token": "эхийн",
+   "sentenceOrigin": "NONE",
+   "category": "INFLECTION",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts N_INFLECTION",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "эх→эхийн",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  }
+ ]
+}

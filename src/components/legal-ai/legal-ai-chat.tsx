@@ -8,6 +8,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
 import Link from "next/link";
 import {
@@ -612,11 +613,13 @@ export function LegalAiChat({
         throw new Error("empty stream body");
       }
 
+      let sawFinalFrame = false;
       for await (const frame of parseSseStream(response.body)) {
         if (frame.event === "delta") {
           const { text: delta } = frame.data as { text: string };
           if (delta) appendStreamingDelta(delta);
         } else if (frame.event === "done") {
+          sawFinalFrame = true;
           const payload = frame.data as {
             conversationId?: string;
             message?: { id?: string; content?: string; citations?: unknown };
@@ -662,6 +665,13 @@ export function LegalAiChat({
           }
           throw new Error(interpreted.type === "error" ? interpreted.message : "stream error");
         }
+      }
+      if (!sawFinalFrame) {
+        // The body ended without a done/error frame (connection closed mid-answer): not a completed turn, so the catch below
+        // removes the partial bubble and shows the retry message instead of leaving a truncated, citation-less answer as final.
+        // (A stream cut because the user pressed Stop is the quiet abort path, not an error.)
+        if (abortRef.current?.signal.aborted) throw new DOMException("Aborted", "AbortError");
+        throw new Error("stream ended without a final frame");
       }
     } catch (err) {
       removeStreamingPlaceholder();
@@ -1225,8 +1235,12 @@ function MessageBubble({ message }: { message: Message }) {
  * mounted so this never disagrees with the server-rendered markup. */
 function useLogoTone(): "on-light" | "on-dark" {
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  // false while server-rendering / hydrating, true on the client afterwards.
+  const mounted = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  );
   return mounted && resolvedTheme === "dark" ? "on-dark" : "on-light";
 }
 

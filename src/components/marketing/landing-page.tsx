@@ -70,6 +70,7 @@ export function LandingPage({
             organizations: home.statsOrganizations,
           }}
           productHrefs={productHrefs}
+          spell={dict.spell.home}
         />
         <LandingIntro home={home} />
         <LandingMarketplace t={landing} />

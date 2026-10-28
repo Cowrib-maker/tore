@@ -10,12 +10,14 @@ import { assertLawyerAiOperation } from "@/application/use-cases/entitlements/as
 import { requireActiveLawyerEntitlement } from "@/application/use-cases/entitlements/ensure-lawyer-solo-subscription";
 import { getLawyerBillingSnapshot } from "@/application/use-cases/entitlements/get-lawyer-billing-snapshot";
 import { DEFAULT_SESSION_PROTECTION_POLICY } from "@/domain/constants/session-protection-policy";
+import { isInvoicePaymentConfirmed } from "@/domain/services/invoice-payment-confirmation";
 import {
   CITIZEN_BASIC_PLAN,
   CITIZEN_PLUS_PLAN,
   SOLO_PLAN,
 } from "@/domain/constants/subscription-plans";
 import {
+  BILLING_PROVIDER_MANUAL_QR,
   BILLING_PROVIDER_QPAY,
   EntitlementFeature,
   InvoiceStatus,
@@ -186,6 +188,129 @@ describe("QPay-activated SOLO subscriptions", () => {
     expect(qpay.created[0]?.amountMnt).toBe(49_000);
     expect(qpay.created[0]?.callbackUrl).toBe(CALLBACK_URL);
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it("repeated clicks / refreshes reuse the open invoice: one invoice, one QPay request, still unpaid and no entitlement", async () => {
+    const deps = billingDeps();
+    const first = await createSoloCheckout(lawyer, deps, now);
+    const second = await createSoloCheckout(lawyer, deps, now);
+    const third = await createSoloCheckout(lawyer, deps, now);
+    expect(second.invoiceId).toBe(first.invoiceId);
+    expect(third.invoiceId).toBe(first.invoiceId);
+    expect(qpay.created).toHaveLength(1);
+    expect((await invoices.findById(first.invoiceId))?.status).toBe(InvoiceStatus.PENDING);
+    // Creating or re-opening an invoice never grants access by itself.
+    expect(await subscriptions.findLatestOwnedByUserId(lawyer.userId, SOLO_PLAN.code)).toBeNull();
+  });
+
+  describe("payment confirmation contract of the invoice status endpoint (what the UI may treat as paid)", () => {
+    it("unverified payment: an unpaid QPay invoice reports paid:false and grants nothing", async () => {
+      const view = await createSoloCheckout(lawyer, billingDeps(), now);
+      qpay.nextCheck = unpaidCheck();
+      const status = await getOwnInvoicePaymentStatus(lawyer, view.invoiceId, billingDeps(), now);
+      expect(status.paid).toBe(false);
+      expect(status.invoiceStatus).toBe(InvoiceStatus.PENDING);
+      expect(isInvoicePaymentConfirmed(status)).toBe(false);
+      expect(await subscriptions.findLatestOwnedByUserId(lawyer.userId, SOLO_PLAN.code)).toBeNull();
+      await expect(requireActiveLawyerEntitlement(lawyer, aiDeps(), now)).rejects.toMatchObject({ code: "BILLING_REQUIRED" });
+    });
+
+    it("a payment of the wrong amount is not confirmed and activates nothing", async () => {
+      const view = await createSoloCheckout(lawyer, billingDeps(), now);
+      qpay.nextCheck = paidCheck("pay-short", 1_000);
+      const status = await getOwnInvoicePaymentStatus(lawyer, view.invoiceId, billingDeps(), now);
+      expect(status.paid).toBe(false);
+      expect(isInvoicePaymentConfirmed(status)).toBe(false);
+      expect(await subscriptions.findLatestOwnedByUserId(lawyer.userId, SOLO_PLAN.code)).toBeNull();
+    });
+
+    it("QPay renewal that is still unpaid: paid:false (the unpaid path reports no subscription, so subscriptionStatus is PENDING)", async () => {
+      const first = await createSoloCheckout(lawyer, billingDeps(), now);
+      qpay.nextCheck = paidCheck("pay-first");
+      await processQpayInvoicePayment(`qpay-${first.invoiceId}`, billingDeps(), now);
+      qpay.createResult = { providerInvoiceId: "qpay-renew-2", qrText: "qr", qrImage: "img", shortUrl: null, urls: [] };
+      const renewal = await createSoloCheckout(lawyer, billingDeps(), later);
+      qpay.nextCheck = unpaidCheck();
+      const status = await getOwnInvoicePaymentStatus(lawyer, renewal.invoiceId, billingDeps(), later);
+      expect(status.invoiceStatus).toBe(InvoiceStatus.PENDING);
+      expect(status.paid).toBe(false);
+      expect(isInvoicePaymentConfirmed(status)).toBe(false);
+    });
+
+    it.each([InvoiceStatus.PENDING, InvoiceStatus.AWAITING_VERIFICATION])(
+      "REGRESSION: a %s manual (QR) renewal invoice while the account subscription is ACTIVE is paid:false even though subscriptionStatus is ACTIVE",
+      async (invoiceStatus) => {
+        // Existing, genuinely paid and active subscription.
+        const first = await createSoloCheckout(lawyer, billingDeps(), now);
+        qpay.nextCheck = paidCheck("pay-first");
+        await processQpayInvoicePayment(`qpay-${first.invoiceId}`, billingDeps(), now);
+        // A second, manual invoice for the same plan that nobody has verified.
+        const manual = await invoices.create({
+          userId: lawyer.userId,
+          planCode: SubscriptionPlanCode.SOLO,
+          amountMnt: SOLO_PLAN.priceMnt,
+          currency: "MNT",
+          provider: BILLING_PROVIDER_MANUAL_QR,
+          status: InvoiceStatus.PENDING,
+          expiresAt: new Date(later.getTime() + 60 * 60 * 1000),
+          paymentCode: "MAN-0001",
+        });
+        if (invoiceStatus !== InvoiceStatus.PENDING) await invoices.updateStatus(manual.id, invoiceStatus);
+
+        const status = await getOwnInvoicePaymentStatus(lawyer, manual.id, billingDeps(), later);
+        // The account-level field is ACTIVE (from the first, real payment) ...
+        expect(status.subscriptionStatus).toBe("ACTIVE");
+        // ... but THIS invoice is unverified: the server says so, and the single client rule must follow it.
+        expect(status.invoiceStatus).toBe(invoiceStatus);
+        expect(status.paid).toBe(false);
+        expect(isInvoicePaymentConfirmed(status)).toBe(false);
+        // The old heuristic (paid || subscriptionStatus === "ACTIVE") would have said "paid" here.
+        expect(status.paid === true || status.subscriptionStatus === "ACTIVE").toBe(true);
+      },
+    );
+
+    it("verified payment: paid:true, invoice PAID, subscription ACTIVE, entitlement granted", async () => {
+      const view = await createSoloCheckout(lawyer, billingDeps(), now);
+      qpay.nextCheck = paidCheck("pay-ok");
+      const status = await getOwnInvoicePaymentStatus(lawyer, view.invoiceId, billingDeps(), now);
+      expect(status.paid).toBe(true);
+      expect(status.invoiceStatus).toBe(InvoiceStatus.PAID);
+      expect(status.subscriptionStatus).toBe("ACTIVE");
+      expect(isInvoicePaymentConfirmed(status)).toBe(true);
+      const access = await requireActiveLawyerEntitlement(lawyer, aiDeps(), now);
+      expect(access.subscription.status).toBe(SubscriptionStatus.ACTIVE);
+    });
+
+    it("repeated callbacks and repeated status polls after payment are idempotent: one transaction, unchanged period, still paid", async () => {
+      const view = await createSoloCheckout(lawyer, billingDeps(), now);
+      qpay.nextCheck = paidCheck("pay-once");
+      const first = await processQpayInvoicePayment(`qpay-${view.invoiceId}`, billingDeps(), now);
+      const periodEnd = first.subscription!.currentPeriodEnd;
+      for (let i = 0; i < 3; i += 1) {
+        const dup = await processQpayInvoicePayment(`qpay-${view.invoiceId}`, billingDeps(), later);
+        expect(dup.alreadyProcessed).toBe(true);
+      }
+      for (let i = 0; i < 3; i += 1) {
+        const status = await getOwnInvoicePaymentStatus(lawyer, view.invoiceId, billingDeps(), later);
+        expect(status.paid).toBe(true);
+        expect(status.expiresAt).toBe(periodEnd.toISOString());
+      }
+      const subscription = await subscriptions.findLatestOwnedByUserId(lawyer.userId, SOLO_PLAN.code);
+      expect(subscription?.currentPeriodEnd).toEqual(periodEnd);
+      expect((await invoices.findById(view.invoiceId))?.status).toBe(InvoiceStatus.PAID);
+      expect((await payments.findByInvoiceId(view.invoiceId))?.providerPaymentId).toBe("pay-once");
+    });
+
+    it("an invoice that is paid but whose plan is no longer active is not reported as paid access", async () => {
+      const view = await createSoloCheckout(lawyer, billingDeps(), now);
+      qpay.nextCheck = paidCheck("pay-old");
+      await processQpayInvoicePayment(`qpay-${view.invoiceId}`, billingDeps(), now);
+      const afterExpiry = new Date(addUtcCalendarMonth(now).getTime() + 24 * 60 * 60 * 1000);
+      const status = await getOwnInvoicePaymentStatus(lawyer, view.invoiceId, billingDeps(), afterExpiry);
+      expect(status.invoiceStatus).toBe(InvoiceStatus.PAID);
+      expect(status.paid).toBe(false);
+      expect(isInvoicePaymentConfirmed(status)).toBe(false);
+    });
   });
 
   it("handles two concurrent checkout calls for the same lawyer without creating an unbounded number of invoices", async () => {

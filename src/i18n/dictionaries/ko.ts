@@ -1,4 +1,5 @@
 import type { Dictionary } from "@/i18n/types";
+import { spellEn } from "@/i18n/dictionaries/spell";
 import { marketplaceKo } from "@/i18n/dictionaries/marketplace/ko";
 
 /**
@@ -162,6 +163,7 @@ export const ko: Dictionary = {
     footerRights: "모든 권리 보유.",
     footerBuilt: "몽골 및 국제 의뢰인 · MN / EN / ZH / KO",
   },
+  spell: spellEn,
   publicHome: {
     brandLine: "LEGAL INTELLIGENCE FOR A STRONGER MONGOLIA",
     tagline: "법을 이해하고, 해결책을 만드십시오.",

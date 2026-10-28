@@ -12,7 +12,7 @@ import type { PracticeArea } from "@/domain/entities/taxonomy";
 import type { InstantSlot } from "@/domain/value-objects/time-slot";
 import type { Locale } from "@/i18n/config";
 import type { MarketplaceDictionary } from "@/i18n/marketplace-types";
-import { formatDateTimeUtc } from "@/lib/format-labels";
+import { formatDateTimeUlaanbaatar } from "@/lib/format-labels";
 import {
   localizedOfferingTitle,
   localizedTaxonomyName,
@@ -100,7 +100,7 @@ export function BookingRequestForm({
               key={slot.startAt.toISOString()}
               value={slot.startAt.toISOString()}
             >
-              {formatDateTimeUtc(slot.startAt, locale)} {copy.utc}
+              {formatDateTimeUlaanbaatar(slot.startAt, locale)} {copy.utc}
             </option>
           ))}
         </NativeSelect>

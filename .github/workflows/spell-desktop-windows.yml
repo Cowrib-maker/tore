@@ -1,0 +1,105 @@
+name: spell-desktop-windows
+
+# TORE Spell BETA — native Windows build, install, launch, uninstall.
+#
+# Two kinds of build (both run the SAME steps from the composite action .github/actions/spell-windows-build):
+#   * UNSIGNED TEST build (pull requests, and a manual run with sign=false): no secret, no `environment` key, artifact `...-windows-unsigned`.
+#     Never release-ready.
+#   * SIGNED RELEASE build (a `spell-v*` tag push, or a manual run with sign=true started FROM a `spell-v*` tag): the only path that can reach CSC_LINK / CSC_KEY_PASSWORD, and only
+#     through the protected environment `spell-release-signing`. A signed build whose Authenticode status is not Valid FAILS before any
+#     upload; the draft release is created only from a measured-signed artifact.
+# No certificate exists yet, so a signed build currently fails at the gate by design. Never commit a certificate.
+#
+# What this job proves:  build · installer size/hash · silent install ·
+#   launch of the INSTALLED app (--selftest: engine, personal dictionary,
+#   DPAPI secret storage, Mongolian UI render) · silent uninstall.
+# What it does NOT prove: activation against the live server, interactive UI,
+#   IME input. Those are the manual QA checklist in docs/spell/WINDOWS_QA.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      sign:
+        description: "Build a SIGNED release candidate (needs approval of the `spell-release-signing` environment). false = unsigned test build."
+        type: boolean
+        default: false
+  push:
+    tags: ["spell-v*"]
+  pull_request:
+    paths:
+      - "desktop/**"
+      - "src/spell-engine/**"
+      - ".github/workflows/spell-desktop-windows.yml"
+      - ".github/actions/spell-windows-build/**"
+
+permissions:
+  contents: read
+
+jobs:
+  # UNSIGNED TEST build: pull requests and sign=false dispatch. Deliberately has NO `environment` key, no secret reference and no `secrets:`.
+  build-unsigned:
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && !inputs.sign)
+    runs-on: windows-latest
+    timeout-minutes: 40
+    concurrency:
+      group: spell-desktop-unsigned-${{ github.ref }}
+      cancel-in-progress: true
+    env:
+      # `npm ci` runs `prisma generate` (postinstall); it needs a URL string, never connects.
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tore?schema=public
+      TORE_SPELL_ENV: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/spell-windows-build
+        with:
+          sign: "false"
+
+  # SIGNED RELEASE build: only a spell-v* TAG ref (a tag push, or a sign=true dispatch started from a tag) - never a pull_request or a branch.
+  # A sign=true dispatch on a branch matches no job. It runs in the protected environment; keep CSC_* as ENVIRONMENT secrets there (not repository
+  # secrets). The certificate reaches only this job's build step, as inputs of the composite action. A non-Valid signature fails the Release gate.
+  build-signed:
+    if: startsWith(github.ref, 'refs/tags/spell-v') && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.sign))
+    runs-on: windows-latest
+    timeout-minutes: 40
+    environment: spell-release-signing
+    concurrency:
+      group: spell-desktop-signed-${{ github.ref }}
+      cancel-in-progress: false
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tore?schema=public
+      TORE_SPELL_ENV: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/spell-windows-build
+        with:
+          sign: "true"
+          csc-link: ${{ secrets.CSC_LINK }}
+          csc-key-password: ${{ secrets.CSC_KEY_PASSWORD }}
+
+  # Only for spell-v* tags. Creates a DRAFT, PRE-RELEASE (not public, not announced) holding the exact installer + SHA256SUMS.txt so the
+  # file outlives artifact expiry. It never publishes: a human reviews and decides. Needs no secrets beyond the built-in token.
+  release-draft:
+    if: startsWith(github.ref, 'refs/tags/spell-v') && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.sign))
+    needs: build-signed
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          # Only a MEASURED-signed installer can reach a release; an unsigned artifact never matches.
+          pattern: tore-spell-*-windows-signed
+          path: dist
+      - name: Create draft pre-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          ls -R dist
+          if ls dist | grep -qi unsigned; then echo "refusing: an unsigned artifact is present"; exit 1; fi
+          ls dist | grep -q 'windows-signed$' || { echo "refusing: no signed artifact"; exit 1; }
+          gh release create "$GITHUB_REF_NAME" --draft --prerelease \
+            --title "TORE Spell ${GITHUB_REF_NAME#spell-v} (draft)" \
+            --notes "Draft. Verify the SHA-256 in SHA256SUMS.txt and the Authenticode state (see the workflow summary) before using. Not a customer download." \
+            dist/*/TORE-Spell-Setup*.exe dist/*/SHA256SUMS.txt

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 import { Check, ChevronDown, Laptop, Moon, Sun } from "lucide-react";
 
@@ -35,11 +35,14 @@ export function ThemeToggle({
 }: ThemeToggleProps) {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  // false while server-rendering / hydrating, true on the client afterwards (no effect + setState needed).
+  const mounted = useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  );
   const rootRef = useRef<HTMLDivElement>(null);
   const listId = useId();
-
-  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     function onPointerDown(event: MouseEvent) {

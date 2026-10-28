@@ -27,7 +27,7 @@ import {
 } from "@/infrastructure/repositories";
 import {
   formatBookingStatus,
-  formatDateTimeUtc,
+  formatDateTimeUlaanbaatar,
 } from "@/lib/format-labels";
 import { cn } from "@/lib/utils";
 
@@ -145,7 +145,7 @@ export default async function ClientBookingsPage() {
                     </Badge>
                   </div>
                   <CardDescription>
-                    {formatDateTimeUtc(booking.scheduledStartAt, locale)}{" "}
+                    {formatDateTimeUlaanbaatar(booking.scheduledStartAt, locale)}{" "}
                     {m.common.utc}
                     {slug ? (
                       <>

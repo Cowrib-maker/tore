@@ -17,8 +17,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { AccountSharingRiskState } from "@/domain/enums";
+import { isInvoicePaymentConfirmed } from "@/domain/services/invoice-payment-confirmation";
 import type { MarketplaceDictionary } from "@/i18n/marketplace-types";
-import { formatDateTimeUtc } from "@/lib/format-labels";
+import { formatDateTimeUlaanbaatar } from "@/lib/format-labels";
 import type { Locale } from "@/i18n/config";
 
 type SessionRow = {
@@ -97,6 +98,15 @@ function statusCopy(
   }
 }
 
+/** Pure fetch + parse (no React state), so an effect can call it without setting state synchronously. */
+async function fetchLawyerBillingPayload(loadErrorMessage: string): Promise<BillingPayload> {
+  const response = await fetch("/api/lawyer/billing", { credentials: "same-origin" });
+  if (!response.ok) {
+    throw new Error(loadErrorMessage);
+  }
+  return (await response.json()) as BillingPayload;
+}
+
 export function BillingAndSessionsPanel({
   copy,
   locale,
@@ -117,14 +127,7 @@ export function BillingAndSessionsPanel({
   const [claimError, setClaimError] = useState<string | null>(null);
   const pollRef = useRef<number | null>(null);
 
-  const load = useCallback(async () => {
-    const response = await fetch("/api/lawyer/billing", {
-      credentials: "same-origin",
-    });
-    if (!response.ok) {
-      throw new Error(copy.sessionsLoadError);
-    }
-    const payload = (await response.json()) as BillingPayload;
+  const applyPayload = useCallback((payload: BillingPayload) => {
     setData({
       ...payload,
       sessions: payload.sessions.map((session) => ({
@@ -139,11 +142,15 @@ export function BillingAndSessionsPanel({
             : new Date(session.firstSeenAt).toISOString(),
       })),
     });
-    if (payload.subscriptionStatus === "ACTIVE" && !payload.billingRequired) {
-      setPaymentState("success");
-    }
+    // No "payment confirmed" state here: an account that is simply active has not paid anything this
+    // visit. Success is set only when the server confirms an invoice (see pollInvoice).
+  }, []);
+
+  const load = useCallback(async () => {
+    const payload = await fetchLawyerBillingPayload(copy.sessionsLoadError);
+    applyPayload(payload);
     return payload;
-  }, [copy.sessionsLoadError]);
+  }, [applyPayload, copy.sessionsLoadError]);
 
   const stopPolling = useCallback(() => {
     if (pollRef.current) {
@@ -166,7 +173,7 @@ export function BillingAndSessionsPanel({
               invoiceStatus?: string;
               subscriptionStatus?: string;
             };
-            if (payload.paid || payload.subscriptionStatus === "ACTIVE") {
+            if (isInvoicePaymentConfirmed(payload)) {
               setPaymentState("success");
               stopPolling();
               await load();
@@ -188,8 +195,12 @@ export function BillingAndSessionsPanel({
   );
 
   useEffect(() => {
-    void load()
+    let cancelled = false;
+    // Fetch first, then update state from the resolved promise (never synchronously in the effect body).
+    fetchLawyerBillingPayload(copy.sessionsLoadError)
       .then((payload) => {
+        if (cancelled) return;
+        applyPayload(payload);
         if (payload.pendingInvoice?.invoiceId && payload.billingRequired) {
           setPaymentState(
             payload.pendingInvoice.status === "AWAITING_VERIFICATION"
@@ -199,9 +210,14 @@ export function BillingAndSessionsPanel({
           pollInvoice(payload.pendingInvoice.invoiceId);
         }
       })
-      .catch(() => setError(copy.sessionsLoadError));
-    return () => stopPolling();
-  }, [copy.sessionsLoadError, load, pollInvoice, stopPolling]);
+      .catch(() => {
+        if (!cancelled) setError(copy.sessionsLoadError);
+      });
+    return () => {
+      cancelled = true;
+      stopPolling();
+    };
+  }, [applyPayload, copy.sessionsLoadError, pollInvoice, stopPolling]);
 
   const startCheckout = async (method: CheckoutMethod) => {
     setCheckoutPending(true);
@@ -290,7 +306,7 @@ export function BillingAndSessionsPanel({
                   <span className="text-muted-foreground">
                     {copy.expiresAtLabel}:{" "}
                   </span>
-                  {formatDateTimeUtc(new Date(data.expiresAt), locale)}
+                  {formatDateTimeUlaanbaatar(new Date(data.expiresAt), locale)}
                 </p>
               ) : null}
               <ul className="list-inside list-disc space-y-1">
@@ -513,7 +529,7 @@ export function BillingAndSessionsPanel({
               <p>{current.deviceLabel}</p>
               <p className="text-muted-foreground">
                 {copy.lastActive}:{" "}
-                {formatDateTimeUtc(new Date(current.lastSeenAt), locale)}
+                {formatDateTimeUlaanbaatar(new Date(current.lastSeenAt), locale)}
               </p>
             </div>
           ) : null}
@@ -555,7 +571,7 @@ export function BillingAndSessionsPanel({
                     <p>{session.deviceLabel}</p>
                     <p className="text-muted-foreground">
                       {copy.lastActive}:{" "}
-                      {formatDateTimeUtc(new Date(session.lastSeenAt), locale)}
+                      {formatDateTimeUlaanbaatar(new Date(session.lastSeenAt), locale)}
                     </p>
                   </div>
                   <Button

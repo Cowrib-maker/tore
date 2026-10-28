@@ -3,10 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  isLawyerInvoicePaid,
-  qrImageSrc,
-} from "@/components/legal-ai/legal-ai-checkout";
+import { qrImageSrc } from "@/components/legal-ai/legal-ai-checkout";
+import { isInvoicePaymentConfirmed } from "@/domain/services/invoice-payment-confirmation";
 
 export function ConsultationPaymentCard({
   invoiceId,
@@ -24,7 +22,6 @@ export function ConsultationPaymentCard({
 
   useEffect(() => {
     paidRef.current = false;
-    setWaiting(true);
     const timer = window.setInterval(() => {
       void fetch(`/api/citizen/billing/invoices/${invoiceId}`, {
         credentials: "include",
@@ -35,7 +32,7 @@ export function ConsultationPaymentCard({
             paid?: boolean;
             subscriptionStatus?: string;
           };
-          if (isLawyerInvoicePaid(payload) && !paidRef.current) {
+          if (isInvoicePaymentConfirmed(payload) && !paidRef.current) {
             paidRef.current = true;
             setWaiting(false);
             window.location.reload();

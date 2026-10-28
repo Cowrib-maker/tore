@@ -39,6 +39,16 @@ type ArticleRow = {
   articleNumber: string | null;
 };
 
+type InList = { in?: string[] };
+type Select = Record<string, boolean>;
+type EdgeWhere = { id?: InList; fromNodeId?: InList | string; toNodeId?: InList | string; edgeType?: InList; OR?: { fromNodeId?: string; toNodeId?: string }[] };
+type IdWhere = { id?: InList | string; documentId?: string };
+/** The arguments the fake reads; the real Prisma types are intentionally not imported into unit tests. */
+type FakeQuery<W> = { where?: W; select?: Select };
+type PrismaDbClient = ConstructorParameters<typeof PrismaLegalGraphRepository>[0];
+/** The fake implements only the surface the repository reads, so it is cast once, here. */
+const repoOver = (fake: object) => new PrismaLegalGraphRepository(fake as unknown as PrismaDbClient);
+
 /** Lazily-executed, thenable "prepared operation" mirroring PrismaPromise:
  * nothing mutates until it is awaited (individually, or via $transaction). */
 function pendingOp<T>(run: () => T) {
@@ -69,27 +79,32 @@ function createFakeGraphPrisma(options: { failTransaction?: boolean; asTransacti
 
   const base = {
     legalKnowledgeGraphEdge: {
-      findMany: async ({ where, select }: any) => {
+      findMany: async ({ where, select }: FakeQuery<EdgeWhere>) => {
         let rows = [...edges.values()];
-        if (where?.id?.in) rows = rows.filter((r) => where.id.in.includes(r.id));
-        if (where?.fromNodeId?.in) rows = rows.filter((r) => where.fromNodeId.in.includes(r.fromNodeId));
-        else if (where?.fromNodeId) rows = rows.filter((r) => r.fromNodeId === where.fromNodeId);
-        if (where?.toNodeId?.in) rows = rows.filter((r) => where.toNodeId.in.includes(r.toNodeId));
-        else if (where?.toNodeId) rows = rows.filter((r) => r.toNodeId === where.toNodeId);
-        if (where?.edgeType?.in) rows = rows.filter((r) => where.edgeType.in.includes(r.edgeType));
+        const inList = (v: InList | string | undefined) => (typeof v === "object" ? v.in : undefined);
+        const ids = inList(where?.id);
+        if (ids) rows = rows.filter((r) => ids.includes(r.id));
+        const fromIn = inList(where?.fromNodeId);
+        if (fromIn) rows = rows.filter((r) => fromIn.includes(r.fromNodeId));
+        else if (typeof where?.fromNodeId === "string") rows = rows.filter((r) => r.fromNodeId === where.fromNodeId);
+        const toIn = inList(where?.toNodeId);
+        if (toIn) rows = rows.filter((r) => toIn.includes(r.toNodeId));
+        else if (typeof where?.toNodeId === "string") rows = rows.filter((r) => r.toNodeId === where.toNodeId);
+        const types = inList(where?.edgeType);
+        if (types) rows = rows.filter((r) => types.includes(r.edgeType));
         return rows.map((r) => pick(r, select));
       },
-      findFirst: async ({ where, select }: any) => {
+      findFirst: async ({ where, select }: FakeQuery<EdgeWhere>) => {
         const rows = [...edges.values()].filter((r) =>
           (where?.OR ?? []).some(
-            (cond: any) =>
+            (cond) =>
               (cond.fromNodeId && r.fromNodeId === cond.fromNodeId) ||
               (cond.toNodeId && r.toNodeId === cond.toNodeId),
           ),
         );
         return rows[0] ? pick(rows[0], select) : null;
       },
-      upsert: ({ where, create, update }: any) =>
+      upsert: ({ where, create, update }: { where: { id: string }; create: EdgeRow; update: Partial<EdgeRow> }) =>
         pendingOp(() => {
           const existing = edges.get(where.id);
           const row: EdgeRow = existing
@@ -100,30 +115,32 @@ function createFakeGraphPrisma(options: { failTransaction?: boolean; asTransacti
         }),
     },
     legalKnowledgeDocument: {
-      findUnique: async ({ where, select }: any) => {
+      findUnique: async ({ where, select }: { where: { id: string }; select?: Select }) => {
         const doc = documents.get(where.id);
         return doc ? pick(doc, select) : null;
       },
-      findMany: async ({ where, select }: any) => {
+      findMany: async ({ where, select }: FakeQuery<IdWhere>) => {
         let rows = [...documents.values()];
-        if (where?.id?.in) rows = rows.filter((r) => where.id.in.includes(r.id));
+        const ids = typeof where?.id === "object" ? where.id.in : undefined;
+        if (ids) rows = rows.filter((r) => ids.includes(r.id));
         return rows.map((r) => pick(r, select));
       },
     },
     legalKnowledgeArticle: {
-      findFirst: async ({ where, select }: any) => {
+      findFirst: async ({ where, select }: FakeQuery<IdWhere>) => {
         let rows = [...articles.values()];
-        if (where?.id) rows = rows.filter((r) => r.id === where.id);
+        if (typeof where?.id === "string") rows = rows.filter((r) => r.id === where.id);
         if (where?.documentId) rows = rows.filter((r) => r.documentId === where.documentId);
         return rows[0] ? pick(rows[0], select) : null;
       },
-      findMany: async ({ where, select }: any) => {
+      findMany: async ({ where, select }: FakeQuery<IdWhere>) => {
         let rows = [...articles.values()];
-        if (where?.id?.in) rows = rows.filter((r) => where.id.in.includes(r.id));
+        const ids = typeof where?.id === "object" ? where.id.in : undefined;
+        if (ids) rows = rows.filter((r) => ids.includes(r.id));
         return rows.map((r) => pick(r, select));
       },
     },
-  } as const;
+  };
 
   const db = options.asTransactionClient
     ? base
@@ -137,7 +154,7 @@ function createFakeGraphPrisma(options: { failTransaction?: boolean; asTransacti
         },
       };
 
-  return { db: db as any, edges, documents, articles };
+  return { db, edges, documents, articles };
 }
 
 describe("PrismaLegalGraphRepository", () => {
@@ -145,7 +162,7 @@ describe("PrismaLegalGraphRepository", () => {
     const { db, documents, articles } = createFakeGraphPrisma();
     documents.set("doc-1", { id: "doc-1", title: "Иргэний хууль", documentType: "LAW", jurisdiction: "MN", language: "mn" });
     articles.set("art-1", { id: "art-1", documentId: "doc-1", title: "Зүйл 17", articleNumber: "17" });
-    const repo = new PrismaLegalGraphRepository(db);
+    const repo = repoOver(db);
 
     const fromId = documentGraphId("doc-1");
     const toId = provisionGraphId("doc-1", "art-1");
@@ -170,7 +187,7 @@ describe("PrismaLegalGraphRepository", () => {
 
   it("falls back to a synthesized AUTHORITY node using the edge's stored label when the target document was never ingested", async () => {
     const { db } = createFakeGraphPrisma();
-    const repo = new PrismaLegalGraphRepository(db);
+    const repo = repoOver(db);
     const fromId = documentGraphId("doc-1");
     const forwardRefId = "graph:ext:LEGALINFO_LAW_ID:999999";
 
@@ -191,7 +208,7 @@ describe("PrismaLegalGraphRepository", () => {
 
   it("is idempotent: re-applying the same edge upserts in place rather than duplicating", async () => {
     const { db, edges } = createFakeGraphPrisma();
-    const repo = new PrismaLegalGraphRepository(db);
+    const repo = repoOver(db);
     const input = {
       edgeType: GraphEdgeType.CITES,
       fromNodeId: documentGraphId("doc-1"),
@@ -216,7 +233,7 @@ describe("PrismaLegalGraphRepository", () => {
 
   it("prevents duplicate edges: two distinct upsertEdges calls for the same (from, type, to) never produce two rows", async () => {
     const { db, edges } = createFakeGraphPrisma();
-    const repo = new PrismaLegalGraphRepository(db);
+    const repo = repoOver(db);
     const edge = {
       edgeType: GraphEdgeType.AMENDS,
       fromNodeId: documentGraphId("doc-1"),
@@ -233,7 +250,7 @@ describe("PrismaLegalGraphRepository", () => {
 
   it("round-trips provenance fields (sourceKind, evidence, fromDocumentId/toDocumentId)", async () => {
     const { db } = createFakeGraphPrisma();
-    const repo = new PrismaLegalGraphRepository(db);
+    const repo = repoOver(db);
     await repo.upsertEdges([
       {
         edgeType: GraphEdgeType.CITES,
@@ -256,7 +273,7 @@ describe("PrismaLegalGraphRepository", () => {
     const { db, documents } = createFakeGraphPrisma();
     documents.set("doc-1", { id: "doc-1", title: "Law A", documentType: "LAW", jurisdiction: "MN", language: "mn" });
     documents.set("doc-2", { id: "doc-2", title: "Law B", documentType: "LAW", jurisdiction: "MN", language: "mn" });
-    const repo = new PrismaLegalGraphRepository(db);
+    const repo = repoOver(db);
     const a = documentGraphId("doc-1");
     const b = documentGraphId("doc-2");
 
@@ -288,12 +305,12 @@ describe("PrismaLegalGraphRepository", () => {
       documents.set(`doc-${i}`, { id: `doc-${i}`, title: `Law ${i}`, documentType: "LAW", jurisdiction: "MN", language: "mn" });
     }
     const originalFindMany = db.legalKnowledgeDocument.findMany.bind(db.legalKnowledgeDocument);
-    db.legalKnowledgeDocument.findMany = async (...args: any[]) => {
+    db.legalKnowledgeDocument.findMany = async (...args: Parameters<typeof originalFindMany>) => {
       documentFindManyCalls += 1;
       return originalFindMany(...args);
     };
 
-    const repo = new PrismaLegalGraphRepository(db);
+    const repo = repoOver(db);
     const hub = documentGraphId("doc-1");
     await repo.upsertEdges(
       [2, 3, 4, 5, 6].map((i) => ({
@@ -313,7 +330,7 @@ describe("PrismaLegalGraphRepository", () => {
 
   it("rolls back the whole batch on transaction failure — no partial edges persist", async () => {
     const { db, edges } = createFakeGraphPrisma({ failTransaction: true });
-    const repo = new PrismaLegalGraphRepository(db);
+    const repo = repoOver(db);
 
     await expect(
       repo.upsertEdges([
@@ -327,7 +344,7 @@ describe("PrismaLegalGraphRepository", () => {
 
   it("falls back to Promise.all (no double-nested transaction) when given an already-scoped transaction client", async () => {
     const { db, edges } = createFakeGraphPrisma({ asTransactionClient: true });
-    const repo = new PrismaLegalGraphRepository(db);
+    const repo = repoOver(db);
     await repo.upsertEdges([
       { edgeType: GraphEdgeType.CITES, fromNodeId: documentGraphId("doc-1"), toNodeId: documentGraphId("doc-2"), fromLabel: "A", toLabel: "B", sourceKind: "LEGALINFO_CROSS_REFERENCE" },
     ]);
@@ -339,7 +356,7 @@ describe("PrismaLegalGraphRepository", () => {
     documents.set("reg-1", { id: "reg-1", title: "Regulation", documentType: "GOVERNMENT_REGULATION", jurisdiction: "MN", language: "mn" });
     documents.set("court-1", { id: "court-1", title: "Decision", documentType: "COURT_DECISION", jurisdiction: "MN", language: "mn" });
     documents.set("unknown-1", { id: "unknown-1", title: "Unknown", documentType: null, jurisdiction: "MN", language: "mn" });
-    const repo = new PrismaLegalGraphRepository(db);
+    const repo = repoOver(db);
 
     expect((await repo.findNode(documentGraphId("reg-1")))?.type).toBe(GraphNodeType.GOVERNMENT_REGULATION);
     expect((await repo.findNode(documentGraphId("court-1")))?.type).toBe(GraphNodeType.COURT_DECISION);
@@ -350,11 +367,11 @@ describe("PrismaLegalGraphRepository", () => {
     const { db, edges } = createFakeGraphPrisma();
     let edgeFindManyCalls = 0;
     const originalFindMany = db.legalKnowledgeGraphEdge.findMany.bind(db.legalKnowledgeGraphEdge);
-    db.legalKnowledgeGraphEdge.findMany = async (...args: any[]) => {
+    db.legalKnowledgeGraphEdge.findMany = async (...args: Parameters<typeof originalFindMany>) => {
       edgeFindManyCalls += 1;
       return originalFindMany(...args);
     };
-    const repo = new PrismaLegalGraphRepository(db);
+    const repo = repoOver(db);
     const a = documentGraphId("doc-a");
     const b = documentGraphId("doc-b");
     const c = documentGraphId("doc-c");
@@ -373,7 +390,7 @@ describe("PrismaLegalGraphRepository", () => {
 
   it("returns null for a node id that resolves to neither a document/article row nor any edge label", async () => {
     const { db } = createFakeGraphPrisma();
-    const repo = new PrismaLegalGraphRepository(db);
+    const repo = repoOver(db);
     expect(await repo.findNode(documentGraphId("never-ingested"))).toBeNull();
   });
 });

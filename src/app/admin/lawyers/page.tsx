@@ -24,7 +24,7 @@ import { getDashboardPath } from "@/domain/services/rbac";
 import { getShellI18n } from "@/i18n/dashboard-shell-i18n";
 import {
   formatCredentialStatus,
-  formatDateTimeUtc,
+  formatDateTimeUlaanbaatar,
   formatVerificationStatus,
 } from "@/lib/format-labels";
 import { localizedTaxonomyName } from "@/lib/localized-content";
@@ -143,7 +143,7 @@ export default async function AdminLawyersPage() {
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {item.lawyerEmail} · {a.submitted}{" "}
-                      {formatDateTimeUtc(item.credential.submittedAt, locale)}
+                      {formatDateTimeUlaanbaatar(item.credential.submittedAt, locale)}
                     </p>
                     <dl className="grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2">
                       <div>
