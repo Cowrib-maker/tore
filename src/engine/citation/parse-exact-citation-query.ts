@@ -34,7 +34,7 @@ export function detectExactCitation(message: string): DetectedExactCitation | nu
 function matchStatuteArticle(text: string): DetectedExactCitation | null {
   // Full Mongolian pinpoint: `хуулийн 17 дугаар зүйлийн 1 дэх хэсэг`.
   const matches = text.matchAll(
-    /([\p{L}][\p{L}\p{N}\s]{0,100}?)\s+хуулийн\s+(\d+)\s*(?:-\s*р|дүгээр|дугаар)?\s*зүй(?:л(?:ийн|д|ээс)?|лийн)\s*(?:(\d+)\s*дэх\s*хэсэг|(?:[\u2013\u2014-]\s*)?(\d+)\s*дэх\s*заалт)?/giu,
+    /([\p{L}](?:(?!хуулийн)[\p{L}\p{N}\s]){0,100}?)\s+хуулийн\s+(\d+)\s*(?:-\s*р|дүгээр|дугаар)?\s*зүй(?:л(?:ийн|д|ээс)?|лийн)\s*(?:(\d+)\s*дэх\s*хэсэг|(?:[\u2013\u2014-]\s*)?(\d+)\s*дэх\s*заалт)?/giu,
   );
 
   let last: RegExpMatchArray | undefined;
@@ -56,7 +56,7 @@ function matchStatuteArticle(text: string): DetectedExactCitation | null {
 function matchDottedStatute(text: string): DetectedExactCitation | null {
   const matches = [
     ...text.matchAll(
-      /([\p{L}][\p{L}\p{N}\s]{0,100}?)\s+хуулийн\s+(\d+)\s*\.\s*(\d+)/giu,
+      /([\p{L}](?:(?!хуулийн)[\p{L}\p{N}\s]){0,100}?)\s+хуулийн\s+(\d+)\s*\.\s*(\d+)/giu,
     ),
   ];
 
@@ -91,6 +91,7 @@ function normalizeTitleHint(rawTitle: string): string {
   return rawTitle
     .replace(/\s+/g, " ")
     .trim()
+    .replace(/^(?:болон|мөн|бас)\s+/iu, "")
     .replace(/\s+хуулийн$/iu, "");
 }
 
