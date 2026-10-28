@@ -4,6 +4,18 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Tailwind's default scale tops out at 2xl (1536px) — everything from a
+   1920px laptop up through a 3440px ultrawide monitor matches that same
+   query, so there is no way to give an ultrawide screen any more room than
+   a 1920px one without a breakpoint above it. Used by the Legal AI
+   chat/composer columns (legal-ai-chat.tsx, lawyer-ai-workbench.tsx) to
+   use more of a genuinely wide desktop's space instead of leaving large
+   unused margins on both sides, while still capping line length — never to
+   go full-bleed. */
+@theme {
+  --breakpoint-3xl: 120rem;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
