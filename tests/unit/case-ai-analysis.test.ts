@@ -394,6 +394,169 @@ describe("generateCaseAiAnalysisForLawyer", () => {
     expect(capturedPrompt).toContain("UNTRUSTED_USER_DOCUMENT_DATA");
   });
 
+  describe("contract-review quality (realistic Mongolian sale/services contract fixture)", () => {
+    // A short, realistic Mongolian sale-of-goods contract — deliberately
+    // missing a termination/notice clause, so the fixture exercises
+    // "missing context" handling, not just happy-path grounding.
+    const CONTRACT_TEXT = [
+      "1-р зүйл. Гэрээний зорилго. Худалдагч нь барааг нийлүүлэх, Худалдан авагч нь төлбөр хийх үүрэгтэй.",
+      "2-р зүйл. Төлбөрийн нөхцөл. Худалдан авагч бараа хүлээн авснаас хойш 30 хоногийн дотор дансаар шилжүүлнэ.",
+      "3-р зүйл. Хүргэлтийн хугацаа. Худалдагч захиалгыг гэрээ байгуулснаас хойш 14 хоногийн дотор хүргэнэ.",
+      "4-р зүйл. Хариуцлага. Хугацаа хэтэрсэн тохиолдолд хоногт үнийн дүнгийн 0.1 хувийн алданги ногдуулна.",
+    ].join(" ");
+
+    function contractAnalysisSectionsJson(): string {
+      const sections: Record<string, unknown[]> = {};
+      for (const key of CASE_AI_ANALYSIS_SECTION_ORDER) sections[key] = [];
+      sections.mainLegalIssue = [
+        {
+          kind: "INFERENCE",
+          text: "Гэрээнд цуцлах нөхцөл тусгагдаагүй нь гол эрх зүйн эрсдэл үүсгэж байна.",
+          citationRefs: [],
+        },
+      ];
+      // Clause-level grounding: cites the actual contract excerpt (index 1
+      // — see citation ordering below), not a generic/ungrounded claim.
+      sections.evidenceAnalysis = [
+        {
+          kind: "FACT",
+          text: "2-р зүйлд төлбөрийг бараа хүлээн авснаас хойш 30 хоногийн дотор хийхээр заасан.",
+          citationRefs: [1],
+        },
+      ];
+      sections.applicableProvisions = [
+        // Grounded in the verified legal authority (index 0) — stays LAW.
+        {
+          kind: "LAW",
+          text: "Иргэний хуулийн холбогдох зохицуулалтыг баримтална.",
+          citationRefs: [0],
+        },
+        // An unsupported legal claim — no citation backs it — must be
+        // downgraded to UNCERTAINTY rather than presented as established law.
+        {
+          kind: "LAW",
+          text: "Гэрээ цуцлахад 30 хоногийн урьдчилсан мэдэгдэл үргэлж шаардлагатай.",
+          citationRefs: [],
+        },
+      ];
+      // Missing-context handling: explicitly flags the absent clause
+      // rather than inventing what it might say.
+      sections.evidenceGaps = [
+        {
+          kind: "UNCERTAINTY",
+          text: "Гэрээнд цуцлах нөхцөл, мэдэгдэх хугацааны тухай заалт байхгүй байна.",
+          citationRefs: [],
+        },
+      ];
+      sections.clarificationNeeded = [
+        {
+          kind: "UNCERTAINTY",
+          text: "Талууд цуцлалтын журмыг тусад нь тохиролцсон эсэхийг тодруулах шаардлагатай.",
+          citationRefs: [],
+        },
+      ];
+      // Practical recommendation, grounded in the contract's own text.
+      sections.nextSteps = [
+        {
+          kind: "INFERENCE",
+          text: "Гэрээнд нэмэлт өөрчлөлт оруулж, цуцлах нөхцөл, мэдэгдэх хугацааг тодорхой тусгахыг зөвлөж байна.",
+          citationRefs: [1],
+        },
+      ];
+      return JSON.stringify(sections);
+    }
+
+    it("identifies the issue, grounds facts at clause level, downgrades an unsupported legal claim, flags the missing clause, and recommends a concrete next step", async () => {
+      const file = await ownedCase(lawyerA, "Худалдааны гэрээний маргаан");
+      await createCaseEvidenceForLawyer(
+        lawyerA,
+        {
+          caseId: file.id,
+          expectedVersion: file.version,
+          title: "Худалдах-худалдан авах гэрээ.pdf",
+          evidenceType: "DOCUMENT",
+          extraction: {
+            extractedText: CONTRACT_TEXT,
+            extractStatus: "OK",
+            pageCount: 1,
+          },
+        },
+        caseDeps,
+      );
+
+      const corpusRetriever = stubCorpusRetriever([
+        {
+          nodeId: "node-civil-1",
+          documentId: "doc-civil-1",
+          documentVersionId: "ver-civil-1",
+          locator: "art-1",
+          title: "Иргэний хууль",
+          excerpt: "Гэрээний үндсэн зарчим.",
+        },
+      ]);
+      const completion = stubCompletion(() =>
+        makeResult(contractAnalysisSectionsJson()),
+      );
+
+      const result = await generateCaseAiAnalysisForLawyer(
+        lawyerA,
+        file.id,
+        deps({ corpusRetriever, completion }),
+      );
+
+      expect(result.status).toBe("OK");
+
+      // 1. Issue identification.
+      expect(result.sections?.mainLegalIssue.statements[0]?.text).toContain(
+        "цуцлах нөхцөл",
+      );
+
+      // 2. Clause-level grounding: the FACT is backed by a citation whose
+      // excerpt is the contract's own text, not a paraphrase or invention.
+      const evidenceStatement = result.sections?.evidenceAnalysis.statements[0];
+      expect(evidenceStatement?.kind).toBe("FACT");
+      expect(evidenceStatement?.citationRefs).toHaveLength(1);
+      const evidenceCitation =
+        result.citations?.[evidenceStatement!.citationRefs[0]!];
+      expect(evidenceCitation?.citationType).toBe("USER_DOCUMENT");
+      expect(evidenceCitation?.excerpt).toContain("2-р зүйл");
+      expect(evidenceCitation?.excerpt).toContain(
+        "30 хоногийн дотор дансаар шилжүүлнэ",
+      );
+
+      // 3. Unsupported legal claim handling: the grounded LAW statement
+      // stays LAW; the uncited one is downgraded to UNCERTAINTY.
+      const [groundedLaw, unsupportedLaw] =
+        result.sections?.applicableProvisions.statements ?? [];
+      expect(groundedLaw?.kind).toBe("LAW");
+      expect(groundedLaw?.citationRefs).toHaveLength(1);
+      expect(unsupportedLaw?.kind).toBe("UNCERTAINTY");
+      expect(unsupportedLaw?.citationRefs).toEqual([]);
+
+      // 4. Missing-context handling: the absent clause is flagged, not
+      // fabricated.
+      expect(result.sections?.evidenceGaps.statements[0]?.text).toContain(
+        "байхгүй",
+      );
+      expect(result.sections?.clarificationNeeded.statements[0]?.kind).toBe(
+        "UNCERTAINTY",
+      );
+
+      // 5. Practical recommendation, itself grounded in the contract text.
+      const nextStep = result.sections?.nextSteps.statements[0];
+      expect(nextStep?.text).toContain("зөвлөж");
+      expect(nextStep?.citationRefs).toHaveLength(1);
+
+      // No fabricated authority: the only VERIFIED_LEGAL_SOURCE citation
+      // present is exactly the one the stub retriever actually returned.
+      const legalCitations = result.citations?.filter(
+        (c) => c.citationType === "VERIFIED_LEGAL_SOURCE",
+      );
+      expect(legalCitations).toHaveLength(1);
+      expect(legalCitations?.[0]?.title).toBe("Иргэний хууль");
+    });
+  });
+
   it("rejects generating an analysis for a case the actor does not own", async () => {
     const file = await ownedCase(lawyerA);
     await expect(
