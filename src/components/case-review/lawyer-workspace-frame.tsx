@@ -15,6 +15,7 @@ import {
   LayoutGrid,
   LogOut,
   Menu,
+  MessageSquareText,
   Plus,
   Receipt,
   Scale,
@@ -114,6 +115,9 @@ type FrameProps = {
   signOutLabel: string;
   variant?: "page" | "workbench";
   unreadNotificationsCount?: number;
+  /** Public feedback form (landing page `#feedback` anchor) — omitted entirely when not set. */
+  feedbackHref?: string | null;
+  feedbackLabel?: string;
   /** Server-computed "YYYY.MM.DD Weekday" label — see lawyer/layout.tsx.
    * Rendered verbatim (never recomputed client-side) so it can never
    * hydration-mismatch. */
@@ -134,6 +138,8 @@ export function LawyerWorkspaceFrame({
   signOutLabel,
   variant = "page",
   unreadNotificationsCount = 0,
+  feedbackHref,
+  feedbackLabel = "Санал хүсэлт илгээх",
   todayLabel,
   licenseState,
 }: FrameProps) {
@@ -157,6 +163,8 @@ export function LawyerWorkspaceFrame({
             languageLabel={languageLabel}
             signOutLabel={signOutLabel}
             licenseState={licenseState}
+            feedbackHref={feedbackHref}
+            feedbackLabel={feedbackLabel}
           />
         </aside>
 
@@ -199,6 +207,8 @@ export function LawyerWorkspaceFrame({
                 languageLabel={languageLabel}
                 signOutLabel={signOutLabel}
                 licenseState={licenseState}
+                feedbackHref={feedbackHref}
+                feedbackLabel={feedbackLabel}
                 onNavigate={() => setOpen(false)}
               />
             </SheetContent>
@@ -272,6 +282,16 @@ export function LawyerWorkspaceFrame({
         <div className="flex items-center gap-2">
           {todayLabel ? <TodayChip label={todayLabel} /> : null}
           <div className="mx-1 h-4 w-px bg-[#0B1F3A]/10" aria-hidden />
+          {feedbackHref ? (
+            <Link
+              href={feedbackHref}
+              aria-label={feedbackLabel}
+              title={feedbackLabel}
+              className="flex size-8 items-center justify-center rounded-lg text-[#5C6570] transition hover:bg-[#F0F4F8] hover:text-[#0B1F3A]"
+            >
+              <MessageSquareText className="size-4" />
+            </Link>
+          ) : null}
           <Link
             href="/lawyer/notifications"
             aria-label="Мэдэгдэл"
@@ -356,6 +376,8 @@ export function LawyerWorkspaceFrame({
               languageLabel={languageLabel}
               signOutLabel={signOutLabel}
               licenseState={licenseState}
+              feedbackHref={feedbackHref}
+              feedbackLabel={feedbackLabel}
               onNavigate={() => setOpen(false)}
             />
           </SheetContent>
@@ -444,6 +466,8 @@ function WorkspaceSidebar({
   languageLabel,
   signOutLabel,
   licenseState,
+  feedbackHref,
+  feedbackLabel = "Санал хүсэлт илгээх",
   onNavigate,
 }: {
   navGroups: NavGroup[];
@@ -453,6 +477,8 @@ function WorkspaceSidebar({
   languageLabel: string;
   signOutLabel: string;
   licenseState?: LawyerVerificationState | null;
+  feedbackHref?: string | null;
+  feedbackLabel?: string;
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
@@ -504,6 +530,17 @@ function WorkspaceSidebar({
           <ThemeToggle
             buttonClassName="border-white/12 bg-white/8 text-[#F7FAF8] hover:border-white/25 hover:bg-white/14"
           />
+          {feedbackHref ? (
+            <Link
+              href={feedbackHref}
+              onClick={onNavigate}
+              aria-label={feedbackLabel}
+              title={feedbackLabel}
+              className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-white/12 bg-white/8 text-[#F7FAF8] transition hover:border-white/25 hover:bg-white/14"
+            >
+              <MessageSquareText className="size-4" />
+            </Link>
+          ) : null}
         </div>
         <Link
           href={profileHref}
@@ -540,7 +577,7 @@ function WorkspaceSidebar({
           </form>
         </div>
         <p className="px-2 text-[10px] leading-4 text-white/35">
-          © 2026 TORE. TORE Legal AI нь хуульч, өмгөөлөгчийг орлохгүй.
+          © 2026 TORE. TORE Legal Chat нь хуульч, өмгөөлөгчийг орлохгүй.
         </p>
       </div>
     </div>

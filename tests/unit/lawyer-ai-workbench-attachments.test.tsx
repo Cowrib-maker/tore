@@ -150,7 +150,13 @@ describe("LawyerAiWorkbench — attachment lifecycle", () => {
     expect(chats[0].conversationId).toBe("conv-1");
   });
 
-  it("multiple files upload one at a time into ONE conversation, then ONE turn", async () => {
+  it("only the FIRST file uploads alone to establish the conversation, the rest run concurrently, then ONE turn", async () => {
+    // Regression for a real reported bug: attaching ~5 images took close
+    // to a minute because every upload ran strictly one at a time, even
+    // after the conversation they all attach to was already known (see
+    // use-document-upload-queue.ts). Only the very FIRST upload has a real
+    // reason to run alone — it is the one that creates the conversation
+    // the rest need to join.
     const releases: Array<() => void> = [];
     const { uploads, chats } = stub((name) => new Promise<Response>((r) => releases.push(() => r(okFor(name)))));
     const { container } = renderWb();
@@ -159,12 +165,21 @@ describe("LawyerAiWorkbench — attachment lifecycle", () => {
     await waitFor(() => expect(uploads).toHaveLength(1));
     await act(async () => send());
     expect(chats).toHaveLength(0);
-    for (let i = 0; i < 3; i += 1) {
-      await waitFor(() => expect(releases).toHaveLength(i + 1));
-      await act(async () => releases[i]());
-    }
+
+    await act(async () => releases[0]());
+
+    // Once the conversation is established, both remaining uploads start
+    // in the SAME wave — not one release at a time.
+    await waitFor(() => expect(uploads).toHaveLength(3));
+    expect(releases).toHaveLength(3);
+    await act(async () => {
+      releases[1]();
+      releases[2]();
+    });
+
     await waitFor(() => expect(chats).toHaveLength(1));
-    expect(uploads.map((u) => u.conversationId)).toEqual([null, "conv-1", "conv-1"]);
+    expect(uploads[0].conversationId).toBeNull();
+    expect(uploads.slice(1).map((u) => u.conversationId)).toEqual(["conv-1", "conv-1"]);
     expect(chats[0].conversationId).toBe("conv-1");
   });
 

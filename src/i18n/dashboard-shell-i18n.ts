@@ -83,6 +83,8 @@ export const getShellI18n = cache(async (role: "client" | "lawyer" | "admin") =>
       brand: dict.common.brand,
       navAriaLabel: m.common.mainNav,
       mobileNavLabel: m.common.navigate,
+      feedbackHref: "/#feedback",
+      feedbackLabel: d.feedbackLabel,
     },
   };
 });

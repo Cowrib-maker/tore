@@ -27,6 +27,9 @@ type Props = {
   notificationsHref?: string | null;
   unreadNotificationsCount?: number;
   notificationsLabel?: string;
+  /** Public feedback form (landing page `#feedback` anchor) — omitted entirely when not set. */
+  feedbackHref?: string | null;
+  feedbackLabel?: string;
   /** Server-computed "YYYY.MM.DD Weekday" label — see lawyer/layout.tsx. */
   todayLabel?: string;
   /** Plan card in the sidebar: `undefined` hides it, `null` shows it without a licence line. */
@@ -68,6 +71,8 @@ export function LawyerAppChrome({
   profileHref,
   notificationsHref,
   unreadNotificationsCount,
+  feedbackHref,
+  feedbackLabel,
   todayLabel,
   licenseState,
 }: Props) {
@@ -82,6 +87,8 @@ export function LawyerAppChrome({
         languageLabel={languageLabel}
         signOutLabel={signOutLabel}
         unreadNotificationsCount={unreadNotificationsCount}
+        feedbackHref={feedbackHref}
+        feedbackLabel={feedbackLabel}
         todayLabel={todayLabel}
         licenseState={licenseState}
       >
@@ -109,6 +116,8 @@ export function LawyerAppChrome({
       brand={brand}
       navAriaLabel={navAriaLabel}
       profileHref={profileHref}
+      feedbackHref={feedbackHref}
+      feedbackLabel={feedbackLabel}
       sidebarExtra={licenseState !== undefined ? <LawyerPlanStatusCard licenseState={licenseState} tone="dark" /> : undefined}
     >
       {children}

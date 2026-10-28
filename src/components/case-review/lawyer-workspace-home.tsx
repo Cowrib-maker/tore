@@ -80,7 +80,7 @@ export function LawyerWorkspaceHome({ view }: Props) {
             Хэрэг, баримт, судалгаагаа нэг ухаалаг орчинд удирдана.
           </h1>
           <p className="mt-1 max-w-2xl text-sm leading-6 text-[#5C6570]">
-            Хуулийн ажлаа төвлөрүүлж, баримтаа шинжилж, TORE Legal AI-аас
+            Хуулийн ажлаа төвлөрүүлж, баримтаа шинжилж, TORE Legal Chat-аас
             судалгаа авна уу.
           </p>
         </div>

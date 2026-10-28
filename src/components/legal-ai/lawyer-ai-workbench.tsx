@@ -126,12 +126,16 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
   const [loading, setLoading] = useState(false);
   const thinkingStageLabel = useThinkingStageLabel(loading);
   const [error, setError] = useState("");
+  /** The question behind the last genuine send failure (never an abort), so Retry can resend it without the user retyping — the composer is already cleared by the time a failure is known. */
+  const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(null);
   const [attachedDocuments, setAttachedDocuments] = useState<AttachedDocument[]>(initialAttachedDocuments);
   const attachedRef = useRef<AttachedDocument[]>(initialAttachedDocuments);
   const conversationIdRef = useRef(initialConversationId);
   const [submitting, setSubmitting] = useState(false);
   const submittingRef = useRef(false);
-  const { items: uploads, uploading, addFiles, retry: retryUpload, cancel: cancelUpload, settle: settleUploads, hasUnready } = useDocumentUploadQueue(performUpload);
+  const { items: uploads, uploading, addFiles, retry: retryUpload, cancel: cancelUpload, settle: settleUploads, hasUnready } = useDocumentUploadQueue(performUpload, {
+    hasEstablishedTarget: () => Boolean(conversationIdRef.current),
+  });
   const [accessGate, setAccessGate] = useState<LegalAiAccessGate | null>(null);
   // Bumped after a verified payment so the entitlement banner re-reads the server state.
   const [entitlementKey, setEntitlementKey] = useState(0);
@@ -143,14 +147,24 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
   const transcriptRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  // See the matching cleanup in legal-ai-chat.tsx: switching cases/
+  // conversations remounts this component (the `key` on LawyerAiWorkbench
+  // in src/app/legal-ai/page.tsx) rather than mutating state in place, so
+  // this never lets a stale response overwrite a newly-opened
+  // conversation — it only stops an abandoned in-flight request from
+  // continuing to stream (and bill) in the background after the lawyer has
+  // already navigated away from it.
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, []);
   const {
     loading: orthographyLoading,
     result: orthographyResult,
     gateMessage: orthographyGate,
     needsBilling: orthographyNeedsBilling,
     open: orthographyOpen,
-    includeLatinToCyrillic,
-    setIncludeLatinToCyrillic,
     check: checkOrthography,
     clear: clearOrthography,
   } = useOrthographyCheck();
@@ -182,7 +196,7 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
     }
   }
 
-  /** One upload, run by the shared serial queue (see useDocumentUploadQueue). */
+  /** One upload, run by the shared upload queue (see useDocumentUploadQueue). */
   async function performUpload(file: File, signal: AbortSignal): Promise<UploadOutcome> {
     const rejected = clientRejectLegalAiDocument(file);
     if (rejected) return { status: "error", message: rejected };
@@ -220,7 +234,7 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
 
   async function sendMessage(text: string, options?: { resume?: boolean }) {
     if (!text || loading) return;
-    setError(""); setAccessGate(null);
+    setError(""); setAccessGate(null); setLastFailedMessage(null);
     if (!options?.resume) { setDraft(""); clearOrthography(); setMessages((current) => [...current, { role: "USER", content: text }]); }
     setLoading(true);
     const controller = new AbortController();
@@ -316,9 +330,15 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
         // Cancelled by the user via the Stop button — no error to show.
       } else {
         setError(LEGAL_AI_CHAT_RETRY_MESSAGE);
+        setLastFailedMessage(text);
       }
     }
     finally { abortRef.current = null; setLoading(false); }
+  }
+
+  /** Resends the last failed question as a continuation, not a duplicate USER bubble. */
+  function retryLastMessage() {
+    if (lastFailedMessage) void sendMessage(lastFailedMessage, { resume: true });
   }
 
   function stopGeneration() {
@@ -351,7 +371,7 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
           <div className="min-w-0">
             {caseContext ? (
               <div data-testid="lawyer-ai-case-header">
-                <p className="text-[11px] font-semibold tracking-[0.16em] text-[#8A6B2A]">TORE Legal AI</p>
+                <p className="text-[11px] font-semibold tracking-[0.16em] text-[#8A6B2A]">TORE Legal Chat</p>
                 <h1 className="truncate text-[1.05rem] font-semibold text-[#0B1F3A]">{caseContext.title}</h1>
                 <p className="text-xs text-[#5C6570]">Хэрэг, баримт, хууль зүйн эх сурвалжид тулгуурлан мэргэжлийн түвшний шинжилгээ хийх AI.</p>
                 <LegalAiDutyNotice variant="lawyer" className="mt-1" />
@@ -359,8 +379,8 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
               </div>
             ) : (
               <div>
-                <p className="text-[11px] font-semibold tracking-[0.16em] text-[#8A6B2A]">TORE Legal AI</p>
-                <h1 className="text-[1.05rem] font-semibold text-[#0B1F3A]">TORE Legal AI</h1>
+                <p className="text-[11px] font-semibold tracking-[0.16em] text-[#8A6B2A]">TORE Legal Chat</p>
+                <h1 className="text-[1.05rem] font-semibold text-[#0B1F3A]">TORE Legal Chat</h1>
                 <p className="text-xs text-[#5C6570]">Хэрэг, баримт, хууль зүйн эх сурвалжид тулгуурлан мэргэжлийн түвшний шинжилгээ хийх AI.</p>
                 <LegalAiDutyNotice variant="lawyer" className="mt-1" />
               </div>
@@ -374,21 +394,30 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
         </header>
 
         <div className={cn("flex min-h-0 flex-1 flex-col", conversationMode ? "justify-end" : "justify-center")}>
-          <div className={cn("mx-auto w-full max-w-[1040px] px-4 transition-all duration-300 ease-out sm:px-6", conversationMode ? "pointer-events-none max-h-0 overflow-hidden -translate-y-2 opacity-0" : "max-h-[22rem] translate-y-0 opacity-100")} aria-hidden={conversationMode} data-testid="lawyer-ai-welcome">
+          <div className={cn("mx-auto w-full max-w-[1040px] xl:max-w-[1100px] 2xl:max-w-[1180px] 3xl:max-w-[1320px] px-4 transition-all duration-300 ease-out sm:px-6", conversationMode ? "pointer-events-none max-h-0 overflow-hidden -translate-y-2 opacity-0" : "max-h-[22rem] translate-y-0 opacity-100")} aria-hidden={conversationMode} data-testid="lawyer-ai-welcome">
             <Welcome caseLinked={Boolean(caseContext)} suggestions={suggestions} onSuggest={(prompt) => { setDraft(prompt); textareaRef.current?.focus(); }} />
           </div>
 
           <div ref={transcriptRef} className={cn("min-h-0 overflow-y-auto transition-[flex-grow,min-height] duration-300 ease-out", conversationMode ? "min-h-0 flex-1" : "h-0 flex-none overflow-hidden")}>
-            <div className="mx-auto flex w-full max-w-[1040px] flex-col gap-5 px-4 py-6 sm:px-6">
+            <div className="mx-auto flex w-full max-w-[1040px] xl:max-w-[1100px] 2xl:max-w-[1180px] 3xl:max-w-[1320px] flex-col gap-5 px-4 py-6 sm:px-6">
               {messages.map((item, index) => <MessageBubble key={`${item.role}-${index}`} message={item} appear={item.role === "ASSISTANT"} />)}
               {loading ? <div className="flex items-start gap-3"><AiMark /><div className="rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-white px-4 py-3 text-sm text-[#66717D]"><span className="inline-flex items-center gap-2"><LoaderCircle className="size-3.5 animate-spin text-[#0B5CFF]" />{thinkingStageLabel}</span></div></div> : null}
-              {error ? <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
+              {error ? (
+                <div role="alert" className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <span>{error}</span>
+                  {lastFailedMessage ? (
+                    <button type="button" onClick={retryLastMessage} className="shrink-0 rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-200">
+                      Дахин оролдох
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
               {accessGate && conversationMode ? <LegalAiAccessGateCard gate={accessGate} onPaid={() => handleGatePaid(accessGate.question)} /> : null}
             </div>
           </div>
 
           <div className="shrink-0 pb-4 pt-2 sm:pb-6">
-            <form onSubmit={handleSubmit} className="mx-auto w-full max-w-[1040px] px-4 sm:px-6" data-testid="lawyer-ai-composer">
+            <form onSubmit={handleSubmit} className="mx-auto w-full max-w-[1040px] xl:max-w-[1100px] 2xl:max-w-[1180px] 3xl:max-w-[1320px] px-4 sm:px-6" data-testid="lawyer-ai-composer">
               {!conversationMode ? <div className="mb-4 space-y-3"><LegalAiEntitlementBanner refreshKey={entitlementKey} onActivate={() => setAccessGate({ kind: "billing", question: "", message: "TORE Lawyer багц идэвхгүй байна. Төлбөрийн аргаа сонгоно уу.", audience: "lawyer" })} />{accessGate ? <LegalAiAccessGateCard gate={accessGate} onPaid={() => handleGatePaid(accessGate.question)} /> : null}</div> : null}
               <div className={cn("rounded-2xl border border-[#0B1F3A]/10 bg-white p-2 shadow-[0_16px_40px_-28px_rgba(11,31,58,0.45)] focus-within:border-[#0B5CFF]/40", dragOver && "border-[#0B5CFF]/40 bg-[#E8F0FE]")} onDragOver={(event) => { event.preventDefault(); if (!loading) setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={handleComposerDrop}>
                 {attachedDocuments.length || uploads.length ? <ul className="mb-2 flex max-h-24 flex-wrap gap-2 overflow-y-auto px-0.5 pt-0.5">{[...uploads].sort((x, y) => Number(y.status === "error") - Number(x.status === "error")).map((item) => item.status === "error" ? <li key={item.id} role="alert" className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-red-50 py-1 pr-1.5 pl-2.5 text-xs text-red-700 ring-1 ring-red-200"><Paperclip className="size-3.5 shrink-0" /><span className="truncate">{item.file.name}</span><span className="min-w-0 break-words">{item.errorMessage}</span><button type="button" aria-label={`${item.file.name} дахин оролдох`} className="shrink-0 rounded-full px-1.5 py-0.5 font-medium hover:bg-red-100" onClick={() => retryUpload(item.id)}>Дахин</button><button type="button" aria-label={`${item.file.name} хасах`} className="inline-flex size-5 shrink-0 items-center justify-center rounded-full hover:bg-red-100" onClick={() => cancelUpload(item.id)}><X className="size-3" /></button></li> : <li key={item.id} className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#F8FAFC] py-1 pr-1.5 pl-2.5 text-xs text-[#3F4852] ring-1 ring-[#0B1F3A]/10"><LoaderCircle className="size-3.5 shrink-0 animate-spin text-[#0B5CFF]" /><span className="truncate">{item.file.name}</span><span className="shrink-0 text-[10px] text-[#66717D]">Файл хавсаргаж байна...</span><button type="button" aria-label={`${item.file.name} цуцлах`} className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[#66717D] hover:bg-[#0B1F3A]/8" onClick={() => cancelUpload(item.id)}><X className="size-3" /></button></li>)}{attachedDocuments.map((document) => { const hint = legalAiExtractStatusHint(document.extractStatus); return <li key={document.id} className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-[#F8FAFC] py-1 pr-1.5 pl-2.5 text-xs text-[#3F4852] ring-1 ring-[#0B1F3A]/10"><Paperclip className="size-3.5" /><span className="truncate">{document.fileName}</span>{hint ? <span className="shrink-0 text-[10px] text-amber-700">{hint}</span> : null}<button type="button" aria-label={`${document.fileName} хасах`} className="inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[#66717D] hover:bg-[#0B1F3A]/8 hover:text-[#0B1F3A]" onClick={() => removeAttachedDocument(document.id)}><X className="size-3" /></button></li>; })}</ul> : null}
@@ -397,7 +426,7 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
                   value={draft}
                   suggestions={orthographyResult?.suggestions ?? []}
                   onChange={setDraft}
-                  onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }}
+                  onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }}
                   placeholder={caseContext ? "Энэ хэрэг дээр юу хийх вэ?" : "Юу дээр ажиллах вэ?"}
                   rows={conversationMode ? 2 : 4}
                   className="min-h-16 w-full"
@@ -416,16 +445,12 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
                   )}
                 </div>
               </div>
+              {/* No Latin→Cyrillic checkbox: see the matching comment in legal-ai-chat.tsx — auto-check already underlines flagged words inline as the lawyer types, and this removed a control that always cluttered the composer regardless of whether spell-check had ever run. */}
               <OrthographyStatusBar
                 loading={orthographyLoading}
                 gateMessage={orthographyGate}
                 needsBilling={orthographyNeedsBilling}
                 billingHref="/legal-ai"
-                includeLatinToCyrillic={includeLatinToCyrillic}
-                onIncludeLatinChange={(value) => {
-                  setIncludeLatinToCyrillic(value);
-                  void checkOrthography(draft, { includeLatinToCyrillic: value, mode: "manual" });
-                }}
               />
             </form>
           </div>

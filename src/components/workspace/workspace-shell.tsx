@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { CSSProperties } from "react";
 import Link from "next/link";
-import { LogOut } from "lucide-react";
+import { LogOut, MessageSquareText } from "lucide-react";
 
 import { logoutAction } from "@/application/actions/auth.actions";
 import { BrandLink } from "@/components/layout/brand-link";
@@ -86,6 +86,9 @@ export interface WorkspaceShellProps {
   rightRail?: ReactNode;
   /** Optional compact block above the identity card in the sidebar (also shown in the mobile drawer), e.g. plan status. */
   sidebarExtra?: ReactNode;
+  /** Public feedback form (landing page `#feedback` anchor) — omitted entirely when not set. */
+  feedbackHref?: string | null;
+  feedbackLabel?: string;
 }
 
 const SIDEBAR_STYLE = {
@@ -130,6 +133,8 @@ export function WorkspaceShell({
   header,
   rightRail,
   sidebarExtra,
+  feedbackHref,
+  feedbackLabel = "Send feedback",
 }: WorkspaceShellProps) {
   const initial = initialOf(user.name, user.email);
   const identity = (
@@ -213,6 +218,19 @@ export function WorkspaceShell({
             <ThemeToggle
               buttonClassName="border-white/10 bg-transparent text-sidebar-foreground hover:bg-white/10 hover:border-white/20"
             />
+            {feedbackHref ? (
+              <Link
+                href={feedbackHref}
+                aria-label={feedbackLabel}
+                title={feedbackLabel}
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "icon-sm" }),
+                  "border-white/10 bg-transparent text-sidebar-foreground hover:bg-white/10 hover:border-white/20",
+                )}
+              >
+                <MessageSquareText />
+              </Link>
+            ) : null}
             <form action={logoutAction}>
               <button
                 type="submit"

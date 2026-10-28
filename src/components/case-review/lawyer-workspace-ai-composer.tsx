@@ -14,7 +14,7 @@ export function LawyerWorkspaceAiComposer() {
         <span className="flex size-5 items-center justify-center rounded bg-[#0B5CFF] text-white">
           <Sparkles className="size-3" />
         </span>
-        <span className="text-[14px] font-bold text-[#0B1F3A]">TORE Legal AI</span>
+        <span className="text-[14px] font-bold text-[#0B1F3A]">TORE Legal Chat</span>
       </div>
 
       <p className="text-sm leading-6 text-[#3F4852]">

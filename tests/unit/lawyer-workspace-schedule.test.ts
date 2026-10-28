@@ -90,6 +90,10 @@ function emptyCaseAiDeps() {
 const actor = { userId: "lawyer-user-1", role: UserRole.LAWYER };
 
 describe("loadLawyerWorkspaceHome — schedule", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("A: the nearest upcoming booking survives past 20+ further-out confirmed bookings", async () => {
     const now = new Date();
     // 25 confirmed bookings on each of the next 25 days — none is "today".
@@ -123,6 +127,13 @@ describe("loadLawyerWorkspaceHome — schedule", () => {
   });
 
   it("B: today's confirmed count is correct with 20+ other future bookings", async () => {
+    // Pinned to a safe mid-day instant (not real wall-clock time): at the
+    // real-time edges of the UTC day, "later today" (+30min / +2h below)
+    // can roll into tomorrow and this test flakes — reproduced directly by
+    // running it at 23:59 UTC, where todaysConfirmedCount came back 0
+    // instead of 2.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-01-15T12:00:00.000Z"));
     const now = new Date();
     const todayStart = new Date(now);
     todayStart.setHours(0, 0, 0, 0);

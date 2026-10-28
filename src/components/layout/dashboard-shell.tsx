@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell } from "lucide-react";
+import { Bell, MessageSquareText } from "lucide-react";
 
 import { logoutAction } from "@/application/actions/auth.actions";
 import { BRAND_LOGO_SHELL, BRAND_NAME } from "@/components/brand/tokens";
@@ -43,6 +43,9 @@ interface DashboardShellProps {
   /** Real unread count from the notification repository. 0/undefined renders no badge — never fabricated. */
   unreadNotificationsCount?: number;
   notificationsLabel?: string;
+  /** Public feedback form (landing page `#feedback` anchor) — omitted entirely when not set. */
+  feedbackHref?: string | null;
+  feedbackLabel?: string;
 }
 
 export function DashboardPageHeading({
@@ -72,6 +75,8 @@ export function DashboardShell({
   notificationsHref,
   unreadNotificationsCount = 0,
   notificationsLabel = "Notifications",
+  feedbackHref,
+  feedbackLabel = "Send feedback",
 }: DashboardShellProps) {
   return (
     <div className="min-h-svh flex flex-col">
@@ -94,6 +99,16 @@ export function DashboardShell({
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <LanguageSwitcher locale={locale} label={languageLabel} />
             <ThemeToggle />
+            {feedbackHref ? (
+              <Link
+                href={feedbackHref}
+                aria-label={feedbackLabel}
+                title={feedbackLabel}
+                className="inline-flex size-9 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <MessageSquareText className="size-[1.1rem]" />
+              </Link>
+            ) : null}
             {notificationsHref ? (
               <Link
                 href={notificationsHref}

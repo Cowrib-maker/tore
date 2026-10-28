@@ -58,6 +58,8 @@ export function WorkspaceShell() {
     accessGate,
     sendMessage,
     stop,
+    retry,
+    canRetry,
     setConversationId,
   } = useLegalAiChatSession();
 
@@ -190,7 +192,7 @@ export function WorkspaceShell() {
             <div>
               <h2 className="text-sm font-semibold">Баримт бичиг</h2>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                PDF, DOCX, JPG, PNG, WEBP хавсаргах — TORE Legal AI үүн дээр
+                PDF, DOCX, JPG, PNG, WEBP хавсаргах — TORE Legal Chat үүн дээр
                 үндэслэн шинжилгээ хийж, баруун талын AI туслахаар дамжуулж
                 хариулна.
               </p>
@@ -267,6 +269,8 @@ export function WorkspaceShell() {
               messages={messages}
               loading={loading}
               chatError={chatError}
+              canRetry={canRetry}
+              onRetry={retry}
               accessGateMessage={accessGate?.message}
               className="min-h-[16rem] flex-1"
             />
@@ -310,6 +314,8 @@ export function WorkspaceShell() {
           messages={messages}
           loading={loading}
           chatError={chatError}
+          canRetry={canRetry}
+          onRetry={retry}
           accessGateMessage={accessGate?.message}
           compact
           className="min-h-0 flex-1"
@@ -331,6 +337,8 @@ function ChatTranscript({
   messages,
   loading,
   chatError,
+  canRetry,
+  onRetry,
   accessGateMessage,
   compact = false,
   className,
@@ -338,6 +346,8 @@ function ChatTranscript({
   messages: ChatMessage[];
   loading: boolean;
   chatError: string;
+  canRetry?: boolean;
+  onRetry?: () => void;
   accessGateMessage?: string;
   compact?: boolean;
   className?: string;
@@ -394,9 +404,18 @@ function ChatTranscript({
         <p className="text-[11px] text-[#8A939D]">{thinkingStageLabel}</p>
       ) : null}
       {chatError ? (
-        <p role="alert" className="text-[11px] text-red-600">
-          {chatError}
-        </p>
+        <div role="alert" className="flex items-center justify-between gap-2 text-[11px] text-red-600">
+          <p>{chatError}</p>
+          {canRetry ? (
+            <button
+              type="button"
+              onClick={() => onRetry?.()}
+              className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-700 hover:bg-red-200"
+            >
+              Дахин оролдох
+            </button>
+          ) : null}
+        </div>
       ) : null}
       {accessGateMessage ? (
         <p role="alert" className="text-[11px] text-amber-700">

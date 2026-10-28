@@ -34,6 +34,16 @@ export function useLegalAiChatSession(initial?: {
   const [error, setError] = useState("");
   const [accessGate, setAccessGate] = useState<LegalAiAccessGate | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  /**
+   * The question behind the most recent genuine send failure (never an
+   * abort), so `retry()` can resend it without the caller having to keep
+   * its own copy — and without the user having to retype a question that
+   * was already cleared from the composer the instant they pressed send.
+   */
+  const [lastFailedMessage, setLastFailedMessage] = useState<{
+    text: string;
+    mode?: "CITIZEN" | "PROFESSIONAL";
+  } | null>(null);
 
   useEffect(() => {
     conversationIdRef.current = conversationId;
@@ -46,6 +56,7 @@ export function useLegalAiChatSession(initial?: {
   ): Promise<"ok" | "gated" | "error"> {
     setError("");
     setAccessGate(null);
+    setLastFailedMessage(null);
     if (!options?.resume) {
       setMessages((current) => [...current, { role: "USER", content: text }]);
     }
@@ -193,6 +204,7 @@ export function useLegalAiChatSession(initial?: {
         return "error";
       }
       setError(LEGAL_AI_CHAT_RETRY_MESSAGE);
+      setLastFailedMessage({ text, mode: _mode });
       return "error";
     } finally {
       abortRef.current = null;
@@ -204,6 +216,19 @@ export function useLegalAiChatSession(initial?: {
     abortRef.current?.abort();
   }
 
+  /**
+   * Resends the question behind the last genuine send failure, as a
+   * continuation of the same turn (never a duplicate USER bubble — the
+   * original one is already in `messages`). A no-op if there is nothing
+   * to retry (e.g. the user already typed something new instead).
+   */
+  function retry(): Promise<"ok" | "gated" | "error"> | undefined {
+    if (!lastFailedMessage) return undefined;
+    return sendMessage(lastFailedMessage.text, lastFailedMessage.mode, {
+      resume: true,
+    });
+  }
+
   return {
     messages,
     conversationId,
@@ -212,6 +237,8 @@ export function useLegalAiChatSession(initial?: {
     accessGate,
     sendMessage,
     stop,
+    retry,
+    canRetry: lastFailedMessage !== null,
     setMessages,
     /**
      * Lets a caller sync in a conversationId obtained from a side-channel

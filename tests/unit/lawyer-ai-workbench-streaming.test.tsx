@@ -157,6 +157,12 @@ describe("LawyerAiWorkbench — SSE streaming (regression for Critical Bug #2)",
     await waitFor(() => {
       expect(screen.getByText("Эрүүгийн хууль")).not.toBeNull();
     });
+    // Same assertion the real-browser E2E case (lawyer-journey.e2e.test.ts,
+    // "legal AI research") makes against a live OpenAI call — reproduced
+    // here deterministically via the mocked `done` event above, so citation
+    // rendering is covered without ever depending on a reachable/valid
+    // OpenAI key.
+    expect(screen.getByText("TORE-ийн дүгнэлт", { exact: true })).not.toBeNull();
   });
 
   it("removes the partial assistant bubble and shows an error banner when the stream errors mid-way", async () => {
@@ -345,5 +351,63 @@ describe("LawyerAiWorkbench — SSE streaming (regression for Critical Bug #2)",
     // after logging in — mirrors the pre-streaming auth-gate behavior.
     const textarea = screen.getByPlaceholderText("Юу дээр ажиллах вэ?") as HTMLTextAreaElement;
     expect(textarea.value).toBe("Асуулт");
+  });
+
+  it("a genuine send failure shows a Retry button that resends the same question without retyping it", async () => {
+    // Unlike the 401 case above, a genuine network/stream failure clears
+    // the composer on submit (the normal chat-UX behavior), so without a
+    // retry action the lawyer would have to remember and retype their
+    // whole question — reproduced here, then fixed by the Retry button.
+    let callCount = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = typeof input === "string" ? input : input.toString();
+        if (!url.includes("/api/ai/chat")) return new Response(null, { status: 404 });
+        callCount += 1;
+        if (callCount === 1) {
+          // stream ends without a terminal frame — a genuine failure
+          return sseResponse([{ event: "delta", data: { text: "Таслагдсан" } }]);
+        }
+        return sseResponse([
+          { event: "done", data: { conversationId: "conv-1", message: { id: "m1", content: "Эцсийн хариулт.", citations: [] } } },
+        ]);
+      }),
+    );
+
+    renderWorkbench();
+    await act(async () => {
+      typeAndSubmit("Миний асуулт");
+    });
+
+    const retryButton = await screen.findByRole("button", { name: "Дахин оролдох" });
+    expect(callCount).toBe(1);
+
+    await act(async () => {
+      fireEvent.click(retryButton);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Эцсийн хариулт.")).not.toBeNull();
+    });
+    expect(callCount).toBe(2);
+    // Resuming the failed turn, not a second copy of the question.
+    expect(screen.getAllByText("Миний асуулт")).toHaveLength(1);
+    expect(screen.queryByRole("button", { name: "Дахин оролдох" })).toBeNull();
+  });
+
+  it("the composer never shows the Latin→Cyrillic checkbox — it used to always clutter the default view", () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = typeof input === "string" ? input : input.toString();
+        return url.includes("/api/ai/chat") ? sseResponse([]) : new Response(null, { status: 404 });
+      }),
+    );
+    renderWorkbench();
+    expect(
+      screen.queryByText(/Латин үсгээр бичсэн монгол үгийг кириллээр санал болгох/),
+    ).toBeNull();
+    expect(screen.queryByRole("checkbox")).toBeNull();
   });
 });

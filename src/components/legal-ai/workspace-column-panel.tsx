@@ -51,6 +51,8 @@ export function WorkspaceColumnPanel({
     accessGate,
     sendMessage,
     stop,
+    retry,
+    canRetry,
     setConversationId,
   } = useLegalAiChatSession();
   const thinkingStageLabel = useThinkingStageLabel(loading);
@@ -241,7 +243,7 @@ export function WorkspaceColumnPanel({
         {messages.length === 0 ? (
           <p className="text-[12.5px] leading-relaxed text-[#5C6570]">
             Хэргийн талаар асуултаа энд бичээрэй — хавсаргасан баримт байвал
-            TORE Legal AI түүн дээр үндэслэн хариулна.
+            TORE Legal Chat түүн дээр үндэслэн хариулна.
           </p>
         ) : (
           messages.map((item, index) =>
@@ -268,9 +270,18 @@ export function WorkspaceColumnPanel({
           <p className="text-[11px] text-[#8A939D]">{thinkingStageLabel}</p>
         ) : null}
         {chatError ? (
-          <p role="alert" className="text-[11px] text-red-600">
-            {chatError}
-          </p>
+          <div role="alert" className="flex items-center justify-between gap-2 text-[11px] text-red-600">
+            <p>{chatError}</p>
+            {canRetry ? (
+              <button
+                type="button"
+                onClick={() => void retry()}
+                className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-700 hover:bg-red-200"
+              >
+                Дахин оролдох
+              </button>
+            ) : null}
+          </div>
         ) : null}
         {accessGate ? (
           <p role="alert" className="text-[11px] text-amber-700">
