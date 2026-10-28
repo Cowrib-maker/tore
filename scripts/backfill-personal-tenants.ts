@@ -13,11 +13,13 @@ import "dotenv/config";
 import { backfillPersonalTenantsUseCase } from "../src/application/use-cases/tenancy/ensure-personal-tenant";
 import { tenantRepository } from "../src/infrastructure/repositories";
 import { isFoundationTenantV1Enabled } from "../src/lib/feature-flags";
+import { announceDatabaseTarget } from "./lib/announce-database-target";
 
 async function main() {
   if (!process.env.DATABASE_URL) {
     throw new Error("DATABASE_URL is not set");
   }
+  announceDatabaseTarget("db:backfill-personal-tenants", process.env.DATABASE_URL);
 
   const force = process.argv.includes("--force");
   if (!force && !isFoundationTenantV1Enabled()) {
