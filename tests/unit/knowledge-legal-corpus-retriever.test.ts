@@ -458,6 +458,62 @@ describe("KnowledgeLegalCorpusRetriever N+1 elimination (Sprint 14)", () => {
   });
 });
 
+describe("KnowledgeLegalCorpusRetriever — labor-law domain coverage gap fix", () => {
+  it("retrieves a Labor Law article for an employment-termination question (previously: no domain inferred, forced to the stricter 0.8 threshold, found nothing)", async () => {
+    const knowledge = new InMemoryKnowledgeRepository();
+    await knowledge.save({
+      id: "doc-labor-law",
+      sourceId: "legalinfo",
+      sourceUrl: "https://legalinfo.mn/mn/detail?lawId=565",
+      title: "Хөдөлмөрийн тухай хууль",
+      kind: KnowledgeDocumentKind.HTML,
+      metadata: {
+        title: "Хөдөлмөрийн тухай хууль",
+        language: "mn",
+        jurisdiction: "MN",
+        documentType: "LABOR_LAW",
+        sourceUrl: "https://legalinfo.mn/mn/detail?lawId=565",
+        articleCount: 1,
+        validFrom: null,
+        validTo: null,
+        sourceVersion: null,
+      },
+      articles: [
+        {
+          id: "art-labor-40",
+          articleNumber: "40",
+          title: "Хөдөлмөрийн гэрээг цуцлах үндэслэл",
+          text: "Ажил олгогч ажилтантай байгуулсан хөдөлмөрийн гэрээг хуульд заасан үндэслэлээр цуцалж болно.",
+          order: 0,
+        },
+      ],
+      chunks: [],
+      ingestedAt: new Date("2026-01-01T00:00:00.000Z"),
+      provenance: {
+        archiveId: "arch-labor",
+        sha256: "sha256-labor",
+        originalUrl: "https://legalinfo.mn/mn/detail?lawId=565",
+        lawId: "565",
+      },
+    });
+
+    const retriever = new KnowledgeLegalCorpusRetriever(knowledge);
+    const question = "Ажил олгогч ажилтныг ямар үндэслэлээр ажлаас чөлөөлж болох вэ?";
+
+    const result = await retriever.retrieveLegalQuestion({
+      question,
+      query: question,
+      locator: null,
+    });
+
+    expect(result.kind).toBe("retrieved");
+    if (result.kind === "retrieved") {
+      expect(result.authorities.length).toBeGreaterThan(0);
+      expect(result.authorities[0]!.title).toContain("Хөдөлмөрийн");
+    }
+  });
+});
+
 describe("FallbackLegalCorpusRetriever", () => {
   it("uses local structured retrieval when the golden provision is verified locally", async () => {
     const knowledge = new InMemoryKnowledgeRepository();

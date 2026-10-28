@@ -29,6 +29,7 @@ import {
   type RawKnowledgeDocument,
 } from "@/engine/knowledge/types";
 import { LegalInfoKnowledgeParser } from "@/engine/knowledge/parser/legalinfo-knowledge.parser";
+import { tokenizeSearchTerms } from "@/engine/knowledge/repository/article-search";
 import { canonicalLawTitlesMatch } from "./legalinfo-title-discovery";
 
 export type VerifiedLegalInfoArticle = {
@@ -187,4 +188,93 @@ export function isArticleNumberStruck(
     }
   }
   return false;
+}
+
+export type RelevantLegalInfoArticle = {
+  documentTitle: string;
+  articleNumber: string;
+  text: string;
+  validFrom: string | null;
+  validTo: string | null;
+  score: number;
+};
+
+/** Open-question article matches below this score are treated as noise (prefer empty). */
+export const MIN_RELEVANT_ARTICLE_SCORE = 0.34;
+
+/**
+ * Parses an already-fetched LegalInfo.mn detail page and ranks its
+ * (non-repealed) articles by search-term overlap against an open legal
+ * question — this tier's equivalent of KnowledgeLegalCorpusRetriever's
+ * local full-text search (see MIN_OPEN_QUESTION_CITATION_SCORE there), but
+ * scoped to one already-identified, allowlisted law page instead of a
+ * free-text web or database search: the caller (OfficialWebLegalCorpusRetriever)
+ * only ever fetches one of a small, hand-verified set of candidate laws for
+ * the question's inferred domain (see candidateLawIdsForDomain), never an
+ * arbitrary site-wide search. A law with no article scoring at or above
+ * MIN_RELEVANT_ARTICLE_SCORE returns an empty list — never a guess.
+ */
+export async function extractRelevantLegalInfoArticles(input: {
+  html: string;
+  sourceUrl: string;
+  questionText: string;
+  maxResults: number;
+}): Promise<RelevantLegalInfoArticle[]> {
+  const raw: RawKnowledgeDocument = {
+    sourceId: "legalinfo-live",
+    sourceUrl: input.sourceUrl,
+    kind: KnowledgeDocumentKind.HTML,
+    bytes: new TextEncoder().encode(input.html),
+    contentType: "text/html",
+    fetchedAt: new Date(),
+  };
+
+  let parsed;
+  try {
+    parsed = await new LegalInfoKnowledgeParser().parse(raw);
+  } catch {
+    return [];
+  }
+
+  const title = parsed.title?.trim();
+  if (!title) {
+    return [];
+  }
+
+  const terms = tokenizeSearchTerms(input.questionText, 10);
+  if (terms.length === 0) {
+    return [];
+  }
+
+  const struckLocators = collectStruckLocators(input.html);
+  const scored: RelevantLegalInfoArticle[] = [];
+
+  for (const article of parsed.articles) {
+    const number = (article.articleNumber ?? "").trim();
+    if (!number || isArticleNumberStruck(number, struckLocators)) {
+      // Never surface a repealed provision as a live open-question match —
+      // same rule retrieveAndVerifyExactCitation already applies above.
+      continue;
+    }
+    const haystack = `${article.title ?? ""} ${article.text}`.toLowerCase();
+    const hitCount = terms.filter((term) => haystack.includes(term)).length;
+    if (hitCount === 0) {
+      continue;
+    }
+    const score = hitCount / terms.length;
+    if (score < MIN_RELEVANT_ARTICLE_SCORE) {
+      continue;
+    }
+    scored.push({
+      documentTitle: title,
+      articleNumber: number,
+      text: article.text,
+      validFrom: parsed.validFrom ?? null,
+      validTo: parsed.validTo ?? null,
+      score,
+    });
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, Math.max(0, input.maxResults));
 }

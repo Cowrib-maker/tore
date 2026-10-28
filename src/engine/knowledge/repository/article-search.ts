@@ -20,7 +20,7 @@ const DOMAIN_TITLE_HINTS: Record<string, RegExp> = {
   CRIMINAL:
     /(criminal|эрүүгийн|гэмт\s*хэрэг|цагдаа|хорих|ял\s*ших|offense|offence|prosecut)/i,
   CIVIL:
-    /(civil|иргэний|contract|гэрээ|obligation|tort|өмчийн|family|гэр\s*бүл)/i,
+    /(civil|иргэний|contract|гэрээ|obligation|tort|өмчийн|family|гэр\s*бүл|labor|labour|хөдөлмөр|ажил\s*олгогч|ажилтан|ажлаас\s*(халах|чөлөөл)|цалин)/i,
   ADMINISTRATIVE:
     /(administrative|захиргааны|agency|permit|licence|license|regulatory|тусгай\s*зөвшөөрөл)/i,
 };
@@ -34,7 +34,7 @@ const DOMAIN_TITLE_TERMS: Record<string, readonly string[]> = {
     "offense",
     "offence",
   ],
-  CIVIL: ["civil", "иргэний", "contract", "гэрээ", "obligation"],
+  CIVIL: ["civil", "иргэний", "contract", "гэрээ", "obligation", "хөдөлмөр", "ажил олгогч"],
   ADMINISTRATIVE: [
     "administrative",
     "захиргааны",
@@ -414,7 +414,7 @@ export function inferLegalDomainFromText(text: string): string | null {
     return "ADMINISTRATIVE";
   }
   if (
-    /(иргэний\s*хууль|гэрээ|нэхэмжлэл|өр\b|зээл|гэрлэлт|тэтгэмж|өмч|civil|contract|tort)/i.test(
+    /(иргэний\s*хууль|гэрээ|нэхэмжлэл|өр\b|зээл|гэрлэлт|тэтгэмж|өмч|civil|contract|tort|хөдөлмөр|ажил\s*олгогч|ажилтан|ажлаас\s*(халах|чөлөөл)|цалин)/i.test(
       hay,
     )
   ) {

@@ -1007,6 +1007,24 @@ describe("LegalAiService", () => {
     expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
   });
 
+  it("answers a lawyer's plain, non-legal editing request directly — no retrieval, no 'could not verify' framing", async () => {
+    const { service, completion, corpusRetriever } = createService();
+
+    const result = await service.createTurn({
+      userId: "lawyer-1",
+      actorRole: UserRole.LAWYER,
+      message: "Энэ өгүүлбэрийг ойлгомжтой тайлбарла.",
+    });
+
+    expect(result.capability).toBe(LegalAiCapability.LAWYER);
+    expect(result.turnKind).toBe(PromptTurnKind.GENERAL);
+    expect(result.message.content).not.toBe(NON_LEGAL_REFUSAL_MESSAGE);
+    expect(result.message.content).toBe("mocked-answer");
+    expect(completion.complete).toHaveBeenCalledOnce();
+    expect(corpusRetriever.retrieveExactCitation).not.toHaveBeenCalled();
+    expect(corpusRetriever.retrieveLegalQuestion).not.toHaveBeenCalled();
+  });
+
   it("keeps exact citation lookup for a statute question", async () => {
     const corpusRetriever = createRetriever(
       async () => ({

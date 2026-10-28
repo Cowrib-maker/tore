@@ -125,6 +125,72 @@ describe("TieredLegalCorpusRetriever.retrieveExactCitation", () => {
   });
 });
 
+describe("TieredLegalCorpusRetriever.retrieveLegalQuestion (open, non-exact-citation questions)", () => {
+  it("falls through local -> engine -> official web for an open question too, stamping the tier that actually hit", async () => {
+    const local = new StubRetriever(MISS);
+    const engine = new StubRetriever(MISS);
+    const web = new StubRetriever(hit("web"));
+    const tiered = new TieredLegalCorpusRetriever([
+      { retriever: local, source: LegalCorpusSource.LOCAL_CORPUS },
+      { retriever: engine, source: LegalCorpusSource.LEGAL_DATA_ENGINE },
+      { retriever: web, source: LegalCorpusSource.OFFICIAL_WEB },
+    ]);
+
+    const result = await tiered.retrieveLegalQuestion({ question: "q", query: "q", locator: null });
+
+    expect(local.calls.retrieveLegalQuestion).toBe(1);
+    expect(engine.calls.retrieveLegalQuestion).toBe(1);
+    expect(web.calls.retrieveLegalQuestion).toBe(1);
+    expect(result.kind).toBe("retrieved");
+    if (result.kind === "retrieved") {
+      expect(result.source).toBe(LegalCorpusSource.OFFICIAL_WEB);
+    }
+  });
+
+  it("stops at the engine tier when it hits — the official-web tier is never reached", async () => {
+    const local = new StubRetriever(MISS);
+    const engine = new StubRetriever(hit("engine"));
+    const web = new StubRetriever(MISS);
+    const tiered = new TieredLegalCorpusRetriever([
+      { retriever: local, source: LegalCorpusSource.LOCAL_CORPUS },
+      { retriever: engine, source: LegalCorpusSource.LEGAL_DATA_ENGINE },
+      { retriever: web, source: LegalCorpusSource.OFFICIAL_WEB },
+    ]);
+
+    const result = await tiered.retrieveLegalQuestion({ question: "q", query: "q", locator: null });
+
+    expect(web.calls.retrieveLegalQuestion).toBe(0);
+    expect(result.kind).toBe("retrieved");
+    if (result.kind === "retrieved") {
+      expect(result.source).toBe(LegalCorpusSource.LEGAL_DATA_ENGINE);
+    }
+  });
+
+  it("returns unavailable when every tier misses an open question", async () => {
+    const tiered = new TieredLegalCorpusRetriever([
+      { retriever: new StubRetriever(MISS), source: LegalCorpusSource.LOCAL_CORPUS },
+      { retriever: new StubRetriever(MISS), source: LegalCorpusSource.LEGAL_DATA_ENGINE },
+      { retriever: new StubRetriever(MISS), source: LegalCorpusSource.OFFICIAL_WEB },
+    ]);
+    const result = await tiered.retrieveLegalQuestion({ question: "q", query: "q", locator: null });
+    expect(result).toEqual(MISS);
+  });
+
+  it("short-circuits on as_of_unavailable from an early tier for an open question too", async () => {
+    const asOf: LegalCorpusRetrieveResult = { kind: "as_of_unavailable", authorities: [], retrievedAt: null };
+    const local = new StubRetriever(asOf);
+    const web = new StubRetriever(hit("web"));
+    const tiered = new TieredLegalCorpusRetriever([
+      { retriever: local, source: LegalCorpusSource.LOCAL_CORPUS },
+      { retriever: web, source: LegalCorpusSource.OFFICIAL_WEB },
+    ]);
+
+    const result = await tiered.retrieveLegalQuestion({ question: "q", query: "q", locator: null });
+    expect(result).toEqual(asOf);
+    expect(web.calls.retrieveLegalQuestion).toBe(0);
+  });
+});
+
 describe("TieredLegalCorpusRetriever.verifyCitation", () => {
   it("does not treat a CONFLICT as a miss — never asks a later tier to silently resolve ambiguity", async () => {
     const conflict: LegalCitationVerifyResult = {

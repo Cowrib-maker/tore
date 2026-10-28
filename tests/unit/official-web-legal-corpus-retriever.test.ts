@@ -318,7 +318,7 @@ describe("OfficialWebLegalCorpusRetriever.retrieveExactCitation", () => {
 });
 
 describe("OfficialWebLegalCorpusRetriever.retrieveLegalQuestion", () => {
-  it("never performs a web search — always unavailable, no network calls", async () => {
+  it("never free-text-searches the web — a domain-ambiguous question has no candidate law, so no network call happens", async () => {
     const fetchImpl = router({});
     const retriever = new OfficialWebLegalCorpusRetriever({ fetchImpl });
 
@@ -330,6 +330,98 @@ describe("OfficialWebLegalCorpusRetriever.retrieveLegalQuestion", () => {
 
     expect(result).toEqual({ kind: "unavailable", reason: "not_found", authorities: [], retrievedAt: null });
     expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it("fetches the domain-inferred candidate law and returns a verified authority for a matching open question", async () => {
+    const fetchImpl = router({
+      detail: { "https://legalinfo.mn/mn/detail?lawId=11634": () => htmlResponse(FIXTURE_11634) },
+    });
+    const retriever = new OfficialWebLegalCorpusRetriever({ fetchImpl });
+    const question =
+      "Энэ бол гэмт хэрэг: Бусдын эд хөрөнгийг нууцаар, хууль бусаар авсан бол ямар хариуцлага хүлээх вэ?";
+
+    const result = await retriever.retrieveLegalQuestion({ question, query: question, locator: null });
+
+    expect(result.kind).toBe("retrieved");
+    if (result.kind === "retrieved") {
+      expect(result.authorities.length).toBeGreaterThan(0);
+      expect(result.authorities[0]!.article).toBe("17.1");
+      expect(result.authorities[0]!.sourceUrl).toBe("https://legalinfo.mn/mn/detail?lawId=11634");
+      expect(result.authorities[0]!.excerpt).toContain("Бусдын эд хөрөнгийг");
+    }
+  });
+
+  it("only ever fetches from the small, hand-verified candidate-law set for the inferred domain — never any other page", async () => {
+    const fetchImpl = router({
+      detail: { "https://legalinfo.mn/mn/detail?lawId=11634": () => htmlResponse(FIXTURE_11634) },
+    });
+    const retriever = new OfficialWebLegalCorpusRetriever({ fetchImpl });
+    const question =
+      "Энэ бол гэмт хэрэг: Бусдын эд хөрөнгийг нууцаар, хууль бусаар авсан бол ямар хариуцлага хүлээх вэ?";
+
+    await retriever.retrieveLegalQuestion({ question, query: question, locator: null });
+
+    const calledUrls = (fetchImpl as unknown as { mock: { calls: unknown[][] } }).mock.calls.map((call) =>
+      String(call[0]),
+    );
+    expect(calledUrls).toEqual(["https://legalinfo.mn/mn/detail?lawId=11634"]);
+  });
+
+  it("returns unavailable (never fabricates) when the candidate law's page fetches fine but no article matches the question", async () => {
+    const fetchImpl = router({
+      detail: { "https://legalinfo.mn/mn/detail?lawId=11634": () => htmlResponse(FIXTURE_11634) },
+    });
+    const retriever = new OfficialWebLegalCorpusRetriever({ fetchImpl });
+    // CRIMINAL domain (цагдаа/хэрэгтэн/баривчил), but none of these terms
+    // appear on the fixture page, whose only two articles are the law's
+    // purpose clause and theft (unrelated vocabulary) — a real, deterministic
+    // "fetched fine, nothing relevant" case, not a fetch failure.
+    const question = "Цагдаагийн байгууллага хэрэгтнийг хэрхэн баривчлах вэ?";
+
+    const result = await retriever.retrieveLegalQuestion({ question, query: question, locator: null });
+
+    expect(result).toEqual({ kind: "unavailable", reason: "not_found", authorities: [], retrievedAt: null });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
+  it("respects the rate limit for open-question lookups too — refuses without a network call once the budget is spent", async () => {
+    const fetchImpl = router({
+      detail: { "https://legalinfo.mn/mn/detail?lawId=11634": () => htmlResponse(FIXTURE_11634) },
+    });
+    const retriever = new OfficialWebLegalCorpusRetriever({
+      fetchImpl,
+      rateLimitPerMinute: 1,
+      rateLimitKey: "test:open-question-rate-limit-isolation",
+    });
+    const question =
+      "Энэ бол гэмт хэрэг: Бусдын эд хөрөнгийг нууцаар, хууль бусаар авсан бол ямар хариуцлага хүлээх вэ?";
+
+    const first = await retriever.retrieveLegalQuestion({ question, query: question, locator: null });
+    expect(first.kind).toBe("retrieved");
+
+    const callsAfterFirst = (fetchImpl as unknown as { mock: { calls: unknown[] } }).mock.calls.length;
+    const second = await retriever.retrieveLegalQuestion({ question, query: question, locator: null });
+    expect(second.kind).toBe("unavailable");
+    expect((fetchImpl as unknown as { mock: { calls: unknown[] } }).mock.calls.length).toBe(callsAfterFirst);
+  });
+
+  it("bounds total latency with one overall deadline for open questions too, even when the fetch hangs forever", async () => {
+    const fetchImpl = vi.fn(() => new Promise<Response>(() => {})) as unknown as typeof fetch;
+    const retriever = new OfficialWebLegalCorpusRetriever({
+      fetchImpl,
+      timeoutMs: 60_000,
+      overallDeadlineMs: 50,
+      rateLimitKey: "test:open-question-overall-deadline",
+    });
+    const question =
+      "Энэ бол гэмт хэрэг: Бусдын эд хөрөнгийг нууцаар, хууль бусаар авсан бол ямар хариуцлага хүлээх вэ?";
+
+    const started = Date.now();
+    const result = await retriever.retrieveLegalQuestion({ question, query: question, locator: null });
+    const elapsedMs = Date.now() - started;
+
+    expect(result).toEqual({ kind: "unavailable", reason: "timeout", authorities: [], retrievedAt: null });
+    expect(elapsedMs).toBeLessThan(5000);
   });
 });
 

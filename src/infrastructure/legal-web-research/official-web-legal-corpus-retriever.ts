@@ -43,11 +43,16 @@ import {
   isLegalInfoHostname,
   legalInfoDetailUrl,
   parseLegalTemporalQueryIntent,
+  type LegalTemporalExplicitRelation,
 } from "@/engine/knowledge";
 import type { FetchLike } from "@/engine/knowledge/crawler/http-knowledge-crawler";
 import type { IKnowledgeRepository } from "@/engine/knowledge/types";
+import { inferLegalDomainFromText } from "@/engine/knowledge/repository/article-search";
 import { detectExactCitation, type DetectedExactCitation } from "@/engine/citation";
-import { resolveCanonicalLawIdentity } from "@/engine/citation/canonical-law-titles";
+import {
+  candidateLawIdsForDomain,
+  resolveCanonicalLawIdentity,
+} from "@/engine/citation/canonical-law-titles";
 import {
   CitationVerificationStatus,
   type LegalCitationVerifyResult,
@@ -61,7 +66,15 @@ import {
 import { consumeRateLimit } from "@/infrastructure/security/rate-limiter";
 import { cacheVerifiedWebDocument } from "./cache-verified-web-document";
 import { discoverLegalInfoLawByTitle } from "./legalinfo-title-discovery";
-import { extractVerifiedLegalInfoArticle } from "./legalinfo-article-extraction";
+import {
+  extractRelevantLegalInfoArticles,
+  extractVerifiedLegalInfoArticle,
+} from "./legalinfo-article-extraction";
+
+/** Caps how many live-verified authorities one open-question lookup returns — mirrors MAX_OPEN_QUESTION_AUTHORITIES in knowledge-legal-corpus-retriever.ts. */
+const MAX_OPEN_QUESTION_AUTHORITIES = 3;
+/** Caps how many candidate laws one open-question lookup fetches — the domain→lawId map is small by design, but this keeps a future larger mapping from ballooning request count. */
+const MAX_OPEN_QUESTION_CANDIDATE_LAWS = 2;
 
 export const LEGALINFO_LIVE_SOURCE_TYPE = "legalinfo-live";
 const DEFAULT_RATE_LIMIT_KEY = "legal-web-retrieval:legalinfo:global";
@@ -155,11 +168,149 @@ export class OfficialWebLegalCorpusRetriever implements LegalCorpusRetriever {
     return retrieved;
   }
 
+  /**
+   * Open (non-exact-citation) legal questions: scoped, never a free-text
+   * web search. The question's domain (same coarse CRIMINAL/CIVIL/
+   * ADMINISTRATIVE inference the local tier uses) maps to a small,
+   * hand-verified set of candidate laws (candidateLawIdsForDomain, drawn
+   * from the same CANONICAL registry retrieveExactCitation's discovery
+   * falls back on) — never an arbitrary site search, and never more than
+   * MAX_OPEN_QUESTION_CANDIDATE_LAWS pages per question. A question with no
+   * inferable domain has no safe candidate and is an honest `not_found`,
+   * with no network call at all, same as before this method had any real
+   * logic.
+   */
   async retrieveLegalQuestion(
-    _input: LegalCorpusRetrieveInput,
+    input: LegalCorpusRetrieveInput,
   ): Promise<LegalCorpusRetrieveResult> {
-    // Deliberately out of scope — see file header. Never free-text-searches.
-    return unavailable("not_found");
+    const questionText = (input.question || input.query || "").trim();
+    if (!questionText) {
+      return unavailable("not_found");
+    }
+
+    const domain = inferLegalDomainFromText(questionText);
+    const candidateLawIds = candidateLawIdsForDomain(domain).slice(
+      0,
+      MAX_OPEN_QUESTION_CANDIDATE_LAWS,
+    );
+    if (candidateLawIds.length === 0) {
+      return unavailable("not_found");
+    }
+
+    const rate = await consumeRateLimit(this.rateLimitKey, this.rateLimitPerMinute, RATE_LIMIT_WINDOW_MS);
+    if (!rate.ok) {
+      return unavailable("network");
+    }
+
+    const outcome = await withDeadline(
+      this.collectRelevantAuthorities(questionText, candidateLawIds, input.explicitRelations ?? []),
+      this.overallDeadlineMs,
+    );
+    if (outcome === DEADLINE_EXCEEDED) {
+      return unavailable("timeout");
+    }
+    if (outcome.authorities.length === 0) {
+      return unavailable(outcome.failureReason ?? "not_found");
+    }
+    return {
+      kind: "retrieved",
+      status: "ok",
+      authorities: outcome.authorities,
+      retrievedAt: this.now().toISOString(),
+    };
+  }
+
+  /**
+   * Network-bound half of one open-question lookup: fetches each candidate
+   * law's page (same allowlisted crawler as exact citations) and ranks its
+   * articles against the question. Stops once MAX_OPEN_QUESTION_AUTHORITIES
+   * is reached. A candidate that fails to fetch is skipped, not fatal —
+   * the failure reason is only surfaced if EVERY candidate failed to fetch
+   * and nothing was found, so one candidate law's outage never masks a real
+   * match on another.
+   */
+  private async collectRelevantAuthorities(
+    questionText: string,
+    candidateLawIds: readonly string[],
+    explicitRelations: readonly LegalTemporalExplicitRelation[],
+  ): Promise<{ authorities: LegalCorpusAuthority[]; failureReason?: LegalCorpusUnavailableReason }> {
+    const intent = parseLegalTemporalQueryIntent(questionText);
+    const nowIsoDate = this.now().toISOString().slice(0, 10);
+    const authorities: LegalCorpusAuthority[] = [];
+    let failureReason: LegalCorpusUnavailableReason | undefined;
+    let anyFetchSucceeded = false;
+
+    for (const lawId of candidateLawIds) {
+      if (authorities.length >= MAX_OPEN_QUESTION_AUTHORITIES) {
+        break;
+      }
+      const officialUrl = legalInfoDetailUrl(lawId);
+      const fetched = await this.fetchDetailPage(officialUrl);
+      if (!fetched.ok) {
+        failureReason ??= fetched.reason;
+        continue;
+      }
+      anyFetchSucceeded = true;
+
+      const matches = await extractRelevantLegalInfoArticles({
+        html: fetched.html,
+        sourceUrl: officialUrl,
+        questionText,
+        maxResults: MAX_OPEN_QUESTION_AUTHORITIES - authorities.length,
+      });
+
+      for (const match of matches) {
+        const proof = evaluateVersionForTemporalQuery(
+          {
+            validFrom: match.validFrom,
+            validTo: match.validTo,
+            lawId,
+            explicitRelations,
+            title: match.documentTitle,
+          },
+          intent,
+          nowIsoDate,
+        );
+        if (!proof.proven && intent.kind !== "UNSPECIFIED") {
+          // Same rule as the exact-citation path: an unprovable version is
+          // never presented as current law when the question specifically
+          // asked about temporal applicability.
+          continue;
+        }
+
+        const bytes = new TextEncoder().encode(fetched.html);
+        const documentVersionId = contentSha256Hex(bytes);
+        authorities.push({
+          nodeId: `legalinfo-live:${lawId}:${match.articleNumber}`,
+          documentId: `legalinfo-live:${lawId}`,
+          documentVersionId,
+          locator: match.articleNumber,
+          title: match.documentTitle,
+          excerpt: match.text,
+          contentHash: sha256Hex(bytes),
+          sourceContentHash: documentVersionId,
+          parserId: LEGALINFO_LIVE_SOURCE_TYPE,
+          archiveRecordId: "",
+          effectiveFrom: match.validFrom,
+          effectiveTo: match.validTo,
+          sourceUrl: officialUrl,
+          sourceVersion: null,
+          article: match.articleNumber,
+          paragraph: null,
+          sourceType: LEGALINFO_LIVE_SOURCE_TYPE,
+        });
+        if (authorities.length >= MAX_OPEN_QUESTION_AUTHORITIES) {
+          break;
+        }
+      }
+
+      this.cacheBestEffort(fetched.html, officialUrl, lawId);
+    }
+
+    if (authorities.length === 0 && !anyFetchSucceeded && failureReason) {
+      return { authorities: [], failureReason };
+    }
+    return { authorities };
   }
 
   async verifyCitation(
@@ -270,33 +421,7 @@ export class OfficialWebLegalCorpusRetriever implements LegalCorpusRetriever {
       return { retrieved: asOfUnavailable(), verification: { ok: false, reason: "not_found" } };
     }
 
-    const cacheFactory = this.cacheFactory;
-    if (cacheFactory) {
-      // Fire-and-forget by design, not merely best-effort: this must never
-      // add latency to (or block) the citation answer below, and a cache
-      // stack that hangs or is simply slow (a real DB/archive write) must
-      // never be able to turn an already-verified answer into a spurious
-      // failure. cacheVerifiedWebDocument() already catches its own
-      // errors and never throws; the outer catch here only guards the
-      // cache-stack setup (the factory call itself), and resets
-      // `cachePromise` on failure so a transient setup failure gets
-      // retried on the next citation rather than permanently disabling
-      // caching for this retriever's lifetime.
-      void (async () => {
-        try {
-          const cache = await (this.cachePromise ??= cacheFactory());
-          await cacheVerifiedWebDocument({
-            html,
-            sourceUrl: candidate.officialUrl,
-            lawId: candidate.lawId,
-            archive: cache.archive,
-            repository: cache.repository,
-          });
-        } catch {
-          this.cachePromise = undefined;
-        }
-      })();
-    }
+    this.cacheBestEffort(html, candidate.officialUrl, candidate.lawId);
 
     const bytes = new TextEncoder().encode(html);
     const contentHash = sha256Hex(bytes);
@@ -349,6 +474,41 @@ export class OfficialWebLegalCorpusRetriever implements LegalCorpusRetriever {
     verification: LegalCitationVerifyResult;
   } {
     return { retrieved: unavailable(reason), verification: { ok: false, reason } };
+  }
+
+  /**
+   * Fire-and-forget by design, not merely best-effort: this must never add
+   * latency to (or block) the answer it was called alongside, and a cache
+   * stack that hangs or is simply slow (a real DB/archive write) must never
+   * turn an already-verified answer into a spurious failure.
+   * cacheVerifiedWebDocument() already catches its own errors and never
+   * throws; the outer catch here only guards the cache-stack setup (the
+   * factory call itself), and resets `cachePromise` on failure so a
+   * transient setup failure gets retried on the next lookup rather than
+   * permanently disabling caching for this retriever's lifetime. Shared by
+   * the exact-citation and open-question paths — both cache the exact same
+   * way, just with a lawId known up front either from the citation's
+   * resolved candidate or from candidateLawIdsForDomain.
+   */
+  private cacheBestEffort(html: string, officialUrl: string, lawId: string): void {
+    const cacheFactory = this.cacheFactory;
+    if (!cacheFactory) {
+      return;
+    }
+    void (async () => {
+      try {
+        const cache = await (this.cachePromise ??= cacheFactory());
+        await cacheVerifiedWebDocument({
+          html,
+          sourceUrl: officialUrl,
+          lawId,
+          archive: cache.archive,
+          repository: cache.repository,
+        });
+      } catch {
+        this.cachePromise = undefined;
+      }
+    })();
   }
 
   private async resolveCandidateLaw(

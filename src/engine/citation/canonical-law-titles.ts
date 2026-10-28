@@ -39,6 +39,32 @@ const CANONICAL = [
   },
 ] as const;
 
+/**
+ * Candidate law(s) for an open (non-exact-citation) legal question, keyed by
+ * the coarse domain {@link inferLegalDomainFromText} infers from the
+ * question text. Deliberately bounded to this same small, hand-verified
+ * CANONICAL registry — never a free-text search — so a live official-source
+ * lookup for an open question (see OfficialWebLegalCorpusRetriever) only
+ * ever fetches one of these specific, known-good law pages. ADMINISTRATIVE
+ * has no canonical entry yet, so it returns an empty list (an honest "no
+ * candidate" rather than guessing at an unverified one). CIVIL covers both
+ * "299" (Civil Code) and "565" (Labor Law) — matching DOMAIN_DOCUMENT_TYPES
+ * in article-search.ts, which already groups LABOR_LAW documents under the
+ * CIVIL domain for the same reason.
+ */
+const DOMAIN_CANDIDATE_LAW_IDS: Record<string, readonly string[]> = {
+  CRIMINAL: ["11634"],
+  CIVIL: ["299", "565"],
+  ADMINISTRATIVE: [],
+};
+
+export function candidateLawIdsForDomain(domain: string | null): readonly string[] {
+  if (!domain) {
+    return [];
+  }
+  return DOMAIN_CANDIDATE_LAW_IDS[domain.toUpperCase()] ?? [];
+}
+
 function normalize(value: string): string {
   return value
     .toLocaleLowerCase("mn-MN")
