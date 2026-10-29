@@ -246,7 +246,7 @@ export function WorkspaceShell() {
                   : "Файлаа чирж оруулах эсвэл дарж сонгох"}
               </span>
               <span className="text-[11px] text-muted-foreground">
-                PDF, DOCX, JPG, PNG, WEBP · 10MB хүртэл
+                PDF, DOCX, JPG, PNG, WEBP · 4MB хүртэл
               </span>
             </div>
             <input

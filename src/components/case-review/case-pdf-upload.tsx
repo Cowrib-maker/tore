@@ -3,7 +3,10 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
-import { LEGAL_AI_DOCUMENT_MAX_BYTES } from "@/application/ai/legal-ai-document.constants";
+import {
+  LEGAL_AI_DOCUMENT_MAX_BYTES,
+  LEGAL_AI_DOCUMENT_SIZE_MESSAGE,
+} from "@/application/ai/legal-ai-document.constants";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -48,7 +51,7 @@ export function CasePdfUpload({ caseId, expectedVersion }: Props) {
       return;
     }
     if (file.size > LEGAL_AI_DOCUMENT_MAX_BYTES) {
-      setError("Файл 10MB-аас ихгүй байх ёстой.");
+      setError(LEGAL_AI_DOCUMENT_SIZE_MESSAGE);
       return;
     }
     setUploading(true);
@@ -98,7 +101,7 @@ export function CasePdfUpload({ caseId, expectedVersion }: Props) {
           {error}
         </p>
       ) : (
-        <p className="text-xs text-[#5C6570]">PDF эсвэл зураг (камераар авсан ч болно). 10MB хүртэл.</p>
+        <p className="text-xs text-[#5C6570]">PDF эсвэл зураг (камераар авсан ч болно). 4MB хүртэл.</p>
       )}
       <Button type="submit" className="hidden" disabled>
         Хуулах

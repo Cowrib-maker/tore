@@ -24,7 +24,10 @@
  * a new capability.
  */
 
-import { LEGAL_AI_DOCUMENT_MAX_BYTES } from "@/application/ai/legal-ai-document.constants";
+import {
+  LEGAL_AI_DOCUMENT_MAX_BYTES,
+  LEGAL_AI_DOCUMENT_SIZE_MESSAGE,
+} from "@/application/ai/legal-ai-document.constants";
 import { detectLegalAiDocumentFormat } from "@/application/ai/document-upload-validation";
 import { ValidationError } from "@/domain/errors/domain-error";
 
@@ -65,7 +68,7 @@ export function assertValidCaseEvidenceUpload(
     throw new ValidationError("Файл шаардлагатай.");
   }
   if (input.body.byteLength > LEGAL_AI_DOCUMENT_MAX_BYTES) {
-    throw new ValidationError("Файл 10MB-аас ихгүй байх ёстой.");
+    throw new ValidationError(LEGAL_AI_DOCUMENT_SIZE_MESSAGE);
   }
 
   const detected = detectLegalAiDocumentFormat(input.body);

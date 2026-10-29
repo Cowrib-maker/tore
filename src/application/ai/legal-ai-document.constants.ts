@@ -12,9 +12,20 @@
  * which leaves room for the system prompt, a 30-message history, and any
  * verified legal-source excerpts.
  *
- * File-size limit matches the existing application cap (10 MB).
+ * File-size limit: every upload here goes through a Vercel Function
+ * (/api/ai/documents, /api/lawyer/ai/documents), whose request body is
+ * hard-capped at ~4.5 MB by the platform itself, multipart overhead
+ * included — a larger file is cut off with a non-JSON 413 before this
+ * code ever runs, no matter what limit we validate against. This used to
+ * be 10 MB, which meant every attachment between 4.5 MB and 10 MB passed
+ * client-side validation (the UI said "fine, uploading…") and then failed
+ * at the platform layer, surfacing as a generic/confusing upload error.
+ * 4 MB matches the same safe-margin convention already used for the one
+ * other Vercel-Function-bound upload in this app (MATTER_DOCUMENT_MAX_BYTES
+ * in matter-document-policy.ts) instead of the unsafe 10 MB this constant
+ * used to have.
  */
-export const LEGAL_AI_DOCUMENT_MAX_BYTES = 10 * 1024 * 1024;
+export const LEGAL_AI_DOCUMENT_MAX_BYTES = 4 * 1024 * 1024;
 /** @deprecated PDF-only MIME for Case Review uploads. Prefer LEGAL_AI_DOCUMENT_MIMES. */
 export const LEGAL_AI_DOCUMENT_MIME = "application/pdf";
 export const MAX_DOCUMENT_EXTRACT_CHARS = 48_000;
@@ -113,7 +124,7 @@ export const LEGAL_AI_UNSUPPORTED_FORMAT_MESSAGE =
 export const LEGAL_AI_LEGACY_DOC_MESSAGE =
   "Хуучин .doc файлыг дэмжихгүй. .docx форматаар хадгалаад дахин хавсаргана уу.";
 export const LEGAL_AI_DOCUMENT_SIZE_MESSAGE =
-  "Файл 10MB-аас ихгүй байх ёстой.";
+  "Файл 4MB-аас ихгүй байх ёстой.";
 export const LEGAL_AI_OCR_FAILED_MESSAGE =
   "OCR уншилт амжилтгүй боллоо. Файлыг шалгаад дахин оролдоно уу.";
 export const LEGAL_AI_OCR_EMPTY_MESSAGE =

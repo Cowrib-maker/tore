@@ -42,7 +42,7 @@ describe("PDF upload validation", () => {
     ).toThrow(/PDF биш/);
   });
 
-  it("rejects files larger than 10MB", () => {
+  it("rejects files larger than the configured cap", () => {
     const body = new Uint8Array(LEGAL_AI_DOCUMENT_MAX_BYTES + 1);
     body.set([0x25, 0x50, 0x44, 0x46]);
     expect(() =>
@@ -51,7 +51,7 @@ describe("PDF upload validation", () => {
         contentType: "application/pdf",
         body,
       }),
-    ).toThrow(/10MB/);
+    ).toThrow(/4MB/);
   });
 
   it("rejects DOCX MIME regardless of filename", () => {

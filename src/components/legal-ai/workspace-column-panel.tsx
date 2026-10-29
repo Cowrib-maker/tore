@@ -221,7 +221,7 @@ export function WorkspaceColumnPanel({
             {uploading ? "Байршуулж байна…" : "Файл чирж оруулах эсвэл сонгох"}
           </span>
           <span className="text-[10px] text-muted-foreground">
-            PDF, DOCX, JPG, PNG, WEBP · 10MB хүртэл
+            PDF, DOCX, JPG, PNG, WEBP · 4MB хүртэл
           </span>
         </div>
         <input

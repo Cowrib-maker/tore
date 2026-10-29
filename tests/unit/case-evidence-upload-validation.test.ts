@@ -12,7 +12,7 @@ import { buildMinimalPdf } from "./helpers/minimal-pdf";
  * hides the Camera/Photos options entirely for `accept="application/pdf"`
  * — a lawyer could not attach a phone photo of a document to a case at
  * all. This validator is the server-side half of the fix: PDF or a
- * photo (JPEG/PNG/WEBP), detected by magic bytes, same 10MB ceiling as
+ * photo (JPEG/PNG/WEBP), detected by magic bytes, same shared ceiling as
  * before. assertValidPdfUpload (pdf-upload-validation.ts) and its own
  * "rejects images" test are untouched — this is a separate, additive
  * validator, not a loosening of that one.
@@ -83,7 +83,7 @@ describe("assertValidCaseEvidenceUpload", () => {
     body.set(JPEG);
     expect(() =>
       assertValidCaseEvidenceUpload({ fileName: "big.jpg", contentType: "image/jpeg", body }),
-    ).toThrow(/10MB/);
+    ).toThrow(/4MB/);
   });
 
   it("rejects an out-of-scope format (docx) — still narrower than the full Legal AI attachment allowlist", () => {

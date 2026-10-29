@@ -152,7 +152,7 @@ describe("Legal AI document upload validation", () => {
     ).toThrow(ValidationError);
   });
 
-  it("rejects files larger than the existing 10MB cap", () => {
+  it("rejects files larger than the configured cap", () => {
     const body = new Uint8Array(LEGAL_AI_DOCUMENT_MAX_BYTES + 1);
     body.set([0x25, 0x50, 0x44, 0x46]);
     expect(() =>
@@ -161,7 +161,20 @@ describe("Legal AI document upload validation", () => {
         contentType: "application/pdf",
         body,
       }),
-    ).toThrow(/10MB/);
+    ).toThrow(/4MB/);
+  });
+
+  it("keeps the cap safely under Vercel's ~4.5MB Function request-body limit", () => {
+    // A cap at or above the platform's hard limit means every upload between
+    // the platform limit and this cap would pass this validator and then get
+    // cut off by Vercel itself with a non-JSON 413 before attach-conversation
+    // -document's use case ever runs — exactly the bug this constant used to
+    // have at 10MB. 64KB of headroom covers multipart/form-data framing.
+    const VERCEL_FUNCTION_BODY_LIMIT_BYTES = 4.5 * 1024 * 1024;
+    const MULTIPART_OVERHEAD_ALLOWANCE_BYTES = 64 * 1024;
+    expect(LEGAL_AI_DOCUMENT_MAX_BYTES).toBeLessThanOrEqual(
+      VERCEL_FUNCTION_BODY_LIMIT_BYTES - MULTIPART_OVERHEAD_ALLOWANCE_BYTES,
+    );
   });
 
   it("rejects MIME/magic mismatch", () => {
