@@ -158,6 +158,23 @@ describe("LegalDataEngineClient", () => {
     });
   });
 
+  it("maps verify 429 to rate_limited, not server_error or invalid_response", async () => {
+    const client = new LegalDataEngineClient({
+      baseUrl: "http://engine.test",
+      serviceToken: "secret-token",
+      fetchImpl: vi.fn(async () =>
+        jsonResponse(429, { error: "rate_limited" }),
+      ) as unknown as typeof fetch,
+    });
+    await expect(
+      client.verify({ citations: [{ query: "Эрүүгийн хуулийн 17.1" }] }),
+    ).resolves.toMatchObject({
+      ok: false,
+      kind: "rate_limited",
+      status: 429,
+    });
+  });
+
   it("maps verify abort to timeout", async () => {
     const client = new LegalDataEngineClient({
       baseUrl: "http://engine.test",
@@ -202,6 +219,19 @@ describe("LegalDataEngineClient", () => {
     await expect(
       client.retrieve({ question: "Эрүүгийн хуулийн 17.1" }),
     ).resolves.toMatchObject({ ok: false, kind: "server_error", status: 500 });
+  });
+
+  it("maps 429 to rate_limited, not server_error or invalid_response", async () => {
+    const client = new LegalDataEngineClient({
+      baseUrl: "http://engine.test",
+      serviceToken: "secret-token",
+      fetchImpl: vi.fn(async () =>
+        jsonResponse(429, { error: "rate_limited" }),
+      ) as unknown as typeof fetch,
+    });
+    await expect(
+      client.retrieve({ question: "Эрүүгийн хуулийн 17.1" }),
+    ).resolves.toMatchObject({ ok: false, kind: "rate_limited", status: 429 });
   });
 
   it("maps abort to timeout", async () => {

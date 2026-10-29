@@ -94,6 +94,7 @@ export type LegalDataEngineHttpFailure = {
     | "timeout"
     | "unauthorized"
     | "server_error"
+    | "rate_limited"
     | "network"
     | "invalid_response";
   status: number | null;
@@ -189,6 +190,13 @@ export class LegalDataEngineClient {
           status: response.status,
         });
         return { ok: false, kind: "server_error", status: response.status };
+      }
+
+      if (response.status === 429) {
+        console.error(`legal-data-engine ${operation} rate limited`, {
+          status: response.status,
+        });
+        return { ok: false, kind: "rate_limited", status: response.status };
       }
 
       if (!response.ok) {

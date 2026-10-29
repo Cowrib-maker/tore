@@ -97,6 +97,16 @@ function logRetrieveOutcome(
       reason: retrieved.reason,
       latencyMs,
     });
+  } else if (retrieved.reason === "rate_limited") {
+    // Distinct from a genuine engine failure: the engine is configured and
+    // reachable, it is just throttling us right now. Collapsing this into
+    // "engine_failure" would make transient load look like an outage.
+    logLegalCorpusEvent({
+      operation,
+      outcome: "rate_limited",
+      reason: retrieved.reason,
+      latencyMs,
+    });
   } else if (ENGINE_FAILURE_REASONS.has(retrieved.reason)) {
     logLegalCorpusEvent({
       operation,
@@ -160,10 +170,10 @@ const UNVERIFIED_CITATION_MESSAGE =
 const CONFLICT_CITATION_MESSAGE =
   "Энэ ишлэлийг нэг утгатай баталгаажуулж чадсангүй. Тиймээс аль эх нь хамаарахыг таамгаар сонгохгүй, заалтын агуулгыг таамгаар тайлбарлахгүй.";
 
-const AS_OF_UNAVAILABLE_MESSAGE =
+export const AS_OF_UNAVAILABLE_MESSAGE =
   "Тухайн үед хүчинтэй хувилбарыг баталгаажуулж чадсангүй. Тиймээс заалтын агуулгыг таамгаар тайлбарлахгүй.";
 
-const ENGINE_UNAVAILABLE_MESSAGE =
+export const ENGINE_UNAVAILABLE_MESSAGE =
   "Баталгаатай эрх зүйн эх сурвалжид одоогоор холбогдож чадсангүй. Тиймээс заалтын агуулгыг таамгаар тайлбарлахгүй.";
 
 const VERIFIED_SOURCE_TYPE = "legal-data-engine";
@@ -541,11 +551,34 @@ function verificationRefusalMessage(
   return null;
 }
 
+/**
+ * Picks the honest, reason-specific refusal message for an open legal
+ * question that resolved to no usable authority. Previously this (and the
+ * two call sites that duplicated it instead of calling it — see
+ * legal-ai.service.ts) always returned MISSING_LEGAL_SOURCE_MESSAGE
+ * ("no matching provision found") regardless of *why* retrieval came back
+ * empty, so a genuinely engine-down/timeout/rate-limited turn was reported
+ * to the lawyer identically to a turn where every tier was actually
+ * checked and nothing matched — exactly the "timeout misreported as
+ * genuine absence" failure mode this module exists to avoid for exact
+ * citations (see retrieveRefusalMessage above). This mirrors that same
+ * per-reason mapping for open questions.
+ */
 export function missingSourceUserMessage(
   result: ResolveLegalAuthoritiesResult,
 ): string | null {
-  if (result.kind === "empty") {
-    return MISSING_LEGAL_SOURCE_MESSAGE;
+  if (result.kind !== "empty") {
+    return null;
   }
-  return null;
+  switch (result.reason) {
+    case "as_of_unavailable":
+      return AS_OF_UNAVAILABLE_MESSAGE;
+    case "unavailable":
+      return ENGINE_UNAVAILABLE_MESSAGE;
+    case "unverified":
+      return UNVERIFIED_CITATION_MESSAGE;
+    case "not_found":
+    default:
+      return MISSING_LEGAL_SOURCE_MESSAGE;
+  }
 }

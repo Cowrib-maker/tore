@@ -22,7 +22,7 @@ import { formatAuthorityConflictBlock } from "@/application/ai/legal-ai-authorit
 import { formatTemporalValidityBlock } from "@/application/ai/legal-ai-temporal-validity-block";
 import { guardUngroundedCitations } from "@/application/ai/ungrounded-citation-guard";
 import {
-  MISSING_LEGAL_SOURCE_MESSAGE,
+  missingSourceUserMessage,
   resolveLegalAuthorities,
   type ResolvedLegalAuthority,
 } from "@/application/ai/resolve-legal-authorities";
@@ -540,7 +540,7 @@ export class LegalAiService {
       foreignLegalScope && !foreignLegalScope.comparativeWithMn
         ? undefined
         : authorities.kind === "empty" && authorities.retrievalInvoked
-          ? MISSING_LEGAL_SOURCE_MESSAGE
+          ? missingSourceUserMessage(authorities) ?? undefined
           : undefined;
 
     const reasoningPlan = this.prepareReasoningPlan(
@@ -860,7 +860,7 @@ export class LegalAiService {
       : undefined;
     const missingLegalSourceMessage =
       authorities.kind === "empty" && authorities.retrievalInvoked
-        ? MISSING_LEGAL_SOURCE_MESSAGE
+        ? missingSourceUserMessage(authorities) ?? undefined
         : undefined;
 
     const reasoningPlan = this.prepareReasoningPlan(message, intent, verifiedAuthorities);

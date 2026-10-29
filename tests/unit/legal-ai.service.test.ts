@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { LegalAiError } from "@/application/ai/legal-ai.errors";
 import { MAX_DOCUMENT_EXTRACT_CHARS } from "@/application/ai/legal-ai-document.constants";
 import { resolveTurnKind } from "@/application/ai/legal-ai.service";
+import { ENGINE_UNAVAILABLE_MESSAGE } from "@/application/ai/resolve-legal-authorities";
 import { CitationVerificationStatus } from "@/application/ai/legal-corpus";
 import { LegalAiCapability } from "@/application/ai/legal-ai-capability";
 import { UserRole } from "@/domain/enums";
@@ -1600,9 +1601,15 @@ describe("LegalAiService", () => {
     expect(result.message.citations).toEqual([]);
     expect(store.citations).toEqual([]);
     const systemPrompt = completion.complete.mock.calls[0]?.[0]?.systemPrompt ?? "";
-    expect(systemPrompt).toContain(
-      "Холбогдох эрх зүйн зохицуулалт одоогоор баталгаатай эх сурвалжаас олдсонгүй.",
-    );
+    // The default test retriever reports "not_configured" (the engine
+    // tier was never reached), not a genuine "checked and found nothing"
+    // result — so the honest message is "could not reach a verified
+    // source", not the generic "no matching provision found" one. Before
+    // the resolve-legal-authorities.ts reason-aware fix, every empty
+    // reason collapsed into the generic message here, which is the exact
+    // "timeout/config-error misreported as genuine absence" bug this
+    // locks in the fix for.
+    expect(systemPrompt).toContain(ENGINE_UNAVAILABLE_MESSAGE);
     expect(systemPrompt).toContain("Ажлыг бүү зогсоо");
     expect(systemPrompt).not.toContain("LEGAL RULE");
     expect(systemPrompt).toContain("Иш, зүйлийн дугаар, шүүхийн шийдвэр бүү зохио");

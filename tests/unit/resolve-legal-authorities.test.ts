@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
+  AS_OF_UNAVAILABLE_MESSAGE,
+  ENGINE_UNAVAILABLE_MESSAGE,
   MISSING_LEGAL_SOURCE_MESSAGE,
   missingSourceUserMessage,
   resolveLegalAuthorities,
@@ -580,6 +582,51 @@ describe("resolveLegalAuthorities — open question (local-only)", () => {
 
     expect(result).toMatchObject({ kind: "empty", reason: "not_found" });
     expect(missingSourceUserMessage(result)).toBe(MISSING_LEGAL_SOURCE_MESSAGE);
+  });
+
+  it.each([
+    ["unauthorized" as const],
+    ["server_error" as const],
+    ["network" as const],
+    ["rate_limited" as const],
+    ["invalid_response" as const],
+  ])(
+    "reports an honest 'could not reach a verified source' message — never 'no law found' — when the reason is %s",
+    async (reason) => {
+      const retriever = new StubRetriever({
+        kind: "unavailable",
+        reason,
+        authorities: [],
+        retrievedAt: null,
+      });
+
+      const result = await resolveLegalAuthorities({
+        question: OPEN_QUESTION,
+        retriever,
+        requireRetrieval: true,
+      });
+
+      expect(result).toMatchObject({ kind: "empty", reason: "unavailable" });
+      expect(missingSourceUserMessage(result)).toBe(ENGINE_UNAVAILABLE_MESSAGE);
+      expect(missingSourceUserMessage(result)).not.toBe(MISSING_LEGAL_SOURCE_MESSAGE);
+    },
+  );
+
+  it("reports the as-of-specific message, not the generic 'no law found' message, when the version in force could not be verified", async () => {
+    const retriever = new StubRetriever({
+      kind: "as_of_unavailable",
+      authorities: [],
+      retrievedAt: null,
+    });
+
+    const result = await resolveLegalAuthorities({
+      question: OPEN_QUESTION,
+      retriever,
+      requireRetrieval: true,
+    });
+
+    expect(result).toMatchObject({ kind: "empty", reason: "as_of_unavailable" });
+    expect(missingSourceUserMessage(result)).toBe(AS_OF_UNAVAILABLE_MESSAGE);
   });
 
   it("does not call retrieveExactCitation for an open question", async () => {

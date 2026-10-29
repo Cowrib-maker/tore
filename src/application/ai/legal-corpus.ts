@@ -34,6 +34,7 @@ export type LegalCorpusUnavailableReason =
   | "timeout"
   | "unauthorized"
   | "server_error"
+  | "rate_limited"
   | "network"
   | "not_configured"
   | "invalid_response"

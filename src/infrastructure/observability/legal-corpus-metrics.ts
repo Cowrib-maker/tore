@@ -25,6 +25,7 @@ export type LegalCorpusLogOutcome =
   | "engine_success"
   | "engine_failure"
   | "timeout"
+  | "rate_limited"
   | "local_fallback"
   | "official_web_success"
   | "as_of_unavailable"
