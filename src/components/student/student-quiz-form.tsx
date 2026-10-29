@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 import { gradeStudentQuizAction } from "@/application/actions/student.actions";
 import type {
@@ -30,6 +30,7 @@ export function StudentQuizForm({
   const [pending, startTransition] = useTransition();
 
   function submit() {
+    if (pending) return;
     const unanswered = quiz.questions.filter(
       (question) => !answers[question.id],
     ).length;
@@ -44,15 +45,19 @@ export function StudentQuizForm({
 
     setError(null);
     startTransition(async () => {
-      const graded = await gradeStudentQuizAction({
-        quizId: quiz.id,
-        answers,
-      });
-      if ("error" in graded) {
-        setError(QUIZ_ERROR_MESSAGES[graded.error] ?? "Шалгалт илгээхэд алдаа гарлаа.");
-        return;
+      try {
+        const graded = await gradeStudentQuizAction({
+          quizId: quiz.id,
+          answers,
+        });
+        if ("error" in graded) {
+          setError(QUIZ_ERROR_MESSAGES[graded.error] ?? "Шалгалт илгээхэд алдаа гарлаа.");
+          return;
+        }
+        setResult(graded);
+      } catch {
+        setError("Шалгалт илгээхэд алдаа гарлаа. Дахин оролдоно уу.");
       }
-      setResult(graded);
     });
   }
 
@@ -154,10 +159,20 @@ function QuizResult({
   onRetry: () => void;
 }) {
   const missed = result.reviews.filter((item) => !item.correct);
+  const headingRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
 
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border border-[#0B1F3A]/10 bg-white p-5">
+      <section
+        ref={headingRef}
+        tabIndex={-1}
+        aria-live="polite"
+        className="rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 outline-none"
+      >
         <div className="flex flex-wrap gap-6">
           <ScoreStat
             label={copy.scoreLabel}

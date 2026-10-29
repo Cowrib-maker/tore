@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 import { evaluateStudentProblemAction } from "@/application/actions/student.actions";
 import { studentProblemActionErrorMessage } from "@/application/actions/student-action-messages";
@@ -25,17 +25,28 @@ export function StudentCaseStudyForm({
   const c = copy.caseStudy;
 
   function submit() {
+    // Guards against a double-fire between a fast repeat click and the
+    // disabled attribute actually reaching the DOM.
+    if (pending) return;
     setError(null);
     startTransition(async () => {
-      const graded = await evaluateStudentProblemAction({
-        problemId: problem.id,
-        answer,
-      });
-      if ("error" in graded) {
-        setError(studentProblemActionErrorMessage(graded.error));
-        return;
+      try {
+        const graded = await evaluateStudentProblemAction({
+          problemId: problem.id,
+          answer,
+        });
+        if ("error" in graded) {
+          setError(studentProblemActionErrorMessage(graded.error));
+          return;
+        }
+        setResult(graded);
+      } catch {
+        // The server action transport itself failed (e.g. dropped
+        // connection) rather than returning a handled { error } result —
+        // without this the UI would be stuck showing "Илгээж байна…"
+        // forever with no way to retry.
+        setError(studentProblemActionErrorMessage("network"));
       }
-      setResult(graded);
     });
   }
 
@@ -142,10 +153,23 @@ function CaseStudyResult({
   const c = copy.caseStudy;
   const evaluation = result.evaluation;
   const percent = Math.round((result.total / result.maxTotal) * 100);
+  const headingRef = useRef<HTMLDivElement>(null);
+
+  // Grading happens after an async round trip with no page navigation, so
+  // move focus to the result for keyboard/screen-reader users — otherwise
+  // they get no indication that anything happened.
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
 
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border border-[#0B1F3A]/10 bg-white p-5">
+      <section
+        ref={headingRef}
+        tabIndex={-1}
+        aria-live="polite"
+        className="rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 outline-none"
+      >
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-[12px] font-semibold tracking-wide text-[#8A939D] uppercase">
