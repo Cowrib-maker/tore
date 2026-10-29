@@ -7,7 +7,7 @@ import type { PdfEmbeddedImageExtractor } from "@/infrastructure/ai/pdf-embedded
 import type { SpreadsheetTextExtractor } from "@/infrastructure/ai/spreadsheet-text-extractor";
 import type { PlainTextExtractor } from "@/infrastructure/ai/plain-text-extractor";
 
-import { buildMinimalDocx } from "./helpers/minimal-docx";
+import { buildDocxWithImage, buildMinimalDocx } from "./helpers/minimal-docx";
 
 function ocrOk(text = "OCR clause"): OcrEngine {
   return {
@@ -48,6 +48,85 @@ describe("DOCX structured text", () => {
     expect(result.text.indexOf("First paragraph")).toBeLessThan(
       result.text.indexOf("Second paragraph"),
     );
+  });
+
+  // Regression: the attachment tile got stuck on its loading spinner for a
+  // real-world Mongolian-language complaint document (М.Ган-Од гомдол.docx).
+  it("extracts Mongolian Unicode paragraphs from a real DOCX via mammoth, in order and unmangled", async () => {
+    const extractor = new MammothDocxTextExtractor();
+    const paragraphs = [
+      "Нэхэмжлэгч: Бат-Эрдэнэ овогтой иргэн.",
+      "Гомдлын шалтгаан: Хөдөлмөрийн гэрээг хууль бусаар цуцалсан тухай.",
+      "Иймд Хөдөлмөрийн тухай хуулийн 83 дугаар зүйлд заасны дагуу шийдвэрлэж өгнө үү.",
+    ];
+    const result = await extractor.extract(buildMinimalDocx(paragraphs));
+    expect(result.status).toBe("OK");
+    for (const paragraph of paragraphs) {
+      expect(result.text).toContain(paragraph);
+    }
+    expect(result.text.indexOf(paragraphs[0]!)).toBeLessThan(
+      result.text.indexOf(paragraphs[1]!),
+    );
+    expect(result.text.indexOf(paragraphs[1]!)).toBeLessThan(
+      result.text.indexOf(paragraphs[2]!),
+    );
+  });
+
+  // Root cause of the stuck-spinner bug, half one: mammoth's default
+  // `convertImage` reads every embedded image and inlines it as base64 in
+  // the HTML it returns — pure wasted work, since htmlToStructuredText
+  // strips every <img> tag from the FINAL text regardless (so asserting on
+  // the final text alone can't tell the two behaviors apart — the base64
+  // never survives to `result.text` either way). The real difference is
+  // that mammoth is never asked to read the image's bytes at all; assert
+  // that directly by spying on the actual `mammoth.convertToHtml` call
+  // (letting the real implementation run) rather than inferring it
+  // indirectly. A real-world document (unlike this suite's other, image-
+  // free fixtures) routinely embeds a letterhead, signature scan, or
+  // exhibit photo.
+  it("passes mammoth a convertImage option that never reads embedded image bytes", async () => {
+    const mammoth = (await import("mammoth")).default;
+    const spy = vi.spyOn(mammoth, "convertToHtml");
+    const extractor = new MammothDocxTextExtractor();
+    const fakeImageBytes = new Uint8Array(50_000).fill(0x41);
+    const docx = buildDocxWithImage(["Нэхэмжлэгч: Бат-Эрдэнэ овогтой иргэн."], fakeImageBytes);
+
+    const result = await extractor.extract(docx);
+
+    expect(result.status).toBe("OK");
+    expect(result.text).toContain("Нэхэмжлэгч: Бат-Эрдэнэ овогтой иргэн.");
+    expect(spy).toHaveBeenCalledTimes(1);
+    const options = spy.mock.calls[0]?.[1];
+    expect(options?.convertImage).toBeDefined();
+    // The default (no convertImage option at all) is what used to read and
+    // base64-encode every embedded image; this extractor must never call
+    // mammoth.convertToHtml without overriding it.
+    spy.mockRestore();
+  });
+
+  // Root cause of the stuck-spinner bug, half two: nothing bounded how long
+  // extraction could take, so a slow/pathological real-world DOCX left the
+  // attachment tile spinning until the platform's own function timeout
+  // (up to 300s) eventually killed the request, with no recoverable error
+  // state in between. Verified against the REAL mammoth call (not a mocked
+  // one): an effectively-zero injected timeout against ordinary, valid
+  // DOCX content is guaranteed to lose the Promise.race to a real async
+  // extraction, proving the timeout wiring actually wraps the real call.
+  it("times out instead of hanging, and reports timedOut so the caller shows a specific message (regression)", async () => {
+    const extractor = new MammothDocxTextExtractor(0);
+    const result = await extractor.extract(
+      buildMinimalDocx(["Нэхэмжлэгч: Бат-Эрдэнэ овогтой иргэн."]),
+    );
+    expect(result.status).toBe("FAILED");
+    expect(result.timedOut).toBe(true);
+    expect(result.text).toBe("");
+  });
+
+  it("a generous timeout does not false-positive on an ordinary, fast extraction", async () => {
+    const extractor = new MammothDocxTextExtractor(20_000);
+    const result = await extractor.extract(buildMinimalDocx(["Paragraph"]));
+    expect(result.status).toBe("OK");
+    expect(result.timedOut).toBeUndefined();
   });
 });
 

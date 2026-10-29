@@ -561,6 +561,40 @@ describe("attachConversationDocumentUseCase", () => {
     expect(store.documents.size).toBe(1);
   });
 
+  it("shows a DOCX-specific timeout message, not the generic OCR one, when DOCX extraction times out", async () => {
+    // failedExtractMessage() must branch on format for a timed-out FAILED
+    // extract: DOCX extraction (docx-text-extractor.ts) never runs OCR, so
+    // the generic OCR-worded timeout message would be misleading here.
+    const store = createStore();
+    const fileStorage = createStorage();
+    const zip = buildMinimalDocx(["placeholder"]);
+    await expect(
+      attachConversationDocumentUseCase(
+        {
+          userId: "lawyer-1",
+          conversationId: "conv-owner",
+          fileName: "slow.docx",
+          contentType:
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          body: zip,
+        },
+        {
+          store,
+          fileStorage,
+          extractor: {
+            async extract() {
+              return { status: "FAILED", text: "", pageCount: null, timedOut: true };
+            },
+          },
+        },
+      ),
+    ).rejects.toMatchObject({
+      message: expect.stringMatching(/DOCX файлыг уншихад хугацаа хэтэрлээ/),
+    });
+    expect(fileStorage.keys).toEqual([]);
+    expect(store.documents.size).toBe(0);
+  });
+
   it("allows mixed PDF, DOCX, and image attachments on one conversation", async () => {
     const store = createStore();
     const fileStorage = createStorage();

@@ -135,3 +135,81 @@ export function buildMinimalDocx(paragraphs: string[]): Uint8Array {
     },
   ]);
 }
+
+/**
+ * Same as buildMinimalDocx, plus one embedded image via a real DrawingML
+ * `<w:drawing>`/`a:blip` reference — the structure MammothDocxTextExtractor
+ * must skip reading bytes for (see SKIP_IMAGES in docx-text-extractor.ts).
+ * `imageBytes` need not be a real decodable image: mammoth's body reader
+ * only resolves the relationship/content-type to build a lazy image
+ * descriptor — it never reads the bytes itself, only a `convertImage`
+ * callback that chooses to call `image.read()`/`readAsBuffer()`/
+ * `readAsBase64String()` does, which is exactly the behavior under test.
+ */
+export function buildDocxWithImage(
+  paragraphs: string[],
+  imageBytes: Uint8Array,
+): Uint8Array {
+  const body = paragraphs
+    .map((text) => `<w:p><w:r><w:t>${text}</w:t></w:r></w:p>`)
+    .join("");
+  const drawing = `<w:p><w:r><w:drawing>
+    <wp:inline xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">
+      <wp:docPr id="1" name="Picture 1"/>
+      <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+        <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+          <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+            <pic:blipFill>
+              <a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="rId100"/>
+            </pic:blipFill>
+          </pic:pic>
+        </a:graphicData>
+      </a:graphic>
+    </wp:inline>
+  </w:drawing></w:r></w:p>`;
+  return zip([
+    {
+      name: "[Content_Types].xml",
+      data: xml(
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="png" ContentType="image/png"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>`,
+      ),
+    },
+    {
+      name: "_rels/.rels",
+      data: xml(
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`,
+      ),
+    },
+    {
+      name: "word/_rels/document.xml.rels",
+      data: xml(
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId100" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.png"/>
+</Relationships>`,
+      ),
+    },
+    {
+      name: "word/media/image1.png",
+      data: imageBytes,
+    },
+    {
+      name: "word/document.xml",
+      data: xml(
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>${body}${drawing}</w:body>
+</w:document>`,
+      ),
+    },
+  ]);
+}

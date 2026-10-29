@@ -1,6 +1,6 @@
 "use client";
 
-import { readUploadJson, UPLOAD_GENERIC_ERROR } from "@/lib/read-upload-response";
+import { fetchWithUploadTimeout, readUploadJson, UPLOAD_GENERIC_ERROR } from "@/lib/read-upload-response";
 import { useDocumentUploadQueue, type UploadOutcome } from "@/components/legal-ai/use-document-upload-queue";
 import { isNearBottom } from "@/lib/scroll-position";
 import {
@@ -222,7 +222,7 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
     // Read the ref, not state: an earlier queued upload may have just created the conversation.
     if (conversationIdRef.current) formData.append("conversationId", conversationIdRef.current);
     else if (caseFileId) formData.append("caseFileId", caseFileId);
-    const response = await fetch("/api/lawyer/ai/documents", { method: "POST", credentials: "include", body: formData, signal });
+    const response = await fetchWithUploadTimeout("/api/lawyer/ai/documents", { method: "POST", credentials: "include", body: formData, signal });
     const data = await readUploadJson<{ error?: string; code?: string; id?: string; conversationId?: string; fileName?: string; mimeType?: string; sizeBytes?: number; extractStatus?: AttachedDocument["extractStatus"]; pageCount?: number | null; storageKey?: string; key?: string }>(response);
     if (response.status === 401) { window.location.assign(loginHrefForLegalAi()); return { status: "removed" }; }
     if (response.status === 402 || (response.status === 403 && (data.code === "BILLING_REQUIRED" || data.code === "FEATURE_QUOTA_EXCEEDED" || data.code === "TOKEN_CEILING_REACHED" || data.code === "SUBSCRIPTION_INACTIVE"))) {

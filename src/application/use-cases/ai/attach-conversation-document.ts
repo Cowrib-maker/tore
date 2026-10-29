@@ -2,6 +2,7 @@ import { LegalAiError } from "@/application/ai/legal-ai.errors";
 import type { LegalAiStore } from "@/application/ai/legal-ai.types";
 import { assertValidLegalAiDocumentUpload } from "@/application/ai/document-upload-validation";
 import {
+  LEGAL_AI_DOCX_TIMEOUT_MESSAGE,
   LEGAL_AI_OCR_EMPTY_MESSAGE,
   LEGAL_AI_OCR_FAILED_MESSAGE,
   LEGAL_AI_OCR_TIMEOUT_MESSAGE,
@@ -143,7 +144,10 @@ function failedExtractMessage(
   timedOut: boolean,
 ): string {
   if (timedOut) {
-    return LEGAL_AI_OCR_TIMEOUT_MESSAGE;
+    // DOCX extraction (docx-text-extractor.ts) times out independently of
+    // OCR and never runs OCR itself — the generic OCR-worded timeout
+    // message would be actively misleading for a Word document.
+    return format === "docx" ? LEGAL_AI_DOCX_TIMEOUT_MESSAGE : LEGAL_AI_OCR_TIMEOUT_MESSAGE;
   }
   if (format === "docx") {
     return FAILED_DOCX_MESSAGE;

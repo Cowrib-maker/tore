@@ -56,7 +56,7 @@ import {
 } from "@/application/ai/legal-ai-citation";
 import { LegalAiCitationList } from "@/components/legal-ai/legal-ai-citation-list";
 import { LEGAL_AI_CHAT_RETRY_MESSAGE } from "@/components/legal-ai/legal-ai-chat-errors";
-import { readUploadResponse, UPLOAD_GENERIC_ERROR } from "@/lib/read-upload-response";
+import { fetchWithUploadTimeout, readUploadResponse, UPLOAD_GENERIC_ERROR } from "@/lib/read-upload-response";
 import {
   useDocumentUploadQueue,
   type UploadOutcome,
@@ -399,7 +399,7 @@ export function LegalAiChat({
       formData.append("conversationId", conversationIdRef.current);
     }
 
-    const response = await fetch("/api/ai/documents", {
+    const response = await fetchWithUploadTimeout("/api/ai/documents", {
       method: "POST",
       body: formData,
       signal,

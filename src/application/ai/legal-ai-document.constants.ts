@@ -131,6 +131,8 @@ export const LEGAL_AI_OCR_EMPTY_MESSAGE =
   "OCR-оос уншигдах текст олдсонгүй.";
 export const LEGAL_AI_OCR_TIMEOUT_MESSAGE =
   "OCR уншилт хугацаа хэтэрлээ. Файлыг шалгаад дахин оролдоно уу.";
+export const LEGAL_AI_DOCX_TIMEOUT_MESSAGE =
+  "DOCX файлыг уншихад хугацаа хэтэрлээ. Файлыг шалгаад дахин оролдоно уу.";
 /**
  * Shown in the upload UI (not thrown) when a file was accepted but stored as
  * NEEDS_OCR: the AI will not see any text from it until it is re-attached in
