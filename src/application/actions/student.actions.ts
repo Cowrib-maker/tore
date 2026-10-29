@@ -25,11 +25,21 @@ export async function gradeStudentQuizAction(input: {
   if (!parsed.success) {
     return { error: "invalid" };
   }
-  const result = gradeStudentQuizUseCase(parsed.data.quizId, parsed.data.answers);
-  if ("error" in result) {
-    return { error: "not_found" };
+  try {
+    const result = gradeStudentQuizUseCase(parsed.data.quizId, parsed.data.answers);
+    if ("error" in result) {
+      return { error: "not_found" };
+    }
+    return result;
+  } catch {
+    // gradeStudentQuiz throws if quiz content itself is malformed (a
+    // correctOptionId with no matching option) — a content-authoring bug,
+    // not a user-input error. tests/unit/student-quiz-content.test.ts
+    // guards every shipped quiz against this; this catch is the last-resort
+    // backstop so a future authoring slip still fails as a visible,
+    // retryable error card instead of an uncaught Server Action exception.
+    return { error: "grading_failed" };
   }
-  return result;
 }
 
 const problemPayloadSchema = z.object({
