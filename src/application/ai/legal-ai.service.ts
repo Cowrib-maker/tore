@@ -736,8 +736,10 @@ export class LegalAiService {
     const assistantMessage =
       await this.dependencies.store.createAssistantMessage({
         conversationId: input.conversationId,
-        content:
+        content: guardUngroundedCitations(
           completion.content.trim() || "Хариу боловсруулах явцад алдаа гарлаа.",
+          undefined,
+        ).content,
         provider: completion.provider,
         model: completion.model,
         inputTokens: completion.inputTokens,

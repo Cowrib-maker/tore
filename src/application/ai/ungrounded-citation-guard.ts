@@ -48,7 +48,7 @@ export function extractArticleMentions(text: string): number[] {
   return [...found].sort((a, b) => a - b);
 }
 
-export type GroundingAuthority = { article?: string | null; locator?: string | null };
+export type GroundingAuthority = { article?: string | null; locator?: string | null; title?: string | null };
 
 /** Article number of a verified authority: explicit field first, else the `art-<n>[/p-<m>]` locator. */
 function articleNumber(a: GroundingAuthority): number | null {
@@ -59,17 +59,43 @@ function articleNumber(a: GroundingAuthority): number | null {
 
 export type CitationGuardResult = { content: string; ungrounded: number[] };
 
+/**
+ * An article number is only safely "grounded" when every verified authority
+ * carrying it agrees on which law it belongs to. Free text that cites a bare
+ * number («92 дугаар зүйл») never names a law explicitly enough for this
+ * guard to check law identity itself — but when one question's own verified
+ * authorities already disagree (e.g. Иргэний хуулийн 92 vs Хөдөлмөрийн
+ * хуулийн 92, both retrieved this turn), the number is genuinely ambiguous
+ * and must not be silently waved through as grounded: that is exactly the
+ * wrong-law/same-article-number case 93167b4 closed inside the exact-citation
+ * retriever (article-search.ts), which this separate post-generation guard
+ * never inherited. Never raises a false warning for the common case (one law
+ * per number) — it only ever makes an already-conflicting number stricter.
+ */
+function groundedArticleNumbers(verified: ReadonlyArray<GroundingAuthority>): Set<number> {
+  const lawsByNumber = new Map<number, Set<string>>();
+  for (const a of verified) {
+    const n = articleNumber(a);
+    if (n === null) continue;
+    const lawKey = a.title?.trim() || "";
+    const laws = lawsByNumber.get(n) ?? new Set<string>();
+    laws.add(lawKey);
+    lawsByNumber.set(n, laws);
+  }
+  const grounded = new Set<number>();
+  for (const [n, laws] of lawsByNumber) {
+    if (laws.size === 1) grounded.add(n);
+  }
+  return grounded;
+}
+
 export function guardUngroundedCitations(
   content: string,
   verified: ReadonlyArray<GroundingAuthority> | undefined,
 ): CitationGuardResult {
   const mentioned = extractArticleMentions(content);
   if (mentioned.length === 0) return { content, ungrounded: [] };
-  const grounded = new Set<number>();
-  for (const a of verified ?? []) {
-    const n = articleNumber(a);
-    if (n !== null) grounded.add(n);
-  }
+  const grounded = groundedArticleNumbers(verified ?? []);
   const ungrounded = mentioned.filter((n) => !grounded.has(n));
   if (ungrounded.length === 0) return { content, ungrounded: [] };
   const list = ungrounded.map((n) => `${n}-р зүйл`).join(", ");

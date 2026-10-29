@@ -116,6 +116,35 @@ describe("guardUngroundedCitations", () => {
     expect(guardUngroundedCitations("5-р зүйл ба 6-р зүйл", undefined).ungrounded).toEqual([5, 6]);
   });
 
+  it("never raises a false warning for the common case: one verified authority per article number, with or without a title", () => {
+    expect(guardUngroundedCitations("17-р зүйл", [{ article: "17", title: "Иргэний хууль" }]).ungrounded).toEqual([]);
+    expect(guardUngroundedCitations("17-р зүйл", [{ article: "17" }]).ungrounded).toEqual([]);
+  });
+
+  it("flags a same-numbered article as ambiguous (ungrounded) when this turn's own verified authorities disagree on which law it belongs to", () => {
+    // The exact wrong-law/same-article-number gap 93167b4 closed inside the
+    // exact-citation retriever, but this separate post-generation guard
+    // never inherited it: an open-question turn can retrieve two different
+    // laws' "92-р зүйл" in one turn (e.g. Civil Code and Labor Law both
+    // verified this turn), and free text citing "92-р зүйл" never names
+    // which law it means — so that number must not be silently trusted.
+    const verified = [
+      { article: "92", title: "Иргэний хууль" },
+      { article: "92", title: "Хөдөлмөрийн тухай хууль" },
+    ];
+    const r = guardUngroundedCitations("Үүнийг 92-р зүйлд заасан.", verified);
+    expect(r.ungrounded).toEqual([92]);
+    expect(r.content).toContain(INSUFFICIENT_EVIDENCE_MN);
+  });
+
+  it("does not flag a same-numbered article when every verified authority carrying it agrees on the law (same title repeated, e.g. article + paragraph both verified)", () => {
+    const verified = [
+      { article: "17", title: "Эрүүгийн хууль" },
+      { locator: "art-17/p-2", title: "Эрүүгийн хууль" },
+    ];
+    expect(guardUngroundedCitations("17-р зүйл", verified).ungrounded).toEqual([]);
+  });
+
   it("is deterministic and idempotent on already-guarded text only in content, not by re-guarding silently", () => {
     const a = guardUngroundedCitations("12-р зүйл", []);
     const b = guardUngroundedCitations("12-р зүйл", []);
@@ -139,6 +168,24 @@ describe("LegalAiService applies the guard to model output", () => {
     expect(r.message.content).toContain("Таны хэрэгт 99-р зүйл хамаарна.");
     expect(r.message.content).toContain(INSUFFICIENT_EVIDENCE_MN);
     expect(store.assistantMessages[0]).toContain(INSUFFICIENT_EVIDENCE_MN);
+  });
+
+  it("the general (non-legal) answer path is guarded too — not just the legal/retrieval paths (regression)", async () => {
+    // completeGeneralAnswer (DomainLabel.NON_LEGAL / PromptTurnKind.GENERAL)
+    // never calls the retriever at all, so if the model answers a non-legal
+    // question anyway with a fabricated-looking article citation — contrary
+    // to its GENERAL-mode instructions — nothing used to catch it: this was
+    // the one of the three createTurn persistence sites that never called
+    // guardUngroundedCitations, unlike the other two.
+    const completion = createCompletion();
+    completion.complete.mockResolvedValue({ content: "Энэ бол 99-р зүйлд заасан хариулт.", provider: "fake", model: "fake", inputTokens: 1, outputTokens: 1 });
+    const corpusRetriever = createRetriever();
+    const { service, store } = createService({ completion, corpusRetriever });
+    const r = await service.createTurn({ userId: "user-1", message: "Elon Musk хэдэн хүүхэдтэй вэ?" });
+    expect(r.turnKind).toBe("GENERAL");
+    expect(r.message.content).toContain(INSUFFICIENT_EVIDENCE_MN);
+    expect(store.assistantMessages[0]).toContain(INSUFFICIENT_EVIDENCE_MN);
+    expect(corpusRetriever.retrieveLegalQuestion).not.toHaveBeenCalled();
   });
 
   it("a verified article (locator art-17.1) is NOT flagged", async () => {
