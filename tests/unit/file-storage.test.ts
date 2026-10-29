@@ -2,7 +2,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { LocalFileStorage } from "@/infrastructure/storage/local-file-storage";
 import {
@@ -69,5 +69,67 @@ describe("LocalFileStorage", () => {
     await expect(storage.getObject(stored.key)).rejects.toMatchObject({
       code: "NOT_FOUND",
     });
+  });
+});
+
+const mockEnv = vi.hoisted(() => ({
+  FILE_STORAGE: "local" as "local" | "s3",
+  FILE_STORAGE_LOCAL_ROOT: ".data/uploads",
+  NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+  S3_BUCKET: "bucket",
+  S3_REGION: "us-east-1",
+  S3_ACCESS_KEY_ID: "key",
+  S3_SECRET_ACCESS_KEY: "secret",
+  S3_ENDPOINT: undefined as string | undefined,
+  S3_FORCE_PATH_STYLE: undefined as boolean | undefined,
+  S3_PUBLIC_BASE_URL: undefined as string | undefined,
+}));
+
+vi.mock("@/lib/env", () => ({ env: mockEnv }));
+
+describe("createFileStorage — Vercel serverless filesystem guard (regression)", () => {
+  const originalVercel = process.env.VERCEL;
+
+  afterEach(() => {
+    if (originalVercel === undefined) delete process.env.VERCEL;
+    else process.env.VERCEL = originalVercel;
+    mockEnv.FILE_STORAGE = "local";
+    vi.resetModules();
+  });
+
+  // Reproduces the real deployed failure this guard replaces: on a Vercel
+  // preview with FILE_STORAGE unset (TORE_ALLOW_LOCAL_STORAGE=1 bypasses the
+  // boot-time assertProductionEnvGuards check), createFileStorage() used to
+  // silently build a LocalFileStorage whose first real upload then failed
+  // with `ENOENT: no such file or directory, mkdir '/var/task/.data'` — a
+  // confusing, undiagnosable 500 for every caller (document upload, profile
+  // photos, verification uploads, case documents...). It must now fail
+  // immediately with a clear, actionable configuration error instead.
+  it("throws a clear configuration error instead of building a doomed LocalFileStorage on Vercel", async () => {
+    process.env.VERCEL = "1";
+    mockEnv.FILE_STORAGE = "local";
+    vi.resetModules();
+    const { createFileStorage } = await import("@/infrastructure/storage");
+
+    expect(() => createFileStorage()).toThrow(/FILE_STORAGE=s3/);
+    expect(() => createFileStorage()).toThrow(/Vercel/);
+  });
+
+  it("does not throw on Vercel when FILE_STORAGE=s3 is actually configured", async () => {
+    process.env.VERCEL = "1";
+    mockEnv.FILE_STORAGE = "s3";
+    vi.resetModules();
+    const { createFileStorage } = await import("@/infrastructure/storage");
+
+    expect(() => createFileStorage()).not.toThrow();
+  });
+
+  it("still builds LocalFileStorage normally outside Vercel (local dev)", async () => {
+    delete process.env.VERCEL;
+    mockEnv.FILE_STORAGE = "local";
+    vi.resetModules();
+    const { createFileStorage } = await import("@/infrastructure/storage");
+
+    expect(() => createFileStorage()).not.toThrow();
   });
 });
