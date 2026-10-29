@@ -314,7 +314,19 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
           updateAttached(() => []);
         } else if (frame.event === "error") {
           removeStreamingPlaceholder();
-          throw new Error("stream error");
+          // A mid-stream error is thrown by createTurn() AFTER the outer
+          // route handler already committed to a text/event-stream response
+          // (see route.ts) — an exhausted-quota or auth failure discovered
+          // here arrives as this SSE frame, not the non-streaming JSON
+          // response handled above. It must go through the same
+          // interpretLegalAiChatAccess gate logic as that response, or a
+          // real "you need to pay" case degrades into a generic retry error
+          // with no way to activate a plan (mirrors legal-ai-chat.tsx).
+          const payload = frame.data as { error?: string; status?: number; conversationId?: string };
+          const interpreted = interpretLegalAiChatAccess({ status: payload.status ?? 500, body: payload, question: text, audience: "lawyer" });
+          if (interpreted.type === "auth") { setAccessGate(interpreted.gate); setDraft(text); return; }
+          if (interpreted.type === "billing") { setAccessGate(interpreted.gate); if (!options?.resume) setDraft(text); return; }
+          throw new Error(interpreted.type === "error" ? interpreted.message : "stream error");
         }
       }
       if (!sawFinalFrame) {

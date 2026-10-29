@@ -191,6 +191,43 @@ describe("LawyerAiWorkbench — SSE streaming (regression for Critical Bug #2)",
     expect(screen.queryByText(/Хагас хариулт/)).toBeNull();
   });
 
+  it("routes a mid-stream 402 error frame to the billing paywall, not the generic retry message (regression)", async () => {
+    // Quota/entitlement failures discovered inside createTurn() arrive as an
+    // SSE "error" frame AFTER the route already committed to text/event-
+    // stream (see route.ts) — unlike the pre-LLM 401/402 JSON case above,
+    // this frame used to be discarded and replaced with a bare "stream
+    // error", so a lawyer who exhausted their quota mid-conversation got
+    // stuck on a useless Retry button with no way to pay. It must go
+    // through the same interpretLegalAiChatAccess gate as the non-streaming
+    // branch, exactly like legal-ai-chat.tsx already does.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = typeof input === "string" ? input : input.toString();
+        if (url.includes("/api/ai/chat")) {
+          return sseResponse([
+            { event: "delta", data: { text: "Хагас хариулт" } },
+            { event: "error", data: { error: "Таны багцын асуултын хязгаар дууссан.", status: 402 } },
+          ]);
+        }
+        return new Response(null, { status: 404 });
+      }),
+    );
+
+    renderWorkbench();
+    await act(async () => {
+      typeAndSubmit("Асуулт");
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("QR кодоор төлөх")).not.toBeNull();
+    });
+    // The partial streamed text is gone and no generic retry alert is shown
+    // instead — the billing gate replaced both.
+    expect(screen.queryByText(/Хагас хариулт/)).toBeNull();
+    expect(screen.queryByRole("button", { name: "Дахин оролдох" })).toBeNull();
+  });
+
   it("treats a stream that closes after some text but WITHOUT a done/error frame as a failed turn (no truncated answer shown as final)", async () => {
     vi.stubGlobal(
       "fetch",
