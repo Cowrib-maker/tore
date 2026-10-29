@@ -2,10 +2,12 @@
 
 import { readUploadJson, UPLOAD_GENERIC_ERROR } from "@/lib/read-upload-response";
 import { useDocumentUploadQueue, type UploadOutcome } from "@/components/legal-ai/use-document-upload-queue";
+import { isNearBottom } from "@/lib/scroll-position";
 import {
   type ChangeEvent,
   type DragEvent,
   type FormEvent,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -117,6 +119,7 @@ const OPEN_SUGGESTIONS = [
 
 const ATTACHMENT_NOT_READY_MESSAGE = "Хавсралт бэлэн болоогүй байна. Устгах эсвэл дахин оролдоод, дараа нь илгээнэ үү.";
 const ATTACHMENT_ANALYSIS_PROMPT = "Хавсаргасан баримт бичгийг тоймлон, гол агуулга, эрсдэл, дараагийн алхмыг шинжил.";
+const TRANSCRIPT_NEAR_BOTTOM_THRESHOLD_PX = 48;
 
 export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, initialDraft, initialMessages = [], initialAttachedDocuments = [], caseContext, history }: Props) {
   const [draft, setDraft] = useState(initialDraft ?? "");
@@ -173,7 +176,20 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
 
   const conversationMode = messages.length > 0 || draft.trim().length > 0 || loading || Boolean(attachedDocuments.length) || uploads.length > 0;
 
+  // Whether the transcript is scrolled near its bottom — drives whether a
+  // new/streaming message auto-follows, or (lawyer has scrolled up to
+  // re-read an earlier answer) is left alone instead of yanking their
+  // scroll position down on every streamed token. Mirrors legal-ai-chat.tsx.
+  const isNearBottomRef = useRef(true);
+
+  const handleTranscriptScroll = useCallback(() => {
+    const el = transcriptRef.current;
+    if (!el) return;
+    isNearBottomRef.current = isNearBottom(el, TRANSCRIPT_NEAR_BOTTOM_THRESHOLD_PX);
+  }, []);
+
   useEffect(() => {
+    if (!isNearBottomRef.current) return;
     transcriptRef.current?.scrollTo({ top: transcriptRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, loading]);
 
@@ -410,7 +426,7 @@ export function LawyerAiWorkbench({ initialConversationId, initialCaseFileId, in
             <Welcome caseLinked={Boolean(caseContext)} suggestions={suggestions} onSuggest={(prompt) => { setDraft(prompt); textareaRef.current?.focus(); }} />
           </div>
 
-          <div ref={transcriptRef} className={cn("min-h-0 overflow-y-auto transition-[flex-grow,min-height] duration-300 ease-out", conversationMode ? "min-h-0 flex-1" : "h-0 flex-none overflow-hidden")}>
+          <div ref={transcriptRef} onScroll={handleTranscriptScroll} className={cn("min-h-0 overflow-y-auto transition-[flex-grow,min-height] duration-300 ease-out", conversationMode ? "min-h-0 flex-1" : "h-0 flex-none overflow-hidden")}>
             <div className="mx-auto flex w-full max-w-[1040px] xl:max-w-[1100px] 2xl:max-w-[1180px] 3xl:max-w-[1320px] flex-col gap-5 px-4 py-6 sm:px-6">
               {messages.map((item, index) => <MessageBubble key={`${item.role}-${index}`} message={item} appear={item.role === "ASSISTANT"} />)}
               {loading ? <div className="flex items-start gap-3"><AiMark /><div className="rounded-2xl rounded-tl-md border border-[#0B1F3A]/8 bg-white px-4 py-3 text-sm text-[#66717D]"><span className="inline-flex items-center gap-2"><LoaderCircle className="size-3.5 animate-spin text-[#0B5CFF]" />{thinkingStageLabel}</span></div></div> : null}
