@@ -44,7 +44,35 @@ export class LocalFileStorage implements FileStorage {
     return resolved;
   }
 
+  /**
+   * True for every Vercel deployment (production AND preview alike) — Vercel
+   * sets this for the function runtime itself, never for local `next dev` or
+   * `vercel dev`. Checked lazily, inside upload() rather than the factory or
+   * constructor (see createFileStorage()'s doc comment for why): confirmed
+   * on the real deployed preview that FILE_STORAGE unset + TORE_ALLOW_LOCAL_
+   * STORAGE=1 (which only bypasses assertProductionEnvGuards' boot-time
+   * check, for "exceptional deploys") let a LocalFileStorage get built, and
+   * its first real upload then failed with
+   * `ENOENT: no such file or directory, mkdir '/var/task/.data'` — the
+   * deployed function bundle's filesystem is read-only, so local disk
+   * storage can never work there regardless of that bypass flag.
+   */
+  private static isVercelRuntime(): boolean {
+    return process.env.VERCEL === "1";
+  }
+
   async upload(input: UploadFileInput): Promise<StoredObject> {
+    if (LocalFileStorage.isVercelRuntime()) {
+      // Fail clearly instead of letting mkdir/writeFile surface an opaque
+      // ENOENT below — this is a deployment-configuration gap (see the
+      // doc comment above), not an application defect.
+      throw new Error(
+        "FILE_STORAGE=s3 (with S3_BUCKET, S3_REGION, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY) is required on Vercel. " +
+          "Local file storage cannot persist writes on Vercel's read-only serverless filesystem — " +
+          "TORE_ALLOW_LOCAL_STORAGE only bypasses the boot-time check in assertProductionEnvGuards " +
+          "(env-guards.ts); it does not make local storage viable here.",
+      );
+    }
     const key = buildObjectKey(input.purpose, input.ownerId, input.fileName);
     const absolute = this.resolvePath(key);
     await mkdir(path.dirname(absolute), { recursive: true });
