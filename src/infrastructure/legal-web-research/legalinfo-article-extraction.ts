@@ -199,8 +199,19 @@ export type RelevantLegalInfoArticle = {
   score: number;
 };
 
-/** Open-question article matches below this score are treated as noise (prefer empty). */
-export const MIN_RELEVANT_ARTICLE_SCORE = 0.34;
+/**
+ * Open-question article matches below this score are treated as noise
+ * (prefer empty). This tier is the last-resort official-source fallback —
+ * presented to the user as "verified" the same as the local corpus tier's
+ * own open-question match — so its bar must not sit far below that tier's
+ * (MIN_OPEN_QUESTION_CITATION_SCORE = 0.72 in article-search.ts). The two
+ * scores are not directly comparable (this one is a plain search-term
+ * overlap fraction; the local tier's is a multi-factor concept score), so
+ * this constant is not simply set equal to it, but 0.34 (barely a third of
+ * the question's own search terms) was too weak a bar for a "verified"
+ * result from the tier with the least cross-checking available.
+ */
+export const MIN_RELEVANT_ARTICLE_SCORE = 0.5;
 
 /**
  * Parses an already-fetched LegalInfo.mn detail page and ranks its

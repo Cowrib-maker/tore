@@ -67,18 +67,54 @@ function hasVerifiedProvenance(
   return Boolean(sha && archiveId);
 }
 
-/** Question words (>=4 letters) or numeric fragments (>=2 digits) that
- * literally appear in the candidate's title — a deliberately simple,
- * deterministic stand-in for the statute scorer's concept matching, tuned
- * for proper nouns (court/aimag names) and case-number fragments instead
- * of legal concepts. */
+/**
+ * Generic legal/court-procedure vocabulary that appears in nearly every
+ * statute title AND nearly every judgment title alike («... тухай хууль»,
+ * «... шатны шүүх», «... хуулийн дагуу»). None of these distinguish one
+ * document from another, so they must never count toward title-overlap —
+ * an ordinary statute question ("Хөдөлмөрийн тухай хуулийн дагуу...") would
+ * otherwise score a false boost against any judgment whose boilerplate
+ * happens to repeat the same generic words, letting an unrelated judgment
+ * outrank (or stand in for) the correctly-tuned statute tier below it.
+ */
+const TITLE_OVERLAP_STOPWORDS = new Set([
+  "тухай",
+  "хууль",
+  "хуулийн",
+  "хуультай",
+  "дугаар",
+  "дүгээр",
+  "зүйл",
+  "зүйлийн",
+  "журам",
+  "журмын",
+  "заалт",
+  "дагуу",
+  "тогтоол",
+  "шийдвэр",
+  "шүүх",
+  "шүүхийн",
+  "хэргийн",
+  "шатны",
+  "анхан",
+  "давж",
+  "заалдах",
+  "хяналтын",
+]);
+
+/** Question words (>=4 letters, excluding generic legal/court boilerplate)
+ * or numeric fragments (>=2 digits) that literally appear in the
+ * candidate's title — a deliberately simple, deterministic stand-in for the
+ * statute scorer's concept matching, tuned for proper nouns (court/aimag
+ * names) and case-number fragments instead of legal concepts. */
 function titleOverlapBoost(title: string, questionText: string): number {
   const titleLower = title.toLowerCase();
   const tokens = new Set(
     questionText
       .split(/[^\p{L}\p{N}]+/u)
       .map((token) => token.trim().toLowerCase())
-      .filter((token) => (/^\d+$/.test(token) ? token.length >= 2 : token.length >= 4)),
+      .filter((token) => (/^\d+$/.test(token) ? token.length >= 2 : token.length >= 4))
+      .filter((token) => !TITLE_OVERLAP_STOPWORDS.has(token)),
   );
   let boost = 0;
   for (const token of tokens) {

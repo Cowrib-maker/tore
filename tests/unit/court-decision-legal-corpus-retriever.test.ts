@@ -119,6 +119,24 @@ describe("CourtDecisionLegalCorpusRetriever", () => {
     expect(result.kind).toBe("unavailable");
   });
 
+  it("does not let a judgment hijack a generic court-procedure question whose words are all boilerplate shared with the judgment's title (regression)", async () => {
+    // Both seeded judgments' titles contain "Иргэний хэргийн давж заалдах
+    // шатны шүүх" — generic appellate-court boilerplate (already called out
+    // as such in the test above). Before title-overlap had stopword
+    // filtering, a question built entirely from that same boilerplate
+    // ("давж", "заалдах", "шатны", "шүүх" — no aimag name, no case number,
+    // no actual legal concept) would still score boost > 0 against it and
+    // come back "retrieved", wrongly handing a citizen's question about how
+    // appellate courts work a specific, unrelated judgment as if it were
+    // the answer, instead of correctly falling through to the statute tier.
+    const retriever = new CourtDecisionLegalCorpusRetriever(await seededRepository());
+    const question = "Давж заалдах шатны шүүх хэрхэн ажилладаг вэ?";
+
+    const result = await retriever.retrieveLegalQuestion({ question, query: question, locator: null });
+
+    expect(result.kind).toBe("unavailable");
+  });
+
   it("retrieveExactCitation requires an unambiguous single case-number match", async () => {
     const retriever = new CourtDecisionLegalCorpusRetriever(await seededRepository());
     const exact = await retriever.retrieveExactCitation({

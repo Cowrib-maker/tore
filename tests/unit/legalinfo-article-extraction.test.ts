@@ -2,7 +2,11 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { extractVerifiedLegalInfoArticle } from "@/infrastructure/legal-web-research/legalinfo-article-extraction";
+import {
+  extractRelevantLegalInfoArticles,
+  extractVerifiedLegalInfoArticle,
+  MIN_RELEVANT_ARTICLE_SCORE,
+} from "@/infrastructure/legal-web-research/legalinfo-article-extraction";
 
 const FIXTURE_11259 = readFileSync(
   join(process.cwd(), "tests/fixtures/legalinfo-11259-administrative-general-law.html"),
@@ -127,5 +131,43 @@ describe("extractVerifiedLegalInfoArticle", () => {
       });
       expect(result.kind).toBe("found");
     });
+  });
+});
+
+describe("extractRelevantLegalInfoArticles — MIN_RELEVANT_ARTICLE_SCORE", () => {
+  it("keeps the official-source fallback tier's acceptance bar close to the local tier's (not far below it)", () => {
+    // This tier is the last-resort official-source fallback, presented to
+    // the user as "verified" the same as any other tier's match — its bar
+    // must not sit far below the local corpus tier's own open-question
+    // threshold (MIN_OPEN_QUESTION_CITATION_SCORE = 0.72 in
+    // article-search.ts). 0.34 (barely a third of the question's own search
+    // terms) was too weak a bar for a "verified" result from the tier with
+    // the least cross-checking available; tightened to 0.5.
+    expect(MIN_RELEVANT_ARTICLE_SCORE).toBeGreaterThanOrEqual(0.5);
+  });
+
+  it("still finds a strongly-matching article on a real fetched page above the new bar", async () => {
+    const results = await extractRelevantLegalInfoArticles({
+      html: FIXTURE_11259,
+      sourceUrl: SOURCE_URL,
+      questionText: "Захиргааны гэрээ хууль бусад тооцогдох нь юуг хэлэх вэ?",
+      maxResults: 3,
+    });
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0]!.score).toBeGreaterThanOrEqual(MIN_RELEVANT_ARTICLE_SCORE);
+  });
+
+  it("rejects a question whose overlap with the page is weak, now that the bar is 0.5", async () => {
+    // Only "хууль" realistically overlaps the fixture's administrative-
+    // contract articles; the rest of this question's vocabulary (a wholly
+    // different legal topic) does not appear on the page at all, so the
+    // term-overlap fraction stays well under the new 0.5 bar.
+    const results = await extractRelevantLegalInfoArticles({
+      html: FIXTURE_11259,
+      sourceUrl: SOURCE_URL,
+      questionText: "Хөдөлмөрийн хөлсний доод хэмжээг хэн тогтоодог, ямар хугацаанд нэмэгддэг вэ?",
+      maxResults: 3,
+    });
+    expect(results).toEqual([]);
   });
 });
