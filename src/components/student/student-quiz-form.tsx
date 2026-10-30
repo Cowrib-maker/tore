@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 import { gradeStudentQuizAction } from "@/application/actions/student.actions";
 import type {
@@ -17,6 +17,35 @@ const QUIZ_ERROR_MESSAGES: Record<string, string> = {
   not_found: "Тест олдсонгүй эсвэл хугацаа дууссан байна.",
 };
 
+/** Exported for tests. In-progress answers only — never the graded result. */
+export function studentQuizAnswersStorageKey(quizId: string): string {
+  return `tore-student-quiz-answers:${quizId}`;
+}
+
+/** Tolerates private-browsing/storage-disabled environments — the quiz still
+ * works without persistence, it just won't survive a refresh there. */
+function readStoredAnswers(quizId: string): Record<string, string> | null {
+  try {
+    const raw = sessionStorage.getItem(studentQuizAnswersStorageKey(quizId));
+    if (!raw) return null;
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return null;
+    }
+    return parsed as Record<string, string>;
+  } catch {
+    return null;
+  }
+}
+
+function clearStoredAnswers(quizId: string): void {
+  try {
+    sessionStorage.removeItem(studentQuizAnswersStorageKey(quizId));
+  } catch {
+    // ignore
+  }
+}
+
 export function StudentQuizForm({
   quiz,
   copy,
@@ -28,6 +57,40 @@ export function StudentQuizForm({
   const [result, setResult] = useState<StudentQuizGrade | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+
+  // Restored only after mount (client only — reading sessionStorage during
+  // the server-rendered first pass would either throw or risk a hydration
+  // mismatch), so a refresh mid-quiz doesn't silently erase what was
+  // already answered. Submitted/graded results are never persisted here —
+  // only the in-progress draft.
+  useEffect(() => {
+    const stored = readStoredAnswers(quiz.id);
+    if (stored) {
+      // react-hooks/set-state-in-effect flags this, but a lazy useState
+      // initializer isn't safe here: it would run during the server-rendered
+      // pass too (sessionStorage undefined there) and again, with a
+      // different result, during client hydration — a real checked-attribute
+      // mismatch on the radio inputs. Reading an external store on mount is
+      // exactly the exception React's own guide carves out for effects
+      // (https://react.dev/learn/you-might-not-need-an-effect).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAnswers(stored);
+    }
+    // Only ever restore once, for this quiz instance.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (Object.keys(answers).length === 0) return;
+    try {
+      sessionStorage.setItem(
+        studentQuizAnswersStorageKey(quiz.id),
+        JSON.stringify(answers),
+      );
+    } catch {
+      // ignore — same tolerance as readStoredAnswers above.
+    }
+  }, [answers, quiz.id]);
 
   function submit() {
     const unanswered = quiz.questions.filter(
@@ -52,11 +115,14 @@ export function StudentQuizForm({
         setError(QUIZ_ERROR_MESSAGES[graded.error] ?? "Шалгалт илгээхэд алдаа гарлаа.");
         return;
       }
+      // Done — the draft no longer needs to survive a refresh.
+      clearStoredAnswers(quiz.id);
       setResult(graded);
     });
   }
 
   function retry() {
+    clearStoredAnswers(quiz.id);
     setResult(null);
     setAnswers({});
     setError(null);
