@@ -49,7 +49,8 @@ async function fetchPage(jar: CookieJar, path: string) {
   });
   jar.absorb(response.headers);
   const text = await response.text();
-  return { status: response.status, text };
+  const location = response.headers.get("location");
+  return { status: response.status, text, location };
 }
 
 describe("/legal-ai and /lawyer/workspace role routing (real deployed HTTP)", () => {
@@ -76,6 +77,25 @@ describe("/legal-ai and /lawyer/workspace role routing (real deployed HTTP)", ()
       const jar = await loginUser(BASE_URL, LAWYER_TEST_EMAIL, LAWYER_TEST_PASSWORD!);
       const page = await fetchPage(jar, "/lawyer/workspace");
       expect(page.status).toBe(200);
+    },
+  );
+
+  // The actual post-login redirect: middleware bounces an authenticated
+  // visitor away from /login via getPostAuthRedirect — this is the literal,
+  // browser-observable "where does a LAWYER land after signing in" behavior,
+  // not just the pure function checked at the unit level (rbac.ts /
+  // auth-role-freshness.test.ts).
+  it.skipIf(!LAWYER_TEST_PASSWORD)(
+    "an authenticated LAWYER visiting /login is redirected to /lawyer/workspace, not the old marketplace dashboard",
+    async () => {
+      const jar = await loginUser(BASE_URL, LAWYER_TEST_EMAIL, LAWYER_TEST_PASSWORD!);
+      const page = await fetchPage(jar, "/login");
+      expect(page.status).toBeGreaterThanOrEqual(300);
+      expect(page.status).toBeLessThan(400);
+      expect(page.location).toBeTruthy();
+      // Location is an absolute URL (new URL(path, req.nextUrl) in
+      // middleware.ts) — compare only the path.
+      expect(new URL(page.location!, BASE_URL).pathname).toBe("/lawyer/workspace");
     },
   );
 

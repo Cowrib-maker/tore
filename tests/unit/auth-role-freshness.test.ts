@@ -68,13 +68,43 @@ describe("Legal AI post-auth redirect", () => {
     expect(getPostAuthRedirect(UserRole.CLIENT, "/legal-ai?q=hi")).toBe(
       "/legal-ai?q=hi",
     );
-    expect(getPostAuthRedirect(UserRole.LAWYER, "/legal-ai")).toBe(
-      "/lawyer/dashboard",
-    );
     expect(getPostAuthRedirect(UserRole.ADMIN, "/legal-ai")).toBe(
       "/admin/dashboard",
     );
     expect(legalAiHref("contract")).toBe("/legal-ai?q=contract");
+  });
+});
+
+describe("LAWYER lands on the Lawyer Workspace after sign-in", () => {
+  it("getPostAuthRedirect sends LAWYER to /lawyer/workspace, regardless of callbackUrl", () => {
+    expect(getPostAuthRedirect(UserRole.LAWYER, "/legal-ai")).toBe(
+      "/lawyer/workspace",
+    );
+    expect(getPostAuthRedirect(UserRole.LAWYER, undefined)).toBe(
+      "/lawyer/workspace",
+    );
+    expect(getPostAuthRedirect(UserRole.LAWYER, "/lawyer/dashboard")).toBe(
+      "/lawyer/workspace",
+    );
+  });
+
+  it("does not touch getDashboardPath itself — every other use (the middleware's access-denied bounce, 'back to dashboard' nav links) still resolves LAWYER to /lawyer/dashboard, unchanged", () => {
+    expect(getDashboardPath(UserRole.LAWYER)).toBe("/lawyer/dashboard");
+  });
+
+  it("CLIENT and ADMIN post-auth redirects are unaffected by the LAWYER change", () => {
+    expect(getPostAuthRedirect(UserRole.ADMIN, undefined)).toBe(
+      "/admin/dashboard",
+    );
+    expect(getPostAuthRedirect(UserRole.CLIENT, undefined)).toBe(
+      "/client/dashboard",
+    );
+  });
+
+  it("ADMIN can reach /lawyer/workspace without any role change — canAccessRoute already allows it", () => {
+    expect(canAccessRoute(UserRole.ADMIN, "/lawyer/workspace")).toBe(true);
+    expect(canAccessRoute(UserRole.LAWYER, "/lawyer/workspace")).toBe(true);
+    expect(canAccessRoute(UserRole.CLIENT, "/lawyer/workspace")).toBe(false);
   });
 });
 

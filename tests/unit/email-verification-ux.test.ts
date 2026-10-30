@@ -143,8 +143,10 @@ describe("email verification UX flow", () => {
   });
 
   it("verified accounts still complete login to the role destination", () => {
+    // LAWYER's destination is /lawyer/workspace (the primary working
+    // environment for lawyers) — see getPostAuthRedirect in rbac.ts.
     expect(destinationAfterVerifiedLogin(UserRole.LAWYER)).toBe(
-      "/lawyer/dashboard",
+      "/lawyer/workspace",
     );
     expect(destinationAfterVerifiedLogin(UserRole.CLIENT)).toBe(
       "/client/dashboard",
@@ -166,7 +168,7 @@ describe("email verification UX flow", () => {
       continueHref: "/login",
     });
     expect(destinationAfterVerifiedLogin(UserRole.LAWYER)).toBe(
-      "/lawyer/dashboard",
+      "/lawyer/workspace",
     );
   });
 

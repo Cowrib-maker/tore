@@ -101,7 +101,15 @@ export function registerClientHrefForLegalAi(question?: string): string {
   return `/register/client?callbackUrl=${encodeURIComponent(legalAiHref(question))}`;
 }
 
-/** CLIENT may return to Legal AI; other roles always go to their dashboard. */
+/**
+ * CLIENT may return to Legal AI. LAWYER lands on the Lawyer Workspace
+ * (/lawyer/workspace) — the primary working environment for lawyers — not
+ * the marketplace dashboard (/lawyer/dashboard); that dashboard is still
+ * reachable via its own nav link and remains the target of every other
+ * getDashboardPath() use (the middleware's access-denied bounce, "back to
+ * dashboard" links, etc.), which this function deliberately leaves
+ * untouched. ADMIN always goes to its own dashboard.
+ */
 export function getPostAuthRedirect(
   role: UserRole,
   callbackUrl: unknown,
@@ -111,6 +119,9 @@ export function getPostAuthRedirect(
     if (safe) {
       return safe;
     }
+  }
+  if (role === UserRole.LAWYER) {
+    return "/lawyer/workspace";
   }
   return getDashboardPath(role);
 }
