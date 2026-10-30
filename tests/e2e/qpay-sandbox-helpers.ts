@@ -198,6 +198,20 @@ export async function ensureE2eCitizen(tag: "basic" | "plus"): Promise<{
   });
 }
 
+/**
+ * Only non-empty when VERCEL_OIDC_TOKEN is present (via `vercel link` /
+ * `vercel env run` against a real deployment) — a no-op everywhere else,
+ * including every existing caller of loginUser running against localhost.
+ * Lets this helper work unmodified against a deployment sitting behind
+ * Vercel Deployment Protection, which otherwise redirects an unauthenticated
+ * fetch to Vercel's own login page before it ever reaches the app's auth
+ * endpoints. Never logs or persists the token value.
+ */
+function vercelProtectionHeaders(): Record<string, string> {
+  const token = process.env.VERCEL_OIDC_TOKEN;
+  return token ? { "x-vercel-trusted-oidc-idp-token": token } : {};
+}
+
 export async function loginUser(
   baseUrl: string,
   email: string,
@@ -205,7 +219,7 @@ export async function loginUser(
 ): Promise<CookieJar> {
   const jar = new CookieJar();
   const csrfRes = await fetch(`${baseUrl}/api/auth/csrf`, {
-    headers: { cookie: jar.header() },
+    headers: { cookie: jar.header(), ...vercelProtectionHeaders() },
   });
   jar.absorb(csrfRes.headers);
   if (!csrfRes.ok) {
@@ -231,6 +245,7 @@ export async function loginUser(
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
       cookie: jar.header(),
+      ...vercelProtectionHeaders(),
     },
     body,
     redirect: "manual",
