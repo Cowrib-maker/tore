@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:spell-db": "vitest run --config vitest.db.config.ts",
+    "test:student-db": "vitest run --config vitest.student-db.config.ts",
     "test:qpay-sandbox": "vitest run --config vitest.e2e.config.ts",
     "test:landing-access-e2e": "vitest run --config vitest.e2e.config.ts tests/e2e/landing-access-flow.e2e.test.ts",
     "db:generate": "prisma generate",
