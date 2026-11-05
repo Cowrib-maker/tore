@@ -4,6 +4,16 @@
  * Default max 40 judgments (plan 2C: 20–50). Does not scrape legaldata.mn.
  * Detail HTML is fetched via Playwright because bare HTTP often returns 500.
  *
+ * DATABASE_URL resolution: this script reads `.env.local` DIRECTLY (not
+ * `import "dotenv/config"`, which only loads `.env`) and refuses to run
+ * unless that URL resolves to a local host. `.env` in this repo holds the
+ * production Neon URL, and a plain `dotenv/config` + `@/lib/env` import —
+ * the exact pattern that caused the Sprint 14 production migration incident
+ * and, separately, a `postgresDocumentsCreated: 0` silent-production-write
+ * bug in the legalinfo local-prisma ingest — would have resolved to
+ * production here too. See scripts/ingest-legalinfo-local-verified.ts for
+ * the identical fix applied to that sibling script.
+ *
  * Runbook:
  *   1. npm run discover:shuukh -- --max-pages 2
  *   2. npm run ingest:shuukh:canary
@@ -14,31 +24,45 @@
  *   npm run ingest:shuukh:canary -- --max 40
  */
 
-import "dotenv/config";
-
+import { readFileSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import path, { join } from "node:path";
 
 import { chromium, type Browser } from "playwright";
 
-import { contentSha256Hex, sha256Hex } from "@/engine/data/archive";
-import {
-  HttpShuukhCrawler,
-  InMemoryKnowledgeCrawler,
-  InMemoryKnowledgeRepository,
-  JsonKnowledgeExporter,
-  KnowledgeEngine,
-  ParagraphKnowledgeChunker,
-  RuleBasedKnowledgeMetadataExtractor,
-  ShuukhJudgmentParser,
-  UnicodeKnowledgeNormalizer,
-  assertHttpsShuukhUrl,
-  caseIdFromShuukhUrl,
-} from "@/engine/knowledge";
-import { createLegalArchiveStack } from "@/infrastructure/archive";
-import { getPrismaClient } from "@/infrastructure/database/prisma-client";
-import { PrismaKnowledgeRepository } from "@/infrastructure/repositories/prisma-legal-knowledge-repository";
-import { env } from "@/lib/env";
+import { classifyDatabaseUrl } from "./lib/database-url-safety";
+
+function loadEnvLocalDatabaseUrl(): string {
+  const envLocalPath = path.resolve(process.cwd(), ".env.local");
+  let content: string;
+  try {
+    content = readFileSync(envLocalPath, "utf8");
+  } catch {
+    throw new Error(
+      "[ingest:shuukh:canary] .env.local not found at the repository root. " +
+        "This script only ever targets the DATABASE_URL declared in .env.local, never .env.",
+    );
+  }
+  const match = content.match(/^DATABASE_URL\s*=\s*"?([^"\r\n]+)"?\s*$/m);
+  if (!match) {
+    throw new Error("[ingest:shuukh:canary] DATABASE_URL not found in .env.local.");
+  }
+  return match[1].trim();
+}
+
+const databaseUrl = loadEnvLocalDatabaseUrl();
+const classification = classifyDatabaseUrl(databaseUrl);
+if (classification.kind !== "local") {
+  console.error(
+    `[ingest:shuukh:canary] Refusing: .env.local DATABASE_URL is not local (${classification.kind}).`,
+  );
+  process.exit(1);
+}
+// Set before ANY import below touches @/lib/env (dynamic imports, right
+// after this module-level block runs) — mirrors ingest-legalinfo-local-verified.ts.
+process.env.DATABASE_URL = databaseUrl;
+process.env.ARCHIVE_STORAGE = "local";
+(process.env as { NODE_ENV?: string }).NODE_ENV ??= "test";
 
 const DEFAULT_MAX = 40;
 const REQUEST_DELAY_MS = 400;
@@ -117,19 +141,39 @@ function createPlaywrightFetch(browser: Browser): typeof fetch {
 }
 
 async function main() {
+  const { contentSha256Hex, sha256Hex } = await import("@/engine/data/archive");
+  const {
+    HttpShuukhCrawler,
+    InMemoryKnowledgeCrawler,
+    InMemoryKnowledgeRepository,
+    JsonKnowledgeExporter,
+    KnowledgeEngine,
+    ParagraphKnowledgeChunker,
+    RuleBasedKnowledgeMetadataExtractor,
+    ShuukhJudgmentParser,
+    UnicodeKnowledgeNormalizer,
+    assertHttpsShuukhUrl,
+    caseIdFromShuukhUrl,
+  } = await import("@/engine/knowledge");
+  const { createLegalArchiveStack } = await import("@/infrastructure/archive");
+  const { getPrismaClient } = await import("@/infrastructure/database/prisma-client");
+  const { PrismaKnowledgeRepository } = await import(
+    "@/infrastructure/repositories/prisma-legal-knowledge-repository"
+  );
+  const { env } = await import("@/lib/env");
+
   const args = parseArgs(process.argv.slice(2));
   console.log("shuukh.mn LOCAL Prisma canary ingest");
   console.log("===================================");
 
-  const localEnv = {
-    ...env,
-    ARCHIVE_STORAGE: "local" as const,
-  };
-  if (env.ARCHIVE_STORAGE === "s3") {
-    console.warn(
-      "Note: .env ARCHIVE_STORAGE=s3 ignored for this command — using local archive.",
+  // Defense in depth: re-check after the env module resolved its own copy.
+  if (classifyDatabaseUrl(env.DATABASE_URL).kind !== "local") {
+    console.error(
+      "[ingest:shuukh:canary] Refusing: resolved DATABASE_URL is not local after env load.",
     );
+    process.exit(1);
   }
+  const localEnv = env;
 
   const root = process.cwd();
   const manifestPath = join(root, "tmp", "shuukh-discovery-manifest.json");

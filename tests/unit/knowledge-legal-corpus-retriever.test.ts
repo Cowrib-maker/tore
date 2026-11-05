@@ -1060,3 +1060,125 @@ describe("historical and current Legal AI grounding", () => {
   });
 });
 
+describe("KnowledgeLegalCorpusRetriever — wrong-law same-article-number adversarial cases", () => {
+  // Not one of the 5 canonical laws in canonical-law-titles.ts, so
+  // preferredLawIds is empty and title-hint matching is the only guard.
+  function lawDocument(options: {
+    id: string;
+    lawId: string;
+    title: string;
+    articleNumber: string;
+    articleText: string;
+  }): StoredKnowledgeDocument {
+    return {
+      id: options.id,
+      sourceId: "legalinfo",
+      sourceUrl: `https://legalinfo.mn/mn/detail?lawId=${options.lawId}`,
+      title: options.title,
+      kind: KnowledgeDocumentKind.HTML,
+      metadata: {
+        title: options.title,
+        language: "mn",
+        jurisdiction: "MN",
+        documentType: "STATUTE",
+        sourceUrl: `https://legalinfo.mn/mn/detail?lawId=${options.lawId}`,
+        articleCount: 1,
+        validFrom: null,
+        validTo: null,
+        sourceVersion: null,
+      },
+      articles: [
+        {
+          id: `${options.id}-art`,
+          articleNumber: options.articleNumber,
+          title: `${options.articleNumber} дугаар зүйл`,
+          text: options.articleText,
+          order: 0,
+        },
+      ],
+      chunks: [],
+      ingestedAt: new Date("2026-01-01T00:00:00.000Z"),
+      provenance: {
+        archiveId: `arch-${options.id}`,
+        sha256: `sha-${options.id}`,
+        originalUrl: `https://legalinfo.mn/mn/detail?lawId=${options.lawId}`,
+        lawId: options.lawId,
+      },
+    };
+  }
+
+  it("refuses with CONFLICT rather than guessing when two legally distinct laws with overlapping titles both have the cited article number", async () => {
+    const knowledge = new InMemoryKnowledgeRepository();
+    // The real law cited.
+    await knowledge.save(
+      lawDocument({
+        id: "tax-law-main",
+        lawId: "fixture-tax-main",
+        title: "Татварын тухай хууль",
+        articleNumber: "5",
+        articleText: "Татварын хувь хэмжээг энэ хуулиар тогтооно.",
+      }),
+    );
+    // A different, real law whose title happens to share the exact same
+    // leading phrase ("Татварын тухай") because it is that law's own
+    // enactment/transitional statute — legally distinct, not an alias —
+    // and which happens to also have an article numbered 5.
+    await knowledge.save(
+      lawDocument({
+        id: "tax-law-enactment",
+        lawId: "fixture-tax-enactment",
+        title: "Татварын тухай хуулийг дагаж мөрдөх журмын тухай хууль",
+        articleNumber: "5",
+        articleText: "ӮНДЭСЛЭЛ: дагаж мөрдөх журмын тусгай заалт.",
+      }),
+    );
+    const retriever = new KnowledgeLegalCorpusRetriever(knowledge);
+
+    const retrieved = await retriever.retrieveExactCitation({
+      question: "Татварын тухай хуулийн 5 дугаар зүйл юу гэж заасан бэ?",
+      query: "Татварын тухай хуулийн 5 дугаар зүйл",
+      locator: "art-5",
+    });
+    // Both candidates are surfaced — the retriever never silently drops
+    // one — but verification must refuse to pick between them rather
+    // than letting the caller treat either one as THE answer.
+    expect(retrieved.kind).toBe("retrieved");
+    if (retrieved.kind === "retrieved") {
+      expect(retrieved.authorities.length).toBeGreaterThan(1);
+    }
+
+    const verified = await retriever.verifyCitation({
+      query: "Татварын тухай хуулийн 5 дугаар зүйл",
+    });
+    expect(verified.ok).toBe(true);
+    if (verified.ok) {
+      expect(verified.verdict.status).toBe(CitationVerificationStatus.CONFLICT);
+    }
+  });
+
+  it("still matches when the official title has an extra leading boilerplate prefix (no regression)", async () => {
+    const knowledge = new InMemoryKnowledgeRepository();
+    await knowledge.save(
+      lawDocument({
+        id: "criminal-code",
+        lawId: "fixture-criminal-boilerplate",
+        title: "Монгол Улсын Эрүүгийн хууль",
+        articleNumber: "17",
+        articleText: "Гэмт хэргийн тодорхойлолт.",
+      }),
+    );
+    const retriever = new KnowledgeLegalCorpusRetriever(knowledge);
+
+    const result = await retriever.retrieveExactCitation({
+      question: "Эрүүгийн хуулийн 17 дугаар зүйл юу гэж заасан бэ?",
+      query: "Эрүүгийн хуулийн 17 дугаар зүйл",
+      locator: "art-17",
+    });
+
+    expect(result.kind).toBe("retrieved");
+    if (result.kind === "retrieved") {
+      expect(result.authorities[0]?.excerpt).toBe("Гэмт хэргийн тодорхойлолт.");
+    }
+  });
+});
+

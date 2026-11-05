@@ -32,6 +32,7 @@ import {
   type UnpaidCitizenBackfillRow,
 } from "../src/application/use-cases/entitlements/compute-unpaid-citizen-backfill-plan";
 import { prisma } from "../src/infrastructure/database/prisma";
+import { announceDatabaseTarget } from "./lib/announce-database-target";
 
 async function loadRows(): Promise<UnpaidCitizenBackfillRow[]> {
   const [aggregates, currentRows] = await Promise.all([
@@ -62,6 +63,7 @@ async function main(): Promise<void> {
   if (!process.env.DATABASE_URL) {
     throw new Error("DATABASE_URL is not set");
   }
+  announceDatabaseTarget("db:backfill-unpaid-citizen-usage", process.env.DATABASE_URL);
 
   const commit = process.argv.includes("--commit");
   const rows = await loadRows();

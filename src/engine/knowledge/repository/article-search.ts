@@ -557,6 +557,39 @@ function dedupeByArticle(hits: KnowledgeArticleHit[]): KnowledgeArticleHit[] {
 }
 
 /**
+ * Word-boundary-aware substring containment for law-title matching. A plain
+ * `.includes()` lets a longer law's title falsely match a shorter one
+ * whenever Mongolian case-suffix agglutination (хуулиЙГ, хуулиЙН, ...)
+ * immediately follows the shorter title inside the longer one — e.g. a
+ * transitional/enactment law titled "<title>-ийг дагаж мөрдөх тухай хууль"
+ * shares an exact character-for-character prefix with "<title> хууль",
+ * since "хуулийг" begins with the letters "хууль". Without this guard, a
+ * citation naming the shorter law's article could be silently satisfied by
+ * the longer, legally distinct law's same-numbered article. Requires the
+ * matched term not be immediately preceded or followed by another letter
+ * or digit in the title.
+ */
+export function titleContainsTerm(title: string, term: string): boolean {
+  const normalizedTitle = title.toLowerCase();
+  const normalizedTerm = term.toLowerCase().trim();
+  if (!normalizedTerm) return false;
+
+  let fromIndex = 0;
+  for (;;) {
+    const index = normalizedTitle.indexOf(normalizedTerm, fromIndex);
+    if (index === -1) return false;
+
+    const before = index > 0 ? normalizedTitle[index - 1] : "";
+    const after = normalizedTitle[index + normalizedTerm.length] ?? "";
+    const isBoundary = (ch: string) => !ch || !/[\p{L}\p{N}]/u.test(ch);
+    if (isBoundary(before) && isBoundary(after)) {
+      return true;
+    }
+    fromIndex = index + 1;
+  }
+}
+
+/**
  * Narrow document set for in-memory search before article scoring.
  * Still local to the repository instance — not a full production corpus load.
  */
@@ -584,16 +617,16 @@ export function filterDocumentsForSearch(
       }
     }
     if (query.titleTerms?.length) {
-      const title = document.title.toLowerCase();
-      if (!query.titleTerms.some((term) => title.includes(term.toLowerCase()))) {
+      if (
+        !query.titleTerms.some((term) => titleContainsTerm(document.title, term))
+      ) {
         return false;
       }
     }
     if (query.excludeTitleTerms?.length) {
-      const title = document.title.toLowerCase();
       if (
         query.excludeTitleTerms.some((term) =>
-          title.includes(term.toLowerCase()),
+          titleContainsTerm(document.title, term),
         )
       ) {
         return false;

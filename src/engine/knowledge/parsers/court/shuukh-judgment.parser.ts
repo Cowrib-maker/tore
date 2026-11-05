@@ -41,8 +41,15 @@ export class ShuukhJudgmentParser implements IKnowledgeParser {
   }
 }
 
+/**
+ * decidedOn arrives either already as ISO (from the live "Огноо" table
+ * row — see shuukh-url.ts's tableRowValue) or as a Mongolian date phrase
+ * (older fallback pattern) — accept both without inventing a date for
+ * anything else.
+ */
 function isoFromMongolianDate(value: string | null): string | null {
   if (!value) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
   const match = value.match(/(\d{4})\s*оны\s*(\d{1,2})\s*сарын\s*(\d{1,2})/);
   if (!match) return null;
   const year = match[1];
