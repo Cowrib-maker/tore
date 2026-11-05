@@ -100,8 +100,11 @@ async function main() {
       const upper = t.caseShape === "UPPER" && t.text.length > 1;
       for (const m of artifact ? [acc.types, all] : [acc.types, all, cacc.types, cleanAll]) {
         const r = m.get(key);
-        if (r) (r.n += 1, (r.titleOnly = r.titleOnly && title), (r.upperOnly = r.upperOnly && upper));
-        else m.set(key, { key, n: 1, titleOnly: title, upperOnly: upper, sample: t.text });
+        if (r) {
+          r.n += 1;
+          r.titleOnly = r.titleOnly && title;
+          r.upperOnly = r.upperOnly && upper;
+        } else m.set(key, { key, n: 1, titleOnly: title, upperOnly: upper, sample: t.text });
       }
     }
   }
@@ -139,8 +142,10 @@ async function main() {
       const c: Cell = { words: acc.words, valid: 0, validStructural: 0, unknown: 0, misspelled: 0, fpCandidates: 0 };
       for (const rec of acc.types.values()) {
         const v = e.judge(rec);
-        if (v === "VALID") (c.valid += rec.n, structuralHits.get(rec) && (c.validStructural += rec.n));
-        else if (v === "UNKNOWN") c.unknown += rec.n;
+        if (v === "VALID") {
+          c.valid += rec.n;
+          if (structuralHits.get(rec)) c.validStructural += rec.n;
+        } else if (v === "UNKNOWN") c.unknown += rec.n;
         else {
           c.misspelled += rec.n;
           const ok = hs.accepts(rec.key);
@@ -155,9 +160,14 @@ async function main() {
     const ctotal: Cell = { words: cleanWords, valid: 0, validStructural: 0, unknown: 0, misspelled: 0, fpCandidates: 0 };
     for (const rec of cleanAll.values()) {
       const v = e.judge(rec);
-      if (v === "VALID") (ctotal.valid += rec.n, structuralHits.get(rec) && (ctotal.validStructural += rec.n));
-      else if (v === "UNKNOWN") ctotal.unknown += rec.n;
-      else (ctotal.misspelled += rec.n, hs.accepts(rec.key) && (ctotal.fpCandidates += rec.n));
+      if (v === "VALID") {
+        ctotal.valid += rec.n;
+        if (structuralHits.get(rec)) ctotal.validStructural += rec.n;
+      } else if (v === "UNKNOWN") ctotal.unknown += rec.n;
+      else {
+        ctotal.misspelled += rec.n;
+        if (hs.accepts(rec.key)) ctotal.fpCandidates += rec.n;
+      }
     }
     result[e.name]!["CLEAN(no artifact docs)"] = ctotal;
     flaggedDev.push(flagged);
