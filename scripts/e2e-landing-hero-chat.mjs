@@ -204,7 +204,6 @@ async function runScenarioSuite(page, context, chatRequests) {
   await page.reload({ waitUntil: "networkidle" });
   await openHeroChat(page);
   chatRequests.length = 0;
-  const ids = [];
   const replies = [];
   const msgs = [
     "Манай ажил олгогч намайг гэнэт ажлаас халчихлаа.",
@@ -281,7 +280,6 @@ async function main() {
     await context.clearCookies();
     await page.reload({ waitUntil: "networkidle" });
     await openHeroChat(page);
-    let lastAssistantBeforeError = "";
     await context.route("**/api/ai/chat", (route) =>
       route.fulfill({
         status: 503,

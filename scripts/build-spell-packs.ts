@@ -141,7 +141,10 @@ function addChid(entries: Entry[]): Entry[] {
     for (const e of entries) {
       if (e.pos !== "N" || e.flags?.includes("form") || e.w.length < 5 || e.w !== e.w.toLowerCase()) continue;
       const pl = e.w.endsWith("чин") ? `${e.w.slice(0, -3)}чид` : e.w.endsWith("ч") ? `${e.w.slice(0, -1)}чид` : null;
-      if (pl && !have.has(pl)) (out.push({ w: pl, pos: "N", flags: ["no-plural"], conf: e.conf }), have.add(pl));
+      if (pl && !have.has(pl)) {
+        out.push({ w: pl, pos: "N", flags: ["no-plural"], conf: e.conf });
+        have.add(pl);
+      }
     }
     return out;
 }

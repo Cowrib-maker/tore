@@ -29,7 +29,10 @@ async function main() {
   const engine = createSpellEngineV1();
   const sets = buildConfusionSets(engine);
   const focus = new Set<string>();
-  for (const [k, v] of sets) (focus.add(k), v.forEach((x) => focus.add(x)));
+  for (const [k, v] of sets) {
+    focus.add(k);
+    v.forEach((x) => focus.add(x));
+  }
   console.log(`confusion pairs from the lexicon: ${[...sets.values()].reduce((s, l) => s + l.length, 0) / 2}; focus words ${focus.size}`);
 
   const uni = new Map<string, number>();

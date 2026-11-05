@@ -54,7 +54,10 @@ async function main() {
     perLabel.set(g, b);
     if (d.id % 7 !== 3) continue; // deterministic spread across the file
     const n = d.text.split(/\s+/).length;
-    if (b.tokens < target / 9 + 1) (b.docs.push(d.text), (b.tokens += n));
+    if (b.tokens < target / 9 + 1) {
+      b.docs.push(d.text);
+      b.tokens += n;
+    }
     if ([...perLabel.values()].every((x) => x.tokens >= target / 9) && perLabel.size >= 9) break;
   }
 
@@ -74,8 +77,10 @@ async function main() {
         const key = normalizeToken(t.text);
         const title = t.caseShape === "TITLE" || t.caseShape === "UPPER";
         const r = types.get(key);
-        if (r) (r.n += 1, (r.titleOnly = r.titleOnly && title));
-        else types.set(key, { key, n: 1, titleOnly: title, sample: t.text });
+        if (r) {
+          r.n += 1;
+          r.titleOnly = r.titleOnly && title;
+        } else types.set(key, { key, n: 1, titleOnly: title, sample: t.text });
       }
     }
     genres.set(g, { types, tokens, words });
