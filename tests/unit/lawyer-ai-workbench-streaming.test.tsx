@@ -185,6 +185,29 @@ describe("LawyerAiWorkbench — SSE streaming (regression for Critical Bug #2)",
     expect(screen.queryByText(/Хагас хариулт/)).toBeNull();
   });
 
+  it("treats a stream that closes after some text but WITHOUT a done/error frame as a failed turn (no truncated answer shown as final)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = typeof input === "string" ? input : input.toString();
+        if (url.includes("/api/ai/chat")) {
+          return sseResponse([{ event: "delta", data: { text: "Таслагдсан хариулт" } }]);
+        }
+        return new Response(null, { status: 404 });
+      }),
+    );
+
+    renderWorkbench();
+    await act(async () => {
+      typeAndSubmit("Асуулт");
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).not.toBeNull();
+    });
+    expect(screen.queryByText(/Таслагдсан хариулт/)).toBeNull();
+  });
+
   it("removes the partial assistant bubble on user-initiated abort, with no error shown", async () => {
     const encoder = new TextEncoder();
     let errorReader: ((reason: unknown) => void) | null = null;

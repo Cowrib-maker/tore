@@ -248,6 +248,53 @@ describe("LegalAiChat — streaming content rendering", () => {
     expect(screen.queryByText(/Хагас хариулт/)).toBeNull();
   });
 
+  it("treats a stream that closes after some text but WITHOUT a done/error frame as a failed turn (no truncated answer shown as final)", async () => {
+    // A connection closed cleanly mid-answer (proxy/timeout/restart) ends the body without a terminal frame.
+    // The partial text has no citations and was never persisted, so it must not stay as if it were the answer.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = typeof input === "string" ? input : input.toString();
+        if (url.includes("/api/ai/entitlement")) return new Response(null, { status: 204 });
+        if (url.includes("/api/ai/chat")) {
+          return sseResponse([{ event: "delta", data: { text: "Таслагдсан хариулт" } }]);
+        }
+        return new Response(null, { status: 404 });
+      }),
+    );
+
+    renderChat();
+    await act(async () => {
+      typeAndSubmit("Асуулт");
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).not.toBeNull();
+    });
+    expect(screen.queryByText(/Таслагдсан хариулт/)).toBeNull();
+  });
+
+  it("treats a stream that closes with no frames at all as a failed turn (never a silent no-op)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = typeof input === "string" ? input : input.toString();
+        if (url.includes("/api/ai/entitlement")) return new Response(null, { status: 204 });
+        if (url.includes("/api/ai/chat")) return sseResponse([]);
+        return new Response(null, { status: 404 });
+      }),
+    );
+
+    renderChat();
+    await act(async () => {
+      typeAndSubmit("Асуулт");
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).not.toBeNull();
+    });
+  });
+
   it("removes the partial assistant bubble on user-initiated abort, with no error shown", async () => {
     // Mirrors real fetch-with-AbortSignal semantics for a streamed body:
     // the connection promise resolves normally, but reading the body later
