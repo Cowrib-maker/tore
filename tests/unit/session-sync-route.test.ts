@@ -10,6 +10,7 @@ import { POST } from "@/app/api/session/sync/route";
 const findById = vi.fn();
 const findAuthPrincipal = vi.fn();
 const rotateActiveSessionIdHash = vi.fn();
+const compareAndRotateActiveSessionIdHash = vi.fn();
 
 vi.mock("@/infrastructure/repositories", () => ({
   userRepository: {
@@ -17,6 +18,8 @@ vi.mock("@/infrastructure/repositories", () => ({
     findAuthPrincipal: (...args: unknown[]) => findAuthPrincipal(...args),
     rotateActiveSessionIdHash: (...args: unknown[]) =>
       rotateActiveSessionIdHash(...args),
+    compareAndRotateActiveSessionIdHash: (...args: unknown[]) =>
+      compareAndRotateActiveSessionIdHash(...args),
   },
 }));
 
@@ -70,14 +73,14 @@ describe("POST /api/session/sync", () => {
     findById.mockReset();
     findAuthPrincipal.mockReset();
     rotateActiveSessionIdHash.mockReset();
+    compareAndRotateActiveSessionIdHash.mockReset();
+    compareAndRotateActiveSessionIdHash.mockResolvedValue(true);
   });
 
   it("uses the cookie-forwarding wrapper form, not the RSC zero-arg form", async () => {
-    // The whole point of this route is to be the one place `auth()` is
-    // invoked in a form that forwards Set-Cookie. A regression back to
-    // `await auth()` (the RSC form used everywhere else) would silently
-    // reintroduce the defect without any other test noticing, since a bare
-    // `auth()` call still "works" — it just drops the refreshed cookie.
+    // The route must use the dedicated callback instance, not the regular
+    // RSC-safe auth() instance, so legacy binding and Set-Cookie happen in the
+    // same cookie-capable request.
     const source = await import("node:fs").then((fs) =>
       fs.readFileSync(
         new URL(
@@ -87,7 +90,7 @@ describe("POST /api/session/sync", () => {
         "utf8",
       ),
     );
-    expect(source).toContain("export const POST = auth(");
+    expect(source).toContain("export const POST = sessionSyncAuth(");
     expect(source).not.toContain("await auth()");
   });
 
@@ -101,15 +104,14 @@ describe("POST /api/session/sync", () => {
     // session check) — the invariant this route must uphold is that no
     // session-token cookie is minted out of thin air for a guest.
     expect(sessionTokenCookies(response)).toEqual([]);
+    expect(compareAndRotateActiveSessionIdHash).not.toHaveBeenCalled();
     expect(rotateActiveSessionIdHash).not.toHaveBeenCalled();
   });
 
   it("forwards the refreshed cookie when decideActiveSession binds a legacy token", async () => {
-    // Legacy/never-bound token: no `sid`, and the DB hash is still null ->
-    // decideActiveSession resolves "bind-new". This is exactly the shape
-    // that, called from a Server Component, mutates the DB and strands the
-    // browser on a stale cookie (see the auth-role-freshness.test.ts
-    // regression test for that failure mode in isolation).
+    // Legacy/never-bound token: no `sid`, and the DB hash is still null.
+    // The sync callback derives a stable SID from the signed JWT jti and CAS
+    // binds it before the response forwards the refreshed cookie.
     findAuthPrincipal.mockResolvedValue({
       id: "u1",
       role: UserRole.CLIENT,
@@ -128,9 +130,10 @@ describe("POST /api/session/sync", () => {
       requestWithCookie(`${SESSION_COOKIE_NAME}=${staleCookie}`),
     );
 
-    expect(rotateActiveSessionIdHash).toHaveBeenCalledTimes(1);
-    const [, rotatedHash] = rotateActiveSessionIdHash.mock.calls[0] as [
+    expect(compareAndRotateActiveSessionIdHash).toHaveBeenCalledTimes(1);
+    const [, , rotatedHash] = compareAndRotateActiveSessionIdHash.mock.calls[0] as [
       string,
+      string | null,
       string,
     ];
 
@@ -181,6 +184,7 @@ describe("POST /api/session/sync", () => {
     // always returns { ok: true } — see the route's implementation), so the
     // security-relevant assertion is on the DB write and the actual cookie
     // next-auth's session refresh forwards.
+    expect(compareAndRotateActiveSessionIdHash).not.toHaveBeenCalled();
     expect(rotateActiveSessionIdHash).not.toHaveBeenCalled();
 
     const sessionCookie = sessionTokenCookies(response)[0];
