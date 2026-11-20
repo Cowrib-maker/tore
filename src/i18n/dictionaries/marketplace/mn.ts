@@ -391,6 +391,9 @@ export const marketplaceMn: MarketplaceDictionary = {
     errorType: "Зөвхөн JPEG, PNG эсвэл WebP зураг оруулна уу.",
     errorGeneric: "Зургийг хадгалж чадсангүй. Одоогийн зураг хэвээр байна. Дахин оролдоно уу.",
     previewNote: "Сонгосон зураг. Хадгалахын тулд товчийг дарна уу.",
+    changePhoto: "Зураг солих",
+    formatsHint: "JPEG, PNG, WebP · хамгийн ихдээ 4МБ",
+    adminManaged: "Профайлын зургийг платформын админ удирдана.",
   },
   reviewCredential: {
     saved: "Шийдвэр хадгалагдлаа.",

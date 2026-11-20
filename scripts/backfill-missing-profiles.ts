@@ -13,11 +13,13 @@ import {
   lawyerProfileRepository,
   userRepository,
 } from "../src/infrastructure/repositories";
+import { announceDatabaseTarget } from "./lib/announce-database-target";
 
 async function main() {
   if (!process.env.DATABASE_URL) {
     throw new Error("DATABASE_URL is not set");
   }
+  announceDatabaseTarget("db:backfill-profiles", process.env.DATABASE_URL);
 
   const result = await backfillMissingProfilesUseCase({
     userRepository,

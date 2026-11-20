@@ -11,6 +11,7 @@ import {
   AdminVerificationStatusBadge,
   type VerificationBadgeTone,
 } from "@/components/admin/admin-verification-status-badge";
+import { ProfilePhotoUploadForm } from "@/components/profiles/profile-photo-upload-form";
 import { ReviewCredentialActions } from "@/components/verification/review-credential-actions";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -288,7 +289,15 @@ export default async function AdminLawyersPage() {
                     </a>
                   ) : null}
                 </div>
-                <div className="flex shrink-0 flex-col items-start gap-2 sm:w-64">
+                <div className="flex shrink-0 flex-col items-start gap-3 sm:w-64">
+                  <ProfilePhotoUploadForm
+                    targetUserId={item.userId}
+                    photoUrl={item.photoUrl}
+                    initial={(item.lawyerName?.trim() || item.lawyerEmail || "?")
+                      .charAt(0)
+                      .toUpperCase()}
+                    copy={m.profilePhoto}
+                  />
                   <AdminListingActions
                     lawyerProfileId={item.lawyer.id}
                     isListed={item.lawyer.isListed}

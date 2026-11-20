@@ -146,6 +146,8 @@ export type {
   LegalTestExtractionQuery,
   ExplicitFactMappingInput,
   FactElementMapping,
+  FactMappingInput,
+  FactMappingResult,
   IFactElementMapper,
   SubsumptionEngineResult,
 } from "./case-analysis";

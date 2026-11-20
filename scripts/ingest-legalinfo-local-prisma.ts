@@ -19,27 +19,49 @@
  * Usage:
  *   npm run ingest:legalinfo:local-prisma -- --from-priority
  *   npm run ingest:legalinfo:local-prisma -- --law-ids <id,id,...>
+ *
+ * DATABASE_URL resolution: reads `.env.local` DIRECTLY (not
+ * `import "dotenv/config"`, which only loads `.env` — and `.env` in this
+ * repo holds the production Neon URL) and refuses to run unless that URL
+ * resolves to a local host. Same fix as scripts/ingest-shuukh-canary.ts;
+ * see its header comment for the incident this guards against.
  */
 
-import "dotenv/config";
-
+import { readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import path, { join } from "node:path";
 
-import {
-  FileLegalInfoManifestStore,
-  LEGALINFO_INGESTION_CONCURRENCY,
-  LEGALINFO_INGESTION_DEFAULT_REQUEST_DELAY_MS,
-  LEGALINFO_INGESTION_DEFAULT_TIMEOUT_MS,
-  LegalInfoDocumentStatus,
-  LegalInfoIngestionQueue,
-  identifyPriorityLawsFromDocuments,
-  priorityLawIdsForIngest,
-} from "../src/engine/knowledge";
-import { createLegalArchiveStack } from "../src/infrastructure/archive";
-import { getPrismaClient } from "../src/infrastructure/database/prisma-client";
-import { PrismaKnowledgeRepository } from "../src/infrastructure/repositories/prisma-legal-knowledge-repository";
-import { env } from "../src/lib/env";
+import { classifyDatabaseUrl } from "./lib/database-url-safety";
+
+function loadEnvLocalDatabaseUrl(): string {
+  const envLocalPath = path.resolve(process.cwd(), ".env.local");
+  let content: string;
+  try {
+    content = readFileSync(envLocalPath, "utf8");
+  } catch {
+    throw new Error(
+      "[ingest:legalinfo:local-prisma] .env.local not found at the repository root. " +
+        "This script only ever targets the DATABASE_URL declared in .env.local, never .env.",
+    );
+  }
+  const match = content.match(/^DATABASE_URL\s*=\s*"?([^"\r\n]+)"?\s*$/m);
+  if (!match) {
+    throw new Error("[ingest:legalinfo:local-prisma] DATABASE_URL not found in .env.local.");
+  }
+  return match[1].trim();
+}
+
+const databaseUrl = loadEnvLocalDatabaseUrl();
+const classification = classifyDatabaseUrl(databaseUrl);
+if (classification.kind !== "local") {
+  console.error(
+    `[ingest:legalinfo:local-prisma] Refusing: .env.local DATABASE_URL is not local (${classification.kind}).`,
+  );
+  process.exit(1);
+}
+process.env.DATABASE_URL = databaseUrl;
+process.env.ARCHIVE_STORAGE = "local";
+(process.env as { NODE_ENV?: string }).NODE_ENV ??= "test";
 
 const BATCH_ID = "legalinfo-local-prisma-priority";
 
@@ -80,18 +102,34 @@ function redactDatabaseHost(databaseUrl: string): string {
 }
 
 async function main() {
+  const {
+    FileLegalInfoManifestStore,
+    LEGALINFO_INGESTION_CONCURRENCY,
+    LEGALINFO_INGESTION_DEFAULT_REQUEST_DELAY_MS,
+    LEGALINFO_INGESTION_DEFAULT_TIMEOUT_MS,
+    LegalInfoDocumentStatus,
+    LegalInfoIngestionQueue,
+    identifyPriorityLawsFromDocuments,
+    priorityLawIdsForIngest,
+  } = await import("../src/engine/knowledge");
+  const { createLegalArchiveStack } = await import("../src/infrastructure/archive");
+  const { getPrismaClient } = await import("../src/infrastructure/database/prisma-client");
+  const { PrismaKnowledgeRepository } = await import(
+    "../src/infrastructure/repositories/prisma-legal-knowledge-repository"
+  );
+  const { env } = await import("../src/lib/env");
+
   const args = parseArgs(process.argv.slice(2));
   console.log("LegalInfo LOCAL Prisma ingest (archive = local filesystem).");
-  console.log(
-    "Use a local/staging DATABASE_URL. Do not point at production unless intentional.",
-  );
 
-  // This command always uses local blob storage, even if .env has ARCHIVE_STORAGE=s3
-  // (S3 is for canary-10 / cloud ingest).
-  const localEnv = {
-    ...env,
-    ARCHIVE_STORAGE: "local" as const,
-  };
+  // Defense in depth: re-check after the env module resolved its own copy.
+  if (classifyDatabaseUrl(env.DATABASE_URL).kind !== "local") {
+    console.error(
+      "[ingest:legalinfo:local-prisma] Refusing: resolved DATABASE_URL is not local after env load.",
+    );
+    process.exit(1);
+  }
+  const localEnv = env;
 
   const root = process.cwd();
   const manifestPath = join(root, "tmp", "legalinfo-discovery-manifest.json");

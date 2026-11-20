@@ -12,6 +12,7 @@ import {
 import { createIntentEngine } from "@/engine/intent";
 import { createReasoningEngine } from "@/engine/reasoning";
 import { createLegalRelevanceEngine } from "@/engine/relevance";
+import { CourtDecisionLegalCorpusRetriever } from "@/infrastructure/ai/court-decision-legal-corpus-retriever";
 import { KnowledgeLegalCorpusRetriever } from "@/infrastructure/ai/knowledge-legal-corpus-retriever";
 import { createReadOnlyKnowledgeRepository } from "@/infrastructure/ai/read-only-knowledge-repository";
 import { OpenAiLegalAiCompletion } from "@/infrastructure/ai/openai-legal-ai-completion";
@@ -92,10 +93,18 @@ function createOfficialWebCorpusRetriever(): LegalCorpusRetriever {
 }
 
 export function createCorpusRetriever(): LegalCorpusRetriever {
-  const local = new KnowledgeLegalCorpusRetriever(
-    createReadOnlyKnowledgeRepository(),
-  );
+  const knowledgeRepository = createReadOnlyKnowledgeRepository();
+  const local = new KnowledgeLegalCorpusRetriever(knowledgeRepository);
+  // Tried first: court decisions are a distinct document type the statute
+  // tier below never reliably surfaces (its concept/title scorer is tuned
+  // for legal-concept matching, not court names or case numbers — verified
+  // against the real local corpus). Conservative by design: it only
+  // returns a result when the question's own wording actually overlaps a
+  // judgment's title, so an ordinary statute question safely falls
+  // through to the local tier below unaffected.
+  const courtDecisions = new CourtDecisionLegalCorpusRetriever(knowledgeRepository);
   return new TieredLegalCorpusRetriever([
+    { retriever: courtDecisions, source: LegalCorpusSource.LOCAL_CORPUS },
     { retriever: local, source: LegalCorpusSource.LOCAL_CORPUS },
     { retriever: createRemoteCorpusRetriever(), source: LegalCorpusSource.LEGAL_DATA_ENGINE },
     { retriever: createOfficialWebCorpusRetriever(), source: LegalCorpusSource.OFFICIAL_WEB },

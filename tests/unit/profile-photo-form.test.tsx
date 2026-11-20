@@ -20,13 +20,17 @@ const copy = {
   errorType: "Wrong type",
   errorGeneric: "Could not save; current photo unchanged",
   previewNote: "Selected photo. Press save.",
+  changePhoto: "Change photo",
+  formatsHint: "JPEG, PNG, WebP · max 4MB",
+  adminManaged: "Managed by admin",
 };
+const ENDPOINT = "/api/admin/lawyers/lawyer-1/photo";
 
 const png = (size = 10) =>
   new File([new Uint8Array(size)], "me.png", { type: "image/png" });
 
 function pick(file: File) {
-  const input = screen.getByLabelText("Choose a photo") as HTMLInputElement;
+  const input = screen.getByLabelText("Change photo") as HTMLInputElement;
   fireEvent.change(input, { target: { files: [file] } });
 }
 
@@ -45,16 +49,16 @@ afterEach(() => {
 
 describe("ProfilePhotoUploadForm", () => {
   it("shows the existing photo, or the neutral placeholder when there is none", () => {
-    const { rerender } = render(<ProfilePhotoUploadForm photoUrl="/api/files/profile-photo/u1/a.png" copy={copy} />);
+    const { rerender } = render(<ProfilePhotoUploadForm endpoint={ENDPOINT} photoUrl="/api/files/profile-photo/u1/a.png" copy={copy} />);
     expect(screen.getByTestId("profile-photo-preview").getAttribute("src")).toBe(
       "/api/files/profile-photo/u1/a.png",
     );
-    rerender(<ProfilePhotoUploadForm photoUrl={null} copy={copy} />);
-    expect(screen.getByText("No photo")).toBeTruthy();
+    rerender(<ProfilePhotoUploadForm endpoint={ENDPOINT} photoUrl={null} initial="Б" copy={copy} />);
+    expect(screen.getByTestId("profile-photo-fallback").textContent).toBe("Б");
   });
 
   it("previews the selected photo immediately and enables save", () => {
-    render(<ProfilePhotoUploadForm photoUrl="/old.png" copy={copy} />);
+    render(<ProfilePhotoUploadForm endpoint={ENDPOINT} photoUrl="/old.png" copy={copy} />);
     expect((screen.getByRole("button", { name: "Save photo" }) as HTMLButtonElement).disabled).toBe(true);
     pick(png());
     expect(screen.getByTestId("profile-photo-preview").getAttribute("src")).toBe("blob:preview-1");
@@ -63,7 +67,7 @@ describe("ProfilePhotoUploadForm", () => {
   });
 
   it("rejects a wrong type or oversized file client-side and keeps the existing photo", () => {
-    render(<ProfilePhotoUploadForm photoUrl="/old.png" copy={copy} />);
+    render(<ProfilePhotoUploadForm endpoint={ENDPOINT} photoUrl="/old.png" copy={copy} />);
     pick(new File(["x"], "a.gif", { type: "image/gif" }));
     expect(screen.getByRole("alert").textContent).toBe("Wrong type");
     expect(screen.getByTestId("profile-photo-preview").getAttribute("src")).toBe("/old.png");
@@ -76,14 +80,14 @@ describe("ProfilePhotoUploadForm", () => {
   it("uploads to the own-photo endpoint, then refreshes the page data", async () => {
     const fetchMock = vi.fn(async () => new Response(JSON.stringify({ ok: true }), { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
-    render(<ProfilePhotoUploadForm photoUrl="/old.png" copy={copy} />);
+    render(<ProfilePhotoUploadForm endpoint={ENDPOINT} photoUrl="/old.png" copy={copy} />);
     pick(png());
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Save photo" }));
     });
     await waitFor(() => expect(refresh).toHaveBeenCalled());
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
-    expect(url).toBe("/api/profile/photo");
+    expect(url).toBe(ENDPOINT);
     expect(init.method).toBe("POST");
     expect((init.body as FormData).get("photo")).toBeInstanceOf(File);
     expect(screen.getByText("Photo updated.")).toBeTruthy();
@@ -94,7 +98,7 @@ describe("ProfilePhotoUploadForm", () => {
       "fetch",
       vi.fn(async () => new Response(JSON.stringify({ code: "STORAGE_FAILED" }), { status: 502 })),
     );
-    render(<ProfilePhotoUploadForm photoUrl="/old.png" copy={copy} />);
+    render(<ProfilePhotoUploadForm endpoint={ENDPOINT} photoUrl="/old.png" copy={copy} />);
     pick(png());
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Save photo" }));
@@ -109,7 +113,7 @@ describe("ProfilePhotoUploadForm", () => {
       "fetch",
       vi.fn(async () => new Response(JSON.stringify({ code: "FILE_TOO_LARGE" }), { status: 413 })),
     );
-    render(<ProfilePhotoUploadForm photoUrl={null} copy={copy} />);
+    render(<ProfilePhotoUploadForm endpoint={ENDPOINT} photoUrl={null} copy={copy} />);
     pick(png());
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Save photo" }));

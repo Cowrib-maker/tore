@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   nodeAuthCallbacks,
+  sessionSyncAuthCallbacks,
   PRIVILEGE_REFRESH_MS,
 } from "@/infrastructure/auth/auth.callbacks.node";
 import { UserRole, UserStatus } from "@/domain/enums";
@@ -21,6 +22,7 @@ import {
 const findById = vi.fn();
 const findAuthPrincipal = vi.fn();
 const rotateActiveSessionIdHash = vi.fn();
+const compareAndRotateActiveSessionIdHash = vi.fn();
 
 vi.mock("@/infrastructure/repositories", () => ({
   userRepository: {
@@ -28,6 +30,8 @@ vi.mock("@/infrastructure/repositories", () => ({
     findAuthPrincipal: (...args: unknown[]) => findAuthPrincipal(...args),
     rotateActiveSessionIdHash: (...args: unknown[]) =>
       rotateActiveSessionIdHash(...args),
+    compareAndRotateActiveSessionIdHash: (...args: unknown[]) =>
+      compareAndRotateActiveSessionIdHash(...args),
   },
 }));
 
@@ -83,6 +87,7 @@ describe("JWT privilege refresh", () => {
     findById.mockReset();
     findAuthPrincipal.mockReset();
     rotateActiveSessionIdHash.mockReset();
+    compareAndRotateActiveSessionIdHash.mockReset();
   });
 
   it("reloads role and status from the database after the refresh window", async () => {
@@ -132,12 +137,14 @@ describe("JWT privilege refresh", () => {
 
 describe("JWT single active session", () => {
   beforeEach(() => {
+    vi.stubEnv("AUTH_SECRET", "active-session-unit-test-secret");
     findById.mockReset();
     findAuthPrincipal.mockReset();
     rotateActiveSessionIdHash.mockReset();
+    compareAndRotateActiveSessionIdHash.mockReset();
   });
 
-  it("stores the login sid on the JWT and persists its hash", async () => {
+  it("copies the already-persisted login sid onto the JWT without rotating it again", async () => {
     const sid = generateActiveSessionId();
     findAuthPrincipal.mockResolvedValue({
       id: "u1",
@@ -161,10 +168,7 @@ describe("JWT single active session", () => {
     );
 
     expect(token?.sid).toBe(sid);
-    expect(rotateActiveSessionIdHash).toHaveBeenCalledWith(
-      "u1",
-      hashActiveSessionId(sid),
-    );
+    expect(rotateActiveSessionIdHash).not.toHaveBeenCalled();
   });
 
   it("keeps the current session valid and invalidates a previous sid", async () => {
@@ -206,13 +210,8 @@ describe("JWT single active session", () => {
     expect(previous).toEqual({ sessionReplaced: true });
   });
 
-  it("reproduces the RSC auth() cookie-drop: a bind-new that never reaches the browser looks like a replacement on the next request", async () => {
-    // Request 1: a legacy JWT with no sid, decoded during a Server Component
-    // auth() call. decideActiveSession resolves "bind-new": the DB hash is
-    // rotated immediately, and the callback's *returned* token carries the
-    // new sid. In production this is the token an RSC render can never turn
-    // into a Set-Cookie header, so the browser's cookie is left unchanged.
-    findAuthPrincipal.mockResolvedValueOnce({
+  it("keeps RSC auth read-only when a legacy JWT needs session binding", async () => {
+    findAuthPrincipal.mockResolvedValue({
       id: "u1",
       role: UserRole.CLIENT,
       status: UserStatus.ACTIVE,
@@ -220,50 +219,82 @@ describe("JWT single active session", () => {
     });
 
     const jwt = nodeAuthCallbacks.jwt!;
-    const bound = await jwt(
+    const result = await jwt(
       jwtArgs({
         token: {
           id: "u1",
           role: UserRole.CLIENT,
           status: UserStatus.ACTIVE,
           statusCheckedAt: Date.now(),
+          jti: "legacy-token-1",
         },
       }),
     );
 
-    expect(bound?.sessionReplaced).toBeUndefined();
-    expect(typeof bound?.sid).toBe("string");
-    expect(rotateActiveSessionIdHash).toHaveBeenCalledTimes(1);
-    const [, rotatedHash] = rotateActiveSessionIdHash.mock.calls[0] as [
-      string,
-      string,
-    ];
+    expect(result?.sessionReplaced).toBeUndefined();
+    expect(result?.sid).toBeUndefined();
+    expect(compareAndRotateActiveSessionIdHash).not.toHaveBeenCalled();
+    expect(rotateActiveSessionIdHash).not.toHaveBeenCalled();
+  });
 
-    // Request 2: the browser replays its still-stale, still-sid-less cookie
-    // (the Set-Cookie from request 1 never arrived). The DB now holds the
-    // hash rotated in request 1, so decideActiveSession sees no sid against
-    // a bound hash and — correctly, per its own contract — reports the
-    // session as replaced. This is the defect: a legitimate, never-replaced
-    // session gets signed out.
-    findAuthPrincipal.mockResolvedValueOnce({
+  it("binds a legacy JWT only in the cookie-capable sync callback using CAS", async () => {
+    findAuthPrincipal.mockResolvedValue({
       id: "u1",
       role: UserRole.CLIENT,
       status: UserStatus.ACTIVE,
-      activeSessionIdHash: rotatedHash,
+      activeSessionIdHash: null,
     });
+    compareAndRotateActiveSessionIdHash.mockResolvedValue(true);
 
-    const replayed = await jwt(
+    const jwt = sessionSyncAuthCallbacks.jwt!;
+    const result = await jwt(
       jwtArgs({
         token: {
           id: "u1",
           role: UserRole.CLIENT,
           status: UserStatus.ACTIVE,
           statusCheckedAt: Date.now(),
+          jti: "legacy-token-1",
         },
       }),
     );
 
-    expect(replayed).toEqual({ sessionReplaced: true });
+    expect(typeof result?.sid).toBe("string");
+    expect(compareAndRotateActiveSessionIdHash).toHaveBeenCalledTimes(1);
+    expect(compareAndRotateActiveSessionIdHash).toHaveBeenCalledWith(
+      "u1",
+      null,
+      hashActiveSessionId(result!.sid as string),
+    );
+    expect(rotateActiveSessionIdHash).not.toHaveBeenCalled();
+  });
+
+  it("accepts a concurrent sync winner only when it bound the same legacy JWT", async () => {
+    const stableSid = (await import("@/infrastructure/auth/auth.callbacks.node"))
+      .deriveLegacyActiveSessionId("u1", { jti: "legacy-token-race" });
+    expect(stableSid).toBeTruthy();
+    const stableHash = hashActiveSessionId(stableSid!);
+
+    findAuthPrincipal
+      .mockResolvedValueOnce({
+        id: "u1", role: UserRole.CLIENT, status: UserStatus.ACTIVE,
+        activeSessionIdHash: null,
+      })
+      .mockResolvedValueOnce({
+        id: "u1", role: UserRole.CLIENT, status: UserStatus.ACTIVE,
+        activeSessionIdHash: stableHash,
+      });
+    compareAndRotateActiveSessionIdHash.mockResolvedValue(false);
+
+    const result = await sessionSyncAuthCallbacks.jwt!(
+      jwtArgs({ token: {
+        id: "u1", role: UserRole.CLIENT, status: UserStatus.ACTIVE,
+        statusCheckedAt: Date.now(), jti: "legacy-token-race",
+      } }),
+    );
+
+    expect(result?.sessionReplaced).toBeUndefined();
+    expect(result?.sid).toBe(stableSid);
   });
 
   it.each([UserRole.CLIENT, UserRole.LAWYER, UserRole.ADMIN] as const)(

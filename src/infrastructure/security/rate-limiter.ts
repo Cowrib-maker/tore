@@ -240,3 +240,19 @@ export const STUDENT_PROBLEM_EVALUATION_RATE_LIMIT = {
   limit: 8,
   windowMs: 15 * 60 * 1000,
 };
+
+/**
+ * Written-exam submissions (AI Fact/Element Mapper + AI Legal Tutor) are
+ * two AI calls each, unauthenticated, same abuse profile as the legacy
+ * student-problem grader above — same budget.
+ */
+export const WRITTEN_EXAM_SUBMIT_RATE_LIMIT = {
+  limit: 8,
+  windowMs: 15 * 60 * 1000,
+};
+
+/** Hint requests make no AI call (deterministic) but still bound scripted enumeration of every hint. */
+export const WRITTEN_EXAM_HINT_RATE_LIMIT = {
+  limit: 20,
+  windowMs: 15 * 60 * 1000,
+};

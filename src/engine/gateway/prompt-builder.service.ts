@@ -7,7 +7,7 @@ import {
   type PromptBundle,
   type PromptTurnKind as PromptTurnKindValue,
 } from "./types";
-import { wrapUntrustedDocumentBlock } from "./untrusted-document";
+import { sanitizeUntrustedDocumentText, wrapUntrustedDocumentBlock } from "./untrusted-document";
 import { orthographyCoachBlock } from "@/domain/mongolian-orthography";
 
 /**
@@ -464,7 +464,7 @@ nodeId: ${item.nodeId}${
           sourceUrl ? `\nsourceUrl: ${sourceUrl}` : ""
         }${temporal.length ? `\n${temporal.join("\n")}` : ""}
 excerpt:
-${item.excerpt}`;
+${sanitizeUntrustedDocumentText(item.excerpt)}`;
       })
       .join("\n\n");
     const documentFacts = hasDocumentExtract
