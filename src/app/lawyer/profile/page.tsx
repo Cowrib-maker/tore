@@ -15,7 +15,7 @@ import { ChangeEmailForm } from "@/components/profiles/change-email-form";
 import { ChangePasswordForm } from "@/components/profiles/change-password-form";
 import { BillingAndSessionsPanel } from "@/components/account/billing-and-sessions-panel";
 import { LawyerProfileForm } from "@/components/profiles/lawyer-profile-form";
-import { ProfilePhotoUploadForm } from "@/components/profiles/profile-photo-upload-form";
+import { ProfilePhotoDisplay } from "@/components/profiles/profile-photo-display";
 import { ProfileMissingState } from "@/components/profiles/profile-missing-state";
 import { LawyerVerificationSection } from "@/components/verification/lawyer-verification-section";
 import { DashboardPageHeading } from "@/components/layout/dashboard-shell";
@@ -173,8 +173,11 @@ export default async function LawyerProfilePage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <ProfilePhotoUploadForm
+                  <ProfilePhotoDisplay
                     photoUrl={data.photoUrl}
+                    initial={(data.user.name?.trim() || data.user.email || "?")
+                      .charAt(0)
+                      .toUpperCase()}
                     copy={m.profilePhoto}
                   />
                   <LawyerProfileForm

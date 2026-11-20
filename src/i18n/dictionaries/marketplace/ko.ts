@@ -378,6 +378,9 @@ export const marketplaceKo: MarketplaceDictionary = {
     errorType: "JPEG, PNG 또는 WebP 이미지를 선택해 주세요.",
     errorGeneric: "사진을 저장하지 못했습니다. 현재 사진은 그대로입니다. 다시 시도해 주세요.",
     previewNote: "선택한 사진입니다. 저장을 눌러 적용하세요.",
+    changePhoto: "사진 변경",
+    formatsHint: "JPEG, PNG, WebP · 최대 4MB",
+    adminManaged: "프로필 사진은 플랫폼 관리자가 관리합니다.",
   },
   reviewCredential: {
     saved: "검토 결과가 저장되었습니다.",

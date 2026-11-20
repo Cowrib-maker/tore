@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -22,14 +22,24 @@ function errorFor(code: string | undefined, copy: Copy): string {
   return copy.errorGeneric;
 }
 
+/**
+ * Admin-only photo control (the lawyer-facing page shows ProfilePhotoDisplay
+ * instead). `endpoint` is the admin route for one specific lawyer.
+ */
 export function ProfilePhotoUploadForm({
+  endpoint,
   photoUrl,
+  initial,
   copy,
 }: {
+  endpoint: string;
   photoUrl: string | null;
+  /** Fallback initial shown when no photo exists. */
+  initial?: string;
   copy: Copy;
 }) {
   const router = useRouter();
+  const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [selected, setSelected] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -86,7 +96,7 @@ export function ProfilePhotoUploadForm({
     try {
       const body = new FormData();
       body.append("photo", selected);
-      const response = await fetch("/api/profile/photo", {
+      const response = await fetch(endpoint, {
         method: "POST",
         body,
         signal: AbortSignal.timeout(CLIENT_TIMEOUT_MS),
@@ -124,12 +134,19 @@ export function ProfilePhotoUploadForm({
             className="size-16 shrink-0 rounded-full object-cover"
           />
         ) : (
-          <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-muted text-xs text-muted-foreground">
-            {copy.noPhoto}
+          <div
+            data-testid="profile-photo-fallback"
+            className="flex size-16 shrink-0 items-center justify-center rounded-full bg-muted text-xs text-muted-foreground"
+          >
+            {initial ? (
+              <span className="text-lg font-semibold">{initial}</span>
+            ) : (
+              copy.noPhoto
+            )}
           </div>
         )}
         <p className="text-sm text-muted-foreground">
-          {previewUrl ? copy.previewNote : copy.description}
+          {previewUrl ? copy.previewNote : copy.formatsHint}
         </p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-3">
@@ -149,10 +166,10 @@ export function ProfilePhotoUploadForm({
           </div>
         )}
         <div className="space-y-2">
-          <Label htmlFor="photo">{copy.chooseFile}</Label>
+          <Label htmlFor={inputId}>{copy.changePhoto}</Label>
           <Input
             ref={inputRef}
-            id="photo"
+            id={inputId}
             name="photo"
             type="file"
             accept="image/jpeg,image/png,image/webp"

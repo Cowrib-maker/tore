@@ -371,6 +371,9 @@ export const marketplaceZh: MarketplaceDictionary = {
     errorType: "请选择 JPEG、PNG 或 WebP 图片。",
     errorGeneric: "无法保存照片，当前照片保持不变。请重试。",
     previewNote: "已选择的照片。点击保存以应用。",
+    changePhoto: "更换照片",
+    formatsHint: "JPEG、PNG、WebP · 最大 4MB",
+    adminManaged: "您的头像由平台管理员管理。",
   },
   reviewCredential: {
     saved: "审核结果已保存。",

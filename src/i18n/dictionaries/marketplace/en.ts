@@ -383,6 +383,9 @@ export const marketplaceEn: MarketplaceDictionary = {
     errorType: "Please choose a JPEG, PNG or WebP image.",
     errorGeneric: "The photo could not be saved. Your current photo is unchanged. Please try again.",
     previewNote: "Selected photo. Press save to apply it.",
+    changePhoto: "Change photo",
+    formatsHint: "JPEG, PNG, WebP · max 4MB",
+    adminManaged: "Your profile photo is managed by the platform admin.",
   },
   reviewCredential: {
     saved: "Review saved.",

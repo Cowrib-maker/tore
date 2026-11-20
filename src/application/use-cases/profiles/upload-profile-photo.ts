@@ -3,14 +3,20 @@ import type { ActorContext } from "@/application/common/actor-context";
 import { PROFILE_PHOTO_MAX_BYTES } from "@/application/validators/profile.schema";
 import type { User } from "@/domain/entities/user";
 import { AuditAction, UserRole } from "@/domain/enums";
-import { ForbiddenError, NotFoundError } from "@/domain/errors/domain-error";
+import {
+  ForbiddenError,
+  NotFoundError,
+  ValidationError,
+} from "@/domain/errors/domain-error";
 import { DocumentUploadError } from "@/domain/errors/document-upload-errors";
 import type { FileStorage } from "@/domain/ports/file-storage";
 import type { AuditLogRepository } from "@/domain/repositories/audit-log-repository";
+import type { LawyerProfileRepository } from "@/domain/repositories/profile-repository";
 import type { UserRepository } from "@/domain/repositories/user-repository";
 
 export type UploadProfilePhotoDeps = {
   userRepository: UserRepository;
+  lawyerProfileRepository: LawyerProfileRepository;
   auditLogRepository: AuditLogRepository;
   fileStorage: FileStorage;
 };
@@ -37,22 +43,26 @@ export const PROFILE_PHOTO_SAVE_MESSAGE =
   "Зургийг бүртгэж чадсангүй. Одоогийн зураг хэвээр байна. Дахин оролдоно уу.";
 
 /**
- * Any LAWYER-role account (attorney, prosecutor, judge, other-lawyer) may
- * upload a profile photo — it is part of the shared professional
- * workspace, not a marketplace feature. Public visibility is decided later,
- * per request, by the position/isListed gate in getPublicLawyerProfile.
+ * ADMIN-ONLY: sets or replaces a lawyer's profile photo. Lawyers cannot manage
+ * their own photo. The actor comes from the session; the target is an explicit
+ * user id that must belong to a LAWYER-role account with a lawyer profile, so
+ * this can never be pointed at a client or another admin. Public visibility is
+ * decided later, per request, by the position/isListed gate in
+ * getPublicLawyerProfile.
  *
- * Only ever touches the actor's own User row. The previous photo is deleted
- * strictly after the new one is persisted, so any failure leaves the existing
- * photo intact; a failure after the new blob was stored removes that blob.
+ * The previous photo is deleted strictly after the new one is persisted, so
+ * any failure leaves the existing photo intact; a failure after the new blob
+ * was stored removes that blob. Only owned "profile-photo/" objects are ever
+ * deleted — an external (OAuth) avatar URL is left alone.
  */
 export async function uploadProfilePhotoUseCase(
   actor: ActorContext,
+  targetUserId: string,
   file: UploadProfilePhotoFile,
   deps: UploadProfilePhotoDeps,
   ipAddress?: string,
 ): Promise<User> {
-  if (actor.role !== UserRole.LAWYER) {
+  if (actor.role !== UserRole.ADMIN) {
     throw new ForbiddenError();
   }
 
@@ -68,16 +78,23 @@ export async function uploadProfilePhotoUseCase(
     );
   }
 
-  const previous = await deps.userRepository.findById(actor.userId);
+  const previous = await deps.userRepository.findById(targetUserId);
   if (!previous) {
-    throw new NotFoundError("User", actor.userId);
+    throw new NotFoundError("User", targetUserId);
+  }
+  if (previous.role !== UserRole.LAWYER) {
+    throw new ValidationError("Profile photos can only be set for lawyer accounts");
+  }
+  const targetProfile = await deps.lawyerProfileRepository.findByUserId(targetUserId);
+  if (!targetProfile) {
+    throw new NotFoundError("LawyerProfile");
   }
 
   let stored;
   try {
     stored = await deps.fileStorage.upload({
       purpose: "profile-photo",
-      ownerId: actor.userId,
+      ownerId: targetUserId,
       fileName: file.fileName,
       contentType: PHOTO_MIME_BY_FORMAT[detected],
       body: file.body,
@@ -89,7 +106,7 @@ export async function uploadProfilePhotoUseCase(
 
   let updated: User;
   try {
-    updated = await deps.userRepository.updateProfile(actor.userId, {
+    updated = await deps.userRepository.updateProfile(targetUserId, {
       image: stored.key,
     });
   } catch (error) {
@@ -120,7 +137,7 @@ export async function uploadProfilePhotoUseCase(
     action: AuditAction.UPDATE,
     entityType: "User",
     entityId: updated.id,
-    metadata: { field: "profilePhoto" },
+    metadata: { field: "profilePhoto", targetUserId },
     ipAddress,
   });
 

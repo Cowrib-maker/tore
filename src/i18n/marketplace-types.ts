@@ -343,6 +343,9 @@ export type MarketplaceDictionary = {
     errorType: string;
     errorGeneric: string;
     previewNote: string;
+    changePhoto: string;
+    formatsHint: string;
+    adminManaged: string;
   };
   reviewCredential: {
     saved: string;

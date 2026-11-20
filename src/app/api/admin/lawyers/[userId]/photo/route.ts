@@ -14,6 +14,7 @@ import { UserRole } from "@/domain/enums";
 import { DomainError } from "@/domain/errors/domain-error";
 import {
   auditLogRepository,
+  lawyerProfileRepository,
   userRepository,
 } from "@/infrastructure/repositories";
 import {
@@ -29,17 +30,22 @@ export const maxDuration = 30;
 const REQUEST_OVERHEAD_BYTES = 64 * 1024;
 
 /**
- * Own-photo upload. A route handler rather than a Server Action: Server
- * Actions are capped at 1 MB by default, which silently broke ordinary phone
- * photos. The actor comes from the session only — there is no user id in the
- * request, so a lawyer can never address another user's photo.
+ * ADMIN-ONLY lawyer photo management. The actor and its role come from the
+ * session (re-read from the database by requireActor), never from the request.
+ * Lawyers have no way to change their own photo; a non-admin gets 403 and an
+ * anonymous caller 401 before the body is read. The target is the URL's user
+ * id and the use case refuses anything that is not a lawyer account.
  */
-export async function POST(request: Request) {
+export async function POST(
+  request: Request,
+  context: { params: Promise<{ userId: string }> },
+) {
   try {
-    const actor = await requireActor(UserRole.LAWYER);
+    const actor = await requireActor(UserRole.ADMIN);
+    const { userId: targetUserId } = await context.params;
 
     const rate = await consumeRateLimit(
-      `profile:photo:${actor.userId}`,
+      `admin:lawyer-photo:${actor.userId}`,
       PROFILE_WRITE_RATE_LIMIT.limit,
       PROFILE_WRITE_RATE_LIMIT.windowMs,
     );
@@ -73,15 +79,22 @@ export async function POST(request: Request) {
 
     const updated = await uploadProfilePhotoUseCase(
       actor,
+      targetUserId,
       {
         fileName: file.name || "photo",
         contentType: file.type,
         body: new Uint8Array(await file.arrayBuffer()),
       },
-      { userRepository, auditLogRepository, fileStorage: getFileStorage() },
+      {
+        userRepository,
+        lawyerProfileRepository,
+        auditLogRepository,
+        fileStorage: getFileStorage(),
+      },
       await getClientIp(),
     );
 
+    revalidatePath("/admin/lawyers");
     revalidatePath("/lawyer/profile");
     revalidatePath("/lawyer/dashboard");
     revalidatePath("/lawyers");
@@ -91,12 +104,13 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     if (error instanceof DomainError) {
+      const status = error.code === "VALIDATION_ERROR" ? 400 : error.statusCode;
       return NextResponse.json(
         { error: error.message, code: error.code },
-        { status: error.statusCode },
+        { status },
       );
     }
-    console.error("profile photo upload error", error);
+    console.error("admin lawyer photo upload error", error);
     return NextResponse.json(
       { error: "Зургийг хадгалахад алдаа гарлаа.", code: "UPLOAD_FAILED" },
       { status: 500 },
