@@ -61,8 +61,8 @@ describe("PrismaUserRepository.compareAndRotateActiveSessionIdHash", () => {
     );
 
     expect(result).toBe(true);
-    expect(getCapturedArgs().where.activeSessionIdHash).toBe("old-hash");
-    expect(getCapturedArgs().data.activeSessionIdHash).toBe("new-hash");
+    expect(getCapturedArgs().where!.activeSessionIdHash).toBe("old-hash");
+    expect(getCapturedArgs().data!.activeSessionIdHash).toBe("new-hash");
   });
 
   it("returns false when no row matches the expected hash", async () => {
@@ -75,7 +75,7 @@ describe("PrismaUserRepository.compareAndRotateActiveSessionIdHash", () => {
     );
 
     expect(result).toBe(false);
-    expect(getCapturedArgs().where.activeSessionIdHash).toBe("stale-hash");
+    expect(getCapturedArgs().where!.activeSessionIdHash).toBe("stale-hash");
   });
 
   it("excludes deleted users from session rotation", async () => {
@@ -87,6 +87,6 @@ describe("PrismaUserRepository.compareAndRotateActiveSessionIdHash", () => {
       "new-hash",
     );
 
-    expect(getCapturedArgs().where.deletedAt).toBeNull();
+    expect(getCapturedArgs().where!.deletedAt).toBeNull();
   });
 });
