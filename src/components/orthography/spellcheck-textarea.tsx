@@ -148,7 +148,19 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
     localRef.current?.scrollTo({ top: localRef.current.scrollHeight, behavior: "smooth" });
   }
 
-  useEffect(() => setActiveKey(null), [value]);
+  // No explicit "close the menu when `value` changes" effect: `activeIndex`
+  // above already re-derives from the CURRENT `ranges` every render, and an
+  // edit almost always shifts every later span's start/end, so a stale
+  // `activeKey` naturally stops matching anything (activeIndex === -1) the
+  // moment the text changes — without needing a separate reset. An earlier
+  // version instead ran `useEffect(() => setActiveKey(null), [value])`,
+  // which synchronously calls setState from an effect that re-fires on
+  // every keystroke; under a fast/bursty run of edits (rapid typing, IME
+  // composition, programmatic paste) the resulting stacked post-commit
+  // renders compounded into React's "Maximum update depth exceeded" crash —
+  // reproduced in manual browser testing. Removed rather than replaced with
+  // an equivalent render-time ref check, since this codebase's lint rules
+  // also forbid reading/writing a ref during render.
 
   const closeMenu = useCallback(() => setActiveKey(null), []);
 
