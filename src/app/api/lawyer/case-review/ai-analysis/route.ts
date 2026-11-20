@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { readJsonBody } from "@/application/common/read-json-body";
 import { requireActor } from "@/application/common/require-actor";
 import { assertEmailVerified } from "@/application/common/require-verified-email";
 import {
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
     const actor = await requireActor(UserRole.LAWYER);
     await assertEmailVerified(actor.userId);
     const guard = await guardLawyerAiHttp(actor, EntitlementFeature.CASE_ANALYSIS);
-    const body = (await request.json()) as { caseId?: string };
+    const body = (await readJsonBody(request)) as { caseId?: string };
     if (!body.caseId) {
       return NextResponse.json(
         { error: "caseId шаардлагатай.", code: "VALIDATION_ERROR" },

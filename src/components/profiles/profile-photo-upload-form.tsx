@@ -23,16 +23,20 @@ function errorFor(code: string | undefined, copy: Copy): string {
 }
 
 /**
- * Admin-only photo control (the lawyer-facing page shows ProfilePhotoDisplay
- * instead). `endpoint` is the admin route for one specific lawyer.
+ * Photo control. Defaults to the caller's own photo (/api/profile/photo); an
+ * admin managing one lawyer passes `targetUserId`, which the route and use case
+ * authorize server-side (ADMIN only, LAWYER-role targets only).
  */
 export function ProfilePhotoUploadForm({
-  endpoint,
+  endpoint = "/api/profile/photo",
+  targetUserId,
   photoUrl,
   initial,
   copy,
 }: {
-  endpoint: string;
+  endpoint?: string;
+  /** Admin only: the lawyer whose photo is managed. */
+  targetUserId?: string;
   photoUrl: string | null;
   /** Fallback initial shown when no photo exists. */
   initial?: string;
@@ -96,6 +100,7 @@ export function ProfilePhotoUploadForm({
     try {
       const body = new FormData();
       body.append("photo", selected);
+      if (targetUserId) body.append("targetUserId", targetUserId);
       const response = await fetch(endpoint, {
         method: "POST",
         body,

@@ -42,6 +42,7 @@ import {
 } from "@/domain/enums";
 import { getDictionary } from "@/i18n/get-dictionary";
 import type { Dictionary } from "@/i18n/types";
+import { isFoundationOrgsV1Enabled } from "@/lib/feature-flags";
 import { cn } from "@/lib/utils";
 
 function typeLabel(type: OrganizationType, copy: Dictionary["organizations"]) {
@@ -102,6 +103,9 @@ export default async function OrganizationOverviewPage({
 }: {
   params: Promise<{ organizationId: string }>;
 }) {
+  // Feature flag off: the layout redirects, but the page is not guaranteed to be gated by that redirect (production logged an
+  // uncaught ForbiddenError from /organizations.rsc). Never reach the flag-guarded use cases; answer 404 instead of a 500.
+  if (!isFoundationOrgsV1Enabled()) notFound();
   const { organizationId } = await params;
   const dict = await getDictionary();
   const copy = dict.organizations;

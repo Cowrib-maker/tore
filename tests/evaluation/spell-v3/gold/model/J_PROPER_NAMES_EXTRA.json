@@ -1,0 +1,369 @@
+{
+ "schema": "tore-spell-gold/1",
+ "datasetVersion": "spell-gold-v3.0",
+ "set": "J_PROPER_NAMES_EXTRA",
+ "provenanceDir": "model",
+ "note": "MODEL_ADJUDICATED candidates: authored and judged by the AI assistant. NOT native-reviewed; NOT gold.",
+ "items": [
+  {
+   "id": "J_PROPER_NAMES_EXTRA:001:болд",
+   "token": "Болд",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "given name",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES_EXTRA:002:болдод",
+   "token": "Болдод",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name + dative",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES_EXTRA:003:сарнайн",
+   "token": "Сарнайн",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name + genitive",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES_EXTRA:004:тэмүүлэн",
+   "token": "Тэмүүлэн",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 90,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "name, not in lexicon",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES_EXTRA:005:хөвсгөл",
+   "token": "Хөвсгөл",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "aimag",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES_EXTRA:006:хөвсгөлийн",
+   "token": "Хөвсгөлийн",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "aimag genitive",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES_EXTRA:007:дархан-уул",
+   "token": "Дархан-Уул",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 90,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "hyphenated place",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES_EXTRA:008:улаанбаатарт",
+   "token": "Улаанбаатарт",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "city + dative",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES_EXTRA:009:мөнхжин",
+   "token": "Мөнхжин",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 90,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "name, not in lexicon: must not be MISSPELLED",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES_EXTRA:010:нямсүрэн",
+   "token": "Нямсүрэн",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 90,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "name",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES_EXTRA:011:д.сүхбаатар",
+   "token": "Д.Сүхбаатар",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_INITIAL",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 90,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "initial + surname",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES_EXTRA:012:apple",
+   "token": "Apple",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_LATIN",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 90,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "Latin brand token: never MISSPELLED",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES_EXTRA:013:microsoft-ийн",
+   "token": "Microsoft-ийн",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_MIXED",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 90,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "Latin + Mongolian suffix",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES_EXTRA:014:голомт",
+   "token": "Голомт",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "bank",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES_EXTRA:015:хаан",
+   "token": "Хаан",
+   "sentenceOrigin": "NONE",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts J_PROPER_NAMES_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "bank / title",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  }
+ ]
+}

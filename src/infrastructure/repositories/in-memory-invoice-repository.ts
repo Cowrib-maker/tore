@@ -50,6 +50,7 @@ export class InMemoryInvoiceRepository implements InvoiceRepository {
       subscriptionId: input.subscriptionId ?? null,
       bookingId: input.bookingId ?? null,
       planCode: input.planCode ?? null,
+      spellPlanCode: input.spellPlanCode ?? null,
       amountMnt: input.amountMnt,
       currency: input.currency,
       provider: input.provider,

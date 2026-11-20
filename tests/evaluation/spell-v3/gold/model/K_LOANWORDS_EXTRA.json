@@ -1,0 +1,393 @@
+{
+ "schema": "tore-spell-gold/1",
+ "datasetVersion": "spell-gold-v3.0",
+ "set": "K_LOANWORDS_EXTRA",
+ "provenanceDir": "model",
+ "note": "MODEL_ADJUDICATED candidates: authored and judged by the AI assistant. NOT native-reviewed; NOT gold.",
+ "items": [
+  {
+   "id": "K_LOANWORDS_EXTRA:001:компьютер",
+   "token": "компьютер",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "accepted loan",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:002:компьютерийн",
+   "token": "компьютерийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "accepted loan + genitive",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:003:программ",
+   "token": "программ",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "accepted loan",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:004:аппликейшн",
+   "token": "аппликейшн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 90,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "transliteration, native judgment",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:005:интернэт",
+   "token": "интернэт",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 40,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "variant spelling of интернет",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:006:менежер",
+   "token": "менежер",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "accepted",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:007:бизнес",
+   "token": "бизнес",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "accepted",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:008:маркетинг",
+   "token": "маркетинг",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 90,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "accepted? native judgment",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:009:онлайн",
+   "token": "онлайн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 90,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "anglicism in wide use",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:010:вайфай",
+   "token": "вайфай",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 90,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "technical loan",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:011:софтвер",
+   "token": "софтвер",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 40,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "non-standard transliteration",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:012:флаш",
+   "token": "флаш",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 40,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "loan",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:013:сервер",
+   "token": "сервер",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "accepted",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:014:сайт",
+   "token": "сайт",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "accepted",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:015:email",
+   "token": "email",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_LATIN",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 90,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "Latin token: never MISSPELLED",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS_EXTRA:016:wifi",
+   "token": "WiFi",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_LATIN",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 90,
+   "source": "authoring/targeted.ts K_LOANWORDS_EXTRA",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "Latin",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  }
+ ]
+}

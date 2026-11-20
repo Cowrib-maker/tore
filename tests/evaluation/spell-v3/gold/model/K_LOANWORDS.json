@@ -1,0 +1,2217 @@
+{
+ "schema": "tore-spell-gold/1",
+ "datasetVersion": "spell-gold-v3.0",
+ "set": "K_LOANWORDS",
+ "provenanceDir": "model",
+ "note": "MODEL_ADJUDICATED candidates: authored and judged by the AI assistant. NOT native-reviewed; NOT gold.",
+ "items": [
+  {
+   "id": "K_LOANWORDS:001:компьютер",
+   "token": "компьютер",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:002:компьютерийн",
+   "token": "компьютерийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:003:компьютерт",
+   "token": "компьютерт",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:004:компьютерээр",
+   "token": "компьютерээр",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:005:компьютерууд",
+   "token": "компьютерууд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:006:интернет",
+   "token": "интернет",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:007:интернетийн",
+   "token": "интернетийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:008:интернетэд",
+   "token": "интернетэд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:009:интернетээр",
+   "token": "интернетээр",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:010:программ",
+   "token": "программ",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:011:программын",
+   "token": "программын",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:012:программд",
+   "token": "программд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:013:программыг",
+   "token": "программыг",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:014:программууд",
+   "token": "программууд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:015:банк",
+   "token": "банк",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:016:банкны",
+   "token": "банкны",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:017:банканд",
+   "token": "банканд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:018:банкаар",
+   "token": "банкаар",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:019:банкууд",
+   "token": "банкууд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:020:университет",
+   "token": "университет",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:021:университетийн",
+   "token": "университетийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:022:университетэд",
+   "token": "университетэд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:023:университетаар",
+   "token": "университетаар",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:024:телевиз",
+   "token": "телевиз",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:025:телевизийн",
+   "token": "телевизийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:026:телевизээр",
+   "token": "телевизээр",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:027:телевизүүд",
+   "token": "телевизүүд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:028:радио",
+   "token": "радио",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:029:радиогийн",
+   "token": "радиогийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:030:радиод",
+   "token": "радиод",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:031:радиог",
+   "token": "радиог",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:032:автобус",
+   "token": "автобус",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:033:автобусны",
+   "token": "автобусны",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:034:автобусаар",
+   "token": "автобусаар",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:035:автобусанд",
+   "token": "автобусанд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:036:машин",
+   "token": "машин",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:037:машины",
+   "token": "машины",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:038:машинд",
+   "token": "машинд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:039:машинаар",
+   "token": "машинаар",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:040:клуб",
+   "token": "клуб",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:041:клубын",
+   "token": "клубын",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:042:клубт",
+   "token": "клубт",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:043:клубаас",
+   "token": "клубаас",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:044:клубээс",
+   "token": "клубээс",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:045:клубууд",
+   "token": "клубууд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:046:вирус",
+   "token": "вирус",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:047:вирусын",
+   "token": "вирусын",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:048:вирусаар",
+   "token": "вирусаар",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:049:вирусууд",
+   "token": "вирусууд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:050:проект",
+   "token": "проект",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:051:проектийн",
+   "token": "проектийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:052:проектоор",
+   "token": "проектоор",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:053:проектууд",
+   "token": "проектууд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:054:менежер",
+   "token": "менежер",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:055:менежерийн",
+   "token": "менежерийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:056:менежерт",
+   "token": "менежерт",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:057:менежерүүд",
+   "token": "менежерүүд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:058:сервер",
+   "token": "сервер",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:059:серверийн",
+   "token": "серверийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:060:сервертэй",
+   "token": "сервертэй",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:061:серверүүд",
+   "token": "серверүүд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:062:интернэт",
+   "token": "интернэт",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 60,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:063:интернэтийн",
+   "token": "интернэтийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "priority": 60,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:064:офис",
+   "token": "офис",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:065:офисын",
+   "token": "офисын",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:066:офист",
+   "token": "офист",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:067:офисоор",
+   "token": "офисоор",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:068:график",
+   "token": "график",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:069:графикийн",
+   "token": "графикийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:070:графикаар",
+   "token": "графикаар",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:071:графикууд",
+   "token": "графикууд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:072:метр",
+   "token": "метр",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:073:метрийн",
+   "token": "метрийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:074:метрээр",
+   "token": "метрээр",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:075:километр",
+   "token": "километр",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:076:километрийн",
+   "token": "километрийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:077:километрээр",
+   "token": "километрээр",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:078:процент",
+   "token": "процент",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:079:процентийн",
+   "token": "процентийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:080:процентоор",
+   "token": "процентоор",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:081:доллар",
+   "token": "доллар",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:082:долларын",
+   "token": "долларын",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:083:долларт",
+   "token": "долларт",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:084:долларууд",
+   "token": "долларууд",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:085:тонн",
+   "token": "тонн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:086:тоннын",
+   "token": "тоннын",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:087:тоннаар",
+   "token": "тоннаар",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:088:паспорт",
+   "token": "паспорт",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:089:паспортын",
+   "token": "паспортын",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:090:паспортоор",
+   "token": "паспортоор",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:091:сертификат",
+   "token": "сертификат",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:092:сертификатын",
+   "token": "сертификатын",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:093:сертификатаар",
+   "token": "сертификатаар",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:094:лиценз",
+   "token": "лиценз",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:095:лицензийн",
+   "token": "лицензийн",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "K_LOANWORDS:096:лицензтэй",
+   "token": "лицензтэй",
+   "sentenceOrigin": "NONE",
+   "category": "LOANWORD",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/loanword-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "loan form hand-written by the assistant; both harmonies tolerated",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  }
+ ]
+}

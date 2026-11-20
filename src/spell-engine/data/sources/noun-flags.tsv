@@ -1,0 +1,42 @@
+# Noun stem-class flags (lemma<TAB>flags), inferred by scripts/spell-data/noun-flags-suggest.ts. Native review pending.
+# --- 27 flags proposed by scripts/spell-data/noun-flags-suggest.ts (2026-10-07): explain ≥4 more forms a second-opinion dictionary accepts and make none valid that it rejects. AI-reviewed, native review pending. ---
+баасан	hidden-g
+баясгалан	hidden-g
+буйдан	hidden-g
+булчин	hidden-g
+дугуйлан	hidden-g
+дэлэн	hidden-g
+зовлон	hidden-g
+лууван	hidden-g
+манжин	hidden-g
+мөрдөн	hidden-g
+нягтлан	hidden-g
+орон	hidden-g
+орчлон	hidden-g
+тайлан	hidden-g
+түмэн	hidden-g
+хадан	hidden-g
+хадлан	hidden-g
+хилэн	hidden-g
+хүрээлэн	hidden-g
+хүчин	hidden-g
+хөвөн	hidden-g
+цалин	hidden-g
+цуйван	hidden-g
+шижин	hidden-g
+шуудан	hidden-g
+эгшиглэн	hidden-g
+үзэсгэлэн	hidden-g
+# two-letter ь/и-final noun that inflects like a soft-i stem (R-SOFT-I-2LETTER)
+үе	soft-i
+# --- 5 flags proposed by scripts/spell-data/noun-flags-suggest.ts (2026-10-07): explain ≥4 more forms a second-opinion dictionary accepts and make none valid that it rejects. AI-reviewed, native review pending. ---
+арслан	hidden-g
+булан	hidden-g
+диваажин	hidden-g
+манан	hidden-g
+тавилан	hidden-g
+# --- 4 flags proposed by scripts/spell-data/noun-flags-suggest.ts (2026-10-07): explain ≥4 more forms a second-opinion dictionary accepts and make none valid that it rejects. AI-reviewed, native review pending. ---
+зотон	hidden-g
+ноднин	hidden-g
+шаазан	hidden-g
+өлсгөлөн	hidden-g

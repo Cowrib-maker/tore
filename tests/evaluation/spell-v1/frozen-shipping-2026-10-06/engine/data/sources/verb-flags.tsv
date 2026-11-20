@@ -1,0 +1,40 @@
+# Verb stem-class flags (lemma<TAB>flags). TORE-authored from standard
+# Mongolian orthography; native review pending (see tests/evaluation/spell-v1/gold/verb-gold-draft-v1.json (VERB_GOLD_DRAFT_V1, PENDING_NATIVE_REVIEW)).
+#
+#   vstem   the stem keeps its vowel before consonant-initial suffixes:
+#           ажиллах → ажилла-сан (not ажилл-сан). The class cannot be read off the
+#           spelling (танилцах → танилц-сан), so it is lexicon data.
+#   soft-i  ь-stem verbs (барих, хорих, ярих): барьсан but баривал, барилгүй.
+#   hv:<v>  hidden-vowel root whose vowel the default rule cannot predict:
+#           амрах → амар-сан.
+#   cvb:ж / cvb:ч  lexical bare converb after a sonorant (явж, хэлж; авч, өгч).
+#           Not predictable from spelling; unflagged lemmas stay UNKNOWN.
+# Verbs not listed here use the default class (see morphology/analyzer.ts).
+ажиллах	vstem
+яллах	vstem
+шалгах	vstem
+ойлгох	vstem
+сонгох	vstem
+сургах	vstem
+тоглох	vstem
+дүгнэх	vstem
+шийдвэрлэх	vstem
+сахих	vstem
+хорих	soft-i
+амрах	hv:а
+нотлох	hv:о
+туслах	hv:а
+хамтрах	hv:а
+мэдрэх	hv:э
+шинжлэх	hv:и
+авах	cvb:ч
+өгөх	cvb:ч
+сурах	cvb:ч
+хэлэх	cvb:ж
+ирэх	cvb:ж
+олох	cvb:ж
+харах	cvb:ж
+явах	cvb:ж
+нэмэх	cvb:ж
+төлөх	cvb:ж
+хариулах	cvb:ж

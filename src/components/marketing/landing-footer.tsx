@@ -72,6 +72,7 @@ export function LandingFooter({
             <a href="#lawyer">{home.products.lawyer.name}</a>
             <a href="#firm">{home.products.firm.name}</a>
             <a href="#team">{home.products.team.name}</a>
+            <Link href="/spell">{dict.spell.home.name}</Link>
             <Link href="/lawyers">{t.footerDirectory}</Link>
             <a href="#intelligence">{home.intelligenceTitle}</a>
           </FooterColumn>

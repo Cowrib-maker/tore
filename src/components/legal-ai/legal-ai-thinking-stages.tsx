@@ -30,17 +30,18 @@ export function useThinkingStageLabel(active: boolean): string {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    if (!active) {
-      setIndex(0);
-      return;
-    }
+    if (!active) return;
     const timer = setInterval(() => {
       setIndex((current) =>
         current < THINKING_STAGES.length - 1 ? current + 1 : current,
       );
     }, STAGE_INTERVAL_MS);
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      // Runs when `active` goes false (or on unmount): the next question starts the sequence over.
+      setIndex(0);
+    };
   }, [active]);
 
-  return THINKING_STAGES[index];
+  return THINKING_STAGES[active ? index : 0];
 }

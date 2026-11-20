@@ -107,6 +107,7 @@ describe("booking-requests", () => {
         findExceptionsByLawyerProfileId: vi.fn().mockResolvedValue([]),
       } as never,
       bookingRepository: {
+        lockLawyerSchedule: vi.fn().mockResolvedValue(undefined),
         findOverlappingForLawyer: vi.fn().mockResolvedValue([]),
         bookingNumberExists: vi.fn().mockResolvedValue(false),
         create: bookingCreate,

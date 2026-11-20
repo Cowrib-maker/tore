@@ -46,6 +46,8 @@ function mapInvoice(record: {
   subscriptionId: string | null;
   bookingId: string | null;
   planCode: string | null;
+  /** Absent while Spell is disabled (the column is omitted from queries until the Spell migrations are applied). */
+  spellPlanCode?: string | null;
   amountMnt: number;
   currency: string;
   provider: string;
@@ -69,6 +71,7 @@ function mapInvoice(record: {
     subscriptionId: record.subscriptionId,
     bookingId: record.bookingId,
     planCode: record.planCode as Invoice["planCode"],
+    spellPlanCode: (record.spellPlanCode ?? null) as Invoice["spellPlanCode"],
     amountMnt: record.amountMnt,
     currency: record.currency,
     provider: record.provider,
@@ -100,6 +103,8 @@ export class PrismaInvoiceRepository implements InvoiceRepository {
           subscriptionId: input.subscriptionId ?? null,
           bookingId: input.bookingId ?? null,
           planCode: input.planCode ?? null,
+          // Only written for a Spell invoice: a null column value would otherwise put the column into every INSERT.
+          ...(input.spellPlanCode ? { spellPlanCode: input.spellPlanCode } : {}),
           amountMnt: input.amountMnt,
           currency: input.currency,
           provider: input.provider,

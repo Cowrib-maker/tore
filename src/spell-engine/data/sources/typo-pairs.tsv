@@ -1,0 +1,13 @@
+# Curated wrong<TAB>right pairs. Source: TORE existing orthography engine
+# (COMMON_TYPO_CORRECTIONS) + editor-reviewed additions. Both sides are
+# verified VALID at engine start-up by the build script's checks and tests.
+хунэтаи	хүнтэй
+хүнэтаи	хүнтэй
+хунэтэй	хүнтэй
+өчигдр	өчигдөр
+өчигдөөр	өчигдөр
+очидөр	өчигдөр
+хувцаа	хувцас
+хувцаса	хувцас
+явч	яавч
+явач	яавч

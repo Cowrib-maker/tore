@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { requirePageSession } from "@/application/common/session";
+import { loadLawyerLicenseState } from "@/application/use-cases/lawyers/load-lawyer-license-state";
 import { LawyerAppChrome } from "@/components/layout/lawyer-app-chrome";
 import { AccountSharingBanner } from "@/components/account/account-sharing-banner";
 import { DeviceSessionBeacon } from "@/components/account/device-session-beacon";
@@ -27,10 +28,15 @@ export default async function LawyerLayout({
     redirect(getDashboardPath(session.user.role as UserRole));
   }
 
-  const [i18n, unread, lawyerProfile] = await Promise.all([
+  // canActAsLawyer also admits ADMIN, who has no lawyer plan: the plan card (and its
+  // LAWYER-only status endpoint) is for lawyer accounts only. `undefined` hides the card.
+  const isLawyer = session.user.role === UserRole.LAWYER;
+
+  const [i18n, unread, lawyerProfile, licenseState] = await Promise.all([
     getShellI18n("lawyer"),
     notificationRepository.findByUserId(session.user.id, true),
     lawyerProfileRepository.findByUserId(session.user.id),
+    isLawyer ? loadLawyerLicenseState(session.user.id) : Promise.resolve(undefined),
   ]);
 
   // Computed once, server-side, and rendered verbatim by the client — never
@@ -54,6 +60,7 @@ export default async function LawyerLayout({
       unreadNotificationsCount={unread.items.length}
       notificationsLabel={i18n.dict.dashboard.navNotifications}
       todayLabel={todayLabel}
+      licenseState={licenseState}
       {...i18n.shellProps}
     >
       <DeviceSessionBeacon />

@@ -1,0 +1,1499 @@
+{
+ "schema": "tore-spell-pack/1",
+ "id": "tore-vocab-business",
+ "version": "2026.10.3",
+ "layer": "BUSINESS",
+ "language": "mn-Cyrl",
+ "coverage": "SEED",
+ "provenance": {
+  "source": "sources/vocab/business-core.tsv, business-p3.tsv",
+  "license": "TORE proprietary (original work)",
+  "redistributable": true,
+  "dataClass": "A_TORE_OWNED",
+  "tier": "PROVISIONAL",
+  "sourceIds": [
+   "tore-authored-vocab-2026-10"
+  ],
+  "reviewStatus": "PENDING_NATIVE_REVIEW",
+  "notes": "AI-drafted BUSINESS vocabulary (business-core.tsv, business-p3.tsv); every entry is PENDING_NATIVE_REVIEW. SEED: absence proves nothing."
+ },
+ "entries": [
+  {
+   "w": "авагч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "авагчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "авалт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "авах",
+   "pos": "V",
+   "flags": [
+    "cvb:ч"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "авлага",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "агуулах",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "агуулах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "аж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ажил",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ажиллагаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ажиллах",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ажилтан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "албан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "алдагдал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "арилжаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "арилжаалах",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "арилжаалах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "арилжааны",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "аудит",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "аудитор",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ахуйн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ашгийг",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ашиг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ашиггүй",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ашигт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ашигтай",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "байгуулагч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "байгуулагчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "байгуулах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "байгууллага",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "баланс",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "банк",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "банкны",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "баримт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "баталгаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бизнес",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бизнесийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бирж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бодогч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бодогчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бодох",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бодох",
+   "pos": "V",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бонд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бонус",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "борлуулагч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "борлуулагчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "борлуулалт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "борлуулалтын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "борлуулах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бүртгэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бүртгэх",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бүтээгдэхүүн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "бүтээмж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "гааль",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "гүйлгээ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "гүйцэтгэгч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "гүйцэтгэгчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "гүйцэтгэлийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "гүйцэтгэх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "гүйцэтгэх",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "гэрээ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "гэрээ",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "гэрээний",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "даатгагч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "даатгагчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "даатгал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "даатгах",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "даатгуулагч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "даатгуулагчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "даатгуулах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "данс",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "дансны",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "дериватив",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "дугаар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "дүрэм",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "дэлгүүр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "жагсаалт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зардал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зарлага",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зах",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "захиалагч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "захиалагчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "захиалах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "захиалга",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "захиалгаа",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "захирал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "захирлын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зорилт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зөвлөл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зээл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зээлдүүлэгч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зээлдүүлэгчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зээлдүүлэх",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зээлдэгч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зээлдэгчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зээлдэх",
+   "pos": "V",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зээлийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "зээлэх",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "импорт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "карт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "комисс",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "компани",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "корпораци",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "лиценз",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "логистик",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "маркетинг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "маркетингийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "менежер",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "менежмент",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "мөнгөн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "мэндийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нийгмийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нийлүүлсэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нийлүүлэгч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нийлүүлэгчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нийлүүлэлт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нийлүүлэх",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нийлэх",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ногдол",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ногдуулах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нөөц",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нөөцийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нөхөн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нөхцөл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нэгж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нэгжийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нэмэгдсэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нэмэгдүүлэх",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нэмэгдэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нэхэмжлэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нэхэмжлэх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нэхэмжлэх",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нягтлан",
+   "pos": "N",
+   "flags": [
+    "hidden-g"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нягтлах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "олгогч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "олгогчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "онлайн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "орлого",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "орлогын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "оруулагч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "оруулагчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "оруулалт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "оруулах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "өглөг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "өгөх",
+   "pos": "V",
+   "flags": [
+    "cvb:ч"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "өр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "өрийн",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "өрсөлдөгч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "өрсөлдөгчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "өрсөлдөөн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "өрсөлдөх",
+   "pos": "V",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "өртгийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "өртөг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "партнер",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "протокол",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "санал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "санхүү",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "санхүүгийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "санхүүгийн",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "санхүүжилт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "сертификат",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "стандарт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "стратеги",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тайлагнах",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тайлан",
+   "pos": "N",
+   "flags": [
+    "hidden-g"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тариф",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "татвар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "татварын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "татварын",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тогтоол",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тооцоо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тооцох",
+   "pos": "V",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "төв",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "төлбөр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "төлбөрийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "төлөвлөгөө",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "төлөвлөх",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "төлөгдөх",
+   "pos": "V",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "төлөөлөгч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "төлөөлөгчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "төлөх",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "төсөвлөх",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "түнш",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "тээвэр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "удирдах",
+   "pos": "V",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "удирдлага",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "урамшуулал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "урьдчилгаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үзүүлэлт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үйлдвэр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үйлдвэрлэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үйлдвэрлэх",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үйлчилгээ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үлдэгдэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үндсэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үнийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үнэ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үнэлгээ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үнэт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үр",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "үүсгэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хадгаламж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хадгалах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хамтрагч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хамтрагчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хамтран",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хангамж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "харилцагч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "харилцагчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хариуцлагатай",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хөдөлмөрийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хөлс",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хөнгөлөлт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хөрөнгийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хөрөнгийн",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хөрөнгө",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хөрөнгө",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хуваарь",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хувь",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хувьцаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хувьцааны",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хувьцаат",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "худалдааны",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "худалдааны",
+   "pos": "ADJ",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "худалдан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "худалдан",
+   "pos": "X",
+   "flags": [
+    "form"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "худалдах",
+   "pos": "V",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хураамж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хураах",
+   "pos": "V",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хурал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хурлын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хүргэлт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хүргэх",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хүү",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хүүгийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэмжээ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэмнэх",
+   "pos": "V",
+   "flags": [
+    "vstem"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэрэглэгч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэрэглэгчид",
+   "pos": "N",
+   "flags": [
+    "no-plural"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэрэглэгчийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хэрэгцээ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хязгаарлагдмал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хямдрал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хяналтын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "цаас",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "цалин",
+   "pos": "N",
+   "flags": [
+    "hidden-g"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "цуцлах",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "чанар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "шагнал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "шилжүүлэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "шилжүүлэх",
+   "pos": "V",
+   "flags": [
+    "cvb:ж"
+   ],
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "шимтгэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "ширээ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "эзэмшигч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "эзэмшигчид",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "экспорт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "элэгдэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "эргэлтийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "эрүүл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  }
+ ]
+}

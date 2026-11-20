@@ -117,6 +117,7 @@ export async function createBookingRequestUseCase(
   }
 
   const booking = await deps.unitOfWork.runInTransaction(async (tx) => {
+    await tx.bookingRepository.lockLawyerSchedule(profile.id);
     const overlapping = await tx.bookingRepository.findOverlappingForLawyer(
       profile.id,
       { startAt, endAt },
@@ -214,6 +215,23 @@ export async function createBookingRequestUseCase(
   return booking;
 }
 
+/**
+ * The status read before the transaction can be stale (double-click, accept
+ * racing decline). Re-check under the lawyer's schedule lock so a request is
+ * answered exactly once.
+ */
+async function assertStillPending(
+  repo: Pick<BookingRepository, "lockLawyerSchedule" | "findById">,
+  lawyerProfileId: string,
+  bookingId: string,
+): Promise<void> {
+  await repo.lockLawyerSchedule(lawyerProfileId);
+  const current = await repo.findById(bookingId);
+  if (!current || current.status !== BookingStatus.PENDING_ACCEPTANCE) {
+    throw new ConflictError("Only pending requests can be accepted or rejected");
+  }
+}
+
 export async function respondToBookingRequestUseCase(
   actor: ActorContext,
   input: { bookingId: string; decision: "ACCEPT" | "REJECT"; declineReason?: string },
@@ -240,6 +258,7 @@ export async function respondToBookingRequestUseCase(
       BookingStatus.CONFIRMED,
     );
     return deps.unitOfWork.runInTransaction(async (tx) => {
+      await assertStillPending(tx.bookingRepository, profile.id, booking.id);
       const updated = await tx.bookingRepository.accept(booking.id);
       await tx.bookingRepository.recordStatusChange({
         bookingId: booking.id,
@@ -278,6 +297,7 @@ export async function respondToBookingRequestUseCase(
 
   const reason = input.declineReason.trim();
   return deps.unitOfWork.runInTransaction(async (tx) => {
+    await assertStillPending(tx.bookingRepository, profile.id, booking.id);
     const updated = await tx.bookingRepository.decline(booking.id, {
       declineReason: reason,
     });

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { readJsonBody } from "@/application/common/read-json-body";
 import { requireActor } from "@/application/common/require-actor";
 import {
   extractCaseTimelineForLawyer,
@@ -11,7 +12,7 @@ import { UserRole } from "@/domain/enums";
 export async function POST(request: Request) {
   try {
     const actor = await requireActor(UserRole.LAWYER);
-    const body = (await request.json()) as { caseId?: string };
+    const body = (await readJsonBody(request)) as { caseId?: string };
     if (!body.caseId) {
       return NextResponse.json(
         { error: "caseId шаардлагатай.", code: "VALIDATION_ERROR" },

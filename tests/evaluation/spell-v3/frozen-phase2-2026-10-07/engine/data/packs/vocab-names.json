@@ -1,0 +1,3026 @@
+{
+ "schema": "tore-spell-pack/1",
+ "id": "tore-vocab-names",
+ "version": "2026.10.1",
+ "layer": "PROPER_NOUN",
+ "language": "mn-Cyrl",
+ "coverage": "SEED",
+ "provenance": {
+  "source": "sources/vocab/names-orgs.tsv, names-p2.tsv, names-people.tsv, names-places.tsv",
+  "license": "TORE proprietary (original work)",
+  "redistributable": true,
+  "dataClass": "A_TORE_OWNED",
+  "sourceIds": [
+   "tore-authored-vocab-2026-10"
+  ],
+  "reviewStatus": "PENDING_NATIVE_REVIEW",
+  "notes": "AI-drafted PROPER_NOUN vocabulary (names-orgs.tsv, names-p2.tsv, names-people.tsv, names-places.tsv); every entry is PENDING_NATIVE_REVIEW. SEED: absence proves nothing."
+ },
+ "entries": [
+  {
+   "w": "Австрали",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Австри",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Адъяа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Аж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ази",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Азийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Александр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Алимаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Алис",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Алматы",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Алтай",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Алтайбаяр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Алтайн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Алтан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Алтангэрэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Алтансүх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Алтанхуяг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Алтанцэцэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Алтанчимэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Альфредо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Амарсанаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Амартүвшин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Амгалан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Амгаланбаатар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Америк",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Амстердам",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Анагаах",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ангараг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Англи",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Андрей",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Анна",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Антарктид",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Анхбаяр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Анхтуяа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Араб",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Арвайхээр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Аргентин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ариунаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ариунбаатар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ариунбаяр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ариунболд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ариунзаяа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ариунтуяа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Арктик",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Астана",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Афганистан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Африк",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ахуй",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ахуйн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Аюурзана",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Аюуш",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Аялал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Баабар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Баатар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Багануур",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Багахангай",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Байгаль",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Байгуулалтын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Байгууллага",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Балжинням",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Бангкок",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Банк",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Барилга",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Баруунурт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батбаатар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батбаяр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батболд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батбольд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батжаргал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батзаяа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батзориг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батлан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батмөнх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батсайхан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батсуурь",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батсүх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Баттөр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Баттулга",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батхуяг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батхүү",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батцэнгэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батчимэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Батчулуун",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Бах",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Баяд",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "Баян-Өлгий",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Баянгол",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Баянзүрх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Баянмөнх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Баянхонгор",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Баяржаргал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Баярмаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Баярсайхан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Баярцэцэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Беларусь",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Бельги",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Берлин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Бетховен",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Билгүүдэй",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Билгүүн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Билэгсайхан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Богд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Болгар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Болдбаатар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Боловсрол",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Боловсролын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Болормаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Болортуяа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Борте",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Бостон",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Бразил",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Брамс",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Британи",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Брюс",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Брюссель",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Булган",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Буриад",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "Бүрэнтогтох",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Бээжин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Бямба",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Бямбаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Бямбабаяр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Бямбажав",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Бямбасүрэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Бямбацогт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Бямбын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Вагнер",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Валютын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ван-Гог",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Вашингтон",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Вена",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Венец",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Верди",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Виктор",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Виолетта",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Вьетнам",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Гадаад",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Газар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Галдан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Галсансүх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Гамлет",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ганбаатар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ганбат",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ганболд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ганбольд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ганзориг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Гансүх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Гантөмөр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Гантулга",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ганхуяг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ганцэцэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ганчимэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Герман",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Гёте",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Говь",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Говь-Алтай",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Говь-Сүмбэр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Голланд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Голомт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Гомбо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Гомер",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Гончигсүм",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Горький",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Грек",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Грэйс",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Гэрэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Гэрэлт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дайан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Даланзадгад",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дамдин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дамдинсүрэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Данзанравжаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дани",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Данте",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дарвин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дарьганга",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дашбалбар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дашдондог",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дашдорж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дели",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Диккенс",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Долгор",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Долгорсүрэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Домингогийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дорждэрэм",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Доржсүрэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дорноговь",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Достоевский",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дотоод",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дөрвөд",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "Дулмаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дундговь",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дэвид",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дэлгэр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дэлгэрмаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дэлгэрмөрөн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дэлгэрцогт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дэлхийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дэмбэрэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Дээд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Евгений",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Европ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Европын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Египет",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ерөнхий",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ерөнхийлөгч",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жавхлан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жак",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жамсран",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жамъяндагва",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жанцанноров",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жаргалсайхан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жастин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жеймс",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Женев",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Женнифер",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жессика",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жи-Мобайл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жон",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жорж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жочи",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жульетта",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Жуулчлалын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Загийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Зам",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Занабазар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Засгийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Захчин",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "Зеланд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Золбаяр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Золбоот",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Золжаргал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Золзаяа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Зориг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Зоригт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Зоригтбаатар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Зуунмод",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Зүй",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Зүйн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Израиль",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Индонез",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ирак",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Иран",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Исланд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Испани",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Итали",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Их",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ичинхорлоо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Казахстан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Канад",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Канн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Капитрон",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Кармен",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Киев",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ким",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Киргизстан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Куба",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Латви",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ленин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Литва",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Лондон",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Лувсаншарав",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Лхагвадорж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Лхагважав",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Лхагвасүрэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Лхамноржмаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мадонна",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мадрид",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Майкл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Малайз",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мандалговь",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мандах",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мандуул",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мандухай",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Манж",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "Марк",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мексик",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Микеланджело",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Минжинсайхан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Минск",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мишээл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мобиком",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Монако",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Монголбанк",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Монголын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Монцамэ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Москва",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Моцарт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мөнгөнцэцэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мөнх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мөнхбат",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мөнхбаяр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мөнхболд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мөнхжаргал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мөнхжин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мөнхзул",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мөнхсайхан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мөнхцэцэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мөрөн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Музей",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мумбай",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мэндийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мягмар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мягмарнаран",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Мягмарсүрэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Найдандорж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Налайх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Намжил",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Намхайнямбуу",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Наран",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Наранбаатар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Нарангэрэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Нарантуул",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Наранчимэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Насанбат",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Нацагдорж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Нидерланд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Нийгмийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Номин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Номын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Норвеги",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нуруу",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "нуур",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Нью-Йорк",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ньютон",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Нэгдсэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Нямгаваа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Нямдорж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Нямсүрэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Одончимэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Одсүрэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Оксфорд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Олон",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Онон",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ордон",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Орос",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Орхон",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Орчин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Оскар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Отгон",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Отгонбаяр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Отгонцэцэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Очир",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Очирбат",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Оюу",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Оюунаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Оюунбилэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Оюунгэрэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Оюунжаргал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Оюунчимэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Оюутолгой",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Өвөрхангай",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Өгөдэй",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Өлгий",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Өлзий",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Өмнөговь",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Өөлд",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "Пакистан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Панам",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Парис",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Пелевин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Петер",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Петербург",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Пикассо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Пласидо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Пол",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Польш",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Португал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Прокурорын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Путин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Пуччини",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Пушкин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Пүрэв",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Пүрэвдорж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Равдан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Радио",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Реквием",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Рембрандт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Рианна",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Риголетто",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Рим",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ричард",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Роберт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ромео",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Румын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Рэнчин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Саймон",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сайншанд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сайханбилэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сангийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Санкт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Санкт-Петербург",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сарангэрэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сарантуяа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сарнай",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Саудын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сергей",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сингапур",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Скайтел",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Содногдорж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Содном",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Солонгос",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сонгинохайрхан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сосорбарам",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сөүл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сталин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Стив",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сумитомо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сургууль",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сүрэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сүхбаатарын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сүхбат",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сэлэнгэ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Сэргэлэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Тавантолгой",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Тажикистан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Тайвань",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Тайланд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Талбай",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ташкент",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Телевиз",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Технологийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Тогтохөөр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Токио",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Толгой",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Толстой",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Толуй",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Томас",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Торгууд",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "Тоска",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Төв",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Төгөлдөр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Төмөр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Төрийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Тулга",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Тунгалаг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Турк",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Туркменистан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Туул",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Түвшинбаяр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Түмэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Түмэнжаргал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Түрэг",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "Тэмүүлэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Тэрэлж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Тээврийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Увс",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Узбекистан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Уйгур",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "Украин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Улаангом",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Улсын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Унгар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Урианхай",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "Ууганбаяр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Уул",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Уулбаатар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Уурхай",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ухаан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ухааны",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ухаахудаг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Уянга",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Үйлдвэр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Үйлдвэрийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Үндсэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Үндэсний",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Филиппин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Финлянд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Франц",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хаан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хааны",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Халх",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "Хамгаалах",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хамгааллын",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "хан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хан-Уул",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хангай",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ханс",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Харилцааны",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Харри",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хархорин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хархорум",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хас",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хасбанк",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хемингуэй",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хишигдорж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Ховд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Холбоо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Холливуд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хонгорзул",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хонконг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хот",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хөгжлийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хөдөлмөр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хөдөө",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хөлөгү",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хөнгөн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хөсөгтөн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хөх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хубилай",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Худалдаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хулан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хулангоо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хурал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хустайн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хуулийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хууль",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хүнд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хүннү",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "Хүнс",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хүрэлбаатар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хүрэлсүх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хүчний",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хэнтий",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хэргийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хэрлэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хятад",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Хятан",
+   "pos": "N",
+   "conf": "LOW"
+  },
+  {
+   "w": "Цагаадай",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цагаандэлгэр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цагаансуварга",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цагдаагийн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цогт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цолмон",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цоодол",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цэдэнбал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цэнд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цэндмаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цэрэн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цэрэнболд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цэрэндагва",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цэрэндолгор",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цэрэндорж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цэц",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цэцэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цэцэгмаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Цэцэрлэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Чайковский",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Чех",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Чехов",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Чили",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Чимэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Чингүүн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Чингэлтэй",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Чинзориг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Чойбалсан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Чулуун",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шанхай",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Швед",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Швейцарь",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шекспир",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шивээ-Овоо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шивээовоо",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шижир",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шиллер",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шинжлэх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шинхуа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шинэ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шинэбаяр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шопен",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шуберт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шуудан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шүүдэрцэцэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Шүүх",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эдип",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эдит",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эйнштейн",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Элбэгдорж",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Энхбат",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Энхбаяр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Энхболд",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Энхжаргал",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Энхжин",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Энхмаа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Энхсайхан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Энхтайван",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Энхтөр",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Энхтуяа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Энхцэцэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Энэтхэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эрдэнэ",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эрдэнэбаатар",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эрдэнэбат",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эрдэнэбилэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эрдэнэбулган",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эрдэнэс",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эрдэнэсант",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эрдэнэтуяа",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эрдэнэцогт",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эрдэнэцэцэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эрдэнэчимэг",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эрүүл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эрчим",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Эстони",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Юнионпэй",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Юнитэл",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Яам",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Явуухулан",
+   "pos": "N",
+   "conf": "MEDIUM"
+  },
+  {
+   "w": "Япон",
+   "pos": "N",
+   "conf": "MEDIUM"
+  }
+ ]
+}

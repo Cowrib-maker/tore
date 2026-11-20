@@ -109,6 +109,12 @@ export class PrismaBookingRepository implements BookingRepository {
     return records.map(mapBooking);
   }
 
+  async lockLawyerSchedule(lawyerProfileId: string): Promise<void> {
+    // Transaction-scoped advisory lock keyed by the lawyer: released on
+    // commit/rollback, never blocks other lawyers, needs no schema change.
+    await this.db.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${"lawyer-schedule:" + lawyerProfileId}, 0))`;
+  }
+
   async findOverlappingForLawyer(
     lawyerProfileId: string,
     slot: InstantSlot,

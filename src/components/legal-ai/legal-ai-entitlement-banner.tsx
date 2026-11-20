@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { lawyerBillingHref } from "@/domain/services/safe-return-path";
 import { cn } from "@/lib/utils";
 
 export type LegalAiEntitlementView = {
@@ -21,7 +22,16 @@ export type LegalAiEntitlementView = {
 
 export function LegalAiEntitlementBanner({
   hideForAudiences,
+  onActivate,
+  refreshKey = 0,
 }: {
+  /**
+   * Lawyer workspace: open the plan checkout right here instead of leaving the chat.
+   * Without it the call to action links to the billing page with `/legal-ai` as the return path.
+   */
+  onActivate?: () => void;
+  /** Bump to re-read the entitlement (e.g. right after a verified payment). */
+  refreshKey?: number;
   /**
    * Audiences this instance should render nothing for. Used only by the
    * public marketing-page composer: an authenticated paid_citizen/lawyer
@@ -55,7 +65,7 @@ export function LegalAiEntitlementBanner({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   if (!view) {
     return null;
@@ -86,12 +96,18 @@ export function LegalAiEntitlementBanner({
         </p>
       ) : null}
       {showBillingCta ? (
-        <Link
-          href="/lawyer/profile"
-          className={cn(buttonVariants({ size: "sm" }), "mt-3")}
-        >
-          Багц идэвхжүүлэх
-        </Link>
+        onActivate ? (
+          <Button type="button" size="sm" className="mt-3" onClick={onActivate}>
+            Багц идэвхжүүлэх
+          </Button>
+        ) : (
+          <Link
+            href={lawyerBillingHref("/legal-ai")}
+            className={cn(buttonVariants({ size: "sm" }), "mt-3")}
+          >
+            Багц идэвхжүүлэх
+          </Link>
+        )
       ) : null}
       {exhausted &&
       view.exhaustedNextStep === "billing" &&

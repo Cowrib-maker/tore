@@ -1,0 +1,72 @@
+# TORE-authored corrections to the automatic classifier (word<TAB>pos<TAB>flags).
+# An override REPLACES any entry with the same word in the general/legal packs (or adds it).
+# Found by the real-text audit (scripts/spell-data/corpus-eval.ts): each line is a word the
+# engine wrongly flagged, with the reason. Native review pending.
+#
+# Converb / inflected forms mis-filed as nouns (took noun suffixes: авч+ээ → "harmony" error):
+авч	X	form
+байж	X	form
+хийж	X	form
+болж	X	form
+явж	X	form
+явуулж	X	form
+хөнгөрүүлж	X	form
+чөлөөлж	X	form
+# Conjunctions mis-filed as nouns / verbs:
+боловч	PART	no-infl
+яавч	PART	no-infl
+# «нар» inflects (нарын, нарыг, нарт): collective plural marker and «sun».
+нар	N
+# Valid words the д/т consonant rule mistook for a slip (хараат бус = independent).
+хараат	ADJ
+сахал	N
+# Removals found by auditing our own packs against an independent dictionary (class C, local):
+# wrong forms and bare suffixes that had been filed as words.
+уншсэн	REMOVE	wrong vowel harmony: унш- is masculine → уншсан
+сессэд	REMOVE	typo of сессэд? (not a word form we can vouch for)
+гэрээсэй	REMOVE	unattested form
+бичгэн	REMOVE	not a standard word
+трайс	REMOVE	not a word
+дискрец	REMOVE	not a word
+статемент	REMOVE	not a standard word
+аас	REMOVE	bare ablative suffix, not a word
+ээс	REMOVE	bare ablative suffix, not a word
+тэй	REMOVE	bare comitative suffix, not a word
+аар	REMOVE	bare instrumental suffix, not a word
+ийг	REMOVE	bare accusative suffix, not a word
+ийн	REMOVE	bare genitive suffix, not a word
+# Phase 2: genuine lemmas that had been filed as non-inflecting forms (төгрөг → төгрөгөөр …). Now ordinary nouns; guarded by the corpus FP gate.
+ач	N
+баталгаа	N
+бодол	N
+бөөн	N
+вэб	N
+гал	N
+гишүүн	N
+график	N
+данс	N
+дундаж	N
+дүрэм	N
+захиалга	N
+зочин	N
+зээ	N
+иш	N
+нэхэмжлэх	N
+од	N
+программ	N
+сайт	N
+салхи	N
+сурагч	N
+төгрөг	N
+ус	N
+хадгалалт	N
+хориг	N
+худалдагч	N
+хүснэгт	N
+хөрш	N
+шинэчлэл	N
+эх	N
+эцэг	N
+яам	N
+өвгөн	N
+өргөдөл	N

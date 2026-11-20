@@ -24,11 +24,15 @@ export type AttachCasePdfDeps = CaseFileDeps & {
   extractor: LegalAiDocumentExtractor;
 };
 
-export function defaultAttachCasePdfDeps(): AttachCasePdfDeps {
-  const { getFileStorage } =
-    require("@/infrastructure/storage") as typeof import("@/infrastructure/storage");
-  const { getLegalAiDocumentExtractor } =
-    require("@/infrastructure/ai/document-text-extractor") as typeof import("@/infrastructure/ai/document-text-extractor");
+/**
+ * Loaded lazily: importing storage/extractor modules validates the environment, which must not happen merely because this module was
+ * imported (unit tests, builds). Called at use time, not import time.
+ */
+export async function defaultAttachCasePdfDeps(): Promise<AttachCasePdfDeps> {
+  const [{ getFileStorage }, { getLegalAiDocumentExtractor }] = await Promise.all([
+    import("@/infrastructure/storage"),
+    import("@/infrastructure/ai/document-text-extractor"),
+  ]);
   return {
     ...defaultCaseFileDeps(),
     fileStorage: getFileStorage(),
@@ -70,8 +74,9 @@ const EVIDENCE_LABEL_BY_FORMAT: Record<string, string> = {
 export async function attachCasePdfForLawyer(
   actor: ActorContext,
   input: AttachCasePdfInput,
-  deps: AttachCasePdfDeps = defaultAttachCasePdfDeps(),
+  provided?: AttachCasePdfDeps,
 ): Promise<CaseReviewWorkspacePayload> {
+  const deps = provided ?? (await defaultAttachCasePdfDeps());
   await requireOwnedCaseFile(actor, input.caseId, deps.repository);
   const validated = assertValidCaseEvidenceUpload({
     fileName: input.fileName,

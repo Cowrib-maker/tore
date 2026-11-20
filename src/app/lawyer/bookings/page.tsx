@@ -23,7 +23,7 @@ import {
 } from "@/infrastructure/repositories";
 import {
   formatBookingStatus,
-  formatDateTimeUtc,
+  formatDateTimeUlaanbaatar,
 } from "@/lib/format-labels";
 
 function statusVariant(
@@ -128,8 +128,8 @@ export default async function LawyerBookingsPage() {
                 <CardDescription>
                   {clientNames.get(booking.clientUserId) ??
                     m.common.clientFallback}{" "}
-                  · {formatDateTimeUtc(booking.scheduledStartAt, locale)} –{" "}
-                  {formatDateTimeUtc(booking.scheduledEndAt, locale)}{" "}
+                  · {formatDateTimeUlaanbaatar(booking.scheduledStartAt, locale)} –{" "}
+                  {formatDateTimeUlaanbaatar(booking.scheduledEndAt, locale)}{" "}
                   {m.common.utc}
                 </CardDescription>
               </CardHeader>

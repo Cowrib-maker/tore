@@ -3,20 +3,14 @@ import type { ActorContext } from "@/application/common/actor-context";
 import { PROFILE_PHOTO_MAX_BYTES } from "@/application/validators/profile.schema";
 import type { User } from "@/domain/entities/user";
 import { AuditAction, UserRole } from "@/domain/enums";
-import {
-  ForbiddenError,
-  NotFoundError,
-  ValidationError,
-} from "@/domain/errors/domain-error";
+import { ForbiddenError, NotFoundError } from "@/domain/errors/domain-error";
 import { DocumentUploadError } from "@/domain/errors/document-upload-errors";
 import type { FileStorage } from "@/domain/ports/file-storage";
 import type { AuditLogRepository } from "@/domain/repositories/audit-log-repository";
-import type { LawyerProfileRepository } from "@/domain/repositories/profile-repository";
 import type { UserRepository } from "@/domain/repositories/user-repository";
 
 export type UploadProfilePhotoDeps = {
   userRepository: UserRepository;
-  lawyerProfileRepository: LawyerProfileRepository;
   auditLogRepository: AuditLogRepository;
   fileStorage: FileStorage;
 };
@@ -43,26 +37,45 @@ export const PROFILE_PHOTO_SAVE_MESSAGE =
   "Зургийг бүртгэж чадсангүй. Одоогийн зураг хэвээр байна. Дахин оролдоно уу.";
 
 /**
- * ADMIN-ONLY: sets or replaces a lawyer's profile photo. Lawyers cannot manage
- * their own photo. The actor comes from the session; the target is an explicit
- * user id that must belong to a LAWYER-role account with a lawyer profile, so
- * this can never be pointed at a client or another admin. Public visibility is
- * decided later, per request, by the position/isListed gate in
- * getPublicLawyerProfile.
+ * Profile photo for a LAWYER-role account (attorney, prosecutor, judge, other-lawyer) — part of the shared professional workspace, not a
+ * marketplace feature. Public visibility is decided later, per request, by the position/isListed gate in getPublicLawyerProfile.
  *
- * The previous photo is deleted strictly after the new one is persisted, so
- * any failure leaves the existing photo intact; a failure after the new blob
- * was stored removes that blob. Only owned "profile-photo/" objects are ever
- * deleted — an external (OAuth) avatar URL is left alone.
+ * Whose photo is written (decided here, never by the route):
+ *  - LAWYER: always their own User row. Naming any other user in `targetUserId` is refused (ForbiddenError).
+ *  - ADMIN: only the LAWYER account named in `targetUserId`. A missing, deleted or non-LAWYER target gets the same NotFoundError (no account
+ *    probing). An ADMIN without `targetUserId` is refused (ForbiddenError): admins have no photo of their own here.
+ *  - every other role: refused (ForbiddenError).
+ * Audit: `actorUserId` is always the caller; for an admin acting on a lawyer, `entityId` is the lawyer and `metadata.onBehalfOfAdmin` is true.
+ *
+ * The previous photo is deleted strictly after the new one is persisted, so any failure leaves the existing photo intact; a failure after the
+ * new blob was stored removes that blob.
  */
 export async function uploadProfilePhotoUseCase(
   actor: ActorContext,
-  targetUserId: string,
   file: UploadProfilePhotoFile,
   deps: UploadProfilePhotoDeps,
   ipAddress?: string,
+  /** Admin only: the lawyer whose photo is being managed. */
+  targetUserId?: string,
 ): Promise<User> {
-  if (actor.role !== UserRole.ADMIN) {
+  // Who owns the photo being written:
+  //  - LAWYER: always themselves; naming another user is refused outright.
+  //  - ADMIN: only an explicitly named LAWYER account (all administrative rights).
+  //  - everyone else: refused.
+  let ownerId: string;
+  if (actor.role === UserRole.LAWYER) {
+    if (targetUserId !== undefined && targetUserId !== actor.userId) {
+      throw new ForbiddenError();
+    }
+    ownerId = actor.userId;
+  } else if (actor.role === UserRole.ADMIN && targetUserId) {
+    const target = await deps.userRepository.findById(targetUserId);
+    if (!target || target.role !== UserRole.LAWYER) {
+      // Same answer for "missing" and "not a lawyer": no account probing.
+      throw new NotFoundError("User", targetUserId);
+    }
+    ownerId = target.id;
+  } else {
     throw new ForbiddenError();
   }
 
@@ -78,23 +91,16 @@ export async function uploadProfilePhotoUseCase(
     );
   }
 
-  const previous = await deps.userRepository.findById(targetUserId);
+  const previous = await deps.userRepository.findById(ownerId);
   if (!previous) {
-    throw new NotFoundError("User", targetUserId);
-  }
-  if (previous.role !== UserRole.LAWYER) {
-    throw new ValidationError("Profile photos can only be set for lawyer accounts");
-  }
-  const targetProfile = await deps.lawyerProfileRepository.findByUserId(targetUserId);
-  if (!targetProfile) {
-    throw new NotFoundError("LawyerProfile");
+    throw new NotFoundError("User", ownerId);
   }
 
   let stored;
   try {
     stored = await deps.fileStorage.upload({
       purpose: "profile-photo",
-      ownerId: targetUserId,
+      ownerId,
       fileName: file.fileName,
       contentType: PHOTO_MIME_BY_FORMAT[detected],
       body: file.body,
@@ -106,7 +112,7 @@ export async function uploadProfilePhotoUseCase(
 
   let updated: User;
   try {
-    updated = await deps.userRepository.updateProfile(targetUserId, {
+    updated = await deps.userRepository.updateProfile(ownerId, {
       image: stored.key,
     });
   } catch (error) {
@@ -137,7 +143,7 @@ export async function uploadProfilePhotoUseCase(
     action: AuditAction.UPDATE,
     entityType: "User",
     entityId: updated.id,
-    metadata: { field: "profilePhoto", targetUserId },
+    metadata: { field: "profilePhoto", ...(ownerId !== actor.userId ? { onBehalfOfAdmin: true } : {}) },
     ipAddress,
   });
 

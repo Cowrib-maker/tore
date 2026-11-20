@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 
 import type { ActionState } from "@/application/common/action-state";
 import { adminDeactivateUserAction } from "@/application/actions/admin-users.actions";
@@ -28,13 +28,14 @@ export function AdminDeactivateUserButton({
 }) {
   const [open, setOpen] = useState(false);
   const [state, formAction, pending] = useActionState(
-    adminDeactivateUserAction,
+    async (previous: ActionState, formData: FormData) => {
+      const next = await adminDeactivateUserAction(previous, formData);
+      // Close from the action itself (an event path), not from an effect that reacts to state.
+      if (next.success) setOpen(false);
+      return next;
+    },
     initial,
   );
-
-  useEffect(() => {
-    if (state.success) setOpen(false);
-  }, [state.success]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

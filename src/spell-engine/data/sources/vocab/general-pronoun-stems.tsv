@@ -1,0 +1,5 @@
+# TORE-authored (AI-drafted, PENDING_NATIVE_REVIEW). Pronoun STEMS whose declension is irregular on the surface form but regular on the stem
+# (бид → бидэн-: бидэнд, биднийг, биднээс; тэд → тэдэн-; тэр → түүн-; энэ → үүн-; өөрс-). Handled as no-plural noun lemmas so the regular
+# case + reflexive chain (биднээс, түүнийгээ, өөрсдийгөө) applies; pronouns take no ordinary plural.
+@N no-plural
+бидэн тэдэн түүн үүн өөрсөд өөр

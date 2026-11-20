@@ -1,0 +1,25 @@
+{
+  "schema": "tore-spell-baseline/1",
+  "name": "PHASE_2_FROZEN",
+  "date": "2026-10-07",
+  "note": "Numbers copied from the Phase 2 final report. HISTORICAL: never edited to flatter later phases. Held-out here meant docs >40,000 of the local news corpus, which Phase 2 then inspected word-by-word (so it is NOT a clean holdout).",
+  "metrics": {
+    "validCoverageNewsHeldOutP2": 0.9076,
+    "unknownNewsHeldOutP2": 0.0923,
+    "validCoverageNewsInSample": 0.8837,
+    "confidentSuggestionPrecisionSynthetic": 0.997,
+    "cleanTextFlagRate": 0.00006,
+    "doc20kMedianMs": 18.7,
+    "doc20kMaxMs": 21.1,
+    "wordP95Ms": 0.04,
+    "paradigmAcceptance": 1.0,
+    "mutationSuspects": 0,
+    "mutationWrongRepairs": 0,
+    "properNameRecognition": 0.968,
+    "loanwordRecognition": 0.979,
+    "shippedLexiconEntries": 9623,
+    "tests": 2977,
+    "nativeReviewedGold": 0
+  },
+  "unknownTaxonomyHeldOutP2": { "MISSING_LEMMA": 33.8, "TRUE_UNKNOWN": 22.6, "PROPER_NAME": 12.2, "MISSING_INFLECTION": 12.1, "COMPOUND": 9.7, "DERIVATIONAL_FORM": 5.3, "LOANWORD": 2.3, "ABBREVIATION": 1.1, "TOKENIZER_FAILURE": 0.9, "TECHNICAL_TERM": 0.1 }
+}

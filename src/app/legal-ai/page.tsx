@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { getLegalAiService } from "@/application/ai/create-legal-ai-service";
 import { lookupAuthSession } from "@/application/common/session";
+import { loadLawyerLicenseState } from "@/application/use-cases/lawyers/load-lawyer-license-state";
 import { loadLawyerAiWorkbench } from "@/application/use-cases/ai/load-lawyer-ai-workbench";
 import { LawyerWorkspaceFrame } from "@/components/case-review/lawyer-workspace-frame";
 import { LegalAiChat } from "@/components/legal-ai/legal-ai-chat";
@@ -85,10 +86,14 @@ export default async function LegalAiPage({
       conversationId: ownedConversationId,
       caseId: caseFileId,
     });
-    const i18n = await getShellI18n("lawyer");
+    const [i18n, licenseState] = await Promise.all([
+      getShellI18n("lawyer"),
+      loadLawyerLicenseState(session.user.id),
+    ]);
     return (
       <LawyerWorkspaceFrame
         variant="workbench"
+        licenseState={licenseState}
         user={session.user}
         profileHref={getProfilePath(UserRole.LAWYER) || "/lawyer/profile"}
         locale={i18n.locale}

@@ -1,0 +1,54 @@
+# TORE-authored (AI-drafted, PENDING_NATIVE_REVIEW). Irregular and suppletive FORMS that the regular noun/verb paradigms
+# do not derive (postposition + reflexive/case, pronoun-like stems, numerals). Form-only: each is accepted exactly as written.
+@X form lemma=дээр
+дээрээ дээрээс дээрх дээрээсээ дээгүүр дээгүүрээ
+@X form lemma=доор
+доороо доороос доорх доор
+@X form lemma=дотор
+дотроо дотроос дотрын дотрох дотор дотоод дотооддоо
+@X form lemma=өмнө
+өмнөө өмнөөс өмнөх өмнө
+@X form lemma=ард
+ардаа ардаас араас арын ард
+@X form lemma=хажуу
+хажуугаа хажуугаар хажуугийн хажууд хажуугаас хажуу
+@X form lemma=хооронд
+хоорондоо хоорондын хоорондох хооронд
+@X form lemma=дунд
+дундаа дундаас дундах дундуур дунд
+@X form lemma=гадна
+гаднаас гаднах гаднаа гадна
+@X form lemma=цаана
+цаанаас цаанах цаана
+@X form lemma=наана
+наанаас наанах наана
+@X form lemma=энд
+эндээс эндхийн эндхээс энд
+@X form lemma=тэнд
+тэндээс тэндхийн тэндхээс тэнд
+@X form lemma=манай
+манай манайх манайд манайг манайхан манайхаас
+@X form lemma=танай
+танай танайх танайд танайг танайхан танайхаас
+@X form lemma=миний
+минийх
+@X form lemma=чиний
+чинийх
+@X form lemma=түүний
+түүнийх
+@X form lemma=тэдний
+тэднийх
+@X form lemma=хүн
+хүний хүнийх хүнд хүнийг хүнээс хүнтэй хүнээр хүнгүй хүмүүс хүмүүсийн хүмүүст хүмүүсийг хүмүүсээс хүмүүстэй хүмүүсээр хүмүүн
+@X form lemma=мянга
+мянган мянганд мянганы мянгаар мянгатай
+@X form lemma=зуу
+зуун зуунд зууны зуугаар зуутай зуу
+@X form lemma=арав
+арван арваад арав
+@X form lemma=нэг
+нэгэн нэгний нэгэнд нэгийг нэгээс нэгтэй нэгээр
+@X form lemma=хоёр
+хоёрын хоёрт хоёроос хоёртой хоёроор
+@X form lemma=гурав
+гурван гурвын гурвыг гуравт гурвуулаа

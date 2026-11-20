@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { readJsonBody } from "@/application/common/read-json-body";
 import { requireActor } from "@/application/common/require-actor";
 import { submitManualMappingForLawyer } from "@/application/use-cases/case-review";
 import { caseFileErrorResponse } from "@/application/use-cases/case-review/http-error";
@@ -8,7 +9,7 @@ import { UserRole } from "@/domain/enums";
 export async function POST(request: Request) {
   try {
     const actor = await requireActor(UserRole.LAWYER);
-    const body = (await request.json()) as {
+    const body = (await readJsonBody(request)) as {
       caseId?: string;
       expectedVersion?: number;
       factId?: string;

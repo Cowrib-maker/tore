@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { readJsonBody } from "@/application/common/read-json-body";
 import { requireActor } from "@/application/common/require-actor";
 import { assertEmailVerified } from "@/application/common/require-verified-email";
 import { guardLawyerAiHttp, recordLawyerFeatureUsage } from "@/application/common/guard-lawyer-ai-http";
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
       actor,
       EntitlementFeature.CASE_ANALYSIS,
     );
-    const body = (await request.json()) as {
+    const body = (await readJsonBody(request)) as {
       caseId?: string;
       expectedVersion?: number;
     };

@@ -34,7 +34,7 @@ export const getShellI18n = cache(async (role: "client" | "lawyer" | "admin") =>
             { href: "/matters", label: d.navMatters },
             { href: "/lawyer/offerings", label: d.navOfferings },
             { href: "/lawyer/bookings", label: d.navBookings },
-            { href: "/billing", label: d.navBilling },
+            { href: "/lawyer/billing", label: d.navBilling },
             { href: "/lawyer/notifications", label: d.navNotifications },
             { href: "/legal-ai", label: d.navLegalChat },
             ...orgNav,

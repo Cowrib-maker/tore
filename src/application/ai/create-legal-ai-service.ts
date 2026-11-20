@@ -57,7 +57,7 @@ export function createCompletion() {
   return new FallbackLegalAiCompletion(openAi, anthropic);
 }
 
-function createRemoteCorpusRetriever(): LegalCorpusRetriever {
+export function createRemoteCorpusRetriever(): LegalCorpusRetriever {
   if (!env.ENGINE_BASE_URL || !env.ENGINE_SERVICE_TOKEN) {
     return new UnavailableLegalCorpusRetriever("not_configured");
   }

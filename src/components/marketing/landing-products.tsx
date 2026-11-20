@@ -4,6 +4,7 @@ import {
   Briefcase,
   Building2,
   GraduationCap,
+  SpellCheck,
   Users,
   Users2,
 } from "lucide-react";
@@ -26,9 +27,12 @@ const PRODUCT_STYLE: Record<ProductKey, { icon: typeof Users; tile: string }> = 
 export function LandingProducts({
   home,
   hrefs,
+  spell,
 }: {
   home: Dictionary["publicHome"];
   hrefs: Record<ProductKey, string>;
+  /** TORE Spell is a separate product, shown beside (not among) the role products. */
+  spell?: Dictionary["spell"]["home"];
 }) {
   const items: Array<{
     key: ProductKey;
@@ -99,6 +103,41 @@ export function LandingProducts({
           );
         })}
       </div>
+
+      {spell ? (
+        <LandingReveal delayMs={280} className="mt-4">
+          <article
+            id="spell"
+            className="group flex scroll-mt-28 flex-col gap-5 rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-lg sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div className="flex items-start gap-4">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 transition-transform group-hover:scale-105">
+                <SpellCheck className="size-5" />
+              </span>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-lg leading-tight font-bold text-slate-900">{spell.name}</h3>
+                  <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-[11px] font-semibold tracking-wide text-indigo-700">
+                    {spell.tag}
+                  </span>
+                </div>
+                <p className="mt-1 text-[15px] font-semibold text-blue-600">{spell.audience}</p>
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">
+                  {spell.description}
+                </p>
+                <p className="mt-1.5 text-xs font-medium text-slate-400">{spell.standalone}</p>
+              </div>
+            </div>
+            <Link
+              href="/spell"
+              className="inline-flex shrink-0 items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-700"
+            >
+              {spell.cta}
+              <ArrowRight className="size-3.5 transition group-hover:translate-x-1" />
+            </Link>
+          </article>
+        </LandingReveal>
+      ) : null}
     </div>
   );
 }

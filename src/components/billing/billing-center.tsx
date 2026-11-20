@@ -2,12 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Check, Clock, ShieldCheck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SOLO_PLAN } from "@/domain/constants/subscription-plans";
-import { formatDateTimeUtc } from "@/lib/format-labels";
+import { isInvoicePaymentConfirmed } from "@/domain/services/invoice-payment-confirmation";
+import { formatDateTimeUlaanbaatar } from "@/lib/format-labels";
 import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 
@@ -85,7 +87,32 @@ function methodLabelMn(method: CheckoutMethod): string {
   return "QPay";
 }
 
-export function BillingCenter({ role, backHref, locale }: { role: Role; backHref: string; locale: Locale }) {
+/** Pure fetch + parse (no React state), so it can be called from an effect without setting state synchronously. */
+async function fetchBillingPayload(endpoint: string): Promise<CitizenPayload | LawyerPayload> {
+  const response = await fetch(endpoint, { credentials: "same-origin" });
+  if (!response.ok) {
+    throw new Error("load_failed");
+  }
+  return (await response.json()) as CitizenPayload | LawyerPayload;
+}
+
+/**
+ * `returnTo` must already be validated server-side (safeReturnPath). After a payment that the
+ * SERVER reports as paid, the user is sent back there; a client redirect alone never marks anything paid.
+ */
+export function BillingCenter({
+  role,
+  backHref,
+  locale,
+  returnTo = null,
+}: {
+  role: Role;
+  backHref: string;
+  locale: Locale;
+  returnTo?: string | null;
+}) {
+  const router = useRouter();
+  const [paidThisVisit, setPaidThisVisit] = useState(false);
   const endpoint = role === "citizen" ? "/api/citizen/billing" : "/api/lawyer/billing";
   const [data, setData] = useState<CitizenPayload | LawyerPayload | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -98,11 +125,7 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
   const pollRef = useRef<number | null>(null);
 
   const load = useCallback(async () => {
-    const response = await fetch(endpoint, { credentials: "same-origin" });
-    if (!response.ok) {
-      throw new Error("load_failed");
-    }
-    const payload = (await response.json()) as CitizenPayload | LawyerPayload;
+    const payload = await fetchBillingPayload(endpoint);
     setData(payload);
     return payload;
   }, [endpoint]);
@@ -131,10 +154,13 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
               invoiceStatus?: string;
               invoice?: { status?: string };
             };
-            const paid = payload.paid === true || payload.subscriptionStatus === "ACTIVE";
+            // Shared rule (invoice-payment-confirmation.ts): only the server's `paid` verdict on THIS invoice counts.
+            // `subscriptionStatus` is account-level and can read ACTIVE while this invoice is still pending.
+            const paid = isInvoicePaymentConfirmed(payload);
             if (paid) {
               stopPolling();
               await load();
+              setPaidThisVisit(true);
               return;
             }
             const status = payload.invoiceStatus ?? payload.invoice?.status;
@@ -153,16 +179,34 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
   );
 
   useEffect(() => {
-    void load()
+    let cancelled = false;
+    // Fetch first, then update state from the resolved promise (never synchronously in the effect body).
+    fetchBillingPayload(endpoint)
       .then((payload) => {
+        if (cancelled) return;
+        setData(payload);
         if (payload.pendingInvoice) {
           pollInvoice(payload.pendingInvoice.invoiceId);
         }
       })
-      .catch(() => setLoadError("Ачаалж чадсангүй. Дахин ачаална уу."));
-    return () => stopPolling();
+      .catch(() => {
+        if (!cancelled) setLoadError("Ачаалж чадсангүй. Дахин ачаална уу.");
+      });
+    return () => {
+      cancelled = true;
+      stopPolling();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!paidThisVisit || !returnTo) return;
+    const timer = window.setTimeout(() => {
+      router.replace(returnTo);
+      router.refresh();
+    }, 1500);
+    return () => window.clearTimeout(timer);
+  }, [paidThisVisit, returnTo, router]);
 
   async function startCheckout(planCode: CitizenPlanCode | null, method: CheckoutMethod) {
     setCheckoutPending(true);
@@ -277,8 +321,34 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
     ? citizenData!.availablePlans
     : [{ code: SOLO_PLAN.code, name: SOLO_PLAN.name, priceMnt: SOLO_PLAN.priceMnt, quotas: SOLO_PLAN.quotas }];
 
+  const lastSettled = data.history[0];
+  const retryNote =
+    !invoice && !hasActivePlan && lastSettled && ["FAILED", "CANCELLED", "EXPIRED"].includes(lastSettled.status)
+      ? lastSettled.status === "EXPIRED"
+        ? "Өмнөх нэхэмжлэлийн хугацаа дууссан. Доороос дахин төлбөрийн арга сонгоно уу."
+        : lastSettled.status === "CANCELLED"
+          ? "Өмнөх төлбөр цуцлагдсан. Бүртгэл дахин хийх шаардлагагүй, доороос дахин оролдоно уу."
+          : "Өмнөх төлбөр баталгаажаагүй. Бүртгэл дахин хийх шаардлагагүй, доороос дахин оролдоно уу."
+      : null;
+
   return (
     <div className="space-y-6">
+      {paidThisVisit ? (
+        <p role="status" className="rounded-xl border border-green-600/30 bg-green-50 px-4 py-3 text-sm font-medium text-green-800">
+          Төлбөр баталгаажлаа. Таны багц идэвхжлээ.
+          {returnTo ? " Өмнөх хуудас руу буцаж байна…" : ""}
+        </p>
+      ) : null}
+      {returnTo && (hasActivePlan || paidThisVisit) ? (
+        <Link href={returnTo} className="inline-flex text-sm font-semibold text-[#0B5CFF] underline underline-offset-4">
+          Үргэлжлүүлэх →
+        </Link>
+      ) : null}
+      {retryNote ? (
+        <p role="status" className="rounded-xl border border-amber-500/30 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {retryNote}
+        </p>
+      ) : null}
       {/* MY CURRENT PLAN */}
       <section className="rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -301,7 +371,7 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
         ) : null}
         {expiresAt ? (
           <p className="mt-1 text-sm text-[#5C6570]">
-            Дуусах хугацаа: {formatDateTimeUtc(new Date(expiresAt), locale)}
+            Дуусах хугацаа: {formatDateTimeUlaanbaatar(new Date(expiresAt), locale)}
           </p>
         ) : null}
       </section>
@@ -466,7 +536,7 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
       ) : null}
 
       {/* PAYMENT HISTORY */}
-      <section className="rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 sm:p-6">
+      <section id="history" className="scroll-mt-20 rounded-2xl border border-[#0B1F3A]/10 bg-white p-5 sm:p-6">
         <p className="text-[11px] font-semibold tracking-[0.14em] text-[#0B5CFF] uppercase">
           Төлбөрийн түүх
         </p>
@@ -493,7 +563,7 @@ export function BillingCenter({ role, backHref, locale }: { role: Role; backHref
                     <td className="py-2.5 pr-3">{methodLabelMn(row.method)}</td>
                     <td className="py-2.5 pr-3">{statusLabelMn(row.status)}</td>
                     <td className="py-2.5 pr-3 text-[#7B8490]">
-                      {formatDateTimeUtc(new Date(row.createdAt), locale)}
+                      {formatDateTimeUlaanbaatar(new Date(row.createdAt), locale)}
                     </td>
                     <td className="py-2.5 font-mono text-[#7B8490]">{row.paymentCode ?? "—"}</td>
                   </tr>

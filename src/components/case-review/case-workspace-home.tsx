@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 
@@ -52,9 +52,12 @@ export function CaseWorkspaceHome({
   const title = payload.title;
   const version = payload.version;
 
-  useEffect(() => {
+  // Leave edit mode when the title save reports success (adjusting state while rendering, not in an effect).
+  const [seenTitleSuccess, setSeenTitleSuccess] = useState(titleSuccess);
+  if (titleSuccess !== seenTitleSuccess) {
+    setSeenTitleSuccess(titleSuccess);
     if (titleSuccess) setEditing(false);
-  }, [titleSuccess]);
+  }
 
   const pdfs = documents.length
     ? documents

@@ -1,0 +1,4521 @@
+{
+ "schema": "tore-spell-gold/1",
+ "datasetVersion": "spell-gold-v3.0",
+ "set": "J_PROPER_NAMES",
+ "provenanceDir": "model",
+ "note": "MODEL_ADJUDICATED candidates: authored and judged by the AI assistant. NOT native-reviewed; NOT gold.",
+ "items": [
+  {
+   "id": "J_PROPER_NAMES:001:бат",
+   "token": "Бат",
+   "sentence": "Манай найз Бат ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:002:батын",
+   "token": "Батын",
+   "sentence": "Манай найз Батын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:003:батад",
+   "token": "Батад",
+   "sentence": "Манай найз Батад ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:004:батыг",
+   "token": "Батыг",
+   "sentence": "Манай найз Батыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:005:болд",
+   "token": "Болд",
+   "sentence": "Манай найз Болд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:006:болдын",
+   "token": "Болдын",
+   "sentence": "Манай найз Болдын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:007:болдод",
+   "token": "Болдод",
+   "sentence": "Манай найз Болдод ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:008:болдыг",
+   "token": "Болдыг",
+   "sentence": "Манай найз Болдыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:009:дорж",
+   "token": "Дорж",
+   "sentence": "Манай найз Дорж ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:010:доржийн",
+   "token": "Доржийн",
+   "sentence": "Манай найз Доржийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:011:доржид",
+   "token": "Доржид",
+   "sentence": "Манай найз Доржид ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:012:доржийг",
+   "token": "Доржийг",
+   "sentence": "Манай найз Доржийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:013:нямдорж",
+   "token": "Нямдорж",
+   "sentence": "Манай найз Нямдорж ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:014:нямдоржийн",
+   "token": "Нямдоржийн",
+   "sentence": "Манай найз Нямдоржийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:015:нямдоржид",
+   "token": "Нямдоржид",
+   "sentence": "Манай найз Нямдоржид ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:016:нямдоржийг",
+   "token": "Нямдоржийг",
+   "sentence": "Манай найз Нямдоржийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:017:сүхбаатар",
+   "token": "Сүхбаатар",
+   "sentence": "Манай найз Сүхбаатар ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:018:сүхбаатарын",
+   "token": "Сүхбаатарын",
+   "sentence": "Манай найз Сүхбаатарын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:019:сүхбаатарт",
+   "token": "Сүхбаатарт",
+   "sentence": "Манай найз Сүхбаатарт ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:020:сүхбаатарыг",
+   "token": "Сүхбаатарыг",
+   "sentence": "Манай найз Сүхбаатарыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:021:тэмүүжин",
+   "token": "Тэмүүжин",
+   "sentence": "Манай найз Тэмүүжин ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:022:тэмүүжиний",
+   "token": "Тэмүүжиний",
+   "sentence": "Манай найз Тэмүүжиний ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:023:тэмүүжинд",
+   "token": "Тэмүүжинд",
+   "sentence": "Манай найз Тэмүүжинд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:024:тэмүүжинийг",
+   "token": "Тэмүүжинийг",
+   "sentence": "Манай найз Тэмүүжинийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:025:оюун",
+   "token": "Оюун",
+   "sentence": "Манай найз Оюун ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:026:оюуны",
+   "token": "Оюуны",
+   "sentence": "Манай найз Оюуны ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:027:оюунд",
+   "token": "Оюунд",
+   "sentence": "Манай найз Оюунд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:028:оюуныг",
+   "token": "Оюуныг",
+   "sentence": "Манай найз Оюуныг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:029:сарнай",
+   "token": "Сарнай",
+   "sentence": "Манай найз Сарнай ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:030:сарнайн",
+   "token": "Сарнайн",
+   "sentence": "Манай найз Сарнайн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:031:сарнайд",
+   "token": "Сарнайд",
+   "sentence": "Манай найз Сарнайд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:032:сарнайг",
+   "token": "Сарнайг",
+   "sentence": "Манай найз Сарнайг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:033:мөнхбат",
+   "token": "Мөнхбат",
+   "sentence": "Манай найз Мөнхбат ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:034:мөнхбатын",
+   "token": "Мөнхбатын",
+   "sentence": "Манай найз Мөнхбатын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:035:мөнхбатад",
+   "token": "Мөнхбатад",
+   "sentence": "Манай найз Мөнхбатад ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:036:мөнхбатыг",
+   "token": "Мөнхбатыг",
+   "sentence": "Манай найз Мөнхбатыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:037:батбаяр",
+   "token": "Батбаяр",
+   "sentence": "Манай найз Батбаяр ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:038:батбаярын",
+   "token": "Батбаярын",
+   "sentence": "Манай найз Батбаярын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:039:батбаярт",
+   "token": "Батбаярт",
+   "sentence": "Манай найз Батбаярт ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:040:батбаярыг",
+   "token": "Батбаярыг",
+   "sentence": "Манай найз Батбаярыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:041:цэцэг",
+   "token": "Цэцэг",
+   "sentence": "Манай найз Цэцэг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:042:цэцгийн",
+   "token": "Цэцгийн",
+   "sentence": "Манай найз Цэцгийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:043:цэцэгт",
+   "token": "Цэцэгт",
+   "sentence": "Манай найз Цэцэгт ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:044:цэцгийг",
+   "token": "Цэцгийг",
+   "sentence": "Манай найз Цэцгийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:045:болормаа",
+   "token": "Болормаа",
+   "sentence": "Манай найз Болормаа ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:046:болормаагийн",
+   "token": "Болормаагийн",
+   "sentence": "Манай найз Болормаагийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:047:болормаад",
+   "token": "Болормаад",
+   "sentence": "Манай найз Болормаад ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:048:болормааг",
+   "token": "Болормааг",
+   "sentence": "Манай найз Болормааг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:049:оюунчимэг",
+   "token": "Оюунчимэг",
+   "sentence": "Манай найз Оюунчимэг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:050:оюунчимэгийн",
+   "token": "Оюунчимэгийн",
+   "sentence": "Манай найз Оюунчимэгийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:051:оюунчимэгт",
+   "token": "Оюунчимэгт",
+   "sentence": "Манай найз Оюунчимэгт ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:052:оюунчимэгийг",
+   "token": "Оюунчимэгийг",
+   "sentence": "Манай найз Оюунчимэгийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:053:дулмаа",
+   "token": "Дулмаа",
+   "sentence": "Манай найз Дулмаа ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:054:дулмаагийн",
+   "token": "Дулмаагийн",
+   "sentence": "Манай найз Дулмаагийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:055:дулмаад",
+   "token": "Дулмаад",
+   "sentence": "Манай найз Дулмаад ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:056:дулмааг",
+   "token": "Дулмааг",
+   "sentence": "Манай найз Дулмааг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:057:ганбаатар",
+   "token": "Ганбаатар",
+   "sentence": "Манай найз Ганбаатар ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:058:ганбаатарын",
+   "token": "Ганбаатарын",
+   "sentence": "Манай найз Ганбаатарын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:059:ганбаатарт",
+   "token": "Ганбаатарт",
+   "sentence": "Манай найз Ганбаатарт ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:060:ганбаатарыг",
+   "token": "Ганбаатарыг",
+   "sentence": "Манай найз Ганбаатарыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:061:алтанцэцэг",
+   "token": "Алтанцэцэг",
+   "sentence": "Манай найз Алтанцэцэг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:062:алтанцэцгийн",
+   "token": "Алтанцэцгийн",
+   "sentence": "Манай найз Алтанцэцгийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:063:алтанцэцэгт",
+   "token": "Алтанцэцэгт",
+   "sentence": "Манай найз Алтанцэцэгт ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:064:алтанцэцгийг",
+   "token": "Алтанцэцгийг",
+   "sentence": "Манай найз Алтанцэцгийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:065:пүрэвдорж",
+   "token": "Пүрэвдорж",
+   "sentence": "Манай найз Пүрэвдорж ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:066:пүрэвдоржийн",
+   "token": "Пүрэвдоржийн",
+   "sentence": "Манай найз Пүрэвдоржийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:067:пүрэвдоржид",
+   "token": "Пүрэвдоржид",
+   "sentence": "Манай найз Пүрэвдоржид ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:068:пүрэвдоржийг",
+   "token": "Пүрэвдоржийг",
+   "sentence": "Манай найз Пүрэвдоржийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:069:эрдэнэ",
+   "token": "Эрдэнэ",
+   "sentence": "Манай найз Эрдэнэ ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:070:эрдэнийн",
+   "token": "Эрдэнийн",
+   "sentence": "Манай найз Эрдэнийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:071:эрдэнэд",
+   "token": "Эрдэнэд",
+   "sentence": "Манай найз Эрдэнэд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:072:эрдэнийг",
+   "token": "Эрдэнийг",
+   "sentence": "Манай найз Эрдэнийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:073:баярмаа",
+   "token": "Баярмаа",
+   "sentence": "Манай найз Баярмаа ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:074:баярмаагийн",
+   "token": "Баярмаагийн",
+   "sentence": "Манай найз Баярмаагийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:075:баярмаад",
+   "token": "Баярмаад",
+   "sentence": "Манай найз Баярмаад ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:076:баярмаа",
+   "token": "Баярмаа",
+   "sentence": "Манай найз Баярмаа ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:077:тулга",
+   "token": "Тулга",
+   "sentence": "Манай найз Тулга ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:078:тулгын",
+   "token": "Тулгын",
+   "sentence": "Манай найз Тулгын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:079:тулгад",
+   "token": "Тулгад",
+   "sentence": "Манай найз Тулгад ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:080:тулгыг",
+   "token": "Тулгыг",
+   "sentence": "Манай найз Тулгыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:081:улаанбаатар",
+   "token": "Улаанбаатар",
+   "sentence": "Манай найз Улаанбаатар ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:082:улаанбаатарын",
+   "token": "Улаанбаатарын",
+   "sentence": "Манай найз Улаанбаатарын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:083:улаанбаатарт",
+   "token": "Улаанбаатарт",
+   "sentence": "Манай найз Улаанбаатарт ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:084:улаанбаатарыг",
+   "token": "Улаанбаатарыг",
+   "sentence": "Манай найз Улаанбаатарыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:085:дархан",
+   "token": "Дархан",
+   "sentence": "Манай найз Дархан ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:086:дарханы",
+   "token": "Дарханы",
+   "sentence": "Манай найз Дарханы ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:087:дарханд",
+   "token": "Дарханд",
+   "sentence": "Манай найз Дарханд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:088:дарханыг",
+   "token": "Дарханыг",
+   "sentence": "Манай найз Дарханыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:089:эрдэнэт",
+   "token": "Эрдэнэт",
+   "sentence": "Манай найз Эрдэнэт ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:090:эрдэнэтийн",
+   "token": "Эрдэнэтийн",
+   "sentence": "Манай найз Эрдэнэтийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:091:эрдэнэтэд",
+   "token": "Эрдэнэтэд",
+   "sentence": "Манай найз Эрдэнэтэд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:092:эрдэнэтийг",
+   "token": "Эрдэнэтийг",
+   "sentence": "Манай найз Эрдэнэтийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:093:чойбалсан",
+   "token": "Чойбалсан",
+   "sentence": "Манай найз Чойбалсан ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:094:чойбалсангийн",
+   "token": "Чойбалсангийн",
+   "sentence": "Манай найз Чойбалсангийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "PROPER_NOUN_CANDIDATE",
+   "priority": 60,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:095:чойбалсанд",
+   "token": "Чойбалсанд",
+   "sentence": "Манай найз Чойбалсанд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:096:чойбалсанг",
+   "token": "Чойбалсанг",
+   "sentence": "Манай найз Чойбалсанг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "PROPER_NOUN_CANDIDATE",
+   "priority": 60,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:097:ховд",
+   "token": "Ховд",
+   "sentence": "Манай найз Ховд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:098:ховдын",
+   "token": "Ховдын",
+   "sentence": "Манай найз Ховдын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:099:ховдод",
+   "token": "Ховдод",
+   "sentence": "Манай найз Ховдод ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:100:ховдыг",
+   "token": "Ховдыг",
+   "sentence": "Манай найз Ховдыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:101:увс",
+   "token": "Увс",
+   "sentence": "Манай найз Увс ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:102:увсын",
+   "token": "Увсын",
+   "sentence": "Манай найз Увсын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:103:увст",
+   "token": "Увст",
+   "sentence": "Манай найз Увст ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:104:увсыг",
+   "token": "Увсыг",
+   "sentence": "Манай найз Увсыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:105:баянхонгор",
+   "token": "Баянхонгор",
+   "sentence": "Манай найз Баянхонгор ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:106:баянхонгорын",
+   "token": "Баянхонгорын",
+   "sentence": "Манай найз Баянхонгорын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:107:баянхонгорт",
+   "token": "Баянхонгорт",
+   "sentence": "Манай найз Баянхонгорт ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:108:баянхонгорыг",
+   "token": "Баянхонгорыг",
+   "sentence": "Манай найз Баянхонгорыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:109:сэлэнгэ",
+   "token": "Сэлэнгэ",
+   "sentence": "Манай найз Сэлэнгэ ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:110:сэлэнгийн",
+   "token": "Сэлэнгийн",
+   "sentence": "Манай найз Сэлэнгийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:111:сэлэнгэд",
+   "token": "Сэлэнгэд",
+   "sentence": "Манай найз Сэлэнгэд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:112:сэлэнгийг",
+   "token": "Сэлэнгийг",
+   "sentence": "Манай найз Сэлэнгийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:113:архангай",
+   "token": "Архангай",
+   "sentence": "Манай найз Архангай ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:114:архангайн",
+   "token": "Архангайн",
+   "sentence": "Манай найз Архангайн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:115:архангайд",
+   "token": "Архангайд",
+   "sentence": "Манай найз Архангайд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:116:архангайг",
+   "token": "Архангайг",
+   "sentence": "Манай найз Архангайг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:117:хэнтий",
+   "token": "Хэнтий",
+   "sentence": "Манай найз Хэнтий ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:118:хэнтийн",
+   "token": "Хэнтийн",
+   "sentence": "Манай найз Хэнтийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:119:хэнтийд",
+   "token": "Хэнтийд",
+   "sentence": "Манай найз Хэнтийд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:120:хэнтийг",
+   "token": "Хэнтийг",
+   "sentence": "Манай найз Хэнтийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:121:дорнод",
+   "token": "Дорнод",
+   "sentence": "Манай найз Дорнод ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:122:дорнодын",
+   "token": "Дорнодын",
+   "sentence": "Манай найз Дорнодын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:123:дорнодод",
+   "token": "Дорнодод",
+   "sentence": "Манай найз Дорнодод ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:124:дорнодыг",
+   "token": "Дорнодыг",
+   "sentence": "Манай найз Дорнодыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:125:завхан",
+   "token": "Завхан",
+   "sentence": "Манай найз Завхан ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:126:завханы",
+   "token": "Завханы",
+   "sentence": "Манай найз Завханы ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:127:завханд",
+   "token": "Завханд",
+   "sentence": "Манай найз Завханд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:128:завханыг",
+   "token": "Завханыг",
+   "sentence": "Манай найз Завханыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:129:монгол",
+   "token": "Монгол",
+   "sentence": "Манай найз Монгол ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:130:монголын",
+   "token": "Монголын",
+   "sentence": "Манай найз Монголын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:131:монголд",
+   "token": "Монголд",
+   "sentence": "Манай найз Монголд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:132:монголыг",
+   "token": "Монголыг",
+   "sentence": "Манай найз Монголыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:133:хятад",
+   "token": "Хятад",
+   "sentence": "Манай найз Хятад ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:134:хятадын",
+   "token": "Хятадын",
+   "sentence": "Манай найз Хятадын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:135:хятадад",
+   "token": "Хятадад",
+   "sentence": "Манай найз Хятадад ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:136:хятадыг",
+   "token": "Хятадыг",
+   "sentence": "Манай найз Хятадыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:137:орос",
+   "token": "Орос",
+   "sentence": "Манай найз Орос ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:138:оросын",
+   "token": "Оросын",
+   "sentence": "Манай найз Оросын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:139:орост",
+   "token": "Орост",
+   "sentence": "Манай найз Орост ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:140:оросыг",
+   "token": "Оросыг",
+   "sentence": "Манай найз Оросыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:141:япон",
+   "token": "Япон",
+   "sentence": "Манай найз Япон ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:142:японы",
+   "token": "Японы",
+   "sentence": "Манай найз Японы ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:143:японд",
+   "token": "Японд",
+   "sentence": "Манай найз Японд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:144:японыг",
+   "token": "Японыг",
+   "sentence": "Манай найз Японыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:145:солонгос",
+   "token": "Солонгос",
+   "sentence": "Манай найз Солонгос ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:146:солонгосын",
+   "token": "Солонгосын",
+   "sentence": "Манай найз Солонгосын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:147:солонгост",
+   "token": "Солонгост",
+   "sentence": "Манай найз Солонгост ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:148:солонгосыг",
+   "token": "Солонгосыг",
+   "sentence": "Манай найз Солонгосыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:149:герман",
+   "token": "Герман",
+   "sentence": "Манай найз Герман ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:150:германы",
+   "token": "Германы",
+   "sentence": "Манай найз Германы ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:151:германд",
+   "token": "Германд",
+   "sentence": "Манай найз Германд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:152:германыг",
+   "token": "Германыг",
+   "sentence": "Манай найз Германыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:153:франц",
+   "token": "Франц",
+   "sentence": "Манай найз Франц ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:154:францын",
+   "token": "Францын",
+   "sentence": "Манай найз Францын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:155:францад",
+   "token": "Францад",
+   "sentence": "Манай найз Францад ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:156:францыг",
+   "token": "Францыг",
+   "sentence": "Манай найз Францыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:157:англи",
+   "token": "Англи",
+   "sentence": "Манай найз Англи ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:158:английн",
+   "token": "Английн",
+   "sentence": "Манай найз Английн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:159:англид",
+   "token": "Англид",
+   "sentence": "Манай найз Англид ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:160:английг",
+   "token": "Английг",
+   "sentence": "Манай найз Английг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:161:америк",
+   "token": "Америк",
+   "sentence": "Манай найз Америк ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:162:америкийн",
+   "token": "Америкийн",
+   "sentence": "Манай найз Америкийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:163:америкт",
+   "token": "Америкт",
+   "sentence": "Манай найз Америкт ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:164:америкийг",
+   "token": "Америкийг",
+   "sentence": "Манай найз Америкийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:165:хөвсгөл",
+   "token": "Хөвсгөл",
+   "sentence": "Манай найз Хөвсгөл ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:166:хөвсгөлийн",
+   "token": "Хөвсгөлийн",
+   "sentence": "Манай найз Хөвсгөлийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:167:хөвсгөлд",
+   "token": "Хөвсгөлд",
+   "sentence": "Манай найз Хөвсгөлд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:168:хөвсгөлийг",
+   "token": "Хөвсгөлийг",
+   "sentence": "Манай найз Хөвсгөлийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:169:булган",
+   "token": "Булган",
+   "sentence": "Манай найз Булган ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:170:булганы",
+   "token": "Булганы",
+   "sentence": "Манай найз Булганы ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:171:булганд",
+   "token": "Булганд",
+   "sentence": "Манай найз Булганд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:172:булганыг",
+   "token": "Булганыг",
+   "sentence": "Манай найз Булганыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:173:говьсүмбэр",
+   "token": "Говьсүмбэр",
+   "sentence": "Манай найз Говьсүмбэр ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "PROPER_NOUN_CANDIDATE",
+   "priority": 60,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:174:говьсүмбэрийн",
+   "token": "Говьсүмбэрийн",
+   "sentence": "Манай найз Говьсүмбэрийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "PROPER_NOUN_CANDIDATE",
+   "priority": 60,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:175:говьсүмбэрт",
+   "token": "Говьсүмбэрт",
+   "sentence": "Манай найз Говьсүмбэрт ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "PROPER_NOUN_CANDIDATE",
+   "priority": 60,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:176:говьсүмбэрийг",
+   "token": "Говьсүмбэрийг",
+   "sentence": "Манай найз Говьсүмбэрийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "PROPER_NOUN_CANDIDATE",
+   "priority": 60,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:177:төв",
+   "token": "Төв",
+   "sentence": "Манай найз Төв ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:178:төвийн",
+   "token": "Төвийн",
+   "sentence": "Манай найз Төвийн ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:179:төвд",
+   "token": "Төвд",
+   "sentence": "Манай найз Төвд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:180:төвийг",
+   "token": "Төвийг",
+   "sentence": "Манай найз Төвийг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:181:голомт",
+   "token": "Голомт",
+   "sentence": "Манай найз Голомт ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:182:голомтын",
+   "token": "Голомтын",
+   "sentence": "Манай найз Голомтын ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:183:голомтод",
+   "token": "Голомтод",
+   "sentence": "Манай найз Голомтод ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:184:голомтыг",
+   "token": "Голомтыг",
+   "sentence": "Манай найз Голомтыг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:185:хаан",
+   "token": "Хаан",
+   "sentence": "Манай найз Хаан ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:186:хааны",
+   "token": "Хааны",
+   "sentence": "Манай найз Хааны ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "PROTECTED_PROPER_NOUN",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:187:хаанд",
+   "token": "Хаанд",
+   "sentence": "Манай найз Хаанд ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "J_PROPER_NAMES:188:хааныг",
+   "token": "Хааныг",
+   "sentence": "Манай найз Хааныг ирлээ.",
+   "sentenceOrigin": "MODEL_AUTHORED",
+   "category": "PROPER_NAME",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "priority": 2,
+   "source": "gold/propername-eval-v1.json (Phase 2, in-sample)",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "name/place form hand-written by the assistant; may be non-standard",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  }
+ ]
+}

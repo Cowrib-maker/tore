@@ -1,0 +1,355 @@
+{
+ "schema": "tore-spell-gold/1",
+ "datasetVersion": "spell-gold-v3.0",
+ "set": "M_COMPOUNDS",
+ "provenanceDir": "model",
+ "note": "MODEL_ADJUDICATED candidates: authored and judged by the AI assistant. NOT native-reviewed; NOT gold.",
+ "items": [
+  {
+   "id": "M_COMPOUNDS:001:өнөөдөр",
+   "token": "өнөөдөр",
+   "sentenceOrigin": "NONE",
+   "category": "COMPOUND",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts M_COMPOUNDS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "lexicalized glued compound",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "M_COMPOUNDS:002:өнөөгийн",
+   "token": "өнөөгийн",
+   "sentenceOrigin": "NONE",
+   "category": "COMPOUND",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts M_COMPOUNDS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "genitive of өнөөдөр's stem",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "M_COMPOUNDS:003:улстөрч",
+   "token": "улстөрч",
+   "sentenceOrigin": "NONE",
+   "category": "COMPOUND",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 40,
+   "source": "authoring/targeted.ts M_COMPOUNDS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "politician: native judgment on glued form",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "M_COMPOUNDS:004:хөрөнгөоруулалт",
+   "token": "хөрөнгөоруулалт",
+   "sentenceOrigin": "NONE",
+   "category": "COMPOUND",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "хөрөнгө оруулалт",
+   "priority": 90,
+   "source": "authoring/targeted.ts M_COMPOUNDS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "хөрөнгө оруулалт",
+     "note": "two words glued: the standard is separate",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "M_COMPOUNDS:005:нягтланбодогч",
+   "token": "нягтланбодогч",
+   "sentenceOrigin": "NONE",
+   "category": "COMPOUND",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "нягтлан бодогч",
+   "priority": 90,
+   "source": "authoring/targeted.ts M_COMPOUNDS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "нягтлан бодогч",
+     "note": "glued",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "M_COMPOUNDS:006:засгийнгазар",
+   "token": "засгийнгазар",
+   "sentenceOrigin": "NONE",
+   "category": "COMPOUND",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "Засгийн газар",
+   "priority": 90,
+   "source": "authoring/targeted.ts M_COMPOUNDS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "Засгийн газар",
+     "note": "glued",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "M_COMPOUNDS:007:орон сууц",
+   "token": "орон сууц",
+   "sentenceOrigin": "NONE",
+   "category": "COMPOUND",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts M_COMPOUNDS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "two-word term",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "M_COMPOUNDS:008:эдийн засаг",
+   "token": "эдийн засаг",
+   "sentenceOrigin": "NONE",
+   "category": "COMPOUND",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts M_COMPOUNDS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "two-word term",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "M_COMPOUNDS:009:хөдөлмөрийнхөнгийн",
+   "token": "хөдөлмөрийнхөнгийн",
+   "sentenceOrigin": "NONE",
+   "category": "COMPOUND",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "UNKNOWN",
+   "priority": 40,
+   "source": "authoring/targeted.ts M_COMPOUNDS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "UNKNOWN",
+     "note": "garbage concatenation: must NOT be VALID",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "M_COMPOUNDS:010:арваннэгдүгээр",
+   "token": "арваннэгдүгээр",
+   "sentenceOrigin": "NONE",
+   "category": "COMPOUND",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts M_COMPOUNDS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "ordinal compound as news writes it",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "M_COMPOUNDS:011:хоёроос",
+   "token": "хоёроос",
+   "sentenceOrigin": "NONE",
+   "category": "COMPOUND",
+   "currentVerdict": "VALID",
+   "currentReason": "LEXICON",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts M_COMPOUNDS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "numeral + case",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "M_COMPOUNDS:012:хэрэглэгчдийнхээ",
+   "token": "хэрэглэгчдийнхээ",
+   "sentenceOrigin": "NONE",
+   "category": "COMPOUND",
+   "currentVerdict": "VALID",
+   "currentReason": "MORPHOLOGY",
+   "proposedVerdict": "VALID",
+   "priority": 5,
+   "source": "authoring/targeted.ts M_COMPOUNDS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "VALID",
+     "note": "derived + plural + genitive + reflexive",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "M_COMPOUNDS:013:харилцаахолбоо",
+   "token": "харилцаахолбоо",
+   "sentenceOrigin": "NONE",
+   "category": "COMPOUND",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "харилцаа холбоо",
+   "priority": 90,
+   "source": "authoring/targeted.ts M_COMPOUNDS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "харилцаа холбоо",
+     "note": "glued",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  },
+  {
+   "id": "M_COMPOUNDS:014:байгальорчин",
+   "token": "байгальорчин",
+   "sentenceOrigin": "NONE",
+   "category": "COMPOUND",
+   "currentVerdict": "UNKNOWN",
+   "currentReason": "NOT_IN_LEXICON",
+   "proposedVerdict": "MISSPELLED",
+   "proposedSuggestion": "байгаль орчин",
+   "priority": 90,
+   "source": "authoring/targeted.ts M_COMPOUNDS",
+   "schema": "tore-spell-review/1",
+   "datasetVersion": "spell-gold-v3.0",
+   "provenance": "MODEL_ASSISTANT",
+   "decisions": [
+    {
+     "seq": 1,
+     "reviewerId": "claude-assistant",
+     "reviewerKind": "MODEL_ASSISTANT",
+     "verdict": "MISSPELLED",
+     "suggestion": "байгаль орчин",
+     "note": "glued",
+     "at": "2026-10-08T00:00:00Z"
+    }
+   ]
+  }
+ ]
+}

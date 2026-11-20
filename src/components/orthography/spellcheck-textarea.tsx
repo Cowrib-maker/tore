@@ -148,19 +148,12 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
     localRef.current?.scrollTo({ top: localRef.current.scrollHeight, behavior: "smooth" });
   }
 
-  // No explicit "close the menu when `value` changes" effect: `activeIndex`
-  // above already re-derives from the CURRENT `ranges` every render, and an
-  // edit almost always shifts every later span's start/end, so a stale
-  // `activeKey` naturally stops matching anything (activeIndex === -1) the
-  // moment the text changes — without needing a separate reset. An earlier
-  // version instead ran `useEffect(() => setActiveKey(null), [value])`,
-  // which synchronously calls setState from an effect that re-fires on
-  // every keystroke; under a fast/bursty run of edits (rapid typing, IME
-  // composition, programmatic paste) the resulting stacked post-commit
-  // renders compounded into React's "Maximum update depth exceeded" crash —
-  // reproduced in manual browser testing. Removed rather than replaced with
-  // an equivalent render-time ref check, since this codebase's lint rules
-  // also forbid reading/writing a ref during render.
+  // Any edit closes the open suggestion menu (adjusting state while rendering, not in an effect).
+  const [seenValue, setSeenValue] = useState(value);
+  if (value !== seenValue) {
+    setSeenValue(value);
+    setActiveKey(null);
+  }
 
   const closeMenu = useCallback(() => setActiveKey(null), []);
 
@@ -234,7 +227,10 @@ export function SpellcheckTextarea({ value, suggestions, placeholder, rows = 4, 
     const index = activeIndex;
     return {
       getBoundingClientRect: () => spanRefs.current.get(index)?.getBoundingClientRect() ?? new DOMRect(),
-      contextElement: localRef.current ?? undefined,
+      // A getter, so the ref is read when floating-ui asks for it, not while rendering.
+      get contextElement() {
+        return localRef.current ?? undefined;
+      },
     };
   }, [activeIndex]);
 
