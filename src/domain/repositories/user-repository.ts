@@ -56,4 +56,9 @@ export interface UserRepository {
   findAuthPrincipal(id: string): Promise<AuthPrincipal | null>;
   rotateActiveSessionIdHash(userId: string, sessionIdHash: string): Promise<void>;
   clearActiveSessionIdHash(userId: string): Promise<void>;
+  compareAndRotateActiveSessionIdHash(
+    userId: string,
+    expectedHash: string | null,
+    newHash: string,
+  ): Promise<boolean>;
 }

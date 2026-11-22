@@ -41,7 +41,10 @@ import {
   PROFILE_WRITE_RATE_LIMIT,
 } from "@/infrastructure/security/rate-limiter";
 import { getFileStorage } from "@/infrastructure/storage";
-import { buildAppFilePath } from "@/infrastructure/storage/file-access";
+import {
+  buildAppFilePath,
+  resolveProfilePhotoUrl,
+} from "@/infrastructure/storage/file-access";
 
 const submitDeps = {
   lawyerProfileRepository,
@@ -279,6 +282,10 @@ export type AdminCredentialQueueItem = {
 
 export type AdminLawyerDirectoryItem = {
   lawyer: LawyerProfile;
+  /** Target for the admin photo route. */
+  userId: string;
+  /** Admin-visible photo URL (authenticated route), or null → initials. */
+  photoUrl: string | null;
   lawyerEmail: string | null;
   lawyerName: string | null;
   practiceAreas: PracticeArea[];
@@ -358,6 +365,8 @@ export async function getAdminLawyerVerificationQueue(): Promise<
           ) ?? latestCredential;
         return {
           lawyer,
+          userId: user.id,
+          photoUrl: resolveProfilePhotoUrl(user.image ?? null, { forOwner: true }),
           lawyerEmail: user.email ?? null,
           lawyerName: user.name ?? null,
           practiceAreas: await practiceAreasFor(lawyer.id),

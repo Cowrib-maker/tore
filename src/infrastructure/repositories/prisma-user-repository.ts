@@ -282,6 +282,24 @@ export class PrismaUserRepository implements UserRepository {
       data: { activeSessionIdHash: null },
     });
   }
+  async compareAndRotateActiveSessionIdHash(
+    userId: string,
+    expectedHash: string | null,
+    newHash: string,
+  ): Promise<boolean> {
+    const result = await this.db.user.updateMany({
+      where: {
+        id: userId,
+        deletedAt: null,
+        activeSessionIdHash: expectedHash,
+      },
+      data: {
+        activeSessionIdHash: newHash,
+      },
+    });
+
+    return result.count === 1;
+  }
 }
 
 export const userRepository = new PrismaUserRepository();

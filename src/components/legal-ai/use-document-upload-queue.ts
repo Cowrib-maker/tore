@@ -97,7 +97,27 @@ export function useDocumentUploadQueue(
 
   const addFiles = useCallback(
     (files: File[]) => {
-      const added: UploadItem[] = files.map((file) => ({
+      // Skip a file that's an exact match (name/size/lastModified) for one
+      // already queued, uploading, or failed-and-still-listed — a rapid
+      // double-click on the picker or a duplicate drag-drop must not queue
+      // the same attachment twice. A file re-selected after being removed
+      // (no longer in itemsRef.current) is unaffected and still allowed.
+      const isDuplicate = (candidate: File, existing: File) =>
+        candidate.name === existing.name &&
+        candidate.size === existing.size &&
+        candidate.lastModified === existing.lastModified;
+
+      const seen = [...itemsRef.current.map((item) => item.file)];
+      const deduped: File[] = [];
+      for (const file of files) {
+        if (seen.some((existing) => isDuplicate(file, existing))) {
+          continue;
+        }
+        seen.push(file);
+        deduped.push(file);
+      }
+
+      const added: UploadItem[] = deduped.map((file) => ({
         id: `upload-${(seqRef.current += 1)}`,
         file,
         status: "uploading",

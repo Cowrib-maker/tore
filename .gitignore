@@ -50,6 +50,7 @@ next-env.d.ts
 
 tmp/
 
+.vercel
 # desktop app build output
 /desktop/node_modules
 /desktop/dist

@@ -52,10 +52,56 @@ describe("spell licensing migration safety", () => {
     expect(ddl).toContain('"code_hint" TEXT NOT NULL');
   });
 
-  it("sorts after every non-Spell migration (no ordering conflict); only later Spell migrations follow it", () => {
-    const all = readdirSync(MIGRATIONS).filter((d) => /^\d{14}_/.test(d)).sort();
-    const after = all.slice(all.indexOf(dir) + 1);
-    expect(all).toContain(dir);
-    expect(after.every((d) => /_spell_/.test(d))).toBe(true);
+  // Migration-ordering policy. What actually matters is not that Spell migrations are the LAST migrations (that would reject every
+  // future non-Spell migration), but that Spell migrations (a) are additive, (b) only touch spell_* objects apart from one reviewed
+  // additive column, (c) only depend on tables created by an EARLIER migration, and (d) are never altered by a later non-Spell migration.
+  const allMigrations = readdirSync(MIGRATIONS).filter((d) => /^\d{14}_/.test(d)).sort();
+  const isSpell = (d: string) => /_spell_/.test(d);
+  const ddlOf = (d: string) => readFileSync(path.join(MIGRATIONS, d, "migration.sql"), "utf8").replace(/--.*$/gm, "");
+  const stmtsOf = (d: string) => ddlOf(d).split(/;\s*(?:\r?\n|$)/).map((x) => x.trim()).filter(Boolean);
+  const spellMigrations = allMigrations.filter(isSpell);
+  const FORBIDDEN = [/\bDROP\s+(?!TRIGGER\b)/i, /\bTRUNCATE\s+TABLE\b/i, /\bDELETE\s+FROM\b/i, /\bUPDATE\s+\S+\s+SET\b/i, /\bRENAME\b/i, /\bINSERT\s+INTO\b/i];
+  // The only statement a Spell migration may run against a non-spell_ table: a nullable, additive column on invoices (purchase flow).
+  const ALLOWED_NON_SPELL_ALTER = /^ALTER TABLE "invoices" ADD COLUMN "spell_plan_code" "SpellPlanCode"$/i;
+
+  it("the Spell migration set exists and starts at the licensing foundation", () => {
+    expect(spellMigrations.length).toBeGreaterThanOrEqual(1);
+    expect(allMigrations).toContain(dir);
+    expect(spellMigrations[0]).toBe(dir);
+  });
+
+  it("every Spell migration is purely additive", () => {
+    for (const d of spellMigrations) {
+      for (const forbidden of FORBIDDEN) expect(ddlOf(d), d).not.toMatch(forbidden);
+    }
+  });
+
+  it("every Spell migration alters only spell_* tables (plus the single reviewed additive invoices column)", () => {
+    for (const d of spellMigrations) {
+      for (const stmt of stmtsOf(d).filter((x) => /^ALTER TABLE/i.test(x))) {
+        const ok = /^ALTER TABLE "spell_/i.test(stmt) || ALLOWED_NON_SPELL_ALTER.test(stmt.replace(/\s+/g, " "));
+        expect(ok, `${d}: ${stmt.slice(0, 80)}`).toBe(true);
+      }
+      for (const stmt of stmtsOf(d).filter((x) => /^CREATE (UNIQUE )?INDEX/i.test(x))) expect(stmt, d).toMatch(/ON "spell_/i);
+    }
+  });
+
+  it("every table a Spell migration references or alters outside spell_* is created by a strictly EARLIER migration", () => {
+    for (const d of spellMigrations) {
+      const deps = new Set<string>();
+      for (const m of ddlOf(d).matchAll(/REFERENCES\s+"([^"]+)"/gi)) deps.add(m[1]);
+      for (const m of ddlOf(d).matchAll(/ALTER TABLE\s+"([^"]+)"/gi)) deps.add(m[1]);
+      for (const table of [...deps].filter((t) => !t.startsWith("spell_"))) {
+        const creators = allMigrations.filter((x) => new RegExp(`CREATE TABLE "${table}"`, "i").test(ddlOf(x)));
+        expect(creators.length, `${d} depends on "${table}" but no migration creates it`).toBeGreaterThan(0);
+        expect(creators[0] < d, `${d}: "${table}" must be created by an earlier migration (found ${creators[0]})`).toBe(true);
+      }
+    }
+  });
+
+  it("later non-Spell migrations are allowed, but never touch Spell objects", () => {
+    for (const d of allMigrations.filter((x) => !isSpell(x) && x > dir)) {
+      expect(ddlOf(d), d).not.toMatch(/"spell_[a-z_]*"|"Spell[A-Za-z]+"/);
+    }
   });
 });
