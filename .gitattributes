@@ -5,3 +5,9 @@
 # checkout/commit normalizes it to CRLF and the test fails on line endings
 # alone, even though the generated content itself never changed.
 docs/spell/LEXICON-SOURCE-DECISIONS.md text eol=lf
+
+# Prisma records a SHA-256 of each migration.sql in _prisma_migrations. A Windows
+# checkout with core.autocrlf=true writes CRLF, so the same SQL hashes differently
+# than on Linux/CI. Pin migrations to LF so every checkout hashes the committed bytes.
+# See docs/database/migration-history-reconciliation.md.
+prisma/migrations/**/migration.sql text eol=lf
