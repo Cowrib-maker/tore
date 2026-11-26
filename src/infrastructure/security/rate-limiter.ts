@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { getRedisClient } from "@/infrastructure/security/redis-client";
 
 /**
@@ -43,29 +45,107 @@ function consumeInMemory(
   return { ok: true };
 }
 
+/**
+ * One atomic step: increment, and (re)arm the TTL when this is the first hit
+ * OR the key has no TTL (PTTL == -1, e.g. left behind by an older
+ * INCR-then-PEXPIRE sequence that was interrupted). Returns {count, ttlMs}.
+ * Running as a single script means a dropped connection can no longer leave a
+ * counter that never expires.
+ */
+const RATE_LIMIT_SCRIPT = `
+local count = redis.call('INCR', KEYS[1])
+local ttl = redis.call('PTTL', KEYS[1])
+if count == 1 or ttl == -1 then
+  redis.call('PEXPIRE', KEYS[1], ARGV[1])
+  ttl = tonumber(ARGV[1])
+end
+return {count, ttl}
+`;
+
+const RATE_LIMIT_SCRIPT_SHA = createHash("sha1")
+  .update(RATE_LIMIT_SCRIPT)
+  .digest("hex");
+
+/** The two Redis commands the limiter needs; a real ioredis client satisfies it. */
+export type RateLimitRedis = {
+  evalsha(
+    sha: string,
+    numKeys: number,
+    ...args: Array<string | number>
+  ): Promise<unknown>;
+  eval(
+    script: string,
+    numKeys: number,
+    ...args: Array<string | number>
+  ): Promise<unknown>;
+};
+
+let injectedRedis: RateLimitRedis | undefined;
+
+/** Test seam: route the Redis path through a fake. Refused in production. */
+export function setRateLimitRedisForTesting(
+  redis: RateLimitRedis | undefined,
+): void {
+  if (redis && process.env.NODE_ENV === "production") {
+    throw new Error("setRateLimitRedisForTesting is not available in production");
+  }
+  injectedRedis = redis;
+}
+
+function isNoScriptError(error: unknown): boolean {
+  return error instanceof Error && error.message.startsWith("NOSCRIPT");
+}
+
+async function runRateLimitScript(
+  redis: RateLimitRedis,
+  redisKey: string,
+  windowMs: number,
+): Promise<{ count: number; ttlMs: number }> {
+  let reply: unknown;
+  try {
+    reply = await redis.evalsha(RATE_LIMIT_SCRIPT_SHA, 1, redisKey, windowMs);
+  } catch (error) {
+    if (!isNoScriptError(error)) {
+      throw error;
+    }
+    // Script cache is empty (first use, Redis restart, SCRIPT FLUSH, failover).
+    // EVAL runs the script and re-populates the cache for later EVALSHA calls.
+    reply = await redis.eval(RATE_LIMIT_SCRIPT, 1, redisKey, windowMs);
+  }
+
+  if (
+    !Array.isArray(reply) ||
+    reply.length < 2 ||
+    typeof reply[0] !== "number" ||
+    typeof reply[1] !== "number"
+  ) {
+    throw new Error("Unexpected rate-limit script reply");
+  }
+  return { count: reply[0], ttlMs: reply[1] };
+}
+
 async function consumeRedis(
   key: string,
   limit: number,
   windowMs: number,
 ): Promise<RateLimitResult> {
-  const redis = getRedisClient();
+  const redis = injectedRedis ?? getRedisClient();
   if (!redis) {
     return consumeInMemory(key, limit, windowMs);
   }
 
-  const redisKey = `tore:rl:${key}`;
-  const count = await redis.incr(redisKey);
-  if (count === 1) {
-    await redis.pexpire(redisKey, windowMs);
-  }
+  const { count, ttlMs } = await runRateLimitScript(
+    redis,
+    `tore:rl:${key}`,
+    windowMs,
+  );
 
   if (count > limit) {
-    const ttl = await redis.pttl(redisKey);
     return {
       ok: false,
       retryAfterSeconds: Math.max(
         1,
-        Math.ceil((ttl > 0 ? ttl : windowMs) / 1000),
+        Math.ceil((ttlMs > 0 ? ttlMs : windowMs) / 1000),
       ),
     };
   }
@@ -74,6 +154,7 @@ async function consumeRedis(
 }
 
 function shouldUseRedis(): boolean {
+  if (injectedRedis) return true;
   if (process.env.NODE_ENV === "test") return false;
   if (process.env.NODE_ENV === "production") return true;
   return Boolean(process.env.REDIS_URL);
