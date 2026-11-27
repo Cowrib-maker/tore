@@ -62,7 +62,7 @@ end
 return {count, ttl}
 `;
 
-const RATE_LIMIT_SCRIPT_SHA = createHash("sha1")
+export const RATE_LIMIT_SCRIPT_SHA = createHash("sha1")
   .update(RATE_LIMIT_SCRIPT)
   .digest("hex");
 
